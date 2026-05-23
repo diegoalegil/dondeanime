@@ -20,6 +20,9 @@ public class Anime {
     @Column(name = "anilist_id", unique = true, nullable = false)
     private Long anilistId;
 
+    @Column(name = "tmdb_id")
+    private Long tmdbId;
+
     @Column(name = "title_romaji")
     private String titleRomaji;
 
@@ -89,6 +92,14 @@ public class Anime {
 
     public void setAnilistId(Long anilistId) {
         this.anilistId = anilistId;
+    }
+
+    public Long getTmdbId() {
+        return tmdbId;
+    }
+
+    public void setTmdbId(Long tmdbId) {
+        this.tmdbId = tmdbId;
     }
 
     public String getTitleRomaji() {
