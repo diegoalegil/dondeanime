@@ -10,7 +10,7 @@ Web pública en español para descubrir **cuándo y dónde se estrena cada anime
 
 - URL final: https://dondeanime.com
 - Repo: https://github.com/diegoalegil/dondeanime (privado)
-- Estado: desarrollo activo. **Semana 3 cerrada** (día 6): integración TMDb funcional. 100 anime sincronizados desde AniList, 84 matcheados contra TMDb, 949 entradas en `watch_provider` cubriendo ES/MX/AR/CO/CL. Endpoint `GET /api/anime/{slug}` devuelve un anime con sus providers agrupados por país.
+- Estado: desarrollo activo. **Semana 4 cerrada** (día 7): scheduler `@Scheduled` listo, endpoints para el frontend Astro implementados (providers, genres, seasons, sitemap), refactor DTOs públicos que esconden campos internos, 13 tests verdes. Backend listo para consumo desde el frontend.
 
 ---
 
@@ -82,21 +82,35 @@ DondeAnime/
     ├── mvnw, mvnw.cmd, .mvn/
     └── src/
         ├── main/java/com/dondeanime/backend/
-        │   ├── BackendApplication.java
+        │   ├── BackendApplication.java        # @EnableScheduling
         │   ├── config/
         │   │   └── HttpClientConfig.java
-        │   ├── provider/                     # watch providers (TMDb)
-        │   │   ├── WatchProvider.java
+        │   ├── scheduling/
+        │   │   └── CatalogScheduler.java      # 3 jobs @Scheduled (anilist, match, providers)
+        │   ├── sitemap/
+        │   │   ├── SitemapController.java     # GET /api/sitemap
+        │   │   └── SitemapDto.java
+        │   ├── provider/                      # watch providers (TMDb)
+        │   │   ├── WatchProvider.java         # entidad JPA
         │   │   ├── WatchProviderRepository.java
-        │   │   └── ProviderSyncService.java
+        │   │   ├── ProviderSyncService.java
+        │   │   ├── ProviderController.java    # GET /api/providers, /providers/{slug}/{country}
+        │   │   ├── ProviderDto.java           # DTO público
+        │   │   └── ProviderSummaryDto.java    # DTO agregado con count
         │   └── anime/
-        │       ├── Anime.java                # entidad JPA (20 campos, incluye tmdbId)
-        │       ├── AnimeController.java      # GET, POST /sync, /match, /sync-providers, GET /{slug}
-        │       ├── AnimeRepository.java      # JpaRepository + findByAnilistId/findBySlug
-        │       ├── AnimeSyncService.java     # mapeo DTO→entidad + upsert + slug
-        │       ├── AnimeMatchingService.java # cruce AniList ↔ TMDb (heurística JP+año+pop)
-        │       ├── AnimeDetailResponse.java  # DTO de salida para GET /{slug}
-        │       ├── anilist/                  # cliente + DTOs de AniList
+        │       ├── Anime.java                 # entidad JPA (22 campos: +genres, season, seasonYear)
+        │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers
+        │       ├── AnimeRepository.java       # + findByProviderSlugAndCountry, findByGenreSlug, etc.
+        │       ├── AnimeSyncService.java
+        │       ├── AnimeMatchingService.java
+        │       ├── AnimeSummaryDto.java       # vista de listados (sin id/tmdbId/syncedAt)
+        │       ├── AnimeDetailDto.java        # vista de detalle (sin id/tmdbId/syncedAt)
+        │       ├── AnimeDetailResponse.java   # AnimeDetailDto + Map<country, List<ProviderDto>>
+        │       ├── GenreController.java       # GET /api/genres, /genres/{slug}
+        │       ├── GenreSummaryDto.java
+        │       ├── SeasonController.java      # GET /api/seasons, /seasons/{year}/{season}
+        │       ├── SeasonSummaryDto.java
+        │       ├── anilist/                   # cliente + DTOs de AniList
         │       │   ├── AniListClient.java
         │       │   ├── AniListResponse.java
         │       │   ├── AniListData.java
@@ -105,7 +119,7 @@ DondeAnime/
         │       │   ├── AniListTitle.java
         │       │   ├── AniListFuzzyDate.java
         │       │   └── AniListCoverImage.java
-        │       └── tmdb/                     # cliente + DTOs de TMDb
+        │       └── tmdb/                      # cliente + DTOs de TMDb
         │           ├── TmdbClient.java
         │           ├── TmdbSearchResponse.java
         │           ├── TmdbSearchResult.java
@@ -245,8 +259,12 @@ docker compose up -d
 - [x] `ProviderSyncService` con delete+insert por anime via `TransactionTemplate`
 - [x] Endpoints `POST /api/anime/match`, `POST /api/anime/sync-providers`, `GET /api/anime/{slug}`
 - [x] Probado end-to-end: 84 matches de 100, 949 providers en BD, Attack on Titan en España devuelve Crunchyroll + Netflix + Prime Video (semana 3 cerrada, día 6)
-- [ ] **PRÓXIMO:** Refresco programado (@Scheduled cada 12h) (semana 4)
-- [ ] Frontend Astro 4 (mes 2)
+- [x] Scheduler `@Scheduled` con 3 jobs (sync AniList 12h, match 24h, providers 24h), toggle `scheduling.enabled` para activar/desactivar en local vs prod (semana 4 cerrada, día 7)
+- [x] Entidad `Anime` ampliada con `genres` (@ElementCollection → tabla anime_genre), `season` y `seasonYear`. Re-sync rellenó los 100 anime.
+- [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
+- [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
+- [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
+- [ ] **PRÓXIMO:** Frontend Astro 4 (mes 2) — ver sección "Próxima tarea concreta"
 - [ ] Deploy en Hetzner + Vercel + Cloudflare (mes 2)
 - [ ] Enriquecimiento manual top 50 (mes 3)
 - [ ] Sistema de alertas por email (mes 3)
@@ -256,34 +274,49 @@ docker compose up -d
 
 ## Próxima tarea concreta
 
-**Refresco programado de AniList y providers con `@Scheduled`.** Entregable de la semana 4 del roadmap.
+**Construir el frontend en Astro 4 y desplegar la web pública.** Entregable del mes 2 del roadmap.
 
-### Objetivo
+El backend está completo a efectos de mes 1. Toda la lógica de datos, endpoints REST públicos y scheduler automático ya están en su sitio. El siguiente bloque grande es UI + deploy.
 
-Dejar de disparar los syncs a mano. Que el backend se mantenga al día solo: catálogo de AniList cada N horas, providers de TMDb cada M horas.
+Nota: el frontend se está discutiendo en **otra sesión paralela**. Esta sesión backend solo añade nuevos endpoints si la sesión frontend los pide.
 
-### Plan en sub-pasos
+### Lo que necesita decisión humana (Diego)
 
-1. **Habilitar scheduling**: anotar `BackendApplication` con `@EnableScheduling`.
-2. **Crear `CatalogScheduler`** en un nuevo paquete `scheduling/` (transversal, igual que `config/`):
-   - Inyectar `AnimeSyncService`, `AnimeMatchingService`, `ProviderSyncService`.
-   - Tres jobs `@Scheduled` con cron expressions distintas:
-     - `syncAniList()` cada 12h: `syncService.syncPopular(100)`.
-     - `matchTmdb()` cada 24h: `matchingService.matchAll()` (idempotente, solo procesa los nuevos sin tmdbId).
-     - `syncProviders()` cada 24h: `providerSyncService.syncAll()`.
-   - Cron de las 3 desfasados para que no se solapen (ej. AniList a las 3am y 3pm, match a las 4am, providers a las 5am).
-3. **Configurar las cron expressions vía properties** (`application.properties` o `.env`) para poder ajustar sin recompilar.
-4. **Logging**: cada job loggea inicio/fin/resultado con `@Slf4j` (o LoggerFactory) para diagnosticar.
-5. **Test manual**: cambiar el cron a cada 1 minuto temporalmente, ver que dispara solo, devolver a 12h/24h.
-6. **Plantearse**: ¿queremos un toggle global (`scheduling.enabled=true`) para desactivar en local? Vale la pena.
+1. **Comprar VPS en Hetzner** (~5€/mes, CX22).
+2. **Migrar DNS de Namecheap a Cloudflare** (cuenta gratis).
+3. **Decidir cuándo desplegar el backend**: ¿temprano (justo ahora) para que la sesión frontend pueda apuntar al endpoint público, o tarde (cuando el frontend ya esté presentable)?
+4. **Revisar los 16 anime sin match TMDb** y los matches del top 50 manualmente. Es contenido tuyo, no auto-generable.
 
-### Detalles a tener en cuenta
+### Lo que pueden hacer las sesiones de Claude
 
-- **`@Scheduled` requiere `@EnableScheduling` en una `@Configuration` (BackendApplication ya cuenta como tal).** Sin esto, los jobs no se ejecutan y Spring no avisa.
-- **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron de Unix (5 campos). Ejemplo cada 12h: `0 0 3,15 * * *`.
-- **Solapamiento**: por defecto Spring no lanza una nueva ejecución si la anterior aún corre. Bien para nuestros jobs lentos.
-- **Failover**: si un job falla, el siguiente intento es al próximo cron. No hay retry interno. Considerar pequeño retry-with-backoff dentro del propio job si el roadmap lo pide.
-- **Hora del servidor**: Spring usa la zona horaria del JVM. En Hetzner suele ser UTC. Cuando despleguemos hay que confirmar y ajustar las cron expressions en consecuencia.
+**Sesión backend (esta o nueva)**:
+- Añadir endpoints que pida la sesión frontend.
+- Refactor adicional si encontramos algo en producción.
+- Health endpoint `/actuator/health` para monitoreo.
+- Configurar deploy a Hetzner (Dockerfile del backend, docker-compose para prod, secrets management).
+- Crear `application-prod.properties` con `scheduling.enabled=true`.
+
+**Sesión frontend (nueva)**:
+- Diseño y estructura de páginas Astro.
+- Componentes (CardAnime, FilterByCountry, FilterByProvider, etc.).
+- Estilos (Tailwind o vanilla CSS).
+- Generación de sitemap.xml, robots.txt, structured data JSON-LD.
+- Build pipeline → Vercel.
+
+### Endpoints listos para el frontend
+
+| Método | Path | Para |
+|---|---|---|
+| GET | `/api/anime` | Home / catálogo global |
+| GET | `/api/anime/{slug}` | Página de detalle de cada anime |
+| GET | `/api/providers` | Listado global de plataformas |
+| GET | `/api/providers?country=ES` | Plataformas filtradas por país |
+| GET | `/api/providers/{slug}/{country}` | "Crunchyroll en España" → lista de anime |
+| GET | `/api/genres` | Listado de géneros con count |
+| GET | `/api/genres/{slug}` | "Anime de acción" → lista |
+| GET | `/api/seasons` | Listado de temporadas con count |
+| GET | `/api/seasons/{year}/{season}` | "Estrenos primavera 2024" |
+| GET | `/api/sitemap` | Una sola request: todos los ids/slugs para generar sitemap.xml |
 
 ---
 
@@ -324,14 +357,43 @@ Dejar de disparar los syncs a mano. Que el backend se mantenga al día solo: cat
 - **Estrategia "delete + insert" para providers**: por cada anime, borramos todos sus WatchProvider y reinsertamos los actuales. Más simple que hacer upsert por composite key. Para 100 anime × ~5 providers el coste es trivial.
 - **Solo FLATRATE y FREE**: ignoramos RENT y BUY porque el objetivo es "dónde verlo incluido en suscripción".
 
+### Modelo extendido (semana 4)
+- **`genres` como `@ElementCollection<String>`**: tabla aparte `anime_genre` con PK compuesto `(anime_id, genre)`. EAGER para que Jackson lo serialice fuera de sesión sin petar. Sin entidad Genre dedicada porque no aporta valor (no hay metadata por género, solo el nombre).
+- **`season` como String, no enum**: AniList puede meter valores nuevos. Mismo razonamiento que con `format` y `status`.
+- **`seasonYear` separado de `startYear`**: AniList los distingue (un anime puede anunciarse para una temporada y estrenar después). Guardamos los dos.
+
+### Scheduler (semana 4)
+- **`@ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")`** sobre el bean entero. Si la property no está o es `false`, el bean ni se crea: en local nunca dispara syncs accidentales. En producción se activa con `scheduling.enabled=true`.
+- **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron Unix de 5. Defaults espaciados: AniList 3am/3pm, match 4am, providers 5am, para no solapar.
+- **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` permite cambiar el cron en `.env` sin recompilar.
+- **Try/catch dentro de cada job**: un error en uno NO impide que el siguiente cron del mismo job se ejecute más tarde, ni afecta a los otros jobs.
+
+### DTOs públicos vs entidades JPA
+- **Endpoints REST NUNCA devuelven entidades crudas**. Cada respuesta pasa por un record DTO (`AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto`, etc.) que filtra los campos internos: `id` interno de BD, `syncedAt`, `tmdbId`, `tmdbProviderId`, `updatedAt`, `animeId`...
+- **Factory estático `from(Entity)`** en cada DTO. Mapeo en un solo lugar, fácil de mantener.
+- **Slug provider/genre = lowercase + espacios→guiones** (`ProviderSummaryDto.slugify`, `GenreSummaryDto.slugify`). Convención simple porque los nombres en BD ya vienen limpios (sin chars raros). Si algún día llega un caso raro habrá que reforzar.
+
+### Tests con Spring Boot 4
+- **`@WebMvcTest` cambió de paquete**: en SB3 estaba en `org.springframework.boot.test.autoconfigure.web.servlet`, en SB4 está en **`org.springframework.boot.webmvc.test.autoconfigure`**. Las distribuciones de test se modularizaron junto con los starters (`spring-boot-starter-webmvc-test`).
+- **`@MockBean` → `@MockitoBean`**: `@MockBean` (de spring-boot-test) está deprecado. Usar `@MockitoBean` (de `org.springframework.test.context.bean.override.mockito`).
+- **Mocks puros sin Spring**: para `AnimeMatchingService` y similares, instanciar el service a mano con `mock(TmdbClient.class)` y `mock(AnimeRepository.class)`. Más rápido que arrancar contexto, suficiente para lógica de negocio aislada.
+
 ### Endpoints REST disponibles
 | Método | Path | Descripción |
 |---|---|---|
-| GET | `/api/anime` | Lista plana de todos los anime |
-| GET | `/api/anime/{slug}` | Anime + sus providers agrupados por país |
+| GET | `/api/anime` | Lista plana (`AnimeSummaryDto[]`) |
+| GET | `/api/anime/{slug}` | Detalle + providers agrupados por país (`AnimeDetailResponse`) |
 | POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100) |
 | POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |
 | POST | `/api/anime/sync-providers` | Refresca la tabla `watch_provider` desde TMDb |
+| GET | `/api/providers` | Lista global de plataformas con count (`ProviderSummaryDto[]`) |
+| GET | `/api/providers?country=ES` | Mismo, filtrado por país |
+| GET | `/api/providers/{slug}/{country}` | Anime disponibles en esa plataforma en ese país |
+| GET | `/api/genres` | Lista de géneros con count (`GenreSummaryDto[]`) |
+| GET | `/api/genres/{slug}` | Anime de un género, ordenados por popularidad |
+| GET | `/api/seasons` | Lista de temporadas con count (`SeasonSummaryDto[]`) |
+| GET | `/api/seasons/{year}/{season}` | Anime de una temporada (400 si season inválida) |
+| GET | `/api/sitemap` | Todos los slugs/ids para que el frontend genere sitemap.xml |
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
