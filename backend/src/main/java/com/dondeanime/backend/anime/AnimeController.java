@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
-import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
 @RestController
@@ -41,8 +41,10 @@ public class AnimeController {
     }
 
     @GetMapping
-    public List<Anime> getAll() {
-        return repository.findAll();
+    public List<AnimeSummaryDto> getAll() {
+        return repository.findAll().stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
     }
 
     /**
@@ -53,14 +55,16 @@ public class AnimeController {
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
         return repository.findBySlug(slug)
                 .map(anime -> {
-                    List<WatchProvider> providers = providerRepository
-                            .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId());
-                    Map<String, List<WatchProvider>> byCountry = providers.stream()
+                    Map<String, List<ProviderDto>> byCountry = providerRepository
+                            .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
+                            .stream()
+                            .map(ProviderDto::from)
                             .collect(Collectors.groupingBy(
-                                    WatchProvider::getCountryCode,
+                                    ProviderDto::countryCode,
                                     LinkedHashMap::new,
                                     Collectors.toList()));
-                    return ResponseEntity.ok(new AnimeDetailResponse(anime, byCountry));
+                    return ResponseEntity.ok(new AnimeDetailResponse(
+                            AnimeDetailDto.from(anime), byCountry));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

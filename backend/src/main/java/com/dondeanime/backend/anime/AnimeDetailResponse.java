@@ -3,17 +3,18 @@ package com.dondeanime.backend.anime;
 import java.util.List;
 import java.util.Map;
 
-import com.dondeanime.backend.provider.WatchProvider;
+import com.dondeanime.backend.provider.ProviderDto;
 
 /**
- * DTO de salida para GET /api/anime/{slug}.
+ * Respuesta del endpoint GET /api/anime/{slug}.
  *
- * Envuelve el anime con sus WatchProvider agrupados por código de país.
- * Devolvemos la entidad Anime directamente por ahora; cuando expongamos
- * la API a frontend en mes 2 lo refactorizaremos a un DTO más limpio
- * (sin id interno, sin syncedAt, etc.).
+ * Envuelve un AnimeDetailDto (campos públicos del anime) con un
+ * Map de providers agrupados por código de país.
+ *
+ * Ambos sub-DTOs ya esconden los campos internos (id interno,
+ * syncedAt, tmdbId, updatedAt de providers, etc.).
  */
 public record AnimeDetailResponse(
-        Anime anime,
-        Map<String, List<WatchProvider>> watchProvidersByCountry
+        AnimeDetailDto anime,
+        Map<String, List<ProviderDto>> watchProvidersByCountry
 ) {}
