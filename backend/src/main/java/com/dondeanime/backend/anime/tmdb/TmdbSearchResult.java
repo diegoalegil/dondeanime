@@ -17,5 +17,6 @@ public record TmdbSearchResult(
         String overview,
         String firstAirDate,
         List<String> originCountry,
-        String posterPath
+        String posterPath,
+        Double popularity
 ) {}
