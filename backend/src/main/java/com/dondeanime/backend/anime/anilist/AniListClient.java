@@ -1,5 +1,6 @@
 package com.dondeanime.backend.anime.anilist;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,9 +11,15 @@ import org.springframework.web.client.RestClient;
 @Component
 public class AniListClient {
 
+    /**
+     * AniList limita perPage a 50. Si pides más, devuelve 50 silenciosamente.
+     * Para totales mayores hay que paginar (lo hace fetchPopular abajo).
+     */
+    private static final int MAX_PER_PAGE = 50;
+
     private static final String GRAPHQL_QUERY = """
-        query ($perPage: Int) {
-          Page(page: 1, perPage: $perPage) {
+        query ($page: Int, $perPage: Int) {
+          Page(page: $page, perPage: $perPage) {
             media(type: ANIME, sort: POPULARITY_DESC) {
               id
               title { romaji english }
@@ -39,10 +46,28 @@ public class AniListClient {
                 .build();
     }
 
-    public List<AniListMedia> fetchPopular(int perPage) {
+    /**
+     * Devuelve los {@code totalCount} anime más populares paginando
+     * internamente en bloques de {@value #MAX_PER_PAGE}.
+     */
+    public List<AniListMedia> fetchPopular(int totalCount) {
+        int perPage = Math.min(MAX_PER_PAGE, totalCount);
+        int pages = (int) Math.ceil(totalCount / (double) perPage);
+
+        List<AniListMedia> all = new ArrayList<>(totalCount);
+        for (int page = 1; page <= pages; page++) {
+            List<AniListMedia> chunk = fetchPage(page, perPage);
+            if (chunk.isEmpty()) break; // AniList se quedó sin resultados
+            all.addAll(chunk);
+            if (all.size() >= totalCount) break;
+        }
+        return all.size() > totalCount ? all.subList(0, totalCount) : all;
+    }
+
+    private List<AniListMedia> fetchPage(int page, int perPage) {
         Map<String, Object> body = Map.of(
                 "query", GRAPHQL_QUERY,
-                "variables", Map.of("perPage", perPage)
+                "variables", Map.of("page", page, "perPage", perPage)
         );
 
         AniListResponse response = restClient.post()
