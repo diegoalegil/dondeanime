@@ -1,6 +1,8 @@
 package com.dondeanime.backend.anime;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,8 +91,46 @@ public class AnimeMatchingService {
             return null;
         }
 
-        TmdbSearchResult first = resp.results().get(0);
-        return first.id();
+        // Heurística en tres pasadas, cada una más permisiva:
+        //   1. Origen JP + año de estreno coincide con AniList (±1 año).
+        //   2. Origen JP, cualquier año.
+        //   3. Cualquier resultado.
+        // Dentro de cada pasada elegimos el más popular.
+        //
+        // Por qué la fecha: la "popularity" de TMDb es muy dinámica y un
+        // spin-off recién estrenado puede tener boost de novedad encima
+        // de la serie original (caso real: "My Hero Academia: Vigilantes"
+        // 2025 ganaba a "My Hero Academia" 2016 si solo miramos popularidad).
+        Integer animeYear = anime.getStartYear();
+        Comparator<TmdbSearchResult> byPopDesc = Comparator.comparingDouble(
+                r -> Optional.ofNullable(r.popularity()).orElse(0.0));
+
+        Optional<TmdbSearchResult> best = resp.results().stream()
+                .filter(AnimeMatchingService::isJapanese)
+                .filter(r -> yearMatches(r, animeYear))
+                .max(byPopDesc)
+                .or(() -> resp.results().stream()
+                        .filter(AnimeMatchingService::isJapanese)
+                        .max(byPopDesc))
+                .or(() -> resp.results().stream().max(byPopDesc));
+
+        return best.map(TmdbSearchResult::id).orElse(null);
+    }
+
+    private static boolean isJapanese(TmdbSearchResult r) {
+        return r.originCountry() != null && r.originCountry().contains("JP");
+    }
+
+    private static boolean yearMatches(TmdbSearchResult r, Integer animeYear) {
+        if (animeYear == null || r.firstAirDate() == null || r.firstAirDate().length() < 4) {
+            return false;
+        }
+        try {
+            int tmdbYear = Integer.parseInt(r.firstAirDate().substring(0, 4));
+            return Math.abs(tmdbYear - animeYear) <= 1;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private static void sleep(long ms) {
