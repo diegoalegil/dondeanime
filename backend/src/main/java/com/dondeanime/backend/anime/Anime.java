@@ -1,12 +1,18 @@
 package com.dondeanime.backend.anime;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
@@ -74,6 +80,23 @@ public class Anime {
 
     @Column(name = "synced_at")
     private Instant syncedAt;
+
+    /**
+     * Géneros del anime ("Action", "Romance", "Slice of Life", ...).
+     * Tabla aparte anime_genre con PK compuesto (anime_id, genre).
+     * EAGER para que cuando devolvamos JSON estén ya cargados.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "anime_genre", joinColumns = @JoinColumn(name = "anime_id"))
+    @Column(name = "genre", length = 50, nullable = false)
+    private Set<String> genres = new HashSet<>();
+
+    /** Temporada del estreno: WINTER, SPRING, SUMMER, FALL. */
+    @Column(length = 10)
+    private String season;
+
+    @Column(name = "season_year")
+    private Integer seasonYear;
 
     public Anime() {
     }
@@ -244,6 +267,30 @@ public class Anime {
 
     public void setSyncedAt(Instant syncedAt) {
         this.syncedAt = syncedAt;
+    }
+
+    public Set<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(Set<String> genres) {
+        this.genres = genres;
+    }
+
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    public Integer getSeasonYear() {
+        return seasonYear;
+    }
+
+    public void setSeasonYear(Integer seasonYear) {
+        this.seasonYear = seasonYear;
     }
 
 }

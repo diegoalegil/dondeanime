@@ -2,6 +2,7 @@ package com.dondeanime.backend.anime;
 
 import java.text.Normalizer;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,6 +104,18 @@ public class AnimeSyncService {
             anime.setCoverImage(cover.large());
         }
         anime.setBannerImage(media.bannerImage());
+
+        anime.setSeason(media.season());
+        anime.setSeasonYear(media.seasonYear());
+
+        // Reasignamos el Set entero para que Hibernate borre los géneros
+        // viejos y meta los nuevos en la tabla anime_genre.
+        if (media.genres() != null) {
+            anime.setGenres(new HashSet<>(media.genres()));
+        } else {
+            anime.setGenres(new HashSet<>());
+        }
+
         anime.setSyncedAt(Instant.now());
 
         repository.save(anime);

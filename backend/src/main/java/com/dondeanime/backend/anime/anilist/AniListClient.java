@@ -33,6 +33,9 @@ public class AniListClient {
               description(asHtml: false)
               coverImage { large }
               bannerImage
+              genres
+              season
+              seasonYear
             }
           }
         }
