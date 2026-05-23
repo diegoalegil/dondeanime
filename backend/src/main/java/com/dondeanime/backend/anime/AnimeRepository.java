@@ -59,4 +59,40 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      */
     @Query("SELECT a.slug FROM Anime a WHERE a.slug IS NOT NULL ORDER BY a.slug")
     List<String> findAllSlugs();
+
+    /**
+     * Géneros agregados con count de anime distintos.
+     * Ordenado por count desc para que los más usados aparezcan arriba.
+     */
+    @Query("""
+            SELECT g AS genre, COUNT(DISTINCT a.id) AS animeCount
+            FROM Anime a JOIN a.genres g
+            GROUP BY g
+            ORDER BY COUNT(DISTINCT a.id) DESC, g ASC
+            """)
+    List<GenreAggregation> aggregateGenres();
+
+    /**
+     * Temporadas agregadas (año + season) con count.
+     * Ordenadas de más reciente a más antigua.
+     */
+    @Query("""
+            SELECT a.seasonYear AS year, a.season AS season, COUNT(a) AS animeCount
+            FROM Anime a
+            WHERE a.seasonYear IS NOT NULL AND a.season IS NOT NULL
+            GROUP BY a.seasonYear, a.season
+            ORDER BY a.seasonYear DESC, a.season ASC
+            """)
+    List<SeasonAggregation> aggregateSeasons();
+
+    interface GenreAggregation {
+        String getGenre();
+        Long getAnimeCount();
+    }
+
+    interface SeasonAggregation {
+        Integer getYear();
+        String getSeason();
+        Long getAnimeCount();
+    }
 }
