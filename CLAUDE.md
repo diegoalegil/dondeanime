@@ -10,7 +10,7 @@ Web pública en español para descubrir **cuándo y dónde se estrena cada anime
 
 - URL final: https://dondeanime.com
 - Repo: https://github.com/diegoalegil/dondeanime (privado)
-- Estado: desarrollo activo. Día 2 cerrado (backend conectando a Postgres, sin endpoints todavía).
+- Estado: desarrollo activo. Día 4 cerrado (endpoint `GET /api/anime` funcional, sync de AniList preparado: entidad ampliada + DTOs + cliente HTTP + config compartida).
 
 ---
 
@@ -82,7 +82,22 @@ DondeAnime/
     ├── mvnw, mvnw.cmd, .mvn/
     └── src/
         ├── main/java/com/dondeanime/backend/
-        │   └── BackendApplication.java
+        │   ├── BackendApplication.java
+        │   ├── config/
+        │   │   └── HttpClientConfig.java
+        │   └── anime/
+        │       ├── Anime.java                # entidad JPA (19 campos)
+        │       ├── AnimeController.java      # GET /api/anime
+        │       ├── AnimeRepository.java      # JpaRepository<Anime, Long>
+        │       └── anilist/                  # cliente + DTOs de AniList
+        │           ├── AniListClient.java
+        │           ├── AniListResponse.java
+        │           ├── AniListData.java
+        │           ├── AniListPage.java
+        │           ├── AniListMedia.java
+        │           ├── AniListTitle.java
+        │           ├── AniListFuzzyDate.java
+        │           └── AniListCoverImage.java
         ├── main/resources/
         │   └── application.properties
         └── test/java/com/dondeanime/backend/
@@ -199,8 +214,12 @@ docker compose up -d
 - [x] Brief, arquitectura, APIs y roadmap documentados
 - [x] PostgreSQL 16 corriendo en Docker (puerto 5433 del host)
 - [x] Spring Boot 4 arranca, conecta a BD, responde 404 en localhost:8080
-- [ ] **PRÓXIMO:** endpoint `GET /api/anime` que devuelva `[]`
-- [ ] AniListClient + sync de 100 anime populares (semana 2)
+- [x] Endpoint `GET /api/anime` devuelve `[]` (semana 1 cerrada, día 3)
+- [x] Entidad `Anime` ampliada a 19 campos (description, format, status, episodes, fechas year/month/day, coverImage, bannerImage, averageScore, popularity, syncedAt)
+- [x] DTOs de AniList: 7 records públicos en `anime/anilist/` (uno por archivo)
+- [x] `AniListClient` con `RestClient` apuntando a `https://graphql.anilist.co`
+- [x] `HttpClientConfig` con `@Bean RestClient.Builder` reutilizable
+- [ ] **PRÓXIMO:** `AnimeSyncService` + endpoint `POST /api/anime/sync` (sub-paso 4 de semana 2)
 - [ ] TMDbClient + cruce AniList↔TMDb + providers (semana 3)
 - [ ] Refresco programado (@Scheduled cada 12h) (semana 4)
 - [ ] Frontend Astro 4 (mes 2)
@@ -213,24 +232,45 @@ docker compose up -d
 
 ## Próxima tarea concreta
 
-**Crear el endpoint `GET /api/anime` que devuelva `[]`.** Es el entregable de la semana 1 del roadmap.
+**Crear `AnimeSyncService` + endpoint `POST /api/anime/sync`.** Sub-paso 4 de la semana 2.
 
-Pasos sugeridos (Diego escribe, Claude guía y revisa):
+### Estado de la semana 2
 
-1. Crear paquete `com.dondeanime.backend.anime` dentro de `backend/src/main/java/`.
-2. Entidad `Anime.java` con anotaciones JPA mínimas:
-   - `@Entity`, `@Table(name = "anime")`
-   - `id` (Long, `@Id @GeneratedValue`)
-   - `anilistId` (Long, único)
-   - `titleRomaji`, `titleEnglish`, `slug`
-   - Constructor vacío + getters/setters (Lombok opcional, pero al principio mejor entender el boilerplate antes de esconderlo).
-3. Interfaz `AnimeRepository` que extiende `JpaRepository<Anime, Long>`.
-4. `AnimeController` con `@RestController @RequestMapping("/api/anime")` y un `@GetMapping` que devuelve `repository.findAll()`.
-5. Reiniciar (DevTools lo hace solo al guardar).
-6. Probar:
-   - `curl http://localhost:8080/api/anime` → `[]`
-   - `docker exec -it dondeanime_postgres psql -U dondeanime_user -d dondeanime -c "\dt"` → debe aparecer la tabla `anime` creada por Hibernate (`ddl-auto=update`).
-7. Commit: `git commit -m "Día 3: primer endpoint GET /api/anime (lista vacía)"`.
+- [x] Entidad `Anime` ampliada (19 campos)
+- [x] DTOs de AniList (records en `anime/anilist/`)
+- [x] `AniListClient` listo y compilando
+- [x] `HttpClientConfig` con `RestClient.Builder` compartido
+- [ ] `AnimeSyncService` con lógica de mapeo + upsert + slug
+- [ ] Endpoint `POST /api/anime/sync` que dispara el sync manual
+- [ ] Probar end-to-end: dispara sync → 100 anime en BD → `GET /api/anime` los devuelve
+
+### Plan concreto del sub-paso 4
+
+1. **Ampliar `AnimeRepository`** con `Optional<Anime> findByAnilistId(Long anilistId)`. Spring Data lo implementa solo al parsear el nombre del método.
+2. **Crear `AnimeSyncService`** en `com.dondeanime.backend.anime`:
+   - Inyectar `AniListClient` y `AnimeRepository` por constructor.
+   - Método público `int syncPopular(int count)` que:
+     - Llama a `client.fetchPopular(count)` → recibe `List<AniListMedia>`.
+     - Por cada `AniListMedia`: busca por `anilistId` en BD (`findByAnilistId`). Si existe, actualiza esa entidad; si no, crea una nueva.
+     - Mapea cada campo del DTO al campo correspondiente de `Anime` (cuidado con nulls en `title`, `coverImage`, `startDate`, `endDate`).
+     - Genera el `slug` a partir del título inglés (fallback romaji): minúsculas, sin acentos, espacios→guiones, sin chars especiales.
+     - `setSyncedAt(Instant.now())`.
+     - `repository.save(anime)`.
+     - Devuelve el número de animes procesados.
+3. **Añadir endpoint `POST /sync`** en `AnimeController`:
+   - Inyectar `AnimeSyncService` por constructor (junto al `AnimeRepository` que ya tiene).
+   - `@PostMapping("/sync")` que llama a `service.syncPopular(100)` y devuelve `Map.of("synced", n)`.
+4. **Probar**:
+   - `curl -X POST http://localhost:8080/api/anime/sync` → debería tardar 1-2s y devolver `{"synced": 100}`.
+   - `curl http://localhost:8080/api/anime | jq 'length'` → debería decir 100.
+   - `docker exec dondeanime_postgres psql -U dondeanime_user -d dondeanime -c "SELECT count(*) FROM anime;"` → 100.
+5. **Commit**: `git commit -m "Día 5: sync de AniList con 100 anime populares"`.
+
+### Detalles a tener en cuenta
+
+- **Nulls de AniList**: `media.title()` puede tener `romaji` o `english` en null, `media.startDate()` puede tener año pero no mes ni día. El mapeo tiene que ser defensivo (`if (media.title() != null) anime.setTitleRomaji(media.title().romaji())`).
+- **Slug duplicado**: si dos anime tienen el mismo título normalizado, el segundo `save` violaría el UNIQUE. Estrategia simple inicial: añadir el `anilistId` al final del slug si choca. Más adelante mejoramos.
+- **Description con HTML**: la query GraphQL pide `description(asHtml: false)`, así llega como markdown sin HTML. Aún así puede tener algún `<br>` residual, pero por ahora se guarda tal cual.
 
 ---
 
@@ -246,6 +286,18 @@ Pasos sugeridos (Diego escribe, Claude guía y revisa):
 - **Dialect explícito** (`org.hibernate.dialect.PostgreSQLDialect`) aunque Hibernate suelte WARN HHH90000025 diciendo que no hace falta. SIN él, la app explota si Hikari no consigue leer metadata al primer intento. El WARN se silencia con `logging.level.org.hibernate.orm.deprecation=ERROR`.
 - **`initialization-fail-timeout=-1`** para que el backend no muera si Postgres tarda en estar `healthy`.
 - **`open-in-view=false`** por buena práctica (evita sesiones JPA abiertas durante render).
+
+### Stack HTTP
+- **`RestClient`** (no `WebClient` ni `RestTemplate`) porque es el cliente síncrono recomendado desde Spring 6.1. API fluent, suficiente para llamadas REST/GraphQL no-reactivas.
+- **Bean `RestClient.Builder` centralizado** en `config/HttpClientConfig.java`. Spring Boot 4 con `starter-webmvc` **no lo autoconfigura** (en 3.x con `starter-web` sí). Lo declaramos a mano para que `AniListClient`, futuro `TmdbClient`, etc. lo inyecten y especialicen con su propia `baseUrl`. Beneficio: cuando queramos timeouts globales o interceptors de logging, se añaden en un solo sitio.
+
+### Modelado de datos
+- **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
+- **Un record por archivo**, todos `public`: convención Java, y necesario para usarlos desde paquetes hermanos (el service que está en `anime/` necesita `AniListMedia` que vive en `anime/anilist/`).
+- **Fechas como `Integer` separados** (`startYear`, `startMonth`, `startDay`) y NO `LocalDate`, porque AniList puede devolver año sin mes ni día. `LocalDate` exige los tres.
+- **Sin `enum` Java** para `format`/`status` (Strings simples). Si AniList añade un valor nuevo, `String` lo tolera; un enum petaría al deserializar.
+- **`@Column(columnDefinition = "TEXT")`** para `description` (descripciones largas no caben en `VARCHAR(255)` por defecto).
+- **`Instant`** para `syncedAt` (timestamp técnico UTC). Hibernate lo mapea a `timestamp with time zone` en Postgres.
 
 ### Git
 - Auth con **HTTPS + Personal Access Token** (SSH pendiente, no urgente, ver tareas).
