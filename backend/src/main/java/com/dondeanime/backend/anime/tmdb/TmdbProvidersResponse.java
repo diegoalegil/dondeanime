@@ -2,8 +2,8 @@ package com.dondeanime.backend.anime.tmdb;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 
 /**
  * Respuesta de GET /tv/{id}/watch/providers.
