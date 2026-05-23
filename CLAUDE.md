@@ -10,7 +10,7 @@ Web pública en español para descubrir **cuándo y dónde se estrena cada anime
 
 - URL final: https://dondeanime.com
 - Repo: https://github.com/diegoalegil/dondeanime (privado)
-- Estado: desarrollo activo. Día 4 cerrado (endpoint `GET /api/anime` funcional, sync de AniList preparado: entidad ampliada + DTOs + cliente HTTP + config compartida).
+- Estado: desarrollo activo. **Semana 2 cerrada** (día 5): sync de AniList funcional, 100 anime top por popularidad guardados en BD con todos los campos (título, formato, episodios, fechas, imágenes, score, popularidad, descripción).
 
 ---
 
@@ -87,8 +87,9 @@ DondeAnime/
         │   │   └── HttpClientConfig.java
         │   └── anime/
         │       ├── Anime.java                # entidad JPA (19 campos)
-        │       ├── AnimeController.java      # GET /api/anime
-        │       ├── AnimeRepository.java      # JpaRepository<Anime, Long>
+        │       ├── AnimeController.java      # GET /api/anime + POST /api/anime/sync
+        │       ├── AnimeRepository.java      # JpaRepository + findByAnilistId/findBySlug
+        │       ├── AnimeSyncService.java     # mapeo DTO→entidad + upsert + slug
         │       └── anilist/                  # cliente + DTOs de AniList
         │           ├── AniListClient.java
         │           ├── AniListResponse.java
@@ -217,10 +218,12 @@ docker compose up -d
 - [x] Endpoint `GET /api/anime` devuelve `[]` (semana 1 cerrada, día 3)
 - [x] Entidad `Anime` ampliada a 19 campos (description, format, status, episodes, fechas year/month/day, coverImage, bannerImage, averageScore, popularity, syncedAt)
 - [x] DTOs de AniList: 7 records públicos en `anime/anilist/` (uno por archivo)
-- [x] `AniListClient` con `RestClient` apuntando a `https://graphql.anilist.co`
+- [x] `AniListClient` con `RestClient` apuntando a `https://graphql.anilist.co`, **pagina internamente** (AniList limita perPage a 50)
 - [x] `HttpClientConfig` con `@Bean RestClient.Builder` reutilizable
-- [ ] **PRÓXIMO:** `AnimeSyncService` + endpoint `POST /api/anime/sync` (sub-paso 4 de semana 2)
-- [ ] TMDbClient + cruce AniList↔TMDb + providers (semana 3)
+- [x] `AnimeSyncService` con mapeo DTO→entidad, upsert por anilistId, slug normalizado con dedupe
+- [x] Endpoint `POST /api/anime/sync?count=N` que dispara el sync manual
+- [x] Probado end-to-end: sync de 100 anime en ~1.5s, GET devuelve 100, datos completos en Postgres (semana 2 cerrada, día 5)
+- [ ] **PRÓXIMO:** TMDbClient + cruce AniList↔TMDb + providers (semana 3)
 - [ ] Refresco programado (@Scheduled cada 12h) (semana 4)
 - [ ] Frontend Astro 4 (mes 2)
 - [ ] Deploy en Hetzner + Vercel + Cloudflare (mes 2)
@@ -232,45 +235,44 @@ docker compose up -d
 
 ## Próxima tarea concreta
 
-**Crear `AnimeSyncService` + endpoint `POST /api/anime/sync`.** Sub-paso 4 de la semana 2.
+**Construir `TmdbClient` + cruce AniList↔TMDb + tabla `provider`.** Es el entregable de la semana 3 del roadmap.
 
-### Estado de la semana 2
+### Objetivo
 
-- [x] Entidad `Anime` ampliada (19 campos)
-- [x] DTOs de AniList (records en `anime/anilist/`)
-- [x] `AniListClient` listo y compilando
-- [x] `HttpClientConfig` con `RestClient.Builder` compartido
-- [ ] `AnimeSyncService` con lógica de mapeo + upsert + slug
-- [ ] Endpoint `POST /api/anime/sync` que dispara el sync manual
-- [ ] Probar end-to-end: dispara sync → 100 anime en BD → `GET /api/anime` los devuelve
+Para cada uno de los 100 anime sincronizados, descubrir en qué plataformas de streaming está disponible **por país** (ES, MX, AR, CO, CL, etc.) y persistirlo. Output: poder responder "¿dónde veo Attack on Titan en España?" → "Crunchyroll, Netflix".
 
-### Plan concreto del sub-paso 4
+### Plan en sub-pasos
 
-1. **Ampliar `AnimeRepository`** con `Optional<Anime> findByAnilistId(Long anilistId)`. Spring Data lo implementa solo al parsear el nombre del método.
-2. **Crear `AnimeSyncService`** en `com.dondeanime.backend.anime`:
-   - Inyectar `AniListClient` y `AnimeRepository` por constructor.
-   - Método público `int syncPopular(int count)` que:
-     - Llama a `client.fetchPopular(count)` → recibe `List<AniListMedia>`.
-     - Por cada `AniListMedia`: busca por `anilistId` en BD (`findByAnilistId`). Si existe, actualiza esa entidad; si no, crea una nueva.
-     - Mapea cada campo del DTO al campo correspondiente de `Anime` (cuidado con nulls en `title`, `coverImage`, `startDate`, `endDate`).
-     - Genera el `slug` a partir del título inglés (fallback romaji): minúsculas, sin acentos, espacios→guiones, sin chars especiales.
-     - `setSyncedAt(Instant.now())`.
-     - `repository.save(anime)`.
-     - Devuelve el número de animes procesados.
-3. **Añadir endpoint `POST /sync`** en `AnimeController`:
-   - Inyectar `AnimeSyncService` por constructor (junto al `AnimeRepository` que ya tiene).
-   - `@PostMapping("/sync")` que llama a `service.syncPopular(100)` y devuelve `Map.of("synced", n)`.
-4. **Probar**:
-   - `curl -X POST http://localhost:8080/api/anime/sync` → debería tardar 1-2s y devolver `{"synced": 100}`.
-   - `curl http://localhost:8080/api/anime | jq 'length'` → debería decir 100.
-   - `docker exec dondeanime_postgres psql -U dondeanime_user -d dondeanime -c "SELECT count(*) FROM anime;"` → 100.
-5. **Commit**: `git commit -m "Día 5: sync de AniList con 100 anime populares"`.
+1. **Modelo de datos**:
+   - Nueva entidad `WatchProvider` con: id, anime_id (FK → anime), country_code (ES, MX...), provider_name (Crunchyroll, Netflix...), provider_type (FLATRATE, FREE, RENT, BUY), tmdb_id_anime (cache), updated_at.
+   - Unique constraint en (anime_id, country_code, provider_name) para no duplicar.
+   - Relación `@ManyToOne` con `Anime` o simplemente `anime_id` Long si queremos evitar lazy-loading lío.
+2. **`TmdbClient`** en `com.dondeanime.backend.anime.tmdb`:
+   - REST cliente (no GraphQL como AniList). Inyecta `RestClient.Builder`.
+   - Base URL `https://api.themoviedb.org/3`.
+   - Header `Authorization: Bearer ${TMDB_API_KEY}` leído de `application.properties` (`tmdb.api-key`) que a su vez lee del `.env`.
+   - Método `searchAnime(String title)` → `GET /search/tv?query=...&language=es-ES`. Devuelve `List<TmdbSearchResult>`.
+   - Método `getWatchProviders(Long tmdbId)` → `GET /tv/{id}/watch/providers`. Devuelve `Map<String, TmdbCountryProviders>` (clave = código país).
+3. **DTOs TMDb**: records para `TmdbSearchResponse`, `TmdbSearchResult`, `TmdbProvidersResponse`, `TmdbCountryProviders`, `TmdbProvider`. Mismo patrón que AniList.
+4. **`AnimeMatchingService`** (cruce AniList↔TMDb):
+   - Para cada `Anime` sin `tmdbId`, buscar en TMDb por título inglés (fallback romaji), filtrar resultados que parezcan animación, escoger el primero y guardar el `tmdbId` en la entidad `Anime` (nuevo campo).
+   - Heurística simple: primer resultado de la search. Se afinará después.
+5. **`ProviderSyncService`**:
+   - Para cada `Anime` con `tmdbId`, llamar a `getWatchProviders(tmdbId)`.
+   - Iterar países objetivo (ES, MX, AR, CO, CL inicialmente).
+   - Por cada provider en `flatrate`/`free`, crear o actualizar un `WatchProvider`.
+6. **Endpoints**:
+   - `POST /api/anime/match` (dispara matching de TMDb).
+   - `POST /api/anime/sync-providers` (dispara sync de providers).
+   - `GET /api/anime/{slug}` (nuevo: devuelve un anime con sus providers anidados por país).
+7. **Probar end-to-end**: matching + providers de los 100 anime, validar que un anime conocido (Attack on Titan en España) tiene los providers esperados.
 
 ### Detalles a tener en cuenta
 
-- **Nulls de AniList**: `media.title()` puede tener `romaji` o `english` en null, `media.startDate()` puede tener año pero no mes ni día. El mapeo tiene que ser defensivo (`if (media.title() != null) anime.setTitleRomaji(media.title().romaji())`).
-- **Slug duplicado**: si dos anime tienen el mismo título normalizado, el segundo `save` violaría el UNIQUE. Estrategia simple inicial: añadir el `anilistId` al final del slug si choca. Más adelante mejoramos.
-- **Description con HTML**: la query GraphQL pide `description(asHtml: false)`, así llega como markdown sin HTML. Aún así puede tener algún `<br>` residual, pero por ahora se guarda tal cual.
+- **TMDB_API_KEY**: leer de `.env` vía `${TMDB_API_KEY}` en `application.properties`. NUNCA hardcodear. Spring Boot inyecta como property `tmdb.api-key`. Acceso con `@Value("${tmdb.api-key}")`.
+- **Rate limit TMDb**: 40 req/10s. Con 100 anime × (1 search + 1 watch/providers) = 200 requests. Hay que tirar con sleep o `Thread.sleep(250)` entre llamadas. Después se puede meter un decorador de rate limit en el `Builder`.
+- **Matching impreciso**: TMDb a veces devuelve películas o series no anime. Estrategia inicial: coger primero, almacenar tmdbId, manualmente revisar y corregir top 50 en mes 3.
+- **Países objetivo**: empezar con `ES`. Cuando funcione, expandir a `MX`, `AR`, `CO`, `CL` iterando la misma lógica.
 
 ---
 
@@ -290,6 +292,12 @@ docker compose up -d
 ### Stack HTTP
 - **`RestClient`** (no `WebClient` ni `RestTemplate`) porque es el cliente síncrono recomendado desde Spring 6.1. API fluent, suficiente para llamadas REST/GraphQL no-reactivas.
 - **Bean `RestClient.Builder` centralizado** en `config/HttpClientConfig.java`. Spring Boot 4 con `starter-webmvc` **no lo autoconfigura** (en 3.x con `starter-web` sí). Lo declaramos a mano para que `AniListClient`, futuro `TmdbClient`, etc. lo inyecten y especialicen con su propia `baseUrl`. Beneficio: cuando queramos timeouts globales o interceptors de logging, se añaden en un solo sitio.
+- **AniList `perPage` máx = 50**: la API cappa silenciosamente. Si pides más, devuelve 50 sin error. Por eso `AniListClient.fetchPopular(N)` pagina internamente en bloques de 50 hasta acumular `N`.
+
+### Sync de AniList
+- **Sin `@Transactional`** en `AnimeSyncService.syncPopular`: cada `save` es su propia tx auto-commit. Un anime que falle no arrastra al resto.
+- **Slug**: normalizado a partir del título inglés (fallback romaji, fallback `"anime-{id}"`). Quita acentos, lowercase, espacios→guiones, solo `[a-z0-9-]`. Si colisiona con otro anime distinto, sufija `-{anilistId}`. Determinista entre runs gracias al orden POPULARITY_DESC: el más popular se queda el slug bonito.
+- **Upsert por `anilistId`**: `findByAnilistId` + `orElseGet(Anime::new)` decide insert vs update. La unique constraint en BD es la red de seguridad.
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
