@@ -10,7 +10,7 @@ Web pública en español para descubrir **cuándo y dónde se estrena cada anime
 
 - URL final: https://dondeanime.com
 - Repo: https://github.com/diegoalegil/dondeanime (privado)
-- Estado: desarrollo activo. **Semana 2 cerrada** (día 5): sync de AniList funcional, 100 anime top por popularidad guardados en BD con todos los campos (título, formato, episodios, fechas, imágenes, score, popularidad, descripción).
+- Estado: desarrollo activo. **Semana 3 cerrada** (día 6): integración TMDb funcional. 100 anime sincronizados desde AniList, 84 matcheados contra TMDb, 949 entradas en `watch_provider` cubriendo ES/MX/AR/CO/CL. Endpoint `GET /api/anime/{slug}` devuelve un anime con sus providers agrupados por país.
 
 ---
 
@@ -85,20 +85,33 @@ DondeAnime/
         │   ├── BackendApplication.java
         │   ├── config/
         │   │   └── HttpClientConfig.java
+        │   ├── provider/                     # watch providers (TMDb)
+        │   │   ├── WatchProvider.java
+        │   │   ├── WatchProviderRepository.java
+        │   │   └── ProviderSyncService.java
         │   └── anime/
-        │       ├── Anime.java                # entidad JPA (19 campos)
-        │       ├── AnimeController.java      # GET /api/anime + POST /api/anime/sync
+        │       ├── Anime.java                # entidad JPA (20 campos, incluye tmdbId)
+        │       ├── AnimeController.java      # GET, POST /sync, /match, /sync-providers, GET /{slug}
         │       ├── AnimeRepository.java      # JpaRepository + findByAnilistId/findBySlug
         │       ├── AnimeSyncService.java     # mapeo DTO→entidad + upsert + slug
-        │       └── anilist/                  # cliente + DTOs de AniList
-        │           ├── AniListClient.java
-        │           ├── AniListResponse.java
-        │           ├── AniListData.java
-        │           ├── AniListPage.java
-        │           ├── AniListMedia.java
-        │           ├── AniListTitle.java
-        │           ├── AniListFuzzyDate.java
-        │           └── AniListCoverImage.java
+        │       ├── AnimeMatchingService.java # cruce AniList ↔ TMDb (heurística JP+año+pop)
+        │       ├── AnimeDetailResponse.java  # DTO de salida para GET /{slug}
+        │       ├── anilist/                  # cliente + DTOs de AniList
+        │       │   ├── AniListClient.java
+        │       │   ├── AniListResponse.java
+        │       │   ├── AniListData.java
+        │       │   ├── AniListPage.java
+        │       │   ├── AniListMedia.java
+        │       │   ├── AniListTitle.java
+        │       │   ├── AniListFuzzyDate.java
+        │       │   └── AniListCoverImage.java
+        │       └── tmdb/                     # cliente + DTOs de TMDb
+        │           ├── TmdbClient.java
+        │           ├── TmdbSearchResponse.java
+        │           ├── TmdbSearchResult.java
+        │           ├── TmdbProvidersResponse.java
+        │           ├── TmdbCountryProviders.java
+        │           └── TmdbProvider.java
         ├── main/resources/
         │   └── application.properties
         └── test/java/com/dondeanime/backend/
@@ -223,8 +236,16 @@ docker compose up -d
 - [x] `AnimeSyncService` con mapeo DTO→entidad, upsert por anilistId, slug normalizado con dedupe
 - [x] Endpoint `POST /api/anime/sync?count=N` que dispara el sync manual
 - [x] Probado end-to-end: sync de 100 anime en ~1.5s, GET devuelve 100, datos completos en Postgres (semana 2 cerrada, día 5)
-- [ ] **PRÓXIMO:** TMDbClient + cruce AniList↔TMDb + providers (semana 3)
-- [ ] Refresco programado (@Scheduled cada 12h) (semana 4)
+- [x] Spring Boot lee `.env` vía `spring.config.import=optional:file:./.env[.properties],optional:file:../.env[.properties]`
+- [x] Entidad `Anime` con campo `tmdbId` (nullable, se rellena con el matching)
+- [x] Entidad `WatchProvider` (anime_id, country_code, provider_name, provider_type, logo_url, updated_at) con unique en (anime, country, provider)
+- [x] DTOs de TMDb: 5 records públicos en `anime/tmdb/` (con `@JsonNaming(SnakeCaseStrategy)` Jackson 3.x)
+- [x] `TmdbClient` con auth Bearer, dos endpoints (`/search/tv`, `/tv/{id}/watch/providers`)
+- [x] `AnimeMatchingService` con heurística JP + año (±1) + popularidad descendente, en 3 pasadas
+- [x] `ProviderSyncService` con delete+insert por anime via `TransactionTemplate`
+- [x] Endpoints `POST /api/anime/match`, `POST /api/anime/sync-providers`, `GET /api/anime/{slug}`
+- [x] Probado end-to-end: 84 matches de 100, 949 providers en BD, Attack on Titan en España devuelve Crunchyroll + Netflix + Prime Video (semana 3 cerrada, día 6)
+- [ ] **PRÓXIMO:** Refresco programado (@Scheduled cada 12h) (semana 4)
 - [ ] Frontend Astro 4 (mes 2)
 - [ ] Deploy en Hetzner + Vercel + Cloudflare (mes 2)
 - [ ] Enriquecimiento manual top 50 (mes 3)
@@ -235,44 +256,34 @@ docker compose up -d
 
 ## Próxima tarea concreta
 
-**Construir `TmdbClient` + cruce AniList↔TMDb + tabla `provider`.** Es el entregable de la semana 3 del roadmap.
+**Refresco programado de AniList y providers con `@Scheduled`.** Entregable de la semana 4 del roadmap.
 
 ### Objetivo
 
-Para cada uno de los 100 anime sincronizados, descubrir en qué plataformas de streaming está disponible **por país** (ES, MX, AR, CO, CL, etc.) y persistirlo. Output: poder responder "¿dónde veo Attack on Titan en España?" → "Crunchyroll, Netflix".
+Dejar de disparar los syncs a mano. Que el backend se mantenga al día solo: catálogo de AniList cada N horas, providers de TMDb cada M horas.
 
 ### Plan en sub-pasos
 
-1. **Modelo de datos**:
-   - Nueva entidad `WatchProvider` con: id, anime_id (FK → anime), country_code (ES, MX...), provider_name (Crunchyroll, Netflix...), provider_type (FLATRATE, FREE, RENT, BUY), tmdb_id_anime (cache), updated_at.
-   - Unique constraint en (anime_id, country_code, provider_name) para no duplicar.
-   - Relación `@ManyToOne` con `Anime` o simplemente `anime_id` Long si queremos evitar lazy-loading lío.
-2. **`TmdbClient`** en `com.dondeanime.backend.anime.tmdb`:
-   - REST cliente (no GraphQL como AniList). Inyecta `RestClient.Builder`.
-   - Base URL `https://api.themoviedb.org/3`.
-   - Header `Authorization: Bearer ${TMDB_API_KEY}` leído de `application.properties` (`tmdb.api-key`) que a su vez lee del `.env`.
-   - Método `searchAnime(String title)` → `GET /search/tv?query=...&language=es-ES`. Devuelve `List<TmdbSearchResult>`.
-   - Método `getWatchProviders(Long tmdbId)` → `GET /tv/{id}/watch/providers`. Devuelve `Map<String, TmdbCountryProviders>` (clave = código país).
-3. **DTOs TMDb**: records para `TmdbSearchResponse`, `TmdbSearchResult`, `TmdbProvidersResponse`, `TmdbCountryProviders`, `TmdbProvider`. Mismo patrón que AniList.
-4. **`AnimeMatchingService`** (cruce AniList↔TMDb):
-   - Para cada `Anime` sin `tmdbId`, buscar en TMDb por título inglés (fallback romaji), filtrar resultados que parezcan animación, escoger el primero y guardar el `tmdbId` en la entidad `Anime` (nuevo campo).
-   - Heurística simple: primer resultado de la search. Se afinará después.
-5. **`ProviderSyncService`**:
-   - Para cada `Anime` con `tmdbId`, llamar a `getWatchProviders(tmdbId)`.
-   - Iterar países objetivo (ES, MX, AR, CO, CL inicialmente).
-   - Por cada provider en `flatrate`/`free`, crear o actualizar un `WatchProvider`.
-6. **Endpoints**:
-   - `POST /api/anime/match` (dispara matching de TMDb).
-   - `POST /api/anime/sync-providers` (dispara sync de providers).
-   - `GET /api/anime/{slug}` (nuevo: devuelve un anime con sus providers anidados por país).
-7. **Probar end-to-end**: matching + providers de los 100 anime, validar que un anime conocido (Attack on Titan en España) tiene los providers esperados.
+1. **Habilitar scheduling**: anotar `BackendApplication` con `@EnableScheduling`.
+2. **Crear `CatalogScheduler`** en un nuevo paquete `scheduling/` (transversal, igual que `config/`):
+   - Inyectar `AnimeSyncService`, `AnimeMatchingService`, `ProviderSyncService`.
+   - Tres jobs `@Scheduled` con cron expressions distintas:
+     - `syncAniList()` cada 12h: `syncService.syncPopular(100)`.
+     - `matchTmdb()` cada 24h: `matchingService.matchAll()` (idempotente, solo procesa los nuevos sin tmdbId).
+     - `syncProviders()` cada 24h: `providerSyncService.syncAll()`.
+   - Cron de las 3 desfasados para que no se solapen (ej. AniList a las 3am y 3pm, match a las 4am, providers a las 5am).
+3. **Configurar las cron expressions vía properties** (`application.properties` o `.env`) para poder ajustar sin recompilar.
+4. **Logging**: cada job loggea inicio/fin/resultado con `@Slf4j` (o LoggerFactory) para diagnosticar.
+5. **Test manual**: cambiar el cron a cada 1 minuto temporalmente, ver que dispara solo, devolver a 12h/24h.
+6. **Plantearse**: ¿queremos un toggle global (`scheduling.enabled=true`) para desactivar en local? Vale la pena.
 
 ### Detalles a tener en cuenta
 
-- **TMDB_API_KEY**: leer de `.env` vía `${TMDB_API_KEY}` en `application.properties`. NUNCA hardcodear. Spring Boot inyecta como property `tmdb.api-key`. Acceso con `@Value("${tmdb.api-key}")`.
-- **Rate limit TMDb**: 40 req/10s. Con 100 anime × (1 search + 1 watch/providers) = 200 requests. Hay que tirar con sleep o `Thread.sleep(250)` entre llamadas. Después se puede meter un decorador de rate limit en el `Builder`.
-- **Matching impreciso**: TMDb a veces devuelve películas o series no anime. Estrategia inicial: coger primero, almacenar tmdbId, manualmente revisar y corregir top 50 en mes 3.
-- **Países objetivo**: empezar con `ES`. Cuando funcione, expandir a `MX`, `AR`, `CO`, `CL` iterando la misma lógica.
+- **`@Scheduled` requiere `@EnableScheduling` en una `@Configuration` (BackendApplication ya cuenta como tal).** Sin esto, los jobs no se ejecutan y Spring no avisa.
+- **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron de Unix (5 campos). Ejemplo cada 12h: `0 0 3,15 * * *`.
+- **Solapamiento**: por defecto Spring no lanza una nueva ejecución si la anterior aún corre. Bien para nuestros jobs lentos.
+- **Failover**: si un job falla, el siguiente intento es al próximo cron. No hay retry interno. Considerar pequeño retry-with-backoff dentro del propio job si el roadmap lo pide.
+- **Hora del servidor**: Spring usa la zona horaria del JVM. En Hetzner suele ser UTC. Cuando despleguemos hay que confirmar y ajustar las cron expressions en consecuencia.
 
 ---
 
@@ -298,6 +309,29 @@ Para cada uno de los 100 anime sincronizados, descubrir en qué plataformas de s
 - **Sin `@Transactional`** en `AnimeSyncService.syncPopular`: cada `save` es su propia tx auto-commit. Un anime que falle no arrastra al resto.
 - **Slug**: normalizado a partir del título inglés (fallback romaji, fallback `"anime-{id}"`). Quita acentos, lowercase, espacios→guiones, solo `[a-z0-9-]`. Si colisiona con otro anime distinto, sufija `-{anilistId}`. Determinista entre runs gracias al orden POPULARITY_DESC: el más popular se queda el slug bonito.
 - **Upsert por `anilistId`**: `findByAnilistId` + `orElseGet(Anime::new)` decide insert vs update. La unique constraint en BD es la red de seguridad.
+
+### Integración TMDb
+- **Jackson 3.x en Spring Boot 4**: los paquetes de databind y annotations se separaron. `@JsonProperty` sigue en `com.fasterxml.jackson.annotation`, pero `@JsonNaming` y `PropertyNamingStrategies` ahora viven en **`tools.jackson.databind.*`** (no `com.fasterxml.jackson.databind.*`). Romper este import es el primer tropiezo al añadir cualquier DTO.
+- **`tmdb.api-key` vía `.env`**: `spring.config.import=optional:file:./.env[.properties],optional:file:../.env[.properties]` carga el .env como properties (Spring Boot 2.4+). El sufijo `[.properties]` es obligatorio. Sin default en `${TMDB_API_KEY}` para que el arranque falle si no está, en vez de petar luego al primer request.
+- **Auth TMDb**: token v4 (JWT que empieza con `eyJ...`) en header `Authorization: Bearer ...`. Se inyecta como `defaultHeader` del `RestClient` en el constructor del `TmdbClient`, así no hay que repetirlo en cada llamada.
+- **Heurística de matching en 3 pasadas**:
+  1. Origen JP + año de TMDb dentro de ±1 año del `startYear` de AniList.
+  2. Origen JP cualquier año.
+  3. Cualquier resultado.
+  Dentro de cada pasada, el más popular. El año es clave porque la popularity de TMDb es muy volátil (spin-offs recién estrenados ganan a la serie original por boost de novedad).
+- **Rate limit TMDb**: 40 req/10s. `Thread.sleep(300)` entre cada llamada deja margen y nos mantiene en ~33 req/10s.
+- **`TransactionTemplate` en vez de `@Transactional`** en `ProviderSyncService.syncOne`: la auto-invocación desde la misma clase NO pasa por el proxy de Spring (Spring usa CGLIB o JDK proxies, ambos solo interceptan llamadas externas). `TransactionTemplate` es programático, funciona siempre.
+- **Estrategia "delete + insert" para providers**: por cada anime, borramos todos sus WatchProvider y reinsertamos los actuales. Más simple que hacer upsert por composite key. Para 100 anime × ~5 providers el coste es trivial.
+- **Solo FLATRATE y FREE**: ignoramos RENT y BUY porque el objetivo es "dónde verlo incluido en suscripción".
+
+### Endpoints REST disponibles
+| Método | Path | Descripción |
+|---|---|---|
+| GET | `/api/anime` | Lista plana de todos los anime |
+| GET | `/api/anime/{slug}` | Anime + sus providers agrupados por país |
+| POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100) |
+| POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |
+| POST | `/api/anime/sync-providers` | Refresca la tabla `watch_provider` desde TMDb |
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
