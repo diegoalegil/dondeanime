@@ -58,4 +58,20 @@ public interface WatchProviderRepository extends JpaRepository<WatchProvider, Lo
         String getLogoUrl();
         Long getAnimeCount();
     }
+
+    /**
+     * Pares únicos (providerName, countryCode) para el sitemap.
+     */
+    @Query("""
+            SELECT DISTINCT wp.providerName AS providerName,
+                            wp.countryCode AS countryCode
+            FROM WatchProvider wp
+            ORDER BY wp.providerName, wp.countryCode
+            """)
+    List<ProviderCountryAggregation> aggregateProviderCountries();
+
+    interface ProviderCountryAggregation {
+        String getProviderName();
+        String getCountryCode();
+    }
 }
