@@ -1,0 +1,44 @@
+# ============================================================
+# DondeAnime - Servicios locales con Docker Compose
+# ------------------------------------------------------------
+# Levanta PostgreSQL 16 en un contenedor aislado. Los datos
+# persisten en un volumen llamado "dondeanime_postgres_data"
+# (no se borran al hacer `docker compose down`).
+#
+# Uso:
+#   docker compose up -d        # arranca en segundo plano
+#   docker compose ps           # ver estado
+#   docker compose logs -f postgres   # ver logs en vivo
+#   docker compose down         # parar (NO borra datos)
+#   docker compose down -v      # parar Y borrar volumen (CUIDADO)
+#
+# El servicio lee las variables del archivo .env que tienes
+# en la raíz del repo. Si una variable no está, usa el valor
+# por defecto que aparece después del ":-".
+# ============================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dondeanime_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dondeanime_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambiar_en_local}
+      POSTGRES_DB: ${POSTGRES_DB:-dondeanime}
+    ports:
+      # Expone el puerto 5432 del contenedor en el 5432 de tu Mac.
+      # Si ya tienes algo escuchando en el 5432, cambia el de la
+      # izquierda (ej. "5433:5432") y ajusta POSTGRES_PORT en .env.
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dondeanime_user} -d ${POSTGRES_DB:-dondeanime}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    name: dondeanime_postgres_data
