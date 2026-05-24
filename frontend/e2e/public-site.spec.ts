@@ -79,18 +79,70 @@ test('genre and platform combination pages filter anime and are indexed', async 
   const sitemapIndex = await request.get('/sitemap-index.xml');
   expect(sitemapIndex.ok()).toBe(true);
   const sitemapIndexText = await sitemapIndex.text();
-  const sitemapPath = sitemapIndexText.match(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/)?.[1];
-  expect(sitemapPath).toBeTruthy();
+  const sitemapPaths = [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)].map((m) => m[1]);
+  expect(sitemapPaths.length).toBeGreaterThan(0);
 
-  const sitemap = await request.get(sitemapPath!);
-  expect(sitemap.ok()).toBe(true);
-  const sitemapText = await sitemap.text();
+  const allSitemapText = (
+    await Promise.all(
+      sitemapPaths.map(async (path) => {
+        const sitemap = await request.get(path);
+        expect(sitemap.ok()).toBe(true);
+        return sitemap.text();
+      }),
+    )
+  ).join('\n');
+
   const comboUrls = new Set(
-    [...sitemapText.matchAll(/https:\/\/dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
+    [...allSitemapText.matchAll(/https:\/\/dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
   );
 
   expect(comboUrls.size).toBe(35);
   expect(comboUrls).toContain('https://dondeanime.com/anime/action/en/crunchyroll');
+});
+
+test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
+  await page.goto('/mejores/2024');
+
+  await expect(page.getByRole('heading', { name: /Mejores anime de 2024/i })).toBeVisible();
+  const resultCount = await page.locator('[data-best-year-result]').count();
+  expect(resultCount).toBeGreaterThan(0);
+  expect(resultCount).toBeLessThanOrEqual(30);
+  await expect(page.locator('[data-provider-chip]').first()).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/mejores/2024',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    numberOfItems: resultCount,
+    itemListElement: expect.any(Array),
+  }));
+  expect(itemList.itemListElement).toHaveLength(resultCount);
+
+  const sitemapIndex = await request.get('/sitemap-index.xml');
+  expect(sitemapIndex.ok()).toBe(true);
+  const sitemapIndexText = await sitemapIndex.text();
+  const sitemapPaths = [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)].map((m) => m[1]);
+  expect(sitemapPaths.length).toBeGreaterThan(0);
+
+  const allSitemapText = (
+    await Promise.all(
+      sitemapPaths.map(async (path) => {
+        const sitemap = await request.get(path);
+        expect(sitemap.ok()).toBe(true);
+        return sitemap.text();
+      }),
+    )
+  ).join('\n');
+
+  for (let year = 2010; year <= 2026; year += 1) {
+    expect(allSitemapText).toContain(`https://dondeanime.com/mejores/${year}`);
+  }
 });
 
 test('search index, robots and sitemap are generated', async ({ request }) => {
