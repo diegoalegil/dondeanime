@@ -1,0 +1,34 @@
+---
+import type { AnimeDetail } from '@/lib/api';
+import { formatType, formatStatus, formatDate, formatSeasonYear, formatNumber } from '@/lib/format';
+
+interface Props {
+  anime: AnimeDetail['anime'];
+}
+
+const { anime } = Astro.props;
+
+const rows: Array<{ label: string; value: string; mono?: boolean }> = [
+  { label: 'Formato', value: formatType(anime.format) },
+  { label: 'Estado', value: formatStatus(anime.status) },
+  { label: 'Episodios', value: anime.episodes !== null ? String(anime.episodes) : '—', mono: true },
+  { label: 'Estreno', value: formatDate(anime.startYear, anime.startMonth, anime.startDay), mono: true },
+  { label: 'Fin', value: formatDate(anime.endYear, anime.endMonth, anime.endDay), mono: true },
+  { label: 'Temporada', value: formatSeasonYear(anime.season, anime.seasonYear) },
+  { label: 'Puntuación', value: anime.averageScore !== null ? `${anime.averageScore} / 100` : '—', mono: true },
+  { label: 'Popularidad', value: formatNumber(anime.popularity), mono: true },
+];
+---
+<section class="mx-auto max-w-6xl px-4 py-8">
+  <h2 class="mb-4 text-lg font-semibold text-fg-primary">Detalles</h2>
+  <dl class="grid grid-cols-2 gap-4 rounded-lg border border-surface-2 bg-surface-1 p-6 sm:grid-cols-3 md:grid-cols-4">
+    {rows.map((row) => (
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-fg-muted">{row.label}</dt>
+        <dd class={`mt-1 text-sm text-fg-primary ${row.mono ? 'font-mono' : ''}`}>
+          {row.value}
+        </dd>
+      </div>
+    ))}
+  </dl>
+</section>

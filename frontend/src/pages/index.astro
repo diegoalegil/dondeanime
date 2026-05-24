@@ -1,0 +1,145 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
+import { buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { formatSeason } from '@/lib/format';
+import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
+import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
+
+const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
+
+const [anime, genres, seasons] = await Promise.all([
+  getAllAnime(),
+  getGenres(),
+  getSeasons(),
+]);
+
+const trending = [...anime]
+  .filter((a) => a.popularity !== null)
+  .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+  .slice(0, 12);
+
+const topGenre = genres[0];
+const topGenreAnime = topGenre ? (await getAnimeByGenre(topGenre.slug)).slice(0, 12) : [];
+
+const latestSeason = [...seasons].sort((a, b) => {
+  if (a.year !== b.year) return b.year - a.year;
+  return (SEASON_ORDER[b.season] ?? 0) - (SEASON_ORDER[a.season] ?? 0);
+})[0];
+const latestSeasonAnime = latestSeason
+  ? (await getAnimeBySeason(latestSeason.year, latestSeason.season.toLowerCase())).slice(0, 12)
+  : [];
+
+const featuredPlatforms: PlatformSlug[] = ['crunchyroll', 'netflix', 'amazon-prime-video', 'hbo-max', 'disney-plus'];
+
+const websiteSchema = buildWebSiteSchema();
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 20).map((a) => ({
+    name: a.titleEnglish || a.titleRomaji,
+    url: absoluteUrl(`/anime/${a.slug}`),
+  })),
+  absoluteUrl('/'),
+  'Catálogo de anime en streaming',
+);
+---
+<BaseLayout
+  title="DondeAnime — Dónde ver anime en streaming en español"
+  description="Encuentra dónde ver cada anime en Crunchyroll, Netflix, Prime Video y otras plataformas. Catálogo actualizado para España, México, Argentina, Colombia y Chile."
+>
+  <JsonLd slot="head" data={websiteSchema} />
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <section class="mx-auto max-w-6xl px-4 pt-16 pb-12">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-6xl">
+      Encuentra dónde ver
+      <span class="brand-gradient-text">cada anime</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      Catálogo actualizado de estrenos y plataformas en España, México, Argentina, Colombia y Chile.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-12">
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="text-2xl font-semibold">Tendencia ahora</h2>
+      <span class="text-sm text-fg-muted">Top {trending.length}</span>
+    </div>
+    <AnimeGrid anime={trending} />
+  </section>
+
+  {latestSeason && latestSeasonAnime.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 pb-12">
+      <div class="mb-5 flex items-baseline justify-between">
+        <h2 class="text-2xl font-semibold">
+          Estrenos de {formatSeason(latestSeason.season)} {latestSeason.year}
+        </h2>
+        <a
+          href={`/temporada/${latestSeason.year}/${latestSeason.season.toLowerCase()}`}
+          class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
+        >
+          Ver temporada →
+        </a>
+      </div>
+      <AnimeGrid anime={latestSeasonAnime} />
+    </section>
+  )}
+
+  {topGenre && topGenreAnime.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 pb-12">
+      <div class="mb-5 flex items-baseline justify-between">
+        <h2 class="text-2xl font-semibold">
+          Lo mejor en <span class="brand-gradient-text">{topGenre.name}</span>
+        </h2>
+        <a
+          href={`/genero/${topGenre.slug}`}
+          class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
+        >
+          Ver género →
+        </a>
+      </div>
+      <AnimeGrid anime={topGenreAnime} />
+    </section>
+  )}
+
+  <section class="mx-auto max-w-6xl px-4 pb-12">
+    <h2 class="mb-5 text-2xl font-semibold">Explora por país</h2>
+    <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {COUNTRY_SLUGS.map((slug) => {
+        const c = COUNTRIES[slug];
+        return (
+          <a
+            href={`/pais/${slug}`}
+            class="flex items-center gap-3 rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/40"
+          >
+            <span class={`fi fi-${c.flagCode} rounded text-lg`} aria-hidden="true"></span>
+            <span class="text-sm font-semibold text-fg-primary">{c.name}</span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-12">
+    <h2 class="mb-5 text-2xl font-semibold">Plataformas destacadas</h2>
+    <div class="flex flex-wrap gap-2">
+      {featuredPlatforms.map((slug) => (
+        <a
+          href={`/plataforma/${slug}`}
+          class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
+        >
+          {PLATFORMS[slug].name}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="text-2xl font-semibold">Catálogo completo</h2>
+      <span class="text-sm text-fg-muted">{anime.length} anime</span>
+    </div>
+    <AnimeGrid anime={anime} />
+  </section>
+</BaseLayout>
