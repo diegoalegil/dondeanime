@@ -1,0 +1,174 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getAllAnime } from '@/lib/api';
+
+const anime = await getAllAnime();
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<BaseLayout
+  title="Admin — DondeAnime"
+  description="Panel admin de DondeAnime."
+>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <section
+    class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[22rem_1fr]"
+    data-admin-home
+    data-api-url={apiUrl}
+    data-first-slug={anime[0]?.slug ?? ''}
+  >
+    <aside class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+      <div class="mb-5">
+        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
+        <h1 class="mt-1 text-2xl font-semibold text-fg-primary">Panel editorial</h1>
+      </div>
+
+      <form class="space-y-4" data-login-form>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-fg-secondary">Usuario</span>
+          <input
+            name="username"
+            autocomplete="username"
+            value="admin"
+            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
+          />
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-fg-secondary">Contraseña</span>
+          <input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
+          />
+        </label>
+        <div class="flex items-center gap-3">
+          <button
+            type="submit"
+            class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
+            data-logout-button
+          >
+            Salir
+          </button>
+        </div>
+        <p class="min-h-5 text-sm text-fg-muted" data-login-status></p>
+      </form>
+    </aside>
+
+    <section>
+      <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase text-accent-pink">Catálogo</p>
+          <h2 class="mt-1 text-2xl font-semibold text-fg-primary">Editar fichas</h2>
+        </div>
+        <label class="w-full md:max-w-xs">
+          <span class="sr-only">Buscar anime</span>
+          <input
+            type="search"
+            placeholder="Buscar anime"
+            class="w-full rounded-md border border-surface-2 bg-surface-1 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
+            data-search
+          />
+        </label>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-anime-list>
+        {anime.map((item) => {
+          const title = item.titleEnglish || item.titleRomaji;
+          return (
+            <a
+              href={`/admin/anime/${item.slug}`}
+              class="group flex gap-3 rounded-lg border border-surface-2 bg-surface-1 p-3 transition-colors hover:border-accent-violet"
+              data-anime-card
+              data-search-text={`${title} ${item.titleRomaji ?? ''} ${item.slug}`.toLowerCase()}
+            >
+              <img
+                src={item.coverImage}
+                alt={title}
+                class="h-20 w-14 shrink-0 rounded-md object-cover"
+              />
+              <div class="min-w-0">
+                <h3 class="line-clamp-2 text-sm font-semibold text-fg-primary group-hover:text-accent-violet">
+                  {title}
+                </h3>
+                {item.titleRomaji && item.titleRomaji !== item.titleEnglish && (
+                  <p class="mt-1 truncate text-xs text-fg-muted">{item.titleRomaji}</p>
+                )}
+                <p class="mt-2 text-xs text-fg-muted">{item.startYear ?? 'Sin año'}</p>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  </section>
+
+  <script>
+    const root = document.querySelector('[data-admin-home]');
+    const apiUrl = root?.getAttribute('data-api-url') ?? '';
+    const firstSlug = root?.getAttribute('data-first-slug') ?? '';
+    const form = document.querySelector('[data-login-form]');
+    const status = document.querySelector('[data-login-status]');
+    const logoutButton = document.querySelector('[data-logout-button]');
+    const search = document.querySelector('[data-search]');
+    const cards = Array.from(document.querySelectorAll('[data-anime-card]'));
+
+    const setStatus = (message, tone = 'muted') => {
+      if (!status) return;
+      status.textContent = message;
+      status.className = `min-h-5 text-sm ${tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'}`;
+    };
+
+    const tokenKey = 'dondeanime-admin-token';
+    const hasToken = () => Boolean(sessionStorage.getItem(tokenKey));
+
+    if (hasToken()) {
+      setStatus('Sesión activa.', 'success');
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const username = String(data.get('username') ?? '');
+      const password = String(data.get('password') ?? '');
+      const token = btoa(`${username}:${password}`);
+
+      if (!firstSlug) {
+        setStatus('No hay anime para verificar credenciales.', 'danger');
+        return;
+      }
+
+      setStatus('Verificando...');
+      const response = await fetch(`${apiUrl}/api/admin/anime/${firstSlug}/overrides`, {
+        headers: { Authorization: `Basic ${token}` },
+      });
+
+      if (!response.ok) {
+        setStatus('Credenciales incorrectas.', 'danger');
+        return;
+      }
+
+      sessionStorage.setItem(tokenKey, token);
+      setStatus('Sesión activa.', 'success');
+    });
+
+    logoutButton?.addEventListener('click', () => {
+      sessionStorage.removeItem(tokenKey);
+      setStatus('Sesión cerrada.');
+    });
+
+    search?.addEventListener('input', () => {
+      const query = search.value.trim().toLowerCase();
+      cards.forEach((card) => {
+        const text = card.getAttribute('data-search-text') ?? '';
+        card.classList.toggle('hidden', query.length > 0 && !text.includes(query));
+      });
+    });
+  </script>
+</BaseLayout>
