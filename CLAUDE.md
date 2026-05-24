@@ -335,10 +335,11 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Tests básicos: 31 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest, AnimeOverrideRepositoryTest, AnimeDetailDtoTest, AnimeAdminControllerTest, AffiliateLinkServiceTest, AffiliateLinkAdminControllerTest)
 - [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
 - [x] **Deploy producción (mes 2):** VPS Hetzner CX22 con Docker (Postgres + backend + Caddy reverse proxy), Vercel para frontend Astro estático, Cloudflare gestionando DNS de `dondeanime.com` y `api.dondeanime.com`. Cert Let's Encrypt automático en ambos. Bug `delete+insert duplicate key` en `ProviderSyncService` arreglado con `@Modifying @Query` JPQL. Webhook backend → Vercel disparado al final de `syncProviders` para auto-rebuild.
-- [x] **Sprint 1 en rama `sprint-1/admin-overrides`:** tabla `anime_override`, overrides editoriales en `AnimeDetailDto`, HTTP Basic para `/api/admin/**`, CORS cerrado para frontend, endpoints admin POST/DELETE/GET y panel Astro `/admin` + `/admin/anime/[slug]`. Build frontend: 821 páginas estáticas.
-- [x] **Sprint 3 en rama `sprint-3/monetizacion-analytics`:** tabla `affiliate_link`, tracking público de clicks, eventos para métricas 7/30 días, dashboard admin, links externos con `affiliateUrl`, Plausible preparado, AdSlot condicional y disclosure legal. Build frontend: 824 páginas estáticas.
-- [ ] **PRÓXIMO:** revisar/mergear PRs abiertos en orden. Sprint 3 está apilado sobre Sprint 1 para reutilizar Basic Auth.
-- [ ] Mejora continua paralela (CI/CD, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
+- [x] **Sprint 1 mergeado:** tabla `anime_override`, overrides editoriales en `AnimeDetailDto`, HTTP Basic para `/api/admin/**`, CORS cerrado para frontend, endpoints admin POST/DELETE/GET y panel Astro `/admin` + `/admin/anime/[slug]`.
+- [x] **Sprint 3 mergeado:** tabla `affiliate_link`, tracking público de clicks, eventos para métricas 7/30 días, dashboard admin, links externos con `affiliateUrl`, Plausible preparado, AdSlot condicional y disclosure legal.
+- [x] **CI básico (Sprint 4):** GitHub Actions para `./mvnw test` con Postgres 16 de servicio y `npm run build` del frontend con variables públicas de producción.
+- [ ] **PRÓXIMO:** Sprints de Codex pendientes de mergear (Sprint 2 alertas email, Sprint 4 e2e Playwright, Sprint 4 backups Postgres, Sprint 4 operación Cloudflare).
+- [ ] Mejora continua paralela restante (tests E2E con Playwright, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
 
 ---
 
