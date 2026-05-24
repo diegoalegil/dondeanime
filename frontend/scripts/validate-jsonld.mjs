@@ -1,10 +1,12 @@
 import { readdir, readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const distDir = new URL('../dist', import.meta.url);
+const distDir = fileURLToPath(new URL('../dist', import.meta.url));
 const scriptPattern = /<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>([\s\S]*?)<\/script>/gi;
 const schemaContext = new Set(['https://schema.org', 'http://schema.org']);
 const knownTypes = new Set([
+  'BlogPosting',
   'BreadcrumbList',
   'FAQPage',
   'ItemList',
@@ -18,7 +20,7 @@ const errors = [];
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const asArray = (value) => Array.isArray(value) ? value : [value];
-const rel = (file) => path.relative(distDir.pathname, file);
+const rel = (file) => path.relative(distDir, file);
 
 async function listHtmlFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -98,6 +100,15 @@ function validateNode(node, file) {
     }
 
     if (type === 'BreadcrumbList') requireArray(node, 'itemListElement', file, type);
+    if (type === 'BlogPosting') {
+      requireString(node, 'headline', file, type);
+      requireString(node, 'description', file, type);
+      requireString(node, 'datePublished', file, type);
+      requireString(node, 'dateModified', file, type);
+      if (!isRecord(node.mainEntityOfPage)) errors.push(`${rel(file)}: BlogPosting.mainEntityOfPage debe existir`);
+      if (!isRecord(node.author)) errors.push(`${rel(file)}: BlogPosting.author debe existir`);
+      if (!isRecord(node.publisher)) errors.push(`${rel(file)}: BlogPosting.publisher debe existir`);
+    }
     if (type === 'ItemList') requireArray(node, 'itemListElement', file, type, { allowEmpty: true });
     if (type === 'WebSite') {
       requireString(node, 'name', file, type);
@@ -153,7 +164,7 @@ function isTopLevelAnimePage(file) {
   return parts.length === 2 && parts[0] === 'anime' && parts[1].endsWith('.html');
 }
 
-const htmlFiles = await listHtmlFiles(distDir.pathname);
+const htmlFiles = await listHtmlFiles(distDir);
 const blocksByFile = new Map();
 
 for (const file of htmlFiles) {
@@ -176,7 +187,7 @@ for (const file of htmlFiles) {
   }
 }
 
-const homeFile = path.join(distDir.pathname, 'index.html');
+const homeFile = path.join(distDir, 'index.html');
 const homeBlocks = blocksByFile.get(homeFile) ?? [];
 assertPageHas(homeFile, homeBlocks, 'WebSite');
 assertPageHas(homeFile, homeBlocks, 'FAQPage');

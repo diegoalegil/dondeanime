@@ -219,6 +219,50 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
 });
 
+test('blog index, article schema and RSS are generated', async ({ page, request }) => {
+  await page.goto('/blog');
+
+  await expect(page.getByRole('heading', { name: /Blog DondeAnime/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/blog',
+  );
+
+  const articleLinks = page.locator('article h2 a[href^="/blog/"]');
+  await expect(articleLinks).toHaveCount(2);
+
+  const firstHref = await articleLinks.first().getAttribute('href');
+  expect(firstHref).toBe('/blog/placeholder-guia-editorial');
+
+  await articleLinks.first().click();
+  await expect(page.getByRole('heading', { name: 'Placeholder editorial 1' })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/blog/placeholder-guia-editorial',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const blogPosting = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'BlogPosting');
+
+  expect(blogPosting).toEqual(expect.objectContaining({
+    headline: 'Placeholder editorial 1',
+    inLanguage: 'es',
+    mainEntityOfPage: expect.objectContaining({
+      '@id': 'https://dondeanime.com/blog/placeholder-guia-editorial',
+    }),
+  }));
+
+  const rss = await request.get('/blog/rss.xml');
+  expect(rss.ok()).toBe(true);
+  expect(rss.headers()['content-type']).toMatch(/application\/rss\+xml|application\/xml|text\/xml/);
+  const rssText = await rss.text();
+  expect(rssText).toContain('<rss version="2.0">');
+  expect(rssText).toContain('https://dondeanime.com/blog/placeholder-guia-editorial');
+  expect(rssText).toContain('https://dondeanime.com/blog/placeholder-lista-editorial');
+});
+
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
   await page.goto('/');
 
