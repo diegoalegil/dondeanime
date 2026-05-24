@@ -91,7 +91,7 @@ class AnimeControllerTest {
     void getBySlugReturnsDetailWithProviders() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
         WatchProvider provider = provider();
-        when(animeRepository.findBySlugWithStudios("attack-on-titan")).thenReturn(Optional.of(a));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(a));
         when(providerRepository
                 .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(any()))
                 .thenReturn(List.of(provider));
@@ -108,7 +108,7 @@ class AnimeControllerTest {
 
     @Test
     void getBySlugUnknownReturns404() throws Exception {
-        when(animeRepository.findBySlugWithStudios("inexistente")).thenReturn(Optional.empty());
+        when(animeRepository.findBySlugWithCharacters("inexistente")).thenReturn(Optional.empty());
 
         mvc.perform(get("/api/anime/inexistente"))
                 .andExpect(status().isNotFound());

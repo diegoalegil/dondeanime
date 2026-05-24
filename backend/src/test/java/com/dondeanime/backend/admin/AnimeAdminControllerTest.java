@@ -63,7 +63,7 @@ class AnimeAdminControllerTest {
         Anime anime = anime();
         AnimeOverride override = override(anime, "description", "Descripción propia");
 
-        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(anime));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(anime));
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of(override));
 
         mvc.perform(post("/api/admin/anime/attack-on-titan/override")
@@ -88,7 +88,7 @@ class AnimeAdminControllerTest {
     void deleteOverrideWithCredentialsReturnsFallbackDetail() throws Exception {
         Anime anime = anime();
 
-        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(anime));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(anime));
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of());
 
         mvc.perform(delete("/api/admin/anime/attack-on-titan/override")

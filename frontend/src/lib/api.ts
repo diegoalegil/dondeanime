@@ -36,6 +36,13 @@ export interface WatchProvider {
   affiliateUrl: string | null;
 }
 
+export interface AnimeCharacter {
+  anilistId: number;
+  name: string;
+  image: string | null;
+  role: string;
+}
+
 export interface AnimeDetail {
   anime: {
     anilistId: number;
@@ -61,6 +68,7 @@ export interface AnimeDetail {
     studios?: Studio[];
     season: string | null;
     seasonYear: number | null;
+    characters?: AnimeCharacter[];
   };
   watchProvidersByCountry: Record<string, WatchProvider[]>;
 }

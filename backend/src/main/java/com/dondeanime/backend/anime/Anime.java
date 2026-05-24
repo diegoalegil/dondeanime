@@ -2,8 +2,12 @@ package com.dondeanime.backend.anime;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.dondeanime.backend.character.AnimeCharacterRole;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -15,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -117,6 +122,9 @@ public class Anime {
                     columnNames = {"anime_id", "studio_id"}))
     @OrderBy("name ASC")
     private Set<Studio> studios = new HashSet<>();
+
+    @OneToMany(mappedBy = "anime", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AnimeCharacterRole> characterRoles = new HashSet<>();
 
     public Anime() {
     }
@@ -327,6 +335,22 @@ public class Anime {
 
     public void setStudios(Set<Studio> studios) {
         this.studios = studios;
+    }
+
+    public Set<AnimeCharacterRole> getCharacterRoles() {
+        return characterRoles;
+    }
+
+    public void setCharacterRoles(Set<AnimeCharacterRole> characterRoles) {
+        this.characterRoles = characterRoles;
+    }
+
+    public void replaceCharacterRoles(List<AnimeCharacterRole> roles) {
+        this.characterRoles.clear();
+        roles.forEach(role -> {
+            role.setAnime(this);
+            this.characterRoles.add(role);
+        });
     }
 
 }

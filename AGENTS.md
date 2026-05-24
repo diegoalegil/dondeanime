@@ -97,8 +97,13 @@ DondeAnime/
         │   │   ├── ProviderController.java    # GET /api/providers, /providers/{slug}/{country}
         │   │   ├── ProviderDto.java           # DTO público
         │   │   └── ProviderSummaryDto.java    # DTO agregado con count
+        │   ├── character/
+        │   │   ├── AnimeCharacter.java        # personaje AniList
+        │   │   ├── AnimeCharacterRole.java    # relación anime-personaje con role
+        │   │   ├── AnimeCharacterRepository.java
+        │   │   └── CharacterDto.java
         │   └── anime/
-        │       ├── Anime.java                 # entidad JPA (23 campos: +genres, season, seasonYear, trailerYoutubeId)
+        │       ├── Anime.java                 # entidad JPA + géneros, temporadas, estudios, trailers y personajes
         │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers, /sync-trailers
         │       ├── AnimeRepository.java       # + findByProviderSlugAndCountry, findByGenreSlug, etc.
         │       ├── AnimeSyncService.java
@@ -315,6 +320,7 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Probado end-to-end: 84 matches de 100, 949 providers en BD, Attack on Titan en España devuelve Crunchyroll + Netflix + Prime Video (semana 3 cerrada, día 6)
 - [x] Scheduler `@Scheduled` con 3 jobs (sync AniList 12h, match 24h, providers 24h), toggle `scheduling.enabled` para activar/desactivar en local vs prod (semana 4 cerrada, día 7)
 - [x] Entidad `Anime` ampliada con `genres` (@ElementCollection → tabla anime_genre), `season` y `seasonYear`. Re-sync rellenó los 100 anime.
+- [x] Entidad `AnimeCharacter` + relación `anime_character_role` con `role`; AniList sync guarda hasta 6 personajes MAIN por anime.
 - [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
 - [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)

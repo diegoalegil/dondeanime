@@ -13,12 +13,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.dondeanime.backend.anime.anilist.AniListClient;
+import com.dondeanime.backend.anime.anilist.AniListCharacter;
+import com.dondeanime.backend.anime.anilist.AniListCharacterConnection;
+import com.dondeanime.backend.anime.anilist.AniListCharacterEdge;
+import com.dondeanime.backend.anime.anilist.AniListCharacterImage;
+import com.dondeanime.backend.anime.anilist.AniListCharacterName;
 import com.dondeanime.backend.anime.anilist.AniListCoverImage;
 import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
 import com.dondeanime.backend.anime.anilist.AniListStudio;
 import com.dondeanime.backend.anime.anilist.AniListStudioConnection;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
+import com.dondeanime.backend.character.AnimeCharacter;
+import com.dondeanime.backend.character.AnimeCharacterRepository;
+import com.dondeanime.backend.character.AnimeCharacterRole;
 import com.dondeanime.backend.studio.Studio;
 import com.dondeanime.backend.studio.StudioRepository;
 
@@ -44,11 +52,17 @@ public class AnimeSyncService {
     private final AniListClient client;
     private final AnimeRepository repository;
     private final StudioRepository studioRepository;
+    private final AnimeCharacterRepository characterRepository;
 
-    public AnimeSyncService(AniListClient client, AnimeRepository repository, StudioRepository studioRepository) {
+    public AnimeSyncService(
+            AniListClient client,
+            AnimeRepository repository,
+            StudioRepository studioRepository,
+            AnimeCharacterRepository characterRepository) {
         this.client = client;
         this.repository = repository;
         this.studioRepository = studioRepository;
+        this.characterRepository = characterRepository;
     }
 
     public int syncPopular(int count) {
@@ -80,7 +94,7 @@ public class AnimeSyncService {
     }
 
     private void saveOrUpdate(AniListMedia media) {
-        Anime anime = repository.findByAnilistId(media.id())
+        Anime anime = repository.findByAnilistIdWithCharacters(media.id())
                 .orElseGet(Anime::new);
 
         anime.setAnilistId(media.id());
@@ -133,6 +147,7 @@ public class AnimeSyncService {
         anime.setStudios(mapStudios(media.studios()));
 
         anime.setSyncedAt(Instant.now());
+        anime.replaceCharacterRoles(mapCharacters(media.characters()));
 
         repository.save(anime);
     }
@@ -170,6 +185,57 @@ public class AnimeSyncService {
             slug = slug + "-" + studio.id();
         }
         return slug;
+    }
+
+    private List<AnimeCharacterRole> mapCharacters(AniListCharacterConnection connection) {
+        if (connection == null || connection.edges() == null) {
+            return List.of();
+        }
+
+        return connection.edges().stream()
+                .limit(6)
+                .map(this::mapCharacterRole)
+                .flatMap(Optional::stream)
+                .toList();
+    }
+
+    private Optional<AnimeCharacterRole> mapCharacterRole(AniListCharacterEdge edge) {
+        if (edge == null || edge.node() == null || edge.node().id() == null) {
+            return Optional.empty();
+        }
+
+        AniListCharacter node = edge.node();
+        AnimeCharacter character = characterRepository.findByAnilistId(node.id())
+                .orElseGet(AnimeCharacter::new);
+        character.setAnilistId(node.id());
+        character.setName(characterName(node));
+        character.setImage(characterImage(node.image()));
+
+        AnimeCharacterRole role = new AnimeCharacterRole();
+        role.setCharacter(characterRepository.save(character));
+        role.setRole(isBlank(edge.role()) ? "MAIN" : edge.role());
+        return Optional.of(role);
+    }
+
+    private String characterName(AniListCharacter character) {
+        AniListCharacterName name = character.name();
+        if (name == null) {
+            return "Personaje " + character.id();
+        }
+        if (!isBlank(name.full())) {
+            return name.full();
+        }
+        if (!isBlank(name.nativeName())) {
+            return name.nativeName();
+        }
+        return "Personaje " + character.id();
+    }
+
+    private String characterImage(AniListCharacterImage image) {
+        if (image == null) {
+            return null;
+        }
+        return !isBlank(image.large()) ? image.large() : image.medium();
     }
 
     private String buildSlug(AniListMedia media) {

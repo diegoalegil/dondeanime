@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeHero from '@/components/anime/AnimeHero.astro';
 import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
 import TrailerEmbed from '@/components/anime/TrailerEmbed.astro';
+import CharacterList from '@/components/anime/CharacterList.astro';
 import MetaList from '@/components/anime/MetaList.astro';
 import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
 import AdSlot from '@/components/ads/AdSlot.astro';
@@ -59,5 +60,6 @@ const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
   <TrailerEmbed youtubeId={detail.anime.trailerYoutubeId} title={title} />
   <AdSlot position="inline" />
   <AnimeSynopsis description={detail.anime.description} />
+  <CharacterList characters={detail.anime.characters} />
   <MetaList anime={detail.anime} />
 </BaseLayout>

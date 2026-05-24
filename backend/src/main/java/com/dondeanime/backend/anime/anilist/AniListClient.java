@@ -37,6 +37,16 @@ public class AniListClient {
               studios { nodes { id name isAnimationStudio } }
               season
               seasonYear
+              characters(perPage: 6, role: MAIN) {
+                edges {
+                  role
+                  node {
+                    id
+                    name { full native }
+                    image { large medium }
+                  }
+                }
+              }
             }
           }
         }
