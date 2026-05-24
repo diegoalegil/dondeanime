@@ -244,6 +244,11 @@ Sin esos valores, `AdSlot` no renderiza nada.
 
 ## Operación diaria
 
+Más guías:
+
+- Cloudflare Email Routing y Cache Rules: `docs/cloudflare-operacion.md`.
+- Backups Postgres + R2: sección "Backup de BD" de este documento.
+
 ### Ver logs
 
 ```bash
