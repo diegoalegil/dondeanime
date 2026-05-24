@@ -62,13 +62,22 @@ services:
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
       # Activamos el scheduler en producción (en local está OFF).
       SCHEDULING_ENABLED: "true"
-      # Alertas email con Resend.
+      # --- Admin (Sprint 1) ---
+      # Usuario único del panel admin. La contraseña vive en .env.prod.
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_CORS_ALLOWED_ORIGINS: ${ADMIN_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
+      # --- Alertas email (Sprint 2) ---
       PUBLIC_API_URL: ${PUBLIC_API_URL:-https://api.dondeanime.com}
       PUBLIC_CORS_ALLOWED_ORIGINS: ${PUBLIC_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
       JWT_SECRET: ${JWT_SECRET}
       RESEND_ENABLED: ${RESEND_ENABLED:-true}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-alertas@dondeanime.com}
+      # --- Plausible (Sprint 3, opcional) ---
+      PLAUSIBLE_ENABLED: ${PLAUSIBLE_ENABLED:-false}
+      PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY:-}
+      PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-dondeanime.com}
     # NO mapeamos puerto al host. Caddy lo proxea desde fuera.
     networks:
       - internal

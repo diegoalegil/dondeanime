@@ -6,6 +6,7 @@ export const GET: APIRoute = ({ site }) => {
   const body = `User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin/
 
 Sitemap: ${sitemapUrl}
 `;

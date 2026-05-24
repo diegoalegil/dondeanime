@@ -6,9 +6,10 @@ import ProviderRow from './ProviderRow.astro';
 
 interface Props {
   providersByCountry: Record<string, WatchProvider[]>;
+  animeSlug: string;
 }
 
-const { providersByCountry } = Astro.props;
+const { providersByCountry, animeSlug } = Astro.props;
 
 const blocks = COUNTRY_SLUGS.map((slug: CountrySlug) => {
   const country = COUNTRIES[slug];
@@ -47,7 +48,7 @@ const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
           <p class="text-sm text-fg-muted">No disponible</p>
         ) : (
           <div class="space-y-2">
-            {providers.map((p) => <ProviderRow provider={p} />)}
+            {providers.map((p) => <ProviderRow provider={p} animeSlug={animeSlug} />)}
           </div>
         )}
       </div>
