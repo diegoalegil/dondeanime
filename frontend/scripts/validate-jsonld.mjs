@@ -5,6 +5,7 @@ const distDir = new URL('../dist', import.meta.url);
 const scriptPattern = /<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>([\s\S]*?)<\/script>/gi;
 const schemaContext = new Set(['https://schema.org', 'http://schema.org']);
 const knownTypes = new Set([
+  'BlogPosting',
   'BreadcrumbList',
   'FAQPage',
   'ItemList',
@@ -98,6 +99,15 @@ function validateNode(node, file) {
     }
 
     if (type === 'BreadcrumbList') requireArray(node, 'itemListElement', file, type);
+    if (type === 'BlogPosting') {
+      requireString(node, 'headline', file, type);
+      requireString(node, 'description', file, type);
+      requireString(node, 'datePublished', file, type);
+      requireString(node, 'dateModified', file, type);
+      if (!isRecord(node.mainEntityOfPage)) errors.push(`${rel(file)}: BlogPosting.mainEntityOfPage debe existir`);
+      if (!isRecord(node.author)) errors.push(`${rel(file)}: BlogPosting.author debe existir`);
+      if (!isRecord(node.publisher)) errors.push(`${rel(file)}: BlogPosting.publisher debe existir`);
+    }
     if (type === 'ItemList') requireArray(node, 'itemListElement', file, type, { allowEmpty: true });
     if (type === 'WebSite') {
       requireString(node, 'name', file, type);
