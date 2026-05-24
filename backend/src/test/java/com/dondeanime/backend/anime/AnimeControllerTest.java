@@ -12,9 +12,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
@@ -26,6 +29,12 @@ import com.dondeanime.backend.provider.WatchProviderRepository;
  * sustituidos por Mockito.
  */
 @WebMvcTest(AnimeController.class)
+@Import(SecurityConfig.class)
+@TestPropertySource(properties = {
+        "admin.username=admin",
+        "admin.password=secret",
+        "admin.cors.allowed-origins=http://localhost:4321"
+})
 class AnimeControllerTest {
 
     @Autowired
@@ -45,6 +54,9 @@ class AnimeControllerTest {
 
     @MockitoBean
     private WatchProviderRepository providerRepository;
+
+    @MockitoBean
+    private AnimeOverrideService overrideService;
 
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
@@ -69,6 +81,7 @@ class AnimeControllerTest {
         when(providerRepository
                 .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(any()))
                 .thenReturn(List.of());
+        when(overrideService.findSpanishOverrides(a)).thenReturn(List.of());
 
         mvc.perform(get("/api/anime/attack-on-titan"))
                 .andExpect(status().isOk())
