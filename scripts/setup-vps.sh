@@ -56,10 +56,11 @@ chmod 700 /home/deploy/.ssh
 chmod 600 /home/deploy/.ssh/authorized_keys
 
 echo "==> 5/6 Configurando firewall ufw..."
-ufw allow 22/tcp comment 'SSH'
-ufw allow 80/tcp comment 'HTTP (redirect + Let'\''s Encrypt challenge)'
-ufw allow 443/tcp comment 'HTTPS'
-ufw allow 443/udp comment 'HTTP/3 (QUIC)'
+# Sin comments: ufw rompe si llevan paréntesis o apóstrofes.
+ufw allow 22/tcp
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw allow 443/udp
 ufw --force enable
 
 echo "==> 6/6 Endureciendo SSH (sin root login, sin password auth)..."
