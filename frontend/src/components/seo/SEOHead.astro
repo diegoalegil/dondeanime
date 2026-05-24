@@ -18,7 +18,10 @@ const {
 } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL;
-const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
+const cleanPathname = Astro.url.pathname
+  .replace(/\/index\.html$/, '/')
+  .replace(/\.html$/, '');
+const canonicalUrl = canonical ?? new URL(cleanPathname || '/', siteUrl).toString();
 const ogImage = image ?? `${siteUrl}/og-default.png`;
 ---
 <title>{title}</title>
