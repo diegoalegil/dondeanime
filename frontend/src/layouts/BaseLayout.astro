@@ -3,6 +3,7 @@ import '@/styles/global.css';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
+import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
 
 interface Props {
   title: string;
@@ -14,6 +15,13 @@ interface Props {
 }
 
 const props = Astro.props;
+const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === 'true';
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? 'dondeanime.com';
+const plausibleScriptUrl = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_URL ?? 'https://plausible.io/js/script.js';
+const adsenseEnabled =
+  import.meta.env.ADSENSE_ENABLED === 'true' ||
+  import.meta.env.PUBLIC_ADSENSE_ENABLED === 'true';
+const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
 ---
 <!doctype html>
 <html lang="es" data-theme="dark">
@@ -32,6 +40,23 @@ const props = Astro.props;
       } catch (e) {}
     </script>
     <SEOHead {...props} />
+    {plausibleEnabled && (
+      <>
+        <script is:inline>
+          window.plausible = window.plausible || function() {
+            (window.plausible.q = window.plausible.q || []).push(arguments);
+          };
+        </script>
+        <script defer data-domain={plausibleDomain} src={plausibleScriptUrl}></script>
+      </>
+    )}
+    {adsenseEnabled && adsenseClientId && (
+      <script
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+        crossorigin="anonymous"
+      ></script>
+    )}
     <slot name="head" />
   </head>
   <body class="bg-surface-0 text-fg-primary font-sans">
@@ -40,5 +65,6 @@ const props = Astro.props;
       <slot />
     </main>
     <Footer />
+    <AffiliateTrackingScript />
   </body>
 </html>
