@@ -92,6 +92,8 @@ nano .env.prod
 # Rellenar:
 #   POSTGRES_PASSWORD: openssl rand -base64 32
 #   TMDB_API_KEY: el de tu .env local
+#   JWT_SECRET: openssl rand -base64 64
+#   RESEND_API_KEY: API key de Resend cuando el dominio esté verificado
 #   VERCEL_DEPLOY_HOOK: vacío por ahora, se rellena en paso 6
 
 chmod 600 .env.prod   # solo deploy puede leerlo
@@ -182,6 +184,25 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
   ```
 - A partir de aquí, cada vez que `ProviderSyncService.syncAll()` termine, llamará al hook y Vercel rebuildea.
+
+### 9. Configurar Resend para alertas email
+
+Antes de poner `RESEND_ENABLED=true` con usuarios reales:
+
+- Crear cuenta en Resend y añadir el dominio `dondeanime.com`.
+- Configurar en Cloudflare los registros DNS de SPF/DKIM que indique Resend.
+- Crear una API key y guardarla en `/opt/dondeanime/.env.prod` como `RESEND_API_KEY`.
+- Definir `RESEND_FROM_EMAIL`, por ejemplo `alertas@dondeanime.com`.
+- Generar `JWT_SECRET` en el VPS:
+  ```bash
+  openssl rand -base64 64
+  ```
+- Recrear backend:
+  ```bash
+  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+  ```
+
+En local `RESEND_ENABLED=false` evita enviar correos reales. En producción, si el dominio no está verificado, los correos pueden acabar en spam o ser rechazados.
 
 ---
 
