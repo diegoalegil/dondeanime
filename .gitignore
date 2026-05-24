@@ -83,6 +83,8 @@ tmp/
 # ===== Cobertura de tests =====
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
 
 # ===== Docker (si se mete más adelante) =====
 docker-compose.override.yml
