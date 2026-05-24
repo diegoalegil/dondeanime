@@ -37,3 +37,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Validate JSON-LD
+        run: npm run validate:jsonld
