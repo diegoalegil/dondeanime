@@ -66,6 +66,10 @@ services:
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ADMIN_CORS_ALLOWED_ORIGINS: ${ADMIN_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
+      # Dashboard de métricas via Plausible API.
+      PLAUSIBLE_ENABLED: ${PLAUSIBLE_ENABLED:-false}
+      PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY:-}
+      PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-dondeanime.com}
     # NO mapeamos puerto al host. Caddy lo proxea desde fuera.
     networks:
       - internal
