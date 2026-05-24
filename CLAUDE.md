@@ -320,8 +320,9 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
 - [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
 - [x] **Deploy producción (mes 2):** VPS Hetzner CX22 con Docker (Postgres + backend + Caddy reverse proxy), Vercel para frontend Astro estático, Cloudflare gestionando DNS de `dondeanime.com` y `api.dondeanime.com`. Cert Let's Encrypt automático en ambos. Bug `delete+insert duplicate key` en `ProviderSyncService` arreglado con `@Modifying @Query` JPQL. Webhook backend → Vercel disparado al final de `syncProviders` para auto-rebuild.
+- [x] **Mejora continua E2E (Sprint 4):** Playwright configurado en `frontend/` con smoke tests de home, navegación a ficha, rutas país/plataforma/género/temporada y artefactos SEO (`search-index.json`, `robots.txt`, `sitemap-index.xml`). GitHub Actions ejecuta `npm run test:e2e` en PRs que tocan frontend.
 - [ ] **PRÓXIMO:** Sprints de Codex (ver `CODEX.md`). 3 sprints de ~2 semanas: enriquecimiento manual top 50 + panel admin (sprint 1), sistema alertas email con Resend + doble opt-in (sprint 2), monetización con afiliados + Plausible Analytics (sprint 3).
-- [ ] Mejora continua paralela (CI/CD, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
+- [ ] Mejora continua paralela restante (Cloudflare Email Routing, backups BD automáticos, page rules cache, CI/CD backend, Flyway/Liquibase, etc.)
 
 ---
 
