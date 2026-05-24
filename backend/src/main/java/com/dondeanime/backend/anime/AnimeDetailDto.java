@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dondeanime.backend.studio.StudioDto;
+
 /**
  * Vista completa de un anime para la página de detalle.
  *
@@ -31,6 +33,7 @@ public record AnimeDetailDto(
         Integer endMonth,
         Integer endDay,
         Set<String> genres,
+        List<StudioDto> studios,
         String season,
         Integer seasonYear
 ) {
@@ -66,6 +69,9 @@ public record AnimeDetailDto(
                 a.getEndMonth(),
                 a.getEndDay(),
                 a.getGenres(),
+                a.getStudios().stream()
+                        .map(StudioDto::from)
+                        .toList(),
                 a.getSeason(),
                 a.getSeasonYear()
         );

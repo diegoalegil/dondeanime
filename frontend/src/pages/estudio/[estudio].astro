@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getAnimeByStudio, getStudios } from '@/lib/api';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const studios = await getStudios();
+  return studios.map((studio) => ({
+    params: { estudio: studio.slug },
+    props: { studioName: studio.name, total: studio.animeCount, animationStudio: studio.animationStudio },
+  }));
+}
+
+const { estudio } = Astro.params;
+const { studioName, total, animationStudio } = Astro.props;
+
+const anime = await getAnimeByStudio(estudio!);
+
+const seoTitle = `Anime de ${studioName} — ${total} series para ver en streaming | DondeAnime`;
+const seoDescription = `${studioName} ${animationStudio ? 'anima' : 'participa en'} ${anime.length} anime del catálogo: ${anime.slice(0, 5).map((a) => a.titleEnglish || a.titleRomaji).join(', ')}. Encuentra dónde verlos.`;
+
+const pageUrl = absoluteUrl(`/estudio/${estudio}`);
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((a) => ({
+    name: a.titleEnglish || a.titleRomaji,
+    url: absoluteUrl(`/anime/${a.slug}`),
+  })),
+  pageUrl,
+  `Anime de ${studioName}`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Estudios', url: '/' },
+      { name: studioName, url: `/estudio/${estudio}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">
+      {animationStudio ? 'Estudio de animación' : 'Estudio'}
+    </p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      Anime de <span class="brand-gradient-text">{studioName}</span>
+    </h1>
+    <p class="mt-4 text-lg text-fg-secondary">
+      {anime.length} serie{anime.length === 1 ? '' : 's'} vinculada{anime.length === 1 ? '' : 's'} a este estudio.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos anime catalogados para este estudio ahora mismo.
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

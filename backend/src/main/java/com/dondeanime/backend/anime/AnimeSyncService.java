@@ -4,7 +4,9 @@ import java.text.Normalizer;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +16,11 @@ import com.dondeanime.backend.anime.anilist.AniListClient;
 import com.dondeanime.backend.anime.anilist.AniListCoverImage;
 import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
+import com.dondeanime.backend.anime.anilist.AniListStudio;
+import com.dondeanime.backend.anime.anilist.AniListStudioConnection;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
+import com.dondeanime.backend.studio.Studio;
+import com.dondeanime.backend.studio.StudioRepository;
 
 /**
  * Orquesta el sync desde AniList hacia la BD local.
@@ -37,10 +43,12 @@ public class AnimeSyncService {
 
     private final AniListClient client;
     private final AnimeRepository repository;
+    private final StudioRepository studioRepository;
 
-    public AnimeSyncService(AniListClient client, AnimeRepository repository) {
+    public AnimeSyncService(AniListClient client, AnimeRepository repository, StudioRepository studioRepository) {
         this.client = client;
         this.repository = repository;
+        this.studioRepository = studioRepository;
     }
 
     public int syncPopular(int count) {
@@ -122,9 +130,46 @@ public class AnimeSyncService {
             anime.setGenres(new HashSet<>());
         }
 
+        anime.setStudios(mapStudios(media.studios()));
+
         anime.setSyncedAt(Instant.now());
 
         repository.save(anime);
+    }
+
+    private Set<Studio> mapStudios(AniListStudioConnection connection) {
+        if (connection == null || connection.nodes() == null) {
+            return new HashSet<>();
+        }
+
+        Set<Studio> studios = new HashSet<>();
+        for (AniListStudio node : connection.nodes()) {
+            if (node == null || node.id() == null || isBlank(node.name())) {
+                continue;
+            }
+
+            Studio studio = studioRepository.findByAnilistId(node.id())
+                    .orElseGet(Studio::new);
+            studio.setAnilistId(node.id());
+            studio.setName(node.name());
+            studio.setSlug(buildStudioSlug(node));
+            studio.setAnimationStudio(Boolean.TRUE.equals(node.isAnimationStudio()));
+            studios.add(studioRepository.save(studio));
+        }
+        return studios;
+    }
+
+    private String buildStudioSlug(AniListStudio studio) {
+        String slug = Studio.slugify(studio.name());
+        if (slug.isEmpty()) {
+            slug = "studio-" + studio.id();
+        }
+
+        Optional<Studio> existing = studioRepository.findBySlug(slug);
+        if (existing.isPresent() && !Objects.equals(existing.get().getAnilistId(), studio.id())) {
+            slug = slug + "-" + studio.id();
+        }
+        return slug;
     }
 
     private String buildSlug(AniListMedia media) {

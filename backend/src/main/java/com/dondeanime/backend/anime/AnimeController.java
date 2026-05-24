@@ -62,7 +62,7 @@ public class AnimeController {
      */
     @GetMapping("/{slug}")
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
-        return repository.findBySlug(slug)
+        return repository.findBySlugWithStudios(slug)
                 .map(anime -> {
                     Map<String, List<ProviderDto>> byCountry = providerRepository
                             .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
