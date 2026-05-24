@@ -23,6 +23,7 @@ export interface WatchProvider {
   providerName: string;
   providerType: string;
   logoUrl: string;
+  affiliateUrl: string | null;
 }
 
 export interface AnimeDetail {
