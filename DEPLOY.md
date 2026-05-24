@@ -274,12 +274,53 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 ### Backup de BD
 
 ```bash
-# Dentro del VPS
-docker exec dondeanime_postgres_prod \
-  pg_dump -U dondeanime_user dondeanime | gzip > /opt/dondeanime/backups/dondeanime-$(date +%Y%m%d).sql.gz
+# Dentro del VPS, desde /opt/dondeanime
+scripts/backup-postgres-r2.sh
 ```
 
-TODO el flujo de desarrollo Sprint 1: script cron + envío a Cloudflare R2.
+El script:
+
+- Lee `/opt/dondeanime/.env.prod`.
+- Crea `/opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz`.
+- Crea checksum `.sha256`.
+- Sube a Cloudflare R2 si `R2_*` está configurado.
+- Borra backups locales de más de `BACKUP_RETENTION_DAYS` días.
+
+Variables en `.env.prod`:
+
+```env
+BACKUP_DIR=/opt/dondeanime/backups
+BACKUP_RETENTION_DAYS=30
+R2_BUCKET=TU_BUCKET
+R2_ACCOUNT_ID=TU_ACCOUNT_ID
+R2_ACCESS_KEY_ID=TU_ACCESS_KEY
+R2_SECRET_ACCESS_KEY=TU_SECRET_KEY
+R2_PREFIX=postgres
+```
+
+Para automatizar cada 6 horas:
+
+```bash
+mkdir -p /opt/dondeanime/logs
+crontab -e
+```
+
+Añadir:
+
+```cron
+17 */6 * * * cd /opt/dondeanime && scripts/backup-postgres-r2.sh >> /opt/dondeanime/logs/backup.log 2>&1
+```
+
+En Cloudflare R2, configurar lifecycle del bucket para borrar objetos con prefijo `postgres/` tras 30 días. Así la retención remota no depende del cron.
+
+Restore manual desde un backup local:
+
+```bash
+# CUIDADO: el dump lleva --clean --if-exists y puede sobrescribir datos.
+gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
+  | docker exec -i dondeanime_postgres_prod \
+      psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
+```
 
 ### Disparar sync manual
 
