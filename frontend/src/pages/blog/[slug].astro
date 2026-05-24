@@ -1,0 +1,108 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { absoluteUrl } from '@/lib/seo';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+const pageUrl = absoluteUrl(`/blog/${post.id}`);
+const published = post.data.pubDate.toISOString();
+const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+
+const blogPostingSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: published,
+  dateModified: modified,
+  inLanguage: 'es',
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': pageUrl,
+  },
+  author: {
+    '@type': 'Organization',
+    name: post.data.author,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'DondeAnime',
+    logo: {
+      '@type': 'ImageObject',
+      url: absoluteUrl('/og-default.png'),
+    },
+  },
+};
+---
+<BaseLayout
+  title={`${post.data.title} | DondeAnime`}
+  description={post.data.description}
+  canonical={pageUrl}
+  type="article"
+>
+  <JsonLd slot="head" data={blogPostingSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Blog', url: '/blog' },
+      { name: post.data.title, url: `/blog/${post.id}` },
+    ]}
+  />
+
+  <article class="mx-auto max-w-3xl px-4 pt-8 pb-20">
+    <p class="text-sm text-fg-muted">
+      {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(post.data.pubDate)}
+    </p>
+    <h1 class="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+      {post.data.title}
+    </h1>
+    <p class="mt-4 text-lg leading-8 text-fg-secondary">
+      {post.data.description}
+    </p>
+
+    <div class="blog-content mt-10 border-t border-surface-2 pt-8 text-fg-secondary">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .blog-content :global(h2) {
+    margin-top: 2rem;
+    color: var(--color-fg-primary);
+    font-size: 1.5rem;
+    font-weight: 650;
+  }
+
+  .blog-content :global(p) {
+    margin-top: 1rem;
+    line-height: 1.8;
+  }
+
+  .blog-content :global(ul) {
+    margin-top: 1rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .blog-content :global(li) {
+    margin-top: 0.5rem;
+  }
+</style>
