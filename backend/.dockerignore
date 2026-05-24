@@ -1,0 +1,18 @@
+# Excluye del contexto Docker para que no se copien al builder
+# cosas pesadas o irrelevantes. Acelera el build y reduce la
+# probabilidad de meter secretos en la imagen.
+
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.log
+
+# Configuración local que NO va en imagen
+.env
+.env.local
+.env.dev
+
+# Tests no son necesarios en runtime (ya los hemos pasado fuera)
+src/test/

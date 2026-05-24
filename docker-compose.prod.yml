@@ -1,0 +1,97 @@
+# ============================================================
+# DondeAnime - Stack de PRODUCCIÓN (Hetzner VPS)
+# ------------------------------------------------------------
+# Tres servicios:
+#   - postgres: BD persistente, NO expone puerto al host
+#   - backend:  Spring Boot, NO expone puerto al host
+#   - caddy:    reverse proxy con SSL Let's Encrypt automático
+#               (único servicio que ve internet)
+#
+# Las comunicaciones internas (backend → postgres, caddy → backend)
+# pasan por la red Docker, usando los nombres de servicio como hosts.
+# Esto es más seguro: postgres NO es accesible desde internet.
+#
+# Uso (en el VPS):
+#   docker compose -f docker-compose.prod.yml up -d
+#   docker compose -f docker-compose.prod.yml logs -f
+#   docker compose -f docker-compose.prod.yml down
+#
+# Las variables vienen de un archivo .env.prod que NO está en repo.
+# Ver .env.prod.example para la plantilla.
+# ============================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dondeanime_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # NO mapeamos puertos al host. Postgres solo es accesible
+    # desde otros contenedores en la misma red Docker.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dondeanime_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Conecta a Postgres por nombre de servicio dentro de la red Docker.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      # Vacío si no usamos webhook. Se rellena cuando configuremos
+      # el Deploy Hook de Vercel.
+      VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
+      # Activamos el scheduler en producción (en local está OFF).
+      SCHEDULING_ENABLED: "true"
+    # NO mapeamos puerto al host. Caddy lo proxea desde fuera.
+    networks:
+      - internal
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: dondeanime_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data        # persistencia de certificados Let's Encrypt
+      - caddy_config:/config
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+    name: dondeanime_postgres_prod_data
+  caddy_data:
+    name: dondeanime_caddy_data
+  caddy_config:
+    name: dondeanime_caddy_config
+
+networks:
+  internal:
+    name: dondeanime_internal
+    driver: bridge

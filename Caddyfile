@@ -1,0 +1,44 @@
+# ============================================================
+# DondeAnime - Caddy reverse proxy (producción)
+# ------------------------------------------------------------
+# Caddy emite y renueva certificados Let's Encrypt automáticamente.
+# Funciona zero-config siempre que:
+#   1. El dominio resuelva a esta IP (DNS).
+#   2. El puerto 80 esté abierto en el firewall (Let's Encrypt
+#      hace HTTP-01 challenge).
+#
+# IMPORTANTE: en Cloudflare, el registro DNS de api.dondeanime.com
+# debe estar con proxy DESACTIVADO (nube gris). Si lo dejamos en
+# proxy ON (nube naranja), Let's Encrypt no puede validar y Caddy
+# falla emitiendo el cert. Para activar el proxy de Cloudflare hay
+# que pasar al DNS-01 challenge (requiere API token), lo haremos
+# en una iteración futura.
+# ============================================================
+
+api.dondeanime.com {
+    # Reverse proxy al contenedor backend (nombre de servicio en
+    # docker-compose.prod.yml). Caddy resuelve el DNS Docker.
+    reverse_proxy backend:8080
+
+    # Compresión: brotli y gzip según lo que pida el cliente.
+    encode zstd gzip
+
+    # Logs estructurados a stdout (Docker captura).
+    log {
+        output stdout
+        format json
+        level INFO
+    }
+
+    # Headers de seguridad razonables para una API pública.
+    header {
+        # Evita que el navegador adivine MIME types.
+        X-Content-Type-Options "nosniff"
+        # No queremos que la API se renderice en iframes.
+        X-Frame-Options "DENY"
+        # Política de referrer mínima.
+        Referrer-Policy "no-referrer"
+        # Quita la cabecera Server por defecto que delata Caddy.
+        -Server
+    }
+}
