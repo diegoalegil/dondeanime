@@ -17,6 +17,12 @@ export interface AnimeSummary {
   seasonYear: number | null;
 }
 
+export interface UpcomingAnime extends AnimeSummary {
+  startYear: number;
+  startMonth: number;
+  startDay: number;
+}
+
 export interface WatchProvider {
   countryCode: string;
   providerSlug: string;
@@ -69,6 +75,17 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 export const getAllAnime = () => fetchJson<AnimeSummary[]>('/api/anime');
+
+export const getUpcomingAnime = async (days: number) => {
+  const res = await fetch(`${API_URL}/api/anime/upcoming?days=${days}`);
+  if (res.status === 404) {
+    return [] as UpcomingAnime[];
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/anime/upcoming failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<UpcomingAnime[]>;
+};
 
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
