@@ -1,0 +1,194 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeDetail, AnimeSummary, WatchProvider } from '@/lib/api';
+import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { BEST_ANIME_YEARS } from '@/lib/bestYears';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { filterVisibleProviders, getPlatform } from '@/lib/platforms';
+
+interface Props {
+  topAnime: AnimeSummary[];
+  totalInYear: number;
+}
+
+interface ProviderSummary {
+  slug: string;
+  name: string;
+  logoUrl: string;
+  countryCount: number;
+}
+
+export async function getStaticPaths() {
+  const allAnime = await getAllAnime();
+
+  return BEST_ANIME_YEARS.map((year) => {
+    const animeInYear = allAnime
+      .filter((anime) => anime.year === year)
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+
+    return {
+      params: { year: String(year) },
+      props: {
+        topAnime: animeInYear.slice(0, 30),
+        totalInYear: animeInYear.length,
+      },
+    };
+  });
+}
+
+const { year } = Astro.params;
+const { topAnime, totalInYear } = Astro.props as Props;
+const yearNum = Number(year);
+
+const summarizeProviders = (detail: AnimeDetail): ProviderSummary[] => {
+  const providerMap = new Map<string, { provider: WatchProvider; countryCodes: Set<string> }>();
+
+  Object.entries(detail.watchProvidersByCountry).forEach(([countryCode, providers]) => {
+    filterVisibleProviders(providers).forEach((provider) => {
+      const existing = providerMap.get(provider.providerSlug);
+      if (existing) {
+        existing.countryCodes.add(countryCode);
+        return;
+      }
+
+      providerMap.set(provider.providerSlug, {
+        provider,
+        countryCodes: new Set([countryCode]),
+      });
+    });
+  });
+
+  return Array.from(providerMap.entries())
+    .map(([slug, { provider, countryCodes }]) => ({
+      slug,
+      name: getPlatform(slug)?.name ?? provider.providerName,
+      logoUrl: provider.logoUrl,
+      countryCount: countryCodes.size,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+};
+
+const details = await Promise.all(topAnime.map((anime) => getAnimeBySlug(anime.slug)));
+const detailBySlug = new Map(details.map((detail) => [detail.anime.slug, detail]));
+
+const rankedAnime = topAnime.map((anime) => ({
+  anime,
+  providers: summarizeProviders(detailBySlug.get(anime.slug)!),
+}));
+
+const seoTitle = `Mejores anime de ${yearNum} - Top ${topAnime.length} para ver en streaming | DondeAnime`;
+const seoDescription = topAnime.length > 0
+  ? `Ranking de los mejores anime de ${yearNum} por popularidad: ${topAnime.slice(0, 5).map((anime) => anime.titleEnglish || anime.titleRomaji).join(', ')} y más.`
+  : `Ranking de anime de ${yearNum} para ver en streaming en plataformas hispanoamericanas.`;
+
+const pageUrl = absoluteUrl(`/mejores/${year}`);
+const itemListSchema = buildItemListSchema(
+  topAnime.map((anime) => ({
+    name: anime.titleEnglish || anime.titleRomaji,
+    url: absoluteUrl(`/anime/${anime.slug}`),
+  })),
+  pageUrl,
+  `Mejores anime de ${yearNum}`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Mejores anime', url: '/' },
+      { name: String(year), url: `/mejores/${year}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Ranking anual</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      Mejores anime de <span class="brand-gradient-text">{year}</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      Top {topAnime.length} por popularidad de {totalInYear} anime catalogados de {year}.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {rankedAnime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos anime catalogados de este año todavía.
+      </p>
+    ) : (
+      <ol class="grid gap-4">
+        {rankedAnime.map(({ anime, providers }, index) => {
+          const title = anime.titleEnglish || anime.titleRomaji;
+          const visibleProviders = providers.slice(0, 5);
+          const hiddenProviderCount = Math.max(0, providers.length - visibleProviders.length);
+
+          return (
+            <li
+              class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[4rem_6rem_1fr] sm:items-start"
+              data-best-year-result
+            >
+              <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet sm:h-12 sm:w-16">
+                #{index + 1}
+              </div>
+              <a href={`/anime/${anime.slug}`} class="block w-24 sm:w-full">
+                <img
+                  src={anime.coverImage}
+                  alt={title}
+                  loading="lazy"
+                  class="aspect-[2/3] w-full rounded-lg object-cover ring-1 ring-surface-2"
+                />
+              </a>
+              <div class="min-w-0">
+                <a
+                  href={`/anime/${anime.slug}`}
+                  class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
+                >
+                  {title}
+                </a>
+                <p class="mt-2 text-sm text-fg-muted">
+                  {anime.format} · Popularidad {anime.popularity ?? 'sin dato'} · Nota {anime.averageScore ?? 'sin dato'}
+                </p>
+
+                {visibleProviders.length === 0 ? (
+                  <p class="mt-4 text-sm text-fg-secondary">
+                    Sin plataformas actuales en los países cubiertos.
+                  </p>
+                ) : (
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    {visibleProviders.map((provider) => (
+                      <a
+                        href={`/plataforma/${provider.slug}`}
+                        class="inline-flex min-h-10 items-center gap-2 rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
+                        data-provider-chip
+                      >
+                        <img
+                          src={provider.logoUrl}
+                          alt=""
+                          loading="lazy"
+                          class="h-6 w-6 rounded object-cover"
+                        />
+                        <span>{provider.name}</span>
+                        <span class="text-xs text-fg-muted">
+                          {provider.countryCount} {provider.countryCount === 1 ? 'país' : 'países'}
+                        </span>
+                      </a>
+                    ))}
+                    {hiddenProviderCount > 0 && (
+                      <span class="inline-flex min-h-10 items-center rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-muted">
+                        +{hiddenProviderCount} más
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    )}
+  </section>
+</BaseLayout>
