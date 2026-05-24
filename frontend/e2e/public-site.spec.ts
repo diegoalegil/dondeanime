@@ -1,4 +1,45 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
+
+const expectedPartitionSitemaps = [
+  '/sitemap-anime.xml',
+  '/sitemap-paises.xml',
+  '/sitemap-plataformas.xml',
+  '/sitemap-generos.xml',
+  '/sitemap-temporadas.xml',
+  '/sitemap-mejores.xml',
+  '/sitemap-combinatoria.xml',
+];
+
+const sitemapPathsFromIndex = async (request: APIRequestContext, path = '/sitemap-index.xml') => {
+  const sitemapIndex = await request.get(path);
+  expect(sitemapIndex.ok()).toBe(true);
+  const sitemapIndexText = await sitemapIndex.text();
+
+  expect(sitemapIndexText).toContain('<sitemapindex');
+  expect(expectedPartitionSitemaps.every((sitemapPath) =>
+    sitemapIndexText.includes(`https://dondeanime.com${sitemapPath}`),
+  )).toBe(true);
+
+  return [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)]
+    .map((m) => m[1]);
+};
+
+const allPartitionedSitemapText = async (request: APIRequestContext) => {
+  const sitemapPaths = await sitemapPathsFromIndex(request);
+  expect(sitemapPaths).toEqual(expect.arrayContaining(expectedPartitionSitemaps));
+
+  return (
+    await Promise.all(
+      sitemapPaths.map(async (path) => {
+        const sitemap = await request.get(path);
+        expect(sitemap.ok()).toBe(true);
+        const text = await sitemap.text();
+        expect(text).toContain('<urlset');
+        return text;
+      }),
+    )
+  ).join('\n');
+};
 
 test('home renders the static catalog and links to an anime detail page', async ({ page }) => {
   await page.goto('/');
@@ -68,15 +109,7 @@ test('upcoming release pages render and are indexed', async ({ page, request }) 
     'https://dondeanime.com/estrenos/proximo-mes',
   );
 
-  const sitemapIndex = await request.get('/sitemap-index.xml');
-  expect(sitemapIndex.ok()).toBe(true);
-  const sitemapIndexText = await sitemapIndex.text();
-  const sitemapPath = sitemapIndexText.match(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/)?.[1];
-  expect(sitemapPath).toBeTruthy();
-
-  const sitemap = await request.get(sitemapPath!);
-  expect(sitemap.ok()).toBe(true);
-  const sitemapText = await sitemap.text();
+  const sitemapText = await allPartitionedSitemapText(request);
   expect(sitemapText).toContain('https://dondeanime.com/estrenos/proxima-semana');
   expect(sitemapText).toContain('https://dondeanime.com/estrenos/proximo-mes');
 });
@@ -105,21 +138,7 @@ test('genre and platform combination pages filter anime and are indexed', async 
   }));
   expect(itemList.itemListElement).toHaveLength(Math.min(resultCount, 30));
 
-  const sitemapIndex = await request.get('/sitemap-index.xml');
-  expect(sitemapIndex.ok()).toBe(true);
-  const sitemapIndexText = await sitemapIndex.text();
-  const sitemapPaths = [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)].map((m) => m[1]);
-  expect(sitemapPaths.length).toBeGreaterThan(0);
-
-  const allSitemapText = (
-    await Promise.all(
-      sitemapPaths.map(async (path) => {
-        const sitemap = await request.get(path);
-        expect(sitemap.ok()).toBe(true);
-        return sitemap.text();
-      }),
-    )
-  ).join('\n');
+  const allSitemapText = await allPartitionedSitemapText(request);
 
   const comboUrls = new Set(
     [...allSitemapText.matchAll(/https:\/\/dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
@@ -153,21 +172,7 @@ test('best anime by year pages render ranking, providers and schema', async ({ p
   }));
   expect(itemList.itemListElement).toHaveLength(resultCount);
 
-  const sitemapIndex = await request.get('/sitemap-index.xml');
-  expect(sitemapIndex.ok()).toBe(true);
-  const sitemapIndexText = await sitemapIndex.text();
-  const sitemapPaths = [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)].map((m) => m[1]);
-  expect(sitemapPaths.length).toBeGreaterThan(0);
-
-  const allSitemapText = (
-    await Promise.all(
-      sitemapPaths.map(async (path) => {
-        const sitemap = await request.get(path);
-        expect(sitemap.ok()).toBe(true);
-        return sitemap.text();
-      }),
-    )
-  ).join('\n');
+  const allSitemapText = await allPartitionedSitemapText(request);
 
   for (let year = 2010; year <= 2026; year += 1) {
     expect(allSitemapText).toContain(`https://dondeanime.com/mejores/${year}`);
@@ -190,9 +195,28 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(robots.ok()).toBe(true);
   expect(await robots.text()).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
 
-  const sitemap = await request.get('/sitemap-index.xml');
-  expect(sitemap.ok()).toBe(true);
-  expect(await sitemap.text()).toContain('<sitemapindex');
+  const sitemapPaths = await sitemapPathsFromIndex(request);
+  expect(sitemapPaths).toEqual(expectedPartitionSitemaps);
+
+  const sitemapAlias = await request.get('/sitemap.xml');
+  expect(sitemapAlias.ok()).toBe(true);
+  expect(await sitemapAlias.text()).toContain('<sitemapindex');
+
+  const animeSitemap = await request.get('/sitemap-anime.xml');
+  const animeUrls = [...(await animeSitemap.text()).matchAll(/<url>/g)];
+  expect(animeUrls.length).toBeGreaterThanOrEqual(100);
+
+  const countrySitemap = await request.get('/sitemap-paises.xml');
+  expect(await countrySitemap.text()).toContain('https://dondeanime.com/pais/espana');
+
+  const platformSitemap = await request.get('/sitemap-plataformas.xml');
+  expect(await platformSitemap.text()).toContain('https://dondeanime.com/plataforma/crunchyroll');
+
+  const genreSitemap = await request.get('/sitemap-generos.xml');
+  expect(await genreSitemap.text()).toContain('https://dondeanime.com/genero/action');
+
+  const seasonSitemap = await request.get('/sitemap-temporadas.xml');
+  expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
 });
 
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
