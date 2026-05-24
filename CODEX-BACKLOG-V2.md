@@ -403,3 +403,89 @@ git checkout -b sprint-N-pr1
 - Sprint 16: API pública con rate limiting + docs OpenAPI para terceros.
 
 Estos se detallarán en `CODEX-BACKLOG-V3.md` cuando Sprint 12 esté cerrado.
+
+---
+
+## Fixes prioritarios detectados (Sprint Hotfix)
+
+> Bugs visibles en producción identificados por Diego revisando la web en mayo 2026.
+> Codex los ataca como **rama `hotfix-quick-wins`** intercalada cuando termine el PR
+> actual del sprint en curso. NO esperar a fin de sprint.
+
+### HF-1 — Temporada "actual" dinámica
+
+**Bug:** Home muestra "Estrenos de Otoño 2024" cuando hoy es mayo 2026. Hardcoded
+o mal calculado.
+
+**Fix:**
+- Identificar el componente/página que renderiza ese bloque (probablemente
+  `frontend/src/pages/index.astro` o `frontend/src/components/SeasonBlock.astro`).
+- Calcular temporada actual en build time:
+  - Mes 1-3 → `WINTER`
+  - Mes 4-6 → `SPRING`
+  - Mes 7-9 → `SUMMER`
+  - Mes 10-12 → `FALL`
+  - Año = año actual
+- Si la temporada actual aún no tiene anime en BD (estamos al inicio, no se ha
+  sincronizado), fallback a la última temporada con `count > 0` de
+  `/api/seasons` ordenado por (year, season) desc.
+- Título dinámico: `"Estrenos de {seasonNombreES} {year}"` con map ES:
+  `WINTER=Invierno, SPRING=Primavera, SUMMER=Verano, FALL=Otoño`.
+- Test E2E: build y verificar que el H2 contiene el año actual.
+- **Veto:** no inventar "próxima temporada". Solo actual.
+
+### HF-2 — Descripciones en español (no inglés)
+
+**Bug:** las descripciones de anime se muestran en inglés. El público objetivo es
+hispanohablante. Esto mata SEO local y experiencia.
+
+**Fix en 3 capas (en orden de prioridad):**
+
+1. **TMDb como fuente preferente para descripción**: cuando hay
+   `anime.tmdbId != null`, llamar `TmdbClient.getDetails(tmdbId, "es-ES")` y
+   usar `overview` como `description`. TMDb sirve descripciones en español
+   para la mayoría de anime populares.
+   - Añadir campo `descriptionEs` a entidad `Anime` (nullable, TEXT).
+   - Migración Flyway (cuando Sprint 6 esté, mientras tanto `ddl-auto=update`).
+   - `AnimeMatchingService` o nuevo `AnimeDescriptionEnricher` rellena
+     `descriptionEs` tras el match.
+   - `AnimeDetailDto.from(...)` usa `descriptionEs ?? description` (fallback al
+     inglés de AniList si no hay traducción).
+
+2. **Override editorial sobrescribe ambas**: el sistema de Sprint 1 ya soporta
+   `description` en `anime_override`. Mantener prioridad:
+   `override > descriptionEs > description (inglés)`.
+
+3. **Disclaimer visual cuando solo hay inglés**: si `AnimeDetailDto` acaba
+   sirviendo la descripción inglesa (porque no hubo TMDb ni override), añadir
+   un badge sutil arriba de la descripción: *"Descripción en inglés. Traducción
+   pendiente."* No esconder el contenido, solo señalar.
+
+- Tests:
+  - Unitario `AnimeDescriptionEnricherTest`: mock TmdbClient, verifica que
+    rellena `descriptionEs` correctamente.
+  - Integration: anime con TMDb match conocido, sync, verificar BD tiene
+    `descriptionEs` no nula.
+- **Veto:** NO usar Google Translate/DeepL automáticos. Coste + traducciones
+  malas dañan SEO. Solo TMDb o manual.
+
+### HF-3 — Frontend redesign (esbozo)
+
+**Diagnóstico:** Diego reporta que el frontend "necesita un cambio". Sin
+especificación detallada todavía.
+
+**Acción Codex:** NO implementar nada todavía. Crear archivo
+`frontend/REDESIGN-NOTES.md` con auditoría actual:
+- Captura de cada página principal (home, detalle, país, plataforma).
+- Listado de problemas evidentes (CLS, jerarquía visual débil, hero pobre,
+  cards monótonas, etc.).
+- Propuestas concretas con mockups en ASCII o referencias a sitios bien
+  resueltos (ejemplo: hero tipo JustWatch, cards tipo Letterboxd).
+- Estimación de esfuerzo por sección.
+
+Diego revisa el doc y prioriza. Sprint dedicado posterior (probable
+Sprint 7.5 o nuevo Sprint 13) tras feedback.
+
+**Veto:** Codex NO empieza redesign sin que Diego apruebe el doc primero.
+Cambios estéticos sin alineación son tiempo perdido.
+
