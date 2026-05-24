@@ -10,7 +10,7 @@ Web pública en español para descubrir **cuándo y dónde se estrena cada anime
 
 - URL final: https://dondeanime.com
 - Repo: https://github.com/diegoalegil/dondeanime (privado)
-- Estado: desarrollo activo. **Semana 4 cerrada** (día 7): scheduler `@Scheduled` listo, endpoints para el frontend Astro implementados (providers, genres, seasons, sitemap), refactor DTOs públicos que esconden campos internos, 13 tests verdes. Backend listo para consumo desde el frontend.
+- Estado: **EN PRODUCCIÓN**. Frontend en `https://dondeanime.com` (Vercel), backend en `https://api.dondeanime.com` (Hetzner VPS CX22 con Docker + Caddy + Let's Encrypt). Scheduler activo: AniList cada 12h, TMDb match cada 24h, providers cada 24h, webhook auto-rebuild de Vercel tras cada sync de providers. A partir de aquí el trabajo lo lleva Codex en sprints (ver `CODEX.md`).
 
 ---
 
@@ -237,6 +237,57 @@ docker compose up -d
 
 ---
 
+## Producción (URLs y comandos)
+
+### URLs vivas
+- **Frontend**: https://dondeanime.com (apex 307 → www.dondeanime.com, Astro estático en Vercel)
+- **Backend API**: https://api.dondeanime.com (Spring Boot en Hetzner VPS, Caddy reverse proxy, Let's Encrypt)
+- **Dashboards**:
+  - Cloudflare DNS: https://dash.cloudflare.com → `dondeanime.com`
+  - Vercel: https://vercel.com/diegoalegil/dondeanime
+  - Hetzner: https://console.hetzner.cloud → proyecto `dondeanime` → server `dondeanime-prod` (IP `46.224.162.174`)
+
+### Acceso al VPS
+```bash
+# SSH como deploy (sin password, con SSH key en ~/.ssh/id_ed25519)
+ssh deploy@46.224.162.174
+
+# Directorio del proyecto en el VPS
+cd /opt/dondeanime
+```
+
+### Operación habitual en el VPS
+```bash
+# Logs en vivo
+docker compose -f docker-compose.prod.yml logs -f backend
+docker compose -f docker-compose.prod.yml logs -f caddy
+
+# Estado de contenedores
+docker compose -f docker-compose.prod.yml ps
+
+# Reiniciar backend (tras cambio de config en .env.prod)
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+
+# Deploy de nueva versión del código
+git pull
+docker compose -f docker-compose.prod.yml --env-file .env.prod build backend
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+
+# Disparar sync manual (también lo hace el scheduler en cron)
+curl -X POST https://api.dondeanime.com/api/anime/sync
+curl -X POST https://api.dondeanime.com/api/anime/match
+curl -X POST https://api.dondeanime.com/api/anime/sync-providers
+```
+
+### Variables de entorno producción
+Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
+Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`.
+
+### Más detalle operativo
+Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.
+
+---
+
 ## Estado actual del proyecto
 
 - [x] APIs externas validadas (AniList + TMDb devuelven datos reales)
@@ -268,46 +319,34 @@ docker compose up -d
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
 - [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
 - [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
-- [ ] **PRÓXIMO:** Deploy backend en Hetzner + frontend en Vercel + DNS a Cloudflare (mes 2)
-- [ ] Enriquecimiento manual top 50 (mes 3)
-- [ ] Sistema de alertas por email (mes 3)
-- [ ] Monetización: AdSense + afiliados (mes 3)
+- [x] **Deploy producción (mes 2):** VPS Hetzner CX22 con Docker (Postgres + backend + Caddy reverse proxy), Vercel para frontend Astro estático, Cloudflare gestionando DNS de `dondeanime.com` y `api.dondeanime.com`. Cert Let's Encrypt automático en ambos. Bug `delete+insert duplicate key` en `ProviderSyncService` arreglado con `@Modifying @Query` JPQL. Webhook backend → Vercel disparado al final de `syncProviders` para auto-rebuild.
+- [ ] **PRÓXIMO:** Sprints de Codex (ver `CODEX.md`). 3 sprints de ~2 semanas: enriquecimiento manual top 50 + panel admin (sprint 1), sistema alertas email con Resend + doble opt-in (sprint 2), monetización con afiliados + Plausible Analytics (sprint 3).
+- [ ] Mejora continua paralela (CI/CD, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
 
 ---
 
 ## Próxima tarea concreta
 
-**Desplegar la web pública.** Entregable del mes 2 del roadmap (segunda mitad).
+**El trabajo grande lo lleva Codex en 3 sprints (~6 semanas).** Ver `CODEX.md` en la raíz del repo para el backlog detallado, convenciones inviolables y decisiones intocables.
 
-El backend está completo y el frontend Astro está cerrado con 720 páginas estáticas funcionando en local. Lo que queda es el deploy:
-- VPS Hetzner para backend + Postgres.
-- Vercel para frontend (build estático).
-- Cloudflare como DNS + CDN delante de los dos.
-- Variables de entorno: `PUBLIC_API_URL` apunta a la API pública en Hetzner.
-- Imagen OG real generada vía ChatGPT Pro (placeholder SVG actual).
+Resumen sprints:
+- **Sprint 1**: enriquecimiento manual top 50 (overrides editorial) + panel admin con auth básica.
+- **Sprint 2**: sistema de alertas email (Resend, doble opt-in, GDPR mínimo).
+- **Sprint 3**: monetización (links de afiliado curados) + Plausible Analytics + slot AdSense preparado.
 
-### Lo que necesita decisión humana (Diego)
+Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare Email Routing, backups BD automáticos a R2, page rules de cache, CI/CD básico.
 
-1. **Comprar VPS en Hetzner** (~5€/mes, CX22).
-2. **Migrar DNS de Namecheap a Cloudflare** (cuenta gratis).
-3. **Decidir cuándo desplegar el backend**: ¿temprano (justo ahora) para que la sesión frontend pueda apuntar al endpoint público, o tarde (cuando el frontend ya esté presentable)?
-4. **Revisar los 16 anime sin match TMDb** y los matches del top 50 manualmente. Es contenido tuyo, no auto-generable.
+### Cómo coordina Diego con Codex (y con Claude)
 
-### Lo que pueden hacer las sesiones de Claude
+- **Codex** ejecuta sprints siguiendo `CODEX.md`. Hace PRs, no merge directo a main.
+- **Diego** revisa código de Codex antes de mergear. Aprueba decisiones técnicas que se salgan del backlog.
+- **Claude** (esta sesión o nuevas) interviene a petición de Diego para verificar bloques de Codex (`"verifica el bloque X"`) o resolver dudas estratégicas que excedan la autonomía de Codex.
 
-**Sesión backend (esta o nueva)**:
-- Añadir endpoints que pida la sesión frontend.
-- Refactor adicional si encontramos algo en producción.
-- Health endpoint `/actuator/health` para monitoreo.
-- Configurar deploy a Hetzner (Dockerfile del backend, docker-compose para prod, secrets management).
-- Crear `application-prod.properties` con `scheduling.enabled=true`.
+### Lo que sigue necesitando decisión humana
 
-**Sesión frontend (nueva)**:
-- Diseño y estructura de páginas Astro.
-- Componentes (CardAnime, FilterByCountry, FilterByProvider, etc.).
-- Estilos (Tailwind o vanilla CSS).
-- Generación de sitemap.xml, robots.txt, structured data JSON-LD.
-- Build pipeline → Vercel.
+1. **Revisar los 16 anime sin match TMDb** y los matches del top 50 manualmente. Es contenido editorial, no auto-generable. Codex puede preparar el panel admin pero las decisiones de qué texto y qué afiliados son de Diego.
+2. **Configurar cuenta Resend** (sprint 2) o equivalente para email.
+3. **Aprobar configuración AdSense** (sprint 3) cuando haya 3+ meses de tráfico.
 
 ### Endpoints listos para el frontend
 
