@@ -276,6 +276,37 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 # Postgres y Caddy no se recrean si no cambiaron.
 ```
 
+### Primer deploy con Flyway
+
+Solo la primera vez que producción pase de Hibernate `ddl-auto=update` a
+Flyway:
+
+```bash
+ssh deploy@IP_VPS
+cd /opt/dondeanime
+git pull
+set -a
+. ./.env.prod
+set +a
+
+docker run --rm --network dondeanime_internal \
+  flyway/flyway:11-alpine \
+  -url="jdbc:postgresql://postgres:5432/${POSTGRES_DB}" \
+  -user="${POSTGRES_USER}" \
+  -password="${POSTGRES_PASSWORD}" \
+  -baselineVersion=1 \
+  -baselineDescription="schema actual producción" \
+  baseline
+
+docker compose -f docker-compose.prod.yml --env-file .env.prod build backend
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+docker compose -f docker-compose.prod.yml logs -f backend
+```
+
+Ese `baseline` marca `V1__baseline.sql` como ya aplicado en la BD viva.
+Después el backend arranca con `ddl-auto=validate` y Flyway aplica las
+migraciones posteriores, empezando por `V2__add_indexes.sql`.
+
 ### Backup de BD
 
 ```bash
