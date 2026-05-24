@@ -7,6 +7,7 @@ import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
 import { pwaInfo } from 'virtual:pwa-info';
 import SkeletonRow from '@/components/ui/SkeletonRow.astro';
+import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -37,6 +38,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <meta name="theme-color" content="#A78BFA" />
     {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
     <ClientRouter />
+    <link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>
       // Anti-FOIT: aplicar tema guardado antes del primer paint
       try {

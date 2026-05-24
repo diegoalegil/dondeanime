@@ -1,6 +1,7 @@
 ---
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, type PlatformSlug } from '@/lib/platforms';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 const year = new Date().getFullYear();
 const featuredPlatforms: PlatformSlug[] = [
@@ -36,7 +37,7 @@ const featuredGenres = [
             return (
               <li>
                 <a href={`/pais/${slug}`} class="flex items-center gap-2 text-fg-muted transition-colors hover:text-fg-primary">
-                  <span class={`fi fi-${c.flagCode} rounded`} aria-hidden="true"></span>
+                  <CountryFlag country={c} />
                   {c.name}
                 </a>
               </li>

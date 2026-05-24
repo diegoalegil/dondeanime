@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -74,7 +75,7 @@ const itemListSchema = buildItemListSchema(
           Anime en {displayName}
           <span class="text-fg-muted">·</span>
           <span class="inline-flex items-center gap-2">
-            <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+            <CountryFlag country={country} />
             {country.name}
           </span>
         </h1>
