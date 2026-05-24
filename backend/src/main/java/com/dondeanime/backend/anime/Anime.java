@@ -35,6 +35,9 @@ public class Anime {
     @Column(name = "tmdb_id")
     private Long tmdbId;
 
+    @Column(name = "trailer_youtube_id", length = 32)
+    private String trailerYoutubeId;
+
     @Column(name = "title_romaji")
     private String titleRomaji;
 
@@ -140,6 +143,14 @@ public class Anime {
 
     public void setTmdbId(Long tmdbId) {
         this.tmdbId = tmdbId;
+    }
+
+    public String getTrailerYoutubeId() {
+        return trailerYoutubeId;
+    }
+
+    public void setTrailerYoutubeId(String trailerYoutubeId) {
+        this.trailerYoutubeId = trailerYoutubeId;
     }
 
     public String getTitleRomaji() {

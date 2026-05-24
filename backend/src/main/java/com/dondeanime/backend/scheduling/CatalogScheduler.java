@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient;
 
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
+import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 /**
@@ -28,10 +29,10 @@ import com.dondeanime.backend.provider.ProviderSyncService;
  * Cron de Spring tiene 6 campos (seg min hora día mes día_semana).
  * Distinto del cron Unix de 5 campos.
  *
- * Tras completar syncProviders (último paso del pipeline) dispara
- * un Deploy Hook de Vercel para que el frontend rebuildee con datos
- * frescos. Solo si vercel.deploy-hook está configurado (env var
- * VERCEL_DEPLOY_HOOK en .env.prod del VPS).
+ * Tras completar syncProviders (providers + trailers, último paso del
+ * pipeline) dispara un Deploy Hook de Vercel para que el frontend
+ * rebuildee con datos frescos. Solo si vercel.deploy-hook está
+ * configurado (env var VERCEL_DEPLOY_HOOK en .env.prod del VPS).
  */
 @Component
 @ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")
@@ -42,6 +43,7 @@ public class CatalogScheduler {
     private final AnimeSyncService syncService;
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
+    private final TrailerSyncService trailerSyncService;
     private final RestClient restClient;
     private final String vercelDeployHook;
 
@@ -49,11 +51,13 @@ public class CatalogScheduler {
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
+            TrailerSyncService trailerSyncService,
             RestClient.Builder restClientBuilder,
             @Value("${vercel.deploy-hook:}") String vercelDeployHook) {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
+        this.trailerSyncService = trailerSyncService;
         this.restClient = restClientBuilder.build();
         this.vercelDeployHook = vercelDeployHook;
     }
@@ -85,8 +89,10 @@ public class CatalogScheduler {
         log.info("[scheduler] syncProviders: iniciando");
         boolean ok = false;
         try {
-            int n = providerSyncService.syncAll();
-            log.info("[scheduler] syncProviders: completado, {} procesados", n);
+            int providers = providerSyncService.syncAll();
+            int trailers = trailerSyncService.syncAll();
+            log.info("[scheduler] syncProviders: completado, {} providers procesados, {} trailers procesados",
+                    providers, trailers);
             ok = true;
         } catch (Exception e) {
             log.error("[scheduler] syncProviders: ERROR", e);

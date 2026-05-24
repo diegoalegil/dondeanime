@@ -28,6 +28,7 @@ public class AnimeController {
     private final AnimeSyncService syncService;
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
+    private final TrailerSyncService trailerSyncService;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -37,6 +38,7 @@ public class AnimeController {
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
+            TrailerSyncService trailerSyncService,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService) {
@@ -44,6 +46,7 @@ public class AnimeController {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
+        this.trailerSyncService = trailerSyncService;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -112,6 +115,15 @@ public class AnimeController {
     @PostMapping("/sync-providers")
     public Map<String, Integer> syncProviders() {
         int processed = providerSyncService.syncAll();
+        return Map.of("processed", processed);
+    }
+
+    /**
+     * Sincroniza trailers de YouTube desde TMDb para cada anime con tmdbId.
+     */
+    @PostMapping("/sync-trailers")
+    public Map<String, Integer> syncTrailers() {
+        int processed = trailerSyncService.syncAll();
         return Map.of("processed", processed);
     }
 }

@@ -60,6 +60,9 @@ class AnimeControllerTest {
     private ProviderSyncService providerSyncService;
 
     @MockitoBean
+    private TrailerSyncService trailerSyncService;
+
+    @MockitoBean
     private WatchProviderRepository providerRepository;
 
     @MockitoBean
@@ -98,6 +101,7 @@ class AnimeControllerTest {
         mvc.perform(get("/api/anime/attack-on-titan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.anime.slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$.anime.trailerYoutubeId").value("abc123DEF45"))
                 .andExpect(jsonPath("$.watchProvidersByCountry").isMap())
                 .andExpect(jsonPath("$.watchProvidersByCountry.ES[0].affiliateUrl").value("https://example.com"));
     }
@@ -129,10 +133,20 @@ class AnimeControllerTest {
         verify(syncService, never()).syncPopular(anyInt());
     }
 
+    @Test
+    void syncTrailersReturnsProcessedCount() throws Exception {
+        when(trailerSyncService.syncAll()).thenReturn(42);
+
+        mvc.perform(post("/api/anime/sync-trailers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.processed").value(42));
+    }
+
     private static Anime makeAnime(String slug, String titleEnglish) {
         Anime a = new Anime();
         a.setId(1L);
         a.setAnilistId(123L);
+        a.setTrailerYoutubeId("abc123DEF45");
         a.setSlug(slug);
         a.setTitleEnglish(titleEnglish);
         a.setFormat("TV");
