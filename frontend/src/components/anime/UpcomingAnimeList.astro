@@ -1,0 +1,64 @@
+---
+import type { UpcomingAnime } from '@/lib/api';
+import { formatDate, formatStatus, formatType } from '@/lib/format';
+
+interface Props {
+  anime: UpcomingAnime[];
+}
+
+const { anime } = Astro.props;
+
+const isoDate = (item: UpcomingAnime): string => {
+  const month = String(item.startMonth).padStart(2, '0');
+  const day = String(item.startDay).padStart(2, '0');
+  return `${item.startYear}-${month}-${day}`;
+};
+---
+<ol class="grid gap-4">
+  {anime.map((item) => {
+    const title = item.titleEnglish || item.titleRomaji;
+
+    return (
+      <li class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[6rem_5rem_1fr] sm:items-start">
+        <time
+          datetime={isoDate(item)}
+          class="flex min-h-12 items-center justify-center rounded-md bg-surface-2 px-3 py-2 text-center text-sm font-semibold text-accent-violet"
+        >
+          {formatDate(item.startYear, item.startMonth, item.startDay)}
+        </time>
+        <a href={`/anime/${item.slug}`} class="block w-24 sm:w-full">
+          <img
+            src={item.coverImage}
+            alt={title}
+            loading="lazy"
+            class="aspect-[2/3] w-full rounded-lg object-cover ring-1 ring-surface-2"
+          />
+        </a>
+        <div class="min-w-0">
+          <a
+            href={`/anime/${item.slug}`}
+            class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
+          >
+            {title}
+          </a>
+          <p class="mt-2 text-sm text-fg-muted">
+            {formatType(item.format)} · {formatStatus(item.status)} · {
+              item.episodes === null
+                ? 'Episodios sin dato'
+                : `${item.episodes} episodio${item.episodes === 1 ? '' : 's'}`
+            }
+          </p>
+          {item.genres.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2">
+              {item.genres.slice(0, 4).map((genre) => (
+                <span class="rounded-full border border-surface-2 bg-surface-0 px-3 py-1 text-xs text-fg-muted">
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </li>
+    );
+  })}
+</ol>
