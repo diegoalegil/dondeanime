@@ -92,6 +92,8 @@ nano .env.prod
 # Rellenar:
 #   POSTGRES_PASSWORD: openssl rand -base64 32
 #   TMDB_API_KEY: el de tu .env local
+#   ADMIN_PASSWORD: openssl rand -base64 32
+#   PLAUSIBLE_API_KEY: opcional, solo si quieres top páginas en dashboard
 #   VERCEL_DEPLOY_HOOK: vacío por ahora, se rellena en paso 6
 
 chmod 600 .env.prod   # solo deploy puede leerlo
@@ -154,6 +156,12 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
 - Root Directory: `frontend` (donde está el proyecto Astro).
 - Environment Variables:
   - `PUBLIC_API_URL` = `https://api.dondeanime.com`
+  - `PUBLIC_SITE_URL` = `https://dondeanime.com`
+  - `PUBLIC_PLAUSIBLE_ENABLED` = `false` al principio
+  - `PUBLIC_PLAUSIBLE_DOMAIN` = `dondeanime.com`
+  - `ADSENSE_ENABLED` = `false`
+  - `PUBLIC_ADSENSE_ENABLED` = `false`
+  - `PUBLIC_ADSENSE_CLIENT_ID` vacío hasta aprobación
 - Click Deploy. Primer build tarda ~2 min.
 - Cuando termine, abrir la URL `dondeanime-xxx.vercel.app` y verificar que carga con datos reales.
 
@@ -182,6 +190,55 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
   ```
 - A partir de aquí, cada vez que `ProviderSyncService.syncAll()` termine, llamará al hook y Vercel rebuildea.
+
+### 9. Monetización y analítica
+
+#### Links afiliados
+
+- Entrar en `https://dondeanime.com/admin/affiliate-links`.
+- Usar el Basic Auth configurado con `ADMIN_USERNAME`/`ADMIN_PASSWORD`.
+- Crear un link por provider y país:
+  - `providerSlug=crunchyroll`, `country=ES`
+  - `providerSlug=amazon-prime-video`, `country=ES`
+- No inventar tags. Cada programa de afiliados puede variar por país.
+
+#### Plausible
+
+Para solo cargar el script en el frontend:
+
+- En Vercel:
+  - `PUBLIC_PLAUSIBLE_ENABLED=true`
+  - `PUBLIC_PLAUSIBLE_DOMAIN=dondeanime.com`
+
+Para que `/admin/dashboard` muestre top páginas desde Plausible API:
+
+- En el VPS, editar `/opt/dondeanime/.env.prod`:
+  ```env
+  PLAUSIBLE_ENABLED=true
+  PLAUSIBLE_API_KEY=TU_TOKEN
+  PLAUSIBLE_SITE_ID=dondeanime.com
+  ```
+- Recrear backend:
+  ```bash
+  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+  ```
+
+Si `PLAUSIBLE_API_KEY` está vacío, el dashboard sigue funcionando pero la sección de páginas visitadas queda vacía.
+
+#### AdSense
+
+No activar hasta tener aprobación y tráfico suficiente. Cuando toque:
+
+- En Vercel:
+  ```env
+  ADSENSE_ENABLED=true
+  PUBLIC_ADSENSE_ENABLED=true
+  PUBLIC_ADSENSE_CLIENT_ID=ca-pub-...
+  PUBLIC_ADSENSE_SIDEBAR_SLOT=...
+  PUBLIC_ADSENSE_INLINE_SLOT=...
+  ```
+
+Sin esos valores, `AdSlot` no renderiza nada.
 
 ---
 
@@ -222,12 +279,53 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 ### Backup de BD
 
 ```bash
-# Dentro del VPS
-docker exec dondeanime_postgres_prod \
-  pg_dump -U dondeanime_user dondeanime | gzip > /opt/dondeanime/backups/dondeanime-$(date +%Y%m%d).sql.gz
+# Dentro del VPS, desde /opt/dondeanime
+scripts/backup-postgres-r2.sh
 ```
 
-TODO el flujo de desarrollo Sprint 1: script cron + envío a Cloudflare R2.
+El script:
+
+- Lee `/opt/dondeanime/.env.prod`.
+- Crea `/opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz`.
+- Crea checksum `.sha256`.
+- Sube a Cloudflare R2 si `R2_*` está configurado.
+- Borra backups locales de más de `BACKUP_RETENTION_DAYS` días.
+
+Variables en `.env.prod`:
+
+```env
+BACKUP_DIR=/opt/dondeanime/backups
+BACKUP_RETENTION_DAYS=30
+R2_BUCKET=TU_BUCKET
+R2_ACCOUNT_ID=TU_ACCOUNT_ID
+R2_ACCESS_KEY_ID=TU_ACCESS_KEY
+R2_SECRET_ACCESS_KEY=TU_SECRET_KEY
+R2_PREFIX=postgres
+```
+
+Para automatizar cada 6 horas:
+
+```bash
+mkdir -p /opt/dondeanime/logs
+crontab -e
+```
+
+Añadir:
+
+```cron
+17 */6 * * * cd /opt/dondeanime && scripts/backup-postgres-r2.sh >> /opt/dondeanime/logs/backup.log 2>&1
+```
+
+En Cloudflare R2, configurar lifecycle del bucket para borrar objetos con prefijo `postgres/` tras 30 días. Así la retención remota no depende del cron.
+
+Restore manual desde un backup local:
+
+```bash
+# CUIDADO: el dump lleva --clean --if-exists y puede sobrescribir datos.
+gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
+  | docker exec -i dondeanime_postgres_prod \
+      psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
+```
 
 ### Disparar sync manual
 
