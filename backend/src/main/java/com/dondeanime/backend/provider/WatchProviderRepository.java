@@ -3,7 +3,9 @@ package com.dondeanime.backend.provider;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface WatchProviderRepository extends JpaRepository<WatchProvider, Long> {
 
@@ -11,12 +13,22 @@ public interface WatchProviderRepository extends JpaRepository<WatchProvider, Lo
     List<WatchProvider> findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(Long animeId);
 
     /**
-     * Borra todos los providers de un anime. Estrategia "delete + insert"
-     * en cada sync: más simple que hacer upsert por composite key y para
-     * el volumen actual (100 anime × ~5 providers) es trivial.
+     * Borra todos los providers de un anime e inmediatamente los persiste.
      *
-     * Debe llamarse desde un método anotado con @Transactional.
+     * Usa @Modifying + JPQL DELETE explícito porque la versión derived query
+     * (Spring Data autogenerada) no garantizaba que el DELETE se ejecutara
+     * antes de los INSERTs subsecuentes dentro de la misma transacción:
+     * Hibernate diferia el DELETE hasta el commit, los INSERTs salían
+     * primero y chocaban con la unique constraint.
+     *
+     * Con @Modifying + flushAutomatically=true el DELETE se ejecuta YA y
+     * los INSERTs después no encuentran duplicados.
+     *
+     * Debe llamarse desde un método con transacción activa.
      */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Transactional
+    @Query("DELETE FROM WatchProvider w WHERE w.animeId = :animeId")
     void deleteByAnimeId(Long animeId);
 
     /**
