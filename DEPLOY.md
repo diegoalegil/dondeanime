@@ -92,6 +92,7 @@ nano .env.prod
 # Rellenar:
 #   POSTGRES_PASSWORD: openssl rand -base64 32
 #   TMDB_API_KEY: el de tu .env local
+#   ADMIN_PASSWORD: openssl rand -base64 32
 #   VERCEL_DEPLOY_HOOK: vacío por ahora, se rellena en paso 6
 
 chmod 600 .env.prod   # solo deploy puede leerlo
