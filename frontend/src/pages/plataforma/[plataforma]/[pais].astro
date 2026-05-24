@@ -1,0 +1,97 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
+import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import { isHiddenVariant, getPlatform } from '@/lib/platforms';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const paths: Array<{ params: { plataforma: string; pais: string } }> = [];
+  for (const cSlug of COUNTRY_SLUGS) {
+    const providers = await getProvidersByCountry(COUNTRIES[cSlug].iso);
+    for (const p of providers) {
+      if (!isHiddenVariant(p.slug)) {
+        paths.push({ params: { plataforma: p.slug, pais: cSlug } });
+      }
+    }
+  }
+  return paths;
+}
+
+const { plataforma, pais } = Astro.params;
+const countrySlug = pais as CountrySlug;
+const country = COUNTRIES[countrySlug];
+
+const providersList = await getProvidersByCountry(country.iso);
+const providerSummary = providersList.find((p) => p.slug === plataforma);
+const platform = getPlatform(plataforma!);
+const displayName = platform?.name ?? providerSummary?.providerName ?? plataforma!;
+
+const anime = await getAnimeByProvider(plataforma!, country.iso);
+
+const seoTitle = `Anime en ${displayName} ${country.name} — ${anime.length} series | DondeAnime`;
+const seoDescription = `Catálogo completo de anime en ${displayName} ${country.name}: ${anime.length} series y películas disponibles. Encuentra qué ver hoy.`;
+
+const pageUrl = absoluteUrl(`/plataforma/${plataforma}/${countrySlug}`);
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((a) => ({
+    name: a.titleEnglish || a.titleRomaji,
+    url: absoluteUrl(`/anime/${a.slug}/${countrySlug}`),
+  })),
+  pageUrl,
+  `Anime en ${displayName} ${country.name}`,
+);
+---
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  locale={country.hreflang.replace('-', '_')}
+>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: displayName, url: `/plataforma/${plataforma}` },
+      { name: country.name, url: `/plataforma/${plataforma}/${countrySlug}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <div class="flex items-center gap-4">
+      {providerSummary?.logoUrl && (
+        <img
+          src={providerSummary.logoUrl}
+          alt={displayName}
+          class="h-14 w-14 rounded-lg object-cover ring-1 ring-surface-2"
+        />
+      )}
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
+          Anime en {displayName}
+          <span class="text-fg-muted">·</span>
+          <span class="inline-flex items-center gap-2">
+            <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+            {country.name}
+          </span>
+        </h1>
+        <p class="mt-2 text-sm text-fg-muted">
+          {anime.length} anime disponible{anime.length === 1 ? '' : 's'}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos anime catalogados en {displayName} {country.name} ahora mismo.
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

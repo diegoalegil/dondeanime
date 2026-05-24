@@ -1,0 +1,119 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getProvidersByCountry, type ProviderSummary } from '@/lib/api';
+import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import { isHiddenVariant, getPlatform } from '@/lib/platforms';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const lists = await Promise.all(
+    COUNTRY_SLUGS.map((s) => getProvidersByCountry(COUNTRIES[s].iso)),
+  );
+  const unique = new Set<string>();
+  for (const list of lists) {
+    for (const p of list) {
+      if (!isHiddenVariant(p.slug)) unique.add(p.slug);
+    }
+  }
+  return Array.from(unique).map((slug) => ({ params: { plataforma: slug } }));
+}
+
+const { plataforma } = Astro.params;
+
+const availability = await Promise.all(
+  COUNTRY_SLUGS.map(async (slug) => {
+    const country = COUNTRIES[slug];
+    const providers = await getProvidersByCountry(country.iso);
+    const provider = providers.find((p) => p.slug === plataforma);
+    return { slug, country, provider };
+  }),
+);
+
+const availableEntries = availability.filter(
+  (a): a is typeof a & { provider: ProviderSummary } => a.provider !== undefined,
+);
+const platform = getPlatform(plataforma!);
+const firstProvider = availableEntries[0]?.provider;
+const displayName = platform?.name ?? firstProvider?.providerName ?? plataforma!;
+const logoUrl = firstProvider?.logoUrl;
+const totalAnime = availableEntries.reduce((sum, a) => sum + a.provider.animeCount, 0);
+
+const seoTitle = `Anime en ${displayName} — Disponibilidad por país | DondeAnime`;
+const seoDescription = `${displayName} ofrece anime en ${availableEntries.length} país${availableEntries.length === 1 ? '' : 'es'} hispanoamericano${availableEntries.length === 1 ? '' : 's'}. Elige tu país para ver el catálogo completo.`;
+
+const pageUrl = absoluteUrl(`/plataforma/${plataforma}`);
+const itemListSchema = buildItemListSchema(
+  availableEntries.map((a) => ({
+    name: `${displayName} en ${a.country.name}`,
+    url: absoluteUrl(`/plataforma/${plataforma}/${a.slug}`),
+  })),
+  pageUrl,
+  `${displayName} por país`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Plataformas', url: '/' },
+      { name: displayName, url: `/plataforma/${plataforma}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <div class="flex items-center gap-4">
+      {logoUrl && (
+        <img
+          src={logoUrl}
+          alt={displayName}
+          class="h-16 w-16 rounded-lg object-cover ring-1 ring-surface-2"
+        />
+      )}
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
+          Anime en {displayName}
+        </h1>
+        <p class="mt-2 text-sm text-fg-muted">
+          {totalAnime} entradas totales en {availableEntries.length} país{availableEntries.length === 1 ? '' : 'es'}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <h2 class="mb-6 text-2xl font-semibold">Disponibilidad por país</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {availability.map(({ slug, country, provider }) => (
+        provider ? (
+          <a
+            href={`/plataforma/${plataforma}/${slug}`}
+            class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
+          >
+            <div class="flex items-center gap-3">
+              <span class={`fi fi-${country.flagCode} rounded text-xl`} aria-hidden="true"></span>
+              <div>
+                <h3 class="text-base font-semibold text-fg-primary">{country.name}</h3>
+                <p class="mt-0.5 text-sm text-fg-muted">{provider.animeCount} anime</p>
+              </div>
+            </div>
+            <span class="text-fg-muted">→</span>
+          </a>
+        ) : (
+          <div class="flex items-center justify-between rounded-xl border border-surface-2/50 bg-surface-1/50 p-5 opacity-60">
+            <div class="flex items-center gap-3">
+              <span class={`fi fi-${country.flagCode} rounded text-xl grayscale`} aria-hidden="true"></span>
+              <div>
+                <h3 class="text-base font-semibold text-fg-secondary">{country.name}</h3>
+                <p class="mt-0.5 text-sm text-fg-muted">No disponible</p>
+              </div>
+            </div>
+          </div>
+        )
+      ))}
+    </div>
+  </section>
+</BaseLayout>

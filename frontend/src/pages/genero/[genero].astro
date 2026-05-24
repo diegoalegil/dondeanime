@@ -1,0 +1,65 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getGenres, getAnimeByGenre } from '@/lib/api';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const genres = await getGenres();
+  return genres.map((g) => ({
+    params: { genero: g.slug },
+    props: { genreName: g.name, total: g.animeCount },
+  }));
+}
+
+const { genero } = Astro.params;
+const { genreName, total } = Astro.props;
+
+const anime = await getAnimeByGenre(genero!);
+
+const seoTitle = `Anime de ${genreName} — ${total} series para ver en streaming | DondeAnime`;
+const seoDescription = `Catálogo de anime de ${genreName}: ${anime.slice(0, 5).map((a) => a.titleEnglish || a.titleRomaji).join(', ')} y ${Math.max(0, total - 5)} más. Encuentra dónde ver cada uno.`;
+
+const pageUrl = absoluteUrl(`/genero/${genero}`);
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((a) => ({
+    name: a.titleEnglish || a.titleRomaji,
+    url: absoluteUrl(`/anime/${a.slug}`),
+  })),
+  pageUrl,
+  `Anime de ${genreName}`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Géneros', url: '/' },
+      { name: genreName, url: `/genero/${genero}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Género</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      Anime de <span class="brand-gradient-text">{genreName}</span>
+    </h1>
+    <p class="mt-4 text-lg text-fg-secondary">
+      {anime.length} serie{anime.length === 1 ? '' : 's'} en este género.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos anime catalogados con este género ahora mismo.
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>
