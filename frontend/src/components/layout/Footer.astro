@@ -1,8 +1,11 @@
 ---
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, type PlatformSlug } from '@/lib/platforms';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { buildOrganizationSchema } from '@/lib/seo';
 
 const year = new Date().getFullYear();
+const organizationSchema = buildOrganizationSchema();
 const featuredPlatforms: PlatformSlug[] = [
   'crunchyroll',
   'netflix',
@@ -84,4 +87,5 @@ const featuredGenres = [
       </p>
     </div>
   </div>
+  <JsonLd data={organizationSchema} />
 </footer>

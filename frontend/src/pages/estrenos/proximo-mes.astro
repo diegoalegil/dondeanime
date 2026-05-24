@@ -1,0 +1,54 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import UpcomingAnimeList from '@/components/anime/UpcomingAnimeList.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getUpcomingAnime } from '@/lib/api';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+
+const anime = await getUpcomingAnime(30);
+
+const pageUrl = absoluteUrl('/estrenos/proximo-mes');
+const itemListSchema = buildItemListSchema(
+  anime.map((item) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  'Estrenos de anime del próximo mes',
+);
+---
+<BaseLayout
+  title="Estrenos de anime del próximo mes | DondeAnime"
+  description="Anime que estrenan en los próximos 30 días, ordenados por fecha de estreno."
+>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Estrenos', url: '/estrenos/proxima-semana' },
+      { name: 'Próximo mes', url: '/estrenos/proximo-mes' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Estrenos</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      Estrenos de anime del <span class="brand-gradient-text">próximo mes</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      {anime.length} anime con fecha completa en los próximos 30 días.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos estrenos con fecha completa para los próximos 30 días.
+      </p>
+    ) : (
+      <UpcomingAnimeList anime={anime} />
+    )}
+  </section>
+</BaseLayout>

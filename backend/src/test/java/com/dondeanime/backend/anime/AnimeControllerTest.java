@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +83,40 @@ class AnimeControllerTest {
     }
 
     @Test
+    void upcomingReturnsOnlyFullDatesWithinRangeOrderedByStartDate() throws Exception {
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        Anime later = makeAnime("later", "Later");
+        later.setPopularity(999);
+        startsOn(later, today.plusDays(6));
+        Anime early = makeAnime("early", "Early");
+        early.setPopularity(1);
+        startsOn(early, today.plusDays(2));
+        Anime outside = makeAnime("outside", "Outside");
+        startsOn(outside, today.plusDays(8));
+        Anime partialDate = makeAnime("partial", "Partial");
+        partialDate.setStartYear(today.getYear());
+        Anime past = makeAnime("past", "Past");
+        startsOn(past, today.minusDays(1));
+
+        when(animeRepository.findAll()).thenReturn(List.of(later, outside, partialDate, early, past));
+
+        mvc.perform(get("/api/anime/upcoming?days=7"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].slug").value("early"))
+                .andExpect(jsonPath("$[0].startYear").value(today.plusDays(2).getYear()))
+                .andExpect(jsonPath("$[0].startMonth").value(today.plusDays(2).getMonthValue()))
+                .andExpect(jsonPath("$[0].startDay").value(today.plusDays(2).getDayOfMonth()))
+                .andExpect(jsonPath("$[1].slug").value("later"));
+    }
+
+    @Test
+    void upcomingRejectsInvalidDays() throws Exception {
+        mvc.perform(get("/api/anime/upcoming?days=0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getBySlugReturnsDetailWithProviders() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
         WatchProvider provider = provider();
@@ -115,6 +151,12 @@ class AnimeControllerTest {
         a.setFormat("TV");
         a.setStatus("FINISHED");
         return a;
+    }
+
+    private static void startsOn(Anime anime, LocalDate date) {
+        anime.setStartYear(date.getYear());
+        anime.setStartMonth(date.getMonthValue());
+        anime.setStartDay(date.getDayOfMonth());
     }
 
     private static WatchProvider provider() {

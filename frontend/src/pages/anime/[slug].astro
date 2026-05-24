@@ -9,7 +9,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import AlternateLangs from '@/components/seo/AlternateLangs.astro';
 import { getAllAnime, getAnimeBySlug } from '@/lib/api';
-import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
 
 export async function getStaticPaths() {
@@ -32,6 +32,7 @@ const seoDescription = detail.anime.description
 
 const pageUrl = absoluteUrl(`/anime/${slug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
+const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 ---
 <BaseLayout
   title={`${title} — Dónde verlo en streaming | DondeAnime`}
@@ -40,6 +41,7 @@ const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
   type="article"
 >
   <JsonLd slot="head" data={tvSchema} />
+  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
   <AlternateLangs
     slot="head"
     basePathWithSlug={`/anime/${slug}`}
