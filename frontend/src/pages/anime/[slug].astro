@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeHero from '@/components/anime/AnimeHero.astro';
+import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
+import MetaList from '@/components/anime/MetaList.astro';
+import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import AlternateLangs from '@/components/seo/AlternateLangs.astro';
+import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { filterVisibleProviders } from '@/lib/platforms';
+
+export async function getStaticPaths() {
+  const all = await getAllAnime();
+  return all.map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const detail = await getAnimeBySlug(slug!);
+const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
+
+const allProviders = Object.values(detail.watchProvidersByCountry).flat();
+const uniqueProviders = filterVisibleProviders(
+  Array.from(new Map(allProviders.map((p) => [p.providerSlug, p])).values())
+);
+
+const seoDescription = detail.anime.description
+  ? detail.anime.description.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').slice(0, 160).trim()
+  : `Descubre dónde ver ${title} en streaming en España, México, Argentina, Colombia y Chile.`;
+
+const pageUrl = absoluteUrl(`/anime/${slug}`);
+const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
+---
+<BaseLayout
+  title={`${title} — Dónde verlo en streaming | DondeAnime`}
+  description={seoDescription}
+  image={detail.anime.bannerImage ?? detail.anime.coverImage}
+  type="article"
+>
+  <JsonLd slot="head" data={tvSchema} />
+  <AlternateLangs
+    slot="head"
+    basePathWithSlug={`/anime/${slug}`}
+    defaultPath={`/anime/${slug}`}
+  />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Anime', url: '/' },
+      { name: title, url: `/anime/${slug}` },
+    ]}
+  />
+  <AnimeHero anime={detail.anime} />
+  <ProvidersByCountry providersByCountry={detail.watchProvidersByCountry} />
+  <AnimeSynopsis description={detail.anime.description} />
+  <MetaList anime={detail.anime} />
+</BaseLayout>

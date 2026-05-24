@@ -1,0 +1,43 @@
+---
+import type { AnimeSummary } from '@/lib/api';
+
+interface Props {
+  anime: AnimeSummary;
+}
+
+const { anime } = Astro.props;
+const title = anime.titleEnglish || anime.titleRomaji;
+const score = anime.averageScore;
+
+let scoreClass = '';
+if (score !== null) {
+  if (score >= 80) scoreClass = 'bg-success/15 text-success';
+  else if (score >= 60) scoreClass = 'bg-warning/15 text-warning';
+  else scoreClass = 'bg-danger/15 text-danger';
+}
+---
+<article class="group">
+  <a href={`/anime/${anime.slug}`} class="block">
+    <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
+      <img
+        src={anime.coverImage}
+        alt={title}
+        loading="lazy"
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+      {score !== null && (
+        <span class={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-semibold backdrop-blur-md ${scoreClass}`}>
+          {score}
+        </span>
+      )}
+    </div>
+    <div class="mt-3">
+      <h3 class="line-clamp-2 text-sm font-semibold text-fg-primary transition-colors group-hover:text-accent-violet">
+        {title}
+      </h3>
+      <p class="mt-1 text-xs text-fg-muted">
+        {anime.year ?? '—'} · {anime.format}
+      </p>
+    </div>
+  </a>
+</article>

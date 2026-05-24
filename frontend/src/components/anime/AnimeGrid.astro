@@ -1,0 +1,13 @@
+---
+import type { AnimeSummary } from '@/lib/api';
+import AnimeCard from './AnimeCard.astro';
+
+interface Props {
+  anime: AnimeSummary[];
+}
+
+const { anime } = Astro.props;
+---
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
+  {anime.map((a) => <AnimeCard anime={a} />)}
+</div>

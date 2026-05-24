@@ -1,0 +1,107 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeHero from '@/components/anime/AnimeHero.astro';
+import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
+import MetaList from '@/components/anime/MetaList.astro';
+import CountrySwitcher from '@/components/ui/CountrySwitcher.astro';
+import ProviderRow from '@/components/providers/ProviderRow.astro';
+import NotAvailableInCountry from '@/components/providers/NotAvailableInCountry.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import AlternateLangs from '@/components/seo/AlternateLangs.astro';
+import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import { filterVisibleProviders } from '@/lib/platforms';
+import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+
+export async function getStaticPaths() {
+  const all = await getAllAnime();
+  return all.flatMap((a) =>
+    COUNTRY_SLUGS.map((countrySlug) => ({
+      params: { slug: a.slug, pais: countrySlug },
+    })),
+  );
+}
+
+const { slug, pais } = Astro.params;
+const countrySlug = pais as CountrySlug;
+const country = COUNTRIES[countrySlug];
+
+const detail = await getAnimeBySlug(slug!);
+const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
+
+const providersRaw = detail.watchProvidersByCountry[country.iso] ?? [];
+const providers = filterVisibleProviders(providersRaw);
+const hasProviders = providers.length > 0;
+
+const availableInCountries = COUNTRY_SLUGS.filter((s) => {
+  if (s === countrySlug) return false;
+  const list = detail.watchProvidersByCountry[COUNTRIES[s].iso] ?? [];
+  return filterVisibleProviders(list).length > 0;
+});
+
+const platformNames = providers.map((p) => p.providerName).join(', ');
+const seoTitle = hasProviders
+  ? `Dónde ver ${title} en ${country.name} — ${platformNames} | DondeAnime`
+  : `${title} en ${country.name} — Dónde verlo en streaming | DondeAnime`;
+const seoDescription = hasProviders
+  ? `${title} está disponible en ${country.name} en: ${platformNames}. Encuentra todas las plataformas de streaming.`
+  : `${title} no está disponible en plataformas de ${country.name} todavía. Mira en qué otros países hispanoamericanos puedes verlo.`;
+
+const pageUrl = absoluteUrl(`/anime/${slug}/${countrySlug}`);
+const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
+---
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  image={detail.anime.bannerImage ?? detail.anime.coverImage}
+  type="article"
+  locale={country.hreflang.replace('-', '_')}
+>
+  <JsonLd slot="head" data={tvSchema} />
+  <AlternateLangs
+    slot="head"
+    basePathWithSlug={`/anime/${slug}`}
+    defaultPath={`/anime/${slug}`}
+  />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: title, url: `/anime/${slug}` },
+      { name: country.name, url: `/anime/${slug}/${countrySlug}` },
+    ]}
+  />
+  <AnimeHero anime={detail.anime} />
+  <CountrySwitcher animeSlug={slug!} activeCountry={countrySlug} />
+
+  {hasProviders ? (
+    <section class="mx-auto max-w-6xl px-4 py-8">
+      <h2 class="mb-6 text-lg font-semibold text-fg-primary">
+        Dónde ver <span class="text-accent-violet">{title}</span> en {country.name}
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {providers.map((p) => <ProviderRow provider={p} />)}
+      </div>
+    </section>
+  ) : (
+    <NotAvailableInCountry
+      animeSlug={slug!}
+      animeTitle={title}
+      countrySlug={countrySlug}
+      availableInCountries={availableInCountries}
+    />
+  )}
+
+  <AnimeSynopsis description={detail.anime.description} />
+  <MetaList anime={detail.anime} />
+
+  <section class="mx-auto max-w-6xl px-4 py-8">
+    <a
+      href={`/anime/${slug}`}
+      class="inline-flex items-center gap-2 text-sm text-fg-muted transition-colors hover:text-accent-violet"
+    >
+      Ver todas las plataformas en todos los países →
+    </a>
+  </section>
+</BaseLayout>

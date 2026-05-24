@@ -1,0 +1,27 @@
+---
+import type { WatchProvider } from '@/lib/api';
+import { getPlatform } from '@/lib/platforms';
+
+interface Props {
+  provider: WatchProvider;
+  size?: 'sm' | 'md';
+}
+
+const { provider, size = 'md' } = Astro.props;
+const platform = getPlatform(provider.providerSlug);
+const displayName = platform?.name ?? provider.providerName;
+
+const sizeClasses = size === 'sm'
+  ? 'h-8 w-8 rounded-md'
+  : 'h-12 w-12 rounded-lg';
+const textClass = size === 'sm' ? 'text-xs' : 'text-sm';
+---
+<div class="flex items-center gap-3">
+  <img
+    src={provider.logoUrl}
+    alt={displayName}
+    loading="lazy"
+    class={`${sizeClasses} object-cover ring-1 ring-surface-2`}
+  />
+  <span class={`font-medium text-fg-primary ${textClass}`}>{displayName}</span>
+</div>
