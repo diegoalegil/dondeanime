@@ -26,18 +26,21 @@ public class AnimeController {
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
     private final WatchProviderRepository providerRepository;
+    private final AnimeOverrideService overrideService;
 
     public AnimeController(
             AnimeRepository repository,
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
-            WatchProviderRepository providerRepository) {
+            WatchProviderRepository providerRepository,
+            AnimeOverrideService overrideService) {
         this.repository = repository;
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
         this.providerRepository = providerRepository;
+        this.overrideService = overrideService;
     }
 
     @GetMapping
@@ -64,7 +67,7 @@ public class AnimeController {
                                     LinkedHashMap::new,
                                     Collectors.toList()));
                     return ResponseEntity.ok(new AnimeDetailResponse(
-                            AnimeDetailDto.from(anime), byCountry));
+                            AnimeDetailDto.from(anime, overrideService.findSpanishOverrides(anime)), byCountry));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
