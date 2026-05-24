@@ -15,7 +15,7 @@ test('home renders the static catalog and links to an anime detail page', async 
 
   await animeCards.first().click();
 
-  expect(new URL(page.url()).pathname).toBe(firstHref);
+  await expect(page).toHaveURL(new RegExp(`${escapeRegExp(firstHref!)}$`));
   await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
   await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -72,3 +72,7 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(sitemap.ok()).toBe(true);
   expect(await sitemap.text()).toContain('<sitemapindex');
 });
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
