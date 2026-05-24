@@ -13,15 +13,21 @@ public record ProviderDto(
         String providerSlug,
         String providerName,
         String providerType,
-        String logoUrl
+        String logoUrl,
+        String affiliateUrl
 ) {
     public static ProviderDto from(WatchProvider p) {
+        return from(p, null);
+    }
+
+    public static ProviderDto from(WatchProvider p, String affiliateUrl) {
         return new ProviderDto(
                 p.getCountryCode(),
                 ProviderSummaryDto.slugify(p.getProviderName()),
                 p.getProviderName(),
                 p.getProviderType(),
-                p.getLogoUrl()
+                p.getLogoUrl(),
+                affiliateUrl
         );
     }
 }
