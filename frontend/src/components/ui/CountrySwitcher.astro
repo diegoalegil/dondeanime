@@ -1,0 +1,41 @@
+---
+import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+
+interface Props {
+  animeSlug: string;
+  activeCountry: CountrySlug;
+}
+
+const { animeSlug, activeCountry } = Astro.props;
+---
+<nav class="mx-auto max-w-6xl px-4 pt-2 pb-6">
+  <div class="flex items-center gap-2 overflow-x-auto">
+    <span class="shrink-0 text-xs uppercase tracking-wide text-fg-muted">Ver en</span>
+    <div class="flex gap-1.5">
+      {COUNTRY_SLUGS.map((slug) => {
+        const country = COUNTRIES[slug];
+        const isActive = slug === activeCountry;
+        const baseClass = "flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors";
+        const stateClass = isActive
+          ? "bg-accent-violet/15 text-accent-violet"
+          : "border border-surface-2 text-fg-secondary hover:border-accent-violet/40 hover:text-fg-primary";
+        const tag = isActive ? 'span' : 'a';
+        return (
+          <Fragment>
+            {isActive ? (
+              <span class={`${baseClass} ${stateClass}`} aria-current="page">
+                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                {country.name}
+              </span>
+            ) : (
+              <a href={`/anime/${animeSlug}/${slug}`} class={`${baseClass} ${stateClass}`}>
+                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                {country.name}
+              </a>
+            )}
+          </Fragment>
+        );
+      })}
+    </div>
+  </div>
+</nav>
