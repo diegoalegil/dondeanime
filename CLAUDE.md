@@ -281,7 +281,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
-Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`.
+Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `JWT_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.
@@ -320,7 +320,8 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
 - [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
 - [x] **Deploy producción (mes 2):** VPS Hetzner CX22 con Docker (Postgres + backend + Caddy reverse proxy), Vercel para frontend Astro estático, Cloudflare gestionando DNS de `dondeanime.com` y `api.dondeanime.com`. Cert Let's Encrypt automático en ambos. Bug `delete+insert duplicate key` en `ProviderSyncService` arreglado con `@Modifying @Query` JPQL. Webhook backend → Vercel disparado al final de `syncProviders` para auto-rebuild.
-- [ ] **PRÓXIMO:** Sprints de Codex (ver `CODEX.md`). 3 sprints de ~2 semanas: enriquecimiento manual top 50 + panel admin (sprint 1), sistema alertas email con Resend + doble opt-in (sprint 2), monetización con afiliados + Plausible Analytics (sprint 3).
+- [x] **Sprint 2 implementado:** alertas email con doble opt-in, tokens firmados, Resend, baja/borrado GDPR mínimo, CORS para el POST público y formulario en páginas país sin providers. Pendiente configurar Resend real.
+- [ ] **PRÓXIMO:** monetización con afiliados + Plausible Analytics + slot AdSense preparado (sprint 3).
 - [ ] Mejora continua paralela (CI/CD, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
 
 ---
@@ -345,7 +346,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 ### Lo que sigue necesitando decisión humana
 
 1. **Revisar los 16 anime sin match TMDb** y los matches del top 50 manualmente. Es contenido editorial, no auto-generable. Codex puede preparar el panel admin pero las decisiones de qué texto y qué afiliados son de Diego.
-2. **Configurar cuenta Resend** (sprint 2) o equivalente para email.
+2. **Configurar cuenta Resend** y DNS SPF/DKIM en Cloudflare antes de activar emails reales.
 3. **Aprobar configuración AdSense** (sprint 3) cuando haya 3+ meses de tráfico.
 
 ### Endpoints listos para el frontend
@@ -362,6 +363,12 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/seasons` | Listado de temporadas con count |
 | GET | `/api/seasons/{year}/{season}` | "Estrenos primavera 2024" |
 | GET | `/api/sitemap` | Una sola request: todos los ids/slugs para generar sitemap.xml |
+| POST | `/api/subscriptions` | Crear alerta email con doble opt-in |
+| GET | `/api/subscriptions/confirm?token=...` | Confirmar alerta desde email |
+| GET | `/api/subscriptions/unsubscribe?token=...` | Página de confirmación de baja |
+| POST | `/api/subscriptions/unsubscribe?token=...` | Marcar baja global de alertas |
+| GET | `/api/users/{email}/erase?token=...` | Página de borrado de datos |
+| DELETE | `/api/users/{email}/erase?token=...` | Borrar usuario y alertas asociadas |
 
 ---
 
@@ -413,6 +420,13 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 - **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` permite cambiar el cron en `.env` sin recompilar.
 - **Try/catch dentro de cada job**: un error en uno NO impide que el siguiente cron del mismo job se ejecute más tarde, ni afecta a los otros jobs.
 
+### Alertas email (sprint 2)
+- **Doble opt-in real**: `POST /api/subscriptions` no crea la subscription si el email no está confirmado; crea `app_user` + `email_token` y manda confirmación. La subscription se crea en `GET /api/subscriptions/confirm`.
+- **Tokens sin datos sensibles**: el token visible es un JWT HS256 corto; en BD solo se guarda `token_hash` SHA-256. `JWT_SECRET` debe vivir en `.env.prod`.
+- **Baja y borrado**: los emails de alerta incluyen baja y borrado. La baja muta solo por POST; el GET muestra una página de confirmación para evitar bajas accidentales por prefetch de clientes de correo.
+- **Resend**: `ResendEmailService` llama a `POST /emails` con Bearer token. En local `RESEND_ENABLED=false`; en prod necesita `RESEND_API_KEY` y dominio verificado con SPF/DKIM.
+- **Detección de alertas**: `ProviderSyncService` compara providers anteriores vs actuales por `(country, providerName, providerType)` y `AlertService` avisa solo suscripciones confirmadas, no dadas de baja y sin `notifiedAt`.
+
 ### DTOs públicos vs entidades JPA
 - **Endpoints REST NUNCA devuelven entidades crudas**. Cada respuesta pasa por un record DTO (`AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto`, etc.) que filtra los campos internos: `id` interno de BD, `syncedAt`, `tmdbId`, `tmdbProviderId`, `updatedAt`, `animeId`...
 - **Factory estático `from(Entity)`** en cada DTO. Mapeo en un solo lugar, fácil de mantener.
@@ -439,6 +453,12 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/seasons` | Lista de temporadas con count (`SeasonSummaryDto[]`) |
 | GET | `/api/seasons/{year}/{season}` | Anime de una temporada (400 si season inválida) |
 | GET | `/api/sitemap` | Todos los slugs/ids para que el frontend genere sitemap.xml |
+| POST | `/api/subscriptions` | Solicita alerta email (`202 Accepted`) |
+| GET | `/api/subscriptions/confirm?token=...` | Confirma email y crea la subscription |
+| GET | `/api/subscriptions/unsubscribe?token=...` | Página HTML para confirmar baja |
+| POST | `/api/subscriptions/unsubscribe?token=...` | Marca `app_user.unsubscribed_at` |
+| GET | `/api/users/{email}/erase?token=...` | Página HTML para borrar datos |
+| DELETE | `/api/users/{email}/erase?token=...` | Borra el usuario y sus alertas |
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
@@ -447,6 +467,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 - **Sin `enum` Java** para `format`/`status` (Strings simples). Si AniList añade un valor nuevo, `String` lo tolera; un enum petaría al deserializar.
 - **`@Column(columnDefinition = "TEXT")`** para `description` (descripciones largas no caben en `VARCHAR(255)` por defecto).
 - **`Instant`** para `syncedAt` (timestamp técnico UTC). Hibernate lo mapea a `timestamp with time zone` en Postgres.
+- **Alertas email**: `app_user` guarda el email y estado global (`confirmedAt`, `unsubscribedAt`), `subscription` une usuario + anime + país y `email_token` guarda hashes de tokens de confirmación/baja. Sin cuentas ni passwords.
 
 ### Git
 - Auth con **HTTPS + Personal Access Token** (SSH pendiente, no urgente, ver tareas).
