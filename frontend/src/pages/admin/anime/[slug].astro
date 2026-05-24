@@ -92,6 +92,20 @@ const title = anime.titleEnglish || anime.titleRomaji;
       Cargando datos...
     </div>
 
+    <div class="mb-5 flex flex-col gap-3 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-fg-primary">TMDb</h2>
+        <p class="mt-1 min-h-5 text-sm text-fg-muted" data-rematch-status></p>
+      </div>
+      <button
+        type="button"
+        class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
+        data-rematch
+      >
+        Re-matchear con TMDb
+      </button>
+    </div>
+
     <div class="grid gap-5">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel="title_english">
         <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
@@ -219,6 +233,8 @@ const title = anime.titleEnglish || anime.titleRomaji;
     const globalStatus = document.querySelector('[data-global-status]');
     const loginForm = document.querySelector('[data-login-form]');
     const loginStatus = document.querySelector('[data-login-status]');
+    const rematchButton = document.querySelector('[data-rematch]');
+    const rematchStatus = document.querySelector('[data-rematch-status]');
     const panels = Array.from(document.querySelectorAll('[data-field-panel]'));
 
     const apiFieldByOverride = {
@@ -239,6 +255,14 @@ const title = anime.titleEnglish || anime.titleRomaji;
       if (!loginStatus) return;
       loginStatus.textContent = message;
       loginStatus.className = `mt-2 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
+    const setRematchStatus = (message, tone = 'muted') => {
+      if (!rematchStatus) return;
+      rematchStatus.textContent = message;
+      rematchStatus.className = `mt-1 min-h-5 text-sm ${
         tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
       }`;
     };
@@ -349,6 +373,23 @@ const title = anime.titleEnglish || anime.titleRomaji;
       setGlobalStatus('Reseteado al original.', 'success');
     }
 
+    async function rematchTmdb() {
+      if (!getToken()) {
+        setRematchStatus('Inicia sesión antes de re-matchear.', 'danger');
+        return;
+      }
+
+      setRematchStatus('Re-matcheando...');
+      const result = await fetchJson(`/api/admin/anime/${slug}/rematch`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+      setRematchStatus(
+        result.matched ? 'Match actualizado.' : 'Sin match en TMDb.',
+        result.matched ? 'success' : 'danger'
+      );
+    }
+
     loginForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(loginForm);
@@ -368,6 +409,12 @@ const title = anime.titleEnglish || anime.titleRomaji;
     panels.forEach((panel) => {
       panel.querySelector('[data-save]')?.addEventListener('click', () => saveField(panel));
       panel.querySelector('[data-reset]')?.addEventListener('click', () => resetField(panel));
+    });
+
+    rematchButton?.addEventListener('click', () => {
+      rematchTmdb().catch((error) => {
+        setRematchStatus(error.status === 401 ? 'Credenciales incorrectas.' : 'No se pudo re-matchear.', 'danger');
+      });
     });
 
     loadEditor().catch(() => {

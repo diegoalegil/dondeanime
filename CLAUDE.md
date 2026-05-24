@@ -87,9 +87,10 @@ DondeAnime/
         │   │   ├── HttpClientConfig.java
         │   │   └── SecurityConfig.java        # HTTP Basic + CORS para /api/**
         │   ├── admin/
-        │   │   ├── AnimeAdminController.java  # /api/admin/anime/{slug}/override(s)
+        │   │   ├── AnimeAdminController.java  # /api/admin/anime/{slug}/override(s), /rematch
         │   │   ├── AnimeOverrideRequest.java
-        │   │   └── AnimeOverrideDto.java
+        │   │   ├── AnimeOverrideDto.java
+        │   │   └── AnimeRematchResponse.java
         │   ├── scheduling/
         │   │   └── CatalogScheduler.java      # 3 jobs @Scheduled (anilist, match, providers)
         │   ├── sitemap/
@@ -385,6 +386,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | POST | `/api/admin/anime/{slug}/override` | Guardar override editorial de un campo (Basic Auth) |
 | DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Resetear override de un campo (Basic Auth) |
 | GET | `/api/admin/anime/{slug}/overrides` | Listar overrides activos de una ficha (Basic Auth) |
+| POST | `/api/admin/anime/{slug}/rematch` | Re-ejecutar matching TMDb de una ficha (Basic Auth) |
 | GET | `/api/admin/affiliate-links` | Listar links afiliados (Basic Auth) |
 | POST | `/api/admin/affiliate-links` | Crear/actualizar link afiliado por provider+país (Basic Auth) |
 | DELETE | `/api/admin/affiliate-links/{id}` | Borrar link afiliado (Basic Auth) |
@@ -479,6 +481,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | POST | `/api/admin/anime/{slug}/override` | Crea/actualiza override editorial. Devuelve `AnimeDetailDto` refrescado |
 | DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Borra override y vuelve al valor AniList |
 | GET | `/api/admin/anime/{slug}/overrides` | Lista overrides activos con valor original |
+| POST | `/api/admin/anime/{slug}/rematch` | Re-ejecuta la heurística TMDb existente para una ficha |
 | GET | `/api/admin/affiliate-links` | Lista links afiliados |
 | POST | `/api/admin/affiliate-links` | Crea/actualiza link afiliado |
 | DELETE | `/api/admin/affiliate-links/{id}` | Borra link afiliado |
