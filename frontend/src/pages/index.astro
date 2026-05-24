@@ -7,6 +7,12 @@ import { buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo'
 import { formatSeason } from '@/lib/format';
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
+import {
+  DEFAULT_ANIME_IMAGE_SIZES,
+  DEFAULT_ANIME_IMAGE_WIDTHS,
+  buildAnimeImageSrcset,
+  buildAnimeImageUrl,
+} from '@/lib/images';
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
@@ -20,6 +26,10 @@ const trending = [...anime]
   .filter((a) => a.popularity !== null)
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
   .slice(0, 12);
+const priorityCoverPreloads = trending.slice(0, 2).map((a) => ({
+  href: buildAnimeImageUrl(a.coverImage, 320),
+  srcset: buildAnimeImageSrcset(a.coverImage, DEFAULT_ANIME_IMAGE_WIDTHS),
+}));
 
 const topGenre = genres[0];
 const topGenreAnime = topGenre ? (await getAnimeByGenre(topGenre.slug)).slice(0, 12) : [];
@@ -50,6 +60,17 @@ const itemListSchema = buildItemListSchema(
 >
   <JsonLd slot="head" data={websiteSchema} />
   <JsonLd slot="head" data={itemListSchema} />
+  {priorityCoverPreloads.map((preload) => (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      href={preload.href}
+      imagesrcset={preload.srcset}
+      imagesizes={preload.srcset ? DEFAULT_ANIME_IMAGE_SIZES : undefined}
+      fetchpriority="high"
+    />
+  ))}
 
   <section class="mx-auto max-w-6xl px-4 pt-16 pb-12">
     <h1 class="text-4xl font-semibold tracking-tight md:text-6xl">
