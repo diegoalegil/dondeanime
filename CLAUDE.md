@@ -45,10 +45,10 @@ Estudiante de 1º DAM en España. Terminando curso de mayo 2026, va a programar 
 | Build | Maven | wrapper incluido en repo (`./mvnw`) |
 | BD | PostgreSQL | 16-alpine en Docker |
 | ORM | Hibernate | 7.2.12 (Spring Data JPA) |
-| Frontend | Astro | 4 (pendiente, mes 2) |
-| Deploy backend | Hetzner Cloud VPS CX22 | mes 2 |
-| Deploy frontend | Vercel free tier | mes 2 |
-| CDN/DNS | Cloudflare free | mes 2 |
+| Frontend | Astro | **6** + Tailwind 4 |
+| Deploy backend | Hetzner Cloud VPS CX22 | producción |
+| Deploy frontend | Vercel free tier | producción |
+| CDN/DNS | Cloudflare free | producción |
 
 ### Dependencias Spring Boot actuales
 Web, Data JPA, PostgreSQL Driver, Validation, Lombok, DevTools.
@@ -84,7 +84,12 @@ DondeAnime/
         ├── main/java/com/dondeanime/backend/
         │   ├── BackendApplication.java        # @EnableScheduling
         │   ├── config/
-        │   │   └── HttpClientConfig.java
+        │   │   ├── HttpClientConfig.java
+        │   │   └── SecurityConfig.java        # HTTP Basic + CORS para /api/**
+        │   ├── admin/
+        │   │   ├── AnimeAdminController.java  # /api/admin/anime/{slug}/override(s)
+        │   │   ├── AnimeOverrideRequest.java
+        │   │   └── AnimeOverrideDto.java
         │   ├── scheduling/
         │   │   └── CatalogScheduler.java      # 3 jobs @Scheduled (anilist, match, providers)
         │   ├── sitemap/
@@ -106,6 +111,9 @@ DondeAnime/
         │       ├── AnimeSummaryDto.java       # vista de listados (sin id/tmdbId/syncedAt)
         │       ├── AnimeDetailDto.java        # vista de detalle (sin id/tmdbId/syncedAt)
         │       ├── AnimeDetailResponse.java   # AnimeDetailDto + Map<country, List<ProviderDto>>
+        │       ├── AnimeOverride.java         # overrides editoriales por campo y locale
+        │       ├── AnimeOverrideRepository.java
+        │       ├── AnimeOverrideService.java
         │       ├── GenreController.java       # GET /api/genres, /genres/{slug}
         │       ├── GenreSummaryDto.java
         │       ├── SeasonController.java      # GET /api/seasons, /seasons/{year}/{season}
@@ -159,6 +167,9 @@ POSTGRES_USER=dondeanime_user
 POSTGRES_PASSWORD=cambiar_en_local
 SERVER_PORT=8080
 SPRING_PROFILES_ACTIVE=dev
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin
+ADMIN_CORS_ALLOWED_ORIGINS=http://localhost:4321,http://127.0.0.1:4321,https://dondeanime.com,https://www.dondeanime.com
 PUBLIC_API_URL=http://localhost:8080
 PUBLIC_SITE_URL=https://dondeanime.com
 CATALOG_REFRESH_HOURS=12
@@ -169,6 +180,10 @@ CATALOG_REFRESH_HOURS=12
 ```properties
 spring.application.name=dondeanime-backend
 server.port=8080
+
+admin.username=${ADMIN_USERNAME:admin}
+admin.password=${ADMIN_PASSWORD:admin}
+admin.cors.allowed-origins=${ADMIN_CORS_ALLOWED_ORIGINS:http://localhost:4321,http://127.0.0.1:4321,https://dondeanime.com,https://www.dondeanime.com}
 
 spring.datasource.url=jdbc:postgresql://localhost:5433/dondeanime
 spring.datasource.username=dondeanime_user
@@ -281,7 +296,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
-Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`.
+Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.
@@ -317,12 +332,14 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Entidad `Anime` ampliada con `genres` (@ElementCollection → tabla anime_genre), `season` y `seasonYear`. Re-sync rellenó los 100 anime.
 - [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
-- [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
+- [x] Tests básicos: 31 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest, AnimeOverrideRepositoryTest, AnimeDetailDtoTest, AnimeAdminControllerTest, AffiliateLinkServiceTest, AffiliateLinkAdminControllerTest)
 - [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
 - [x] **Deploy producción (mes 2):** VPS Hetzner CX22 con Docker (Postgres + backend + Caddy reverse proxy), Vercel para frontend Astro estático, Cloudflare gestionando DNS de `dondeanime.com` y `api.dondeanime.com`. Cert Let's Encrypt automático en ambos. Bug `delete+insert duplicate key` en `ProviderSyncService` arreglado con `@Modifying @Query` JPQL. Webhook backend → Vercel disparado al final de `syncProviders` para auto-rebuild.
-- [x] **Backups BD (Sprint 4):** script `scripts/backup-postgres-r2.sh` para generar dumps `.sql.gz`, checksum, retención local de 30 días y subida opcional a Cloudflare R2. `DEPLOY.md` documenta cron cada 6h y restore manual.
-- [ ] **PRÓXIMO:** Sprints de Codex (ver `CODEX.md`). 3 sprints de ~2 semanas: enriquecimiento manual top 50 + panel admin (sprint 1), sistema alertas email con Resend + doble opt-in (sprint 2), monetización con afiliados + Plausible Analytics (sprint 3).
-- [ ] Mejora continua paralela restante (CI/CD, Cloudflare Email Routing, page rules cache, Flyway/Liquibase, etc.)
+- [x] **Sprint 1 mergeado:** tabla `anime_override`, overrides editoriales en `AnimeDetailDto`, HTTP Basic para `/api/admin/**`, CORS cerrado para frontend, endpoints admin POST/DELETE/GET y panel Astro `/admin` + `/admin/anime/[slug]`.
+- [x] **Sprint 3 mergeado:** tabla `affiliate_link`, tracking público de clicks, eventos para métricas 7/30 días, dashboard admin, links externos con `affiliateUrl`, Plausible preparado, AdSlot condicional y disclosure legal.
+- [x] **CI básico (Sprint 4):** GitHub Actions para `./mvnw test` con Postgres 16 de servicio y `npm run build` del frontend con variables públicas de producción.
+- [ ] **PRÓXIMO:** Sprints de Codex pendientes de mergear (Sprint 2 alertas email, Sprint 4 e2e Playwright, Sprint 4 backups Postgres, Sprint 4 operación Cloudflare).
+- [ ] Mejora continua paralela restante (tests E2E con Playwright, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
 
 ---
 
@@ -347,7 +364,9 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 
 1. **Revisar los 16 anime sin match TMDb** y los matches del top 50 manualmente. Es contenido editorial, no auto-generable. Codex puede preparar el panel admin pero las decisiones de qué texto y qué afiliados son de Diego.
 2. **Configurar cuenta Resend** (sprint 2) o equivalente para email.
-3. **Aprobar configuración AdSense** (sprint 3) cuando haya 3+ meses de tráfico.
+3. **Rellenar enlaces afiliados reales** en `/admin/affiliate-links` tras aprobar programas de cada plataforma/país.
+4. **Activar Plausible** si Diego decide usar trial/plan de pago y quiere top páginas en dashboard.
+5. **Aprobar configuración AdSense** cuando haya 3+ meses de tráfico. El slot queda preparado pero apagado.
 
 ### Endpoints listos para el frontend
 
@@ -363,6 +382,14 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/seasons` | Listado de temporadas con count |
 | GET | `/api/seasons/{year}/{season}` | "Estrenos primavera 2024" |
 | GET | `/api/sitemap` | Una sola request: todos los ids/slugs para generar sitemap.xml |
+| POST | `/api/admin/anime/{slug}/override` | Guardar override editorial de un campo (Basic Auth) |
+| DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Resetear override de un campo (Basic Auth) |
+| GET | `/api/admin/anime/{slug}/overrides` | Listar overrides activos de una ficha (Basic Auth) |
+| GET | `/api/admin/affiliate-links` | Listar links afiliados (Basic Auth) |
+| POST | `/api/admin/affiliate-links` | Crear/actualizar link afiliado por provider+país (Basic Auth) |
+| DELETE | `/api/admin/affiliate-links/{id}` | Borrar link afiliado (Basic Auth) |
+| GET | `/api/admin/dashboard` | Métricas de clicks y Plausible (Basic Auth) |
+| POST | `/api/track/affiliate` | Incrementar click afiliado y registrar evento |
 
 ---
 
@@ -371,7 +398,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 ### Stack
 - **Spring Boot 4** porque start.spring.io dio esa versión como estable por defecto en mayo 2026.
 - **PostgreSQL 16** (no 17) porque la imagen alpine es ligera y madura; el VPS de producción usará la misma.
-- **Astro 4** (no Next.js, no React puro) porque genera HTML estático puro → Google indexa al 100% sin esperar JS. La batalla SEO se gana o se pierde aquí.
+- **Astro 6** (no Next.js, no React puro) porque genera HTML estático puro → Google indexa al 100% sin esperar JS. La batalla SEO se gana o se pierde aquí.
 - **Hetzner CX22** elegido por relación precio/recursos en EU. Datacenter europeo = baja latencia para España y LatAm vía Cloudflare.
 
 ### Configuración Hibernate
@@ -414,9 +441,18 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 - **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` permite cambiar el cron en `.env` sin recompilar.
 - **Try/catch dentro de cada job**: un error en uno NO impide que el siguiente cron del mismo job se ejecute más tarde, ni afecta a los otros jobs.
 
+### Monetización y analítica (sprint 3)
+- **`ProviderDto.affiliateUrl` es opcional**: si hay link activo para `(provider_slug, country_code)`, el frontend lo usa; si no, enlaza al sitio genérico de la plataforma.
+- **Tracking público fire-and-forget**: `POST /api/track/affiliate` responde 204, no devuelve datos y solo incrementa si existe link activo. También guarda `affiliate_click_event` para métricas por fecha/anime.
+- **Dashboard admin**: `/api/admin/dashboard` combina clicks propios 7/30 días, top links, top anime por clicks y top páginas de Plausible si `PLAUSIBLE_ENABLED=true`.
+- **Plausible**: el script público se activa con `PUBLIC_PLAUSIBLE_ENABLED=true`. La API de stats necesita `PLAUSIBLE_API_KEY`; si falta, esa sección queda vacía sin romper.
+- **AdSense**: preparado con `AdSlot`, pero apagado por defecto. No activar hasta tener aprobación y tráfico suficiente.
+- **Disclosure afiliados**: footer y `/legal/afiliados` explican la comisión sin coste extra.
+
 ### DTOs públicos vs entidades JPA
 - **Endpoints REST NUNCA devuelven entidades crudas**. Cada respuesta pasa por un record DTO (`AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto`, etc.) que filtra los campos internos: `id` interno de BD, `syncedAt`, `tmdbId`, `tmdbProviderId`, `updatedAt`, `animeId`...
 - **Factory estático `from(Entity)`** en cada DTO. Mapeo en un solo lugar, fácil de mantener.
+- **`AnimeDetailDto.from(Anime, List<AnimeOverride>)` aplica overrides `locale='es'`** solo en detalle: `description`, `title_english`, `title_romaji`. `AnimeSummaryDto` no usa overrides para evitar N queries en builds/listados.
 - **Slug provider/genre = lowercase + espacios→guiones** (`ProviderSummaryDto.slugify`, `GenreSummaryDto.slugify`). Convención simple porque los nombres en BD ya vienen limpios (sin chars raros). Si algún día llega un caso raro habrá que reforzar.
 
 ### Tests con Spring Boot 4
@@ -440,6 +476,14 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/seasons` | Lista de temporadas con count (`SeasonSummaryDto[]`) |
 | GET | `/api/seasons/{year}/{season}` | Anime de una temporada (400 si season inválida) |
 | GET | `/api/sitemap` | Todos los slugs/ids para que el frontend genere sitemap.xml |
+| POST | `/api/admin/anime/{slug}/override` | Crea/actualiza override editorial. Devuelve `AnimeDetailDto` refrescado |
+| DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Borra override y vuelve al valor AniList |
+| GET | `/api/admin/anime/{slug}/overrides` | Lista overrides activos con valor original |
+| GET | `/api/admin/affiliate-links` | Lista links afiliados |
+| POST | `/api/admin/affiliate-links` | Crea/actualiza link afiliado |
+| DELETE | `/api/admin/affiliate-links/{id}` | Borra link afiliado |
+| GET | `/api/admin/dashboard` | Dashboard monetización/analítica |
+| POST | `/api/track/affiliate` | Tracking público de click afiliado |
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
@@ -448,6 +492,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 - **Sin `enum` Java** para `format`/`status` (Strings simples). Si AniList añade un valor nuevo, `String` lo tolera; un enum petaría al deserializar.
 - **`@Column(columnDefinition = "TEXT")`** para `description` (descripciones largas no caben en `VARCHAR(255)` por defecto).
 - **`Instant`** para `syncedAt` (timestamp técnico UTC). Hibernate lo mapea a `timestamp with time zone` en Postgres.
+- **Afiliados**: `affiliate_link` guarda un link activo por provider+país y `click_count` acumulado; `affiliate_click_event` guarda eventos con `clickedAt` y `animeSlug` para métricas 7/30 días y ranking por anime.
 
 ### Git
 - Auth con **HTTPS + Personal Access Token** (SSH pendiente, no urgente, ver tareas).

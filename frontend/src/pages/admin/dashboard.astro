@@ -1,0 +1,154 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<BaseLayout
+  title="Dashboard admin — DondeAnime"
+  description="Dashboard de métricas de DondeAnime."
+>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Admin', url: '/admin' },
+      { name: 'Dashboard', url: '/admin/dashboard' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 py-8" data-dashboard data-api-url={apiUrl}>
+    <header class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
+        <h1 class="mt-1 text-3xl font-semibold text-fg-primary">Dashboard</h1>
+      </div>
+      <a href="/admin/affiliate-links" class="text-sm text-fg-muted transition-colors hover:text-accent-violet">
+        Gestionar enlaces afiliados →
+      </a>
+    </header>
+
+    <form class="mb-6 rounded-lg border border-surface-2 bg-surface-1 p-4" data-login-form>
+      <div class="grid gap-3 sm:grid-cols-[9rem_12rem_auto]">
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Usuario</span>
+          <input name="username" autocomplete="username" value="admin" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Contraseña</span>
+          <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
+          Entrar
+        </button>
+      </div>
+      <p class="mt-2 min-h-5 text-sm text-fg-muted" data-status></p>
+    </form>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Clicks afiliados últimos 7 días</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-clicks-7>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Clicks afiliados últimos 30 días</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-clicks-30>0</p>
+      </article>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Anime con más clicks</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-affiliate-anime></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Links con más clicks</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-links></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Anime más visitados</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-pages></div>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    const root = document.querySelector('[data-dashboard]');
+    const apiUrl = root?.getAttribute('data-api-url') ?? '';
+    const tokenKey = 'dondeanime-admin-token';
+    const form = document.querySelector('[data-login-form]');
+    const status = document.querySelector('[data-status]');
+
+    const setStatus = (message, tone = 'muted') => {
+      if (!status) return;
+      status.textContent = message;
+      status.className = `mt-2 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
+    const authHeaders = () => {
+      const token = sessionStorage.getItem(tokenKey);
+      return token ? { Authorization: `Basic ${token}` } : {};
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+
+    const row = (label, value) => `
+      <div class="flex items-center justify-between gap-3 border-b border-surface-2 pb-2 last:border-b-0">
+        <span class="truncate text-fg-secondary">${escapeHtml(label)}</span>
+        <span class="font-semibold text-fg-primary">${escapeHtml(value)}</span>
+      </div>`;
+
+    const empty = '<p class="text-sm text-fg-muted">Sin datos todavía.</p>';
+
+    async function loadDashboard() {
+      setStatus('Cargando...');
+      const response = await fetch(`${apiUrl}/api/admin/dashboard`, {
+        headers: authHeaders(),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+
+      document.querySelector('[data-clicks-7]').textContent = data.clicksLast7Days ?? 0;
+      document.querySelector('[data-clicks-30]').textContent = data.clicksLast30Days ?? 0;
+      document.querySelector('[data-top-affiliate-anime]').innerHTML =
+        data.topAffiliateAnime?.length
+          ? data.topAffiliateAnime.map((item) => row(item.animeSlug, item.clicks)).join('')
+          : empty;
+      document.querySelector('[data-top-links]').innerHTML =
+        data.topAffiliateLinks?.length
+          ? data.topAffiliateLinks.map((item) => row(`${item.providerSlug} · ${item.countryCode}`, item.clickCount)).join('')
+          : empty;
+      document.querySelector('[data-top-pages]').innerHTML =
+        data.topVisitedAnime?.length
+          ? data.topVisitedAnime.map((item) => row(item.path, item.visitors)).join('')
+          : empty;
+      setStatus('Datos cargados.', 'success');
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
+      loadDashboard().catch(() => {
+        sessionStorage.removeItem(tokenKey);
+        setStatus('Credenciales incorrectas.', 'danger');
+      });
+    });
+
+    if (sessionStorage.getItem(tokenKey)) {
+      loadDashboard().catch(() => setStatus('No se pudo cargar el dashboard.', 'danger'));
+    } else {
+      setStatus('Inicia sesión para ver métricas.');
+    }
+  </script>
+</BaseLayout>
