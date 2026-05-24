@@ -373,6 +373,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | Método | Path | Para |
 |---|---|---|
 | GET | `/api/anime` | Home / catálogo global |
+| GET | `/api/anime/upcoming?days=7` | Próximos estrenos con fecha completa |
 | GET | `/api/anime/{slug}` | Página de detalle de cada anime |
 | GET | `/api/providers` | Listado global de plataformas |
 | GET | `/api/providers?country=ES` | Plataformas filtradas por país |
@@ -439,6 +440,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 - **`@ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")`** sobre el bean entero. Si la property no está o es `false`, el bean ni se crea: en local nunca dispara syncs accidentales. En producción se activa con `scheduling.enabled=true`.
 - **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron Unix de 5. Defaults espaciados: AniList 3am/3pm, match 4am, providers 5am, para no solapar.
 - **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` permite cambiar el cron en `.env` sin recompilar.
+- **Deploy hook tras AniList y providers**: el scheduler dispara `vercel.deploy-hook` al terminar bien `syncAniList` y `syncProviders`, para que las páginas estáticas de estrenos y providers se regeneren con datos frescos.
 - **Try/catch dentro de cada job**: un error en uno NO impide que el siguiente cron del mismo job se ejecute más tarde, ni afecta a los otros jobs.
 
 ### Monetización y analítica (sprint 3)
@@ -464,6 +466,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | Método | Path | Descripción |
 |---|---|---|
 | GET | `/api/anime` | Lista plana (`AnimeSummaryDto[]`) |
+| GET | `/api/anime/upcoming?days=7` | Próximos estrenos con fecha completa (`UpcomingAnimeDto[]`) |
 | GET | `/api/anime/{slug}` | Detalle + providers agrupados por país (`AnimeDetailResponse`) |
 | POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100) |
 | POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |

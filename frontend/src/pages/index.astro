@@ -7,6 +7,7 @@ import { HOME_FAQS, buildFAQPageSchema, buildWebSiteSchema, buildItemListSchema,
 import { formatSeason } from '@/lib/format';
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
+import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
@@ -132,6 +133,20 @@ const itemListSchema = buildItemListSchema(
           class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
         >
           {PLATFORMS[slug].name}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-12">
+    <h2 class="mb-5 text-2xl font-semibold">Mejores por año</h2>
+    <div class="flex flex-wrap gap-2">
+      {BEST_ANIME_YEARS_DESC.map((year) => (
+        <a
+          href={`/mejores/${year}`}
+          class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
+        >
+          {year}
         </a>
       ))}
     </div>

@@ -28,10 +28,10 @@ import com.dondeanime.backend.provider.ProviderSyncService;
  * Cron de Spring tiene 6 campos (seg min hora día mes día_semana).
  * Distinto del cron Unix de 5 campos.
  *
- * Tras completar syncProviders (último paso del pipeline) dispara
- * un Deploy Hook de Vercel para que el frontend rebuildee con datos
- * frescos. Solo si vercel.deploy-hook está configurado (env var
- * VERCEL_DEPLOY_HOOK en .env.prod del VPS).
+ * Tras completar syncAniList y syncProviders dispara un Deploy Hook
+ * de Vercel para que el frontend rebuildee con datos frescos. Solo
+ * si vercel.deploy-hook está configurado (env var VERCEL_DEPLOY_HOOK
+ * en .env.prod del VPS).
  */
 @Component
 @ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")
@@ -61,11 +61,16 @@ public class CatalogScheduler {
     @Scheduled(cron = "${dondeanime.cron.sync-anilist:0 0 3,15 * * *}")
     public void syncAniList() {
         log.info("[scheduler] syncAniList: iniciando");
+        boolean ok = false;
         try {
             int n = syncService.syncPopular(100);
             log.info("[scheduler] syncAniList: completado, {} anime", n);
+            ok = true;
         } catch (Exception e) {
             log.error("[scheduler] syncAniList: ERROR", e);
+        }
+        if (ok) {
+            triggerVercelRebuild();
         }
     }
 
