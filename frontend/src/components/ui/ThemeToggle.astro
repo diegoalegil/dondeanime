@@ -1,0 +1,60 @@
+---
+---
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Cambiar tema"
+  class="flex h-9 w-9 items-center justify-center rounded-md border border-surface-2 bg-surface-1 text-fg-secondary transition-colors hover:border-accent-violet/40 hover:text-fg-primary"
+>
+  <svg
+    data-theme-icon="dark"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="h-4 w-4"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+  </svg>
+  <svg
+    data-theme-icon="light"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="hidden h-4 w-4"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+</button>
+
+<style>
+  :global([data-theme="light"]) [data-theme-icon="dark"] { display: none; }
+  :global([data-theme="light"]) [data-theme-icon="light"] { display: block; }
+</style>
+
+<script>
+  const STORAGE_KEY = 'dondeanime-theme';
+  const html = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+
+  btn?.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme') ?? 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch (e) {
+      // localStorage bloqueado (modo privado, cookies off, etc.)
+    }
+  });
+</script>

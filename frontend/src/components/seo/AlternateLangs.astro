@@ -1,0 +1,22 @@
+---
+import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
+
+interface Props {
+  basePathWithSlug: string;
+  defaultPath: string;
+}
+
+const { basePathWithSlug, defaultPath } = Astro.props;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL;
+---
+{COUNTRY_SLUGS.map((slug) => {
+  const c = COUNTRIES[slug];
+  return (
+    <link
+      rel="alternate"
+      hreflang={c.hreflang}
+      href={`${siteUrl}${basePathWithSlug}/${slug}`}
+    />
+  );
+})}
+<link rel="alternate" hreflang="x-default" href={`${siteUrl}${defaultPath}`} />
