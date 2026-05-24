@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
@@ -26,18 +27,24 @@ public class AnimeController {
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
     private final WatchProviderRepository providerRepository;
+    private final AnimeOverrideService overrideService;
+    private final AffiliateLinkService affiliateLinkService;
 
     public AnimeController(
             AnimeRepository repository,
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
-            WatchProviderRepository providerRepository) {
+            WatchProviderRepository providerRepository,
+            AnimeOverrideService overrideService,
+            AffiliateLinkService affiliateLinkService) {
         this.repository = repository;
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
         this.providerRepository = providerRepository;
+        this.overrideService = overrideService;
+        this.affiliateLinkService = affiliateLinkService;
     }
 
     @GetMapping
@@ -58,13 +65,13 @@ public class AnimeController {
                     Map<String, List<ProviderDto>> byCountry = providerRepository
                             .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
                             .stream()
-                            .map(ProviderDto::from)
+                            .map(affiliateLinkService::toProviderDto)
                             .collect(Collectors.groupingBy(
                                     ProviderDto::countryCode,
                                     LinkedHashMap::new,
                                     Collectors.toList()));
                     return ResponseEntity.ok(new AnimeDetailResponse(
-                            AnimeDetailDto.from(anime), byCountry));
+                            AnimeDetailDto.from(anime, overrideService.findSpanishOverrides(anime)), byCountry));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

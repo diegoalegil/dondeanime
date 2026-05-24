@@ -1,43 +1,36 @@
-# Astro Starter Kit: Minimal
+# Frontend DondeAnime
+
+Frontend Astro estático de DondeAnime. Genera las páginas en build time leyendo la API pública.
+
+## Comandos
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev
+npm run build
+npm run preview
+npm run test:e2e
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Variables necesarias
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```env
+PUBLIC_API_URL=https://api.dondeanime.com
+PUBLIC_SITE_URL=https://dondeanime.com
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+`playwright.config.ts` usa esos valores por defecto si no están definidos, para que `npm run test:e2e` funcione en local y en CI sin depender de un `.env` dentro de `frontend/`.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Tests E2E
 
-Any static assets, like images, can be placed in the `public/` directory.
+Los tests viven en `e2e/` y arrancan solos un build estático con preview:
 
-## 🧞 Commands
+```sh
+npm run test:e2e
+```
 
-All commands are run from the root of the project, from a terminal:
+Cubren:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Home con catálogo estático y navegación a ficha de anime.
+- Rutas estáticas de país, plataforma, género y temporada.
+- `search-index.json`, `robots.txt` y `sitemap-index.xml`.
