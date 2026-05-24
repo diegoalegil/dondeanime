@@ -197,7 +197,10 @@ logging.level.org.springframework.web=INFO
 cd ~/Desktop/Repos-Github/DondeAnime
 docker compose up -d              # levanta Postgres
 cd backend
-./mvnw spring-boot:run            # arranca el backend
+./mvnw spring-boot:run            # arranca el backend (puerto 8080)
+# en otra terminal:
+cd ~/Desktop/Repos-Github/DondeAnime/frontend
+npm run dev                       # arranca Astro dev (puerto 4321)
 ```
 
 ### Bajar todo
@@ -264,8 +267,8 @@ docker compose up -d
 - [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
 - [x] Tests básicos: 13 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest)
-- [ ] **PRÓXIMO:** Frontend Astro 4 (mes 2) — ver sección "Próxima tarea concreta"
-- [ ] Deploy en Hetzner + Vercel + Cloudflare (mes 2)
+- [x] **Frontend Astro 6 + Tailwind 4 cerrado (semana 5):** 720 páginas estáticas (100 fichas + 500 país + 5 país-hub + 8 plataforma-hub + 31 plataforma-país + 17 género + 58 temporada + home). Build en 3.4s. Paleta dark modern con gradiente morado→rosa. Geist auto-hospedada. SEO técnico completo (TVSeries/BreadcrumbList/WebSite+SearchAction/ItemList, hreflang regional, sitemap, robots, OG/Twitter). Tema oscuro/claro persistente. Buscador in-memory con search-index.json.
+- [ ] **PRÓXIMO:** Deploy backend en Hetzner + frontend en Vercel + DNS a Cloudflare (mes 2)
 - [ ] Enriquecimiento manual top 50 (mes 3)
 - [ ] Sistema de alertas por email (mes 3)
 - [ ] Monetización: AdSense + afiliados (mes 3)
@@ -274,11 +277,14 @@ docker compose up -d
 
 ## Próxima tarea concreta
 
-**Construir el frontend en Astro 4 y desplegar la web pública.** Entregable del mes 2 del roadmap.
+**Desplegar la web pública.** Entregable del mes 2 del roadmap (segunda mitad).
 
-El backend está completo a efectos de mes 1. Toda la lógica de datos, endpoints REST públicos y scheduler automático ya están en su sitio. El siguiente bloque grande es UI + deploy.
-
-Nota: el frontend se está discutiendo en **otra sesión paralela**. Esta sesión backend solo añade nuevos endpoints si la sesión frontend los pide.
+El backend está completo y el frontend Astro está cerrado con 720 páginas estáticas funcionando en local. Lo que queda es el deploy:
+- VPS Hetzner para backend + Postgres.
+- Vercel para frontend (build estático).
+- Cloudflare como DNS + CDN delante de los dos.
+- Variables de entorno: `PUBLIC_API_URL` apunta a la API pública en Hetzner.
+- Imagen OG real generada vía ChatGPT Pro (placeholder SVG actual).
 
 ### Lo que necesita decisión humana (Diego)
 
