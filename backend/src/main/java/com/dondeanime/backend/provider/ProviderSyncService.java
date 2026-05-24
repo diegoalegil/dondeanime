@@ -1,7 +1,13 @@
 package com.dondeanime.backend.provider;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +21,7 @@ import com.dondeanime.backend.anime.tmdb.TmdbClient;
 import com.dondeanime.backend.anime.tmdb.TmdbCountryProviders;
 import com.dondeanime.backend.anime.tmdb.TmdbProvider;
 import com.dondeanime.backend.anime.tmdb.TmdbProvidersResponse;
+import com.dondeanime.backend.subscription.AlertService;
 
 /**
  * Sincroniza la tabla watch_provider llamando a TMDb por cada anime
@@ -42,16 +49,19 @@ public class ProviderSyncService {
     private final TmdbClient client;
     private final AnimeRepository animeRepository;
     private final WatchProviderRepository providerRepository;
+    private final AlertService alertService;
     private final TransactionTemplate transactionTemplate;
 
     public ProviderSyncService(
             TmdbClient client,
             AnimeRepository animeRepository,
             WatchProviderRepository providerRepository,
+            AlertService alertService,
             PlatformTransactionManager transactionManager) {
         this.client = client;
         this.animeRepository = animeRepository;
         this.providerRepository = providerRepository;
+        this.alertService = alertService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -69,7 +79,11 @@ public class ProviderSyncService {
                 continue;
             }
             try {
-                syncOne(a);
+                Map<String, List<WatchProvider>> newProviders = syncOne(a);
+                int alerts = alertService.notifyNewProviders(a, newProviders);
+                if (alerts > 0) {
+                    log.info("Alertas enviadas slug={}: {}", a.getSlug(), alerts);
+                }
                 processed++;
             } catch (Exception e) {
                 log.error("Error sync providers slug={}: {}", a.getSlug(), e.getMessage());
@@ -83,27 +97,55 @@ public class ProviderSyncService {
         return processed;
     }
 
-    private void syncOne(Anime anime) {
+    private Map<String, List<WatchProvider>> syncOne(Anime anime) {
         TmdbProvidersResponse resp = client.getWatchProviders(anime.getTmdbId());
         if (resp == null || resp.results() == null) {
-            return;
+            return Map.of();
         }
+
+        Instant now = Instant.now();
+        List<WatchProvider> existing = providerRepository
+                .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId());
+        Set<ProviderKey> existingKeys = existing.stream()
+                .map(ProviderKey::from)
+                .collect(Collectors.toCollection(HashSet::new));
+        List<WatchProvider> current = buildProviders(anime.getId(), resp, now);
+        Map<String, List<WatchProvider>> newProvidersByCountry = current.stream()
+                .filter(provider -> !existingKeys.contains(ProviderKey.from(provider)))
+                .collect(Collectors.groupingBy(
+                        WatchProvider::getCountryCode,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
 
         transactionTemplate.executeWithoutResult(status -> {
             providerRepository.deleteByAnimeId(anime.getId());
-
-            Instant now = Instant.now();
-            for (String country : TARGET_COUNTRIES) {
-                TmdbCountryProviders cp = resp.results().get(country);
-                if (cp == null) continue;
-                persistProviders(anime.getId(), country, cp.flatrate(), "FLATRATE", now);
-                persistProviders(anime.getId(), country, cp.free(), "FREE", now);
-            }
+            current.forEach(providerRepository::save);
         });
+
+        return newProvidersByCountry;
     }
 
-    private void persistProviders(Long animeId, String country, List<TmdbProvider> list, String type, Instant now) {
-        if (list == null) return;
+    private List<WatchProvider> buildProviders(Long animeId, TmdbProvidersResponse response, Instant now) {
+        List<WatchProvider> providers = new ArrayList<>();
+        for (String country : TARGET_COUNTRIES) {
+            TmdbCountryProviders cp = response.results().get(country);
+            if (cp == null) continue;
+            addProviders(providers, animeId, country, cp.flatrate(), "FLATRATE", now);
+            addProviders(providers, animeId, country, cp.free(), "FREE", now);
+        }
+        return providers;
+    }
+
+    private void addProviders(
+            List<WatchProvider> providers,
+            Long animeId,
+            String country,
+            List<TmdbProvider> list,
+            String type,
+            Instant now) {
+        if (list == null) {
+            return;
+        }
         for (TmdbProvider p : list) {
             WatchProvider wp = new WatchProvider();
             wp.setAnimeId(animeId);
@@ -113,7 +155,7 @@ public class ProviderSyncService {
             wp.setTmdbProviderId(p.providerId());
             wp.setLogoUrl(TmdbClient.fullLogoUrl(p.logoPath()));
             wp.setUpdatedAt(now);
-            providerRepository.save(wp);
+            providers.add(wp);
         }
     }
 
@@ -122,6 +164,16 @@ public class ProviderSyncService {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+    }
+
+    private record ProviderKey(String countryCode, String providerName, String providerType) {
+
+        static ProviderKey from(WatchProvider provider) {
+            return new ProviderKey(
+                    provider.getCountryCode(),
+                    provider.getProviderName(),
+                    provider.getProviderType());
         }
     }
 }
