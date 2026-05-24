@@ -92,6 +92,8 @@ nano .env.prod
 # Rellenar:
 #   POSTGRES_PASSWORD: openssl rand -base64 32
 #   TMDB_API_KEY: el de tu .env local
+#   ADMIN_PASSWORD: openssl rand -base64 32
+#   PLAUSIBLE_API_KEY: opcional, solo si quieres top páginas en dashboard
 #   VERCEL_DEPLOY_HOOK: vacío por ahora, se rellena en paso 6
 
 chmod 600 .env.prod   # solo deploy puede leerlo
@@ -154,6 +156,12 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
 - Root Directory: `frontend` (donde está el proyecto Astro).
 - Environment Variables:
   - `PUBLIC_API_URL` = `https://api.dondeanime.com`
+  - `PUBLIC_SITE_URL` = `https://dondeanime.com`
+  - `PUBLIC_PLAUSIBLE_ENABLED` = `false` al principio
+  - `PUBLIC_PLAUSIBLE_DOMAIN` = `dondeanime.com`
+  - `ADSENSE_ENABLED` = `false`
+  - `PUBLIC_ADSENSE_ENABLED` = `false`
+  - `PUBLIC_ADSENSE_CLIENT_ID` vacío hasta aprobación
 - Click Deploy. Primer build tarda ~2 min.
 - Cuando termine, abrir la URL `dondeanime-xxx.vercel.app` y verificar que carga con datos reales.
 
@@ -182,6 +190,55 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
   ```
 - A partir de aquí, cada vez que `ProviderSyncService.syncAll()` termine, llamará al hook y Vercel rebuildea.
+
+### 9. Monetización y analítica
+
+#### Links afiliados
+
+- Entrar en `https://dondeanime.com/admin/affiliate-links`.
+- Usar el Basic Auth configurado con `ADMIN_USERNAME`/`ADMIN_PASSWORD`.
+- Crear un link por provider y país:
+  - `providerSlug=crunchyroll`, `country=ES`
+  - `providerSlug=amazon-prime-video`, `country=ES`
+- No inventar tags. Cada programa de afiliados puede variar por país.
+
+#### Plausible
+
+Para solo cargar el script en el frontend:
+
+- En Vercel:
+  - `PUBLIC_PLAUSIBLE_ENABLED=true`
+  - `PUBLIC_PLAUSIBLE_DOMAIN=dondeanime.com`
+
+Para que `/admin/dashboard` muestre top páginas desde Plausible API:
+
+- En el VPS, editar `/opt/dondeanime/.env.prod`:
+  ```env
+  PLAUSIBLE_ENABLED=true
+  PLAUSIBLE_API_KEY=TU_TOKEN
+  PLAUSIBLE_SITE_ID=dondeanime.com
+  ```
+- Recrear backend:
+  ```bash
+  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+  ```
+
+Si `PLAUSIBLE_API_KEY` está vacío, el dashboard sigue funcionando pero la sección de páginas visitadas queda vacía.
+
+#### AdSense
+
+No activar hasta tener aprobación y tráfico suficiente. Cuando toque:
+
+- En Vercel:
+  ```env
+  ADSENSE_ENABLED=true
+  PUBLIC_ADSENSE_ENABLED=true
+  PUBLIC_ADSENSE_CLIENT_ID=ca-pub-...
+  PUBLIC_ADSENSE_SIDEBAR_SLOT=...
+  PUBLIC_ADSENSE_INLINE_SLOT=...
+  ```
+
+Sin esos valores, `AdSlot` no renderiza nada.
 
 ---
 

@@ -1,6 +1,9 @@
 package com.dondeanime.backend.anime;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Vista completa de un anime para la página de detalle.
@@ -32,12 +35,23 @@ public record AnimeDetailDto(
         Integer seasonYear
 ) {
     public static AnimeDetailDto from(Anime a) {
+        return from(a, List.of());
+    }
+
+    public static AnimeDetailDto from(Anime a, List<AnimeOverride> overrides) {
+        Map<String, String> overrideByField = (overrides == null ? List.<AnimeOverride>of() : overrides).stream()
+                .filter(override -> AnimeOverrideService.DEFAULT_LOCALE.equals(override.getLocale()))
+                .collect(Collectors.toMap(
+                        AnimeOverride::getFieldName,
+                        AnimeOverride::getFieldValue,
+                        (first, ignored) -> first));
+
         return new AnimeDetailDto(
                 a.getAnilistId(),
                 a.getSlug(),
-                a.getTitleEnglish(),
-                a.getTitleRomaji(),
-                a.getDescription(),
+                overrideByField.getOrDefault("title_english", a.getTitleEnglish()),
+                overrideByField.getOrDefault("title_romaji", a.getTitleRomaji()),
+                overrideByField.getOrDefault("description", a.getDescription()),
                 a.getFormat(),
                 a.getStatus(),
                 a.getEpisodes(),

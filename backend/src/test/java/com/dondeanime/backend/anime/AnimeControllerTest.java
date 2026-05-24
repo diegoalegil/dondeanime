@@ -12,10 +12,16 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.config.SecurityConfig;
+import com.dondeanime.backend.affiliate.AffiliateLinkService;
+import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
+import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
 /**
@@ -26,6 +32,12 @@ import com.dondeanime.backend.provider.WatchProviderRepository;
  * sustituidos por Mockito.
  */
 @WebMvcTest(AnimeController.class)
+@Import(SecurityConfig.class)
+@TestPropertySource(properties = {
+        "admin.username=admin",
+        "admin.password=secret",
+        "admin.cors.allowed-origins=http://localhost:4321"
+})
 class AnimeControllerTest {
 
     @Autowired
@@ -46,6 +58,12 @@ class AnimeControllerTest {
     @MockitoBean
     private WatchProviderRepository providerRepository;
 
+    @MockitoBean
+    private AnimeOverrideService overrideService;
+
+    @MockitoBean
+    private AffiliateLinkService affiliateLinkService;
+
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
@@ -65,15 +83,19 @@ class AnimeControllerTest {
     @Test
     void getBySlugReturnsDetailWithProviders() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
+        WatchProvider provider = provider();
         when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(a));
         when(providerRepository
                 .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(any()))
-                .thenReturn(List.of());
+                .thenReturn(List.of(provider));
+        when(affiliateLinkService.toProviderDto(provider)).thenReturn(ProviderDto.from(provider, "https://example.com"));
+        when(overrideService.findSpanishOverrides(a)).thenReturn(List.of());
 
         mvc.perform(get("/api/anime/attack-on-titan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.anime.slug").value("attack-on-titan"))
-                .andExpect(jsonPath("$.watchProvidersByCountry").isMap());
+                .andExpect(jsonPath("$.watchProvidersByCountry").isMap())
+                .andExpect(jsonPath("$.watchProvidersByCountry.ES[0].affiliateUrl").value("https://example.com"));
     }
 
     @Test
@@ -93,5 +115,15 @@ class AnimeControllerTest {
         a.setFormat("TV");
         a.setStatus("FINISHED");
         return a;
+    }
+
+    private static WatchProvider provider() {
+        WatchProvider provider = new WatchProvider();
+        provider.setAnimeId(1L);
+        provider.setCountryCode("ES");
+        provider.setProviderName("Crunchyroll");
+        provider.setProviderType("FLATRATE");
+        provider.setLogoUrl("https://example.com/logo.jpg");
+        return provider;
     }
 }
