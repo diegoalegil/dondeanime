@@ -73,6 +73,8 @@ export const getAllAnime = () => fetchJson<AnimeSummary[]>('/api/anime');
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
 
+export const getProviders = () => fetchJson<ProviderSummary[]>('/api/providers');
+
 export const getProvidersByCountry = (countryIso: string) =>
   fetchJson<ProviderSummary[]>(`/api/providers?country=${countryIso}`);
 

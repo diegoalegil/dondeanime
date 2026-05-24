@@ -52,6 +52,47 @@ test('country, platform, genre and season hubs have working static routes', asyn
   await expect(page.getByRole('heading', { name: /Anime de /i })).toBeVisible();
 });
 
+test('genre and platform combination pages filter anime and are indexed', async ({ page, request }) => {
+  await page.goto('/anime/action/en/crunchyroll');
+
+  await expect(page.getByRole('heading', { name: /Anime de Action en Crunchyroll/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/anime/action/en/crunchyroll',
+  );
+
+  const animeCards = page.locator('article a[href^="/anime/"]');
+  const resultCount = await animeCards.count();
+  expect(resultCount).toBeGreaterThan(0);
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    numberOfItems: Math.min(resultCount, 30),
+    itemListElement: expect.any(Array),
+  }));
+  expect(itemList.itemListElement).toHaveLength(Math.min(resultCount, 30));
+
+  const sitemapIndex = await request.get('/sitemap-index.xml');
+  expect(sitemapIndex.ok()).toBe(true);
+  const sitemapIndexText = await sitemapIndex.text();
+  const sitemapPath = sitemapIndexText.match(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/)?.[1];
+  expect(sitemapPath).toBeTruthy();
+
+  const sitemap = await request.get(sitemapPath!);
+  expect(sitemap.ok()).toBe(true);
+  const sitemapText = await sitemap.text();
+  const comboUrls = new Set(
+    [...sitemapText.matchAll(/https:\/\/dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
+  );
+
+  expect(comboUrls.size).toBe(35);
+  expect(comboUrls).toContain('https://dondeanime.com/anime/action/en/crunchyroll');
+});
+
 test('search index, robots and sitemap are generated', async ({ request }) => {
   const searchIndex = await request.get('/search-index.json');
   expect(searchIndex.ok()).toBe(true);
