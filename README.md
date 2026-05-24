@@ -118,3 +118,4 @@ Si el script devuelve datos reales de las 3 APIs, todo está listo para empezar 
 ## Licencia
 
 Privado. Todos los derechos reservados.
+
