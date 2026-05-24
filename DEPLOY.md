@@ -187,6 +187,11 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
 
 ## Operación diaria
 
+Más guías:
+
+- Cloudflare Email Routing y Cache Rules: `docs/cloudflare-operacion.md`.
+- Backups Postgres + R2: sección "Backup de BD" de este documento.
+
 ### Ver logs
 
 ```bash
