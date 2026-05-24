@@ -56,9 +56,9 @@ function requireString(node, key, file, type) {
   }
 }
 
-function requireArray(node, key, file, type) {
-  if (!Array.isArray(node[key]) || node[key].length === 0) {
-    errors.push(`${rel(file)}: ${type}.${key} debe ser un array no vacío`);
+function requireArray(node, key, file, type, { allowEmpty = false } = {}) {
+  if (!Array.isArray(node[key]) || (!allowEmpty && node[key].length === 0)) {
+    errors.push(`${rel(file)}: ${type}.${key} debe ser un array${allowEmpty ? '' : ' no vacío'}`);
   }
 }
 
@@ -98,7 +98,7 @@ function validateNode(node, file) {
     }
 
     if (type === 'BreadcrumbList') requireArray(node, 'itemListElement', file, type);
-    if (type === 'ItemList') requireArray(node, 'itemListElement', file, type);
+    if (type === 'ItemList') requireArray(node, 'itemListElement', file, type, { allowEmpty: true });
     if (type === 'WebSite') {
       requireString(node, 'name', file, type);
       requireString(node, 'url', file, type);
