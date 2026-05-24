@@ -14,7 +14,7 @@ import AlternateLangs from '@/components/seo/AlternateLangs.astro';
 import { getAllAnime, getAnimeBySlug } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
-import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 
 export async function getStaticPaths() {
   const all = await getAllAnime();
@@ -52,6 +52,7 @@ const seoDescription = hasProviders
 
 const pageUrl = absoluteUrl(`/anime/${slug}/${countrySlug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
+const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 ---
 <BaseLayout
   title={seoTitle}
@@ -61,6 +62,7 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={tvSchema} />
+  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
   <AlternateLangs
     slot="head"
     basePathWithSlug={`/anime/${slug}`}

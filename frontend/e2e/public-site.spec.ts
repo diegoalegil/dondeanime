@@ -72,3 +72,32 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(sitemap.ok()).toBe(true);
   expect(await sitemap.text()).toContain('<sitemapindex');
 });
+
+test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
+  await page.goto('/');
+
+  const homeSchemas = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const homeJson = homeSchemas.map((schema) => JSON.parse(schema));
+  const homeTypes = homeJson.map((schema) => schema['@type']);
+  expect(homeTypes).toContain('FAQPage');
+  expect(homeTypes).toContain('Organization');
+
+  const faq = homeJson.find((schema) => schema['@type'] === 'FAQPage');
+  expect(faq.mainEntity).toHaveLength(5);
+
+  const organization = homeJson.find((schema) => schema['@type'] === 'Organization');
+  expect(organization.logo.url).toBe('https://dondeanime.com/og-default.png');
+  expect(organization.sameAs.length).toBeGreaterThan(0);
+
+  await page.locator('article a[href^="/anime/"]').first().click();
+
+  const detailSchemas = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const detailJson = detailSchemas.map((schema) => JSON.parse(schema));
+  const detailTypes = detailJson.map((schema) => schema['@type']);
+  expect(detailTypes).toContain('TVSeries');
+  expect(detailTypes).toContain('Review');
+
+  const review = detailJson.find((schema) => schema['@type'] === 'Review');
+  expect(Number(review.reviewRating.ratingValue)).toBeGreaterThan(0);
+  expect(review.author.name).toBe('AniList');
+});
