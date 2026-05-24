@@ -52,6 +52,35 @@ test('country, platform, genre and season hubs have working static routes', asyn
   await expect(page.getByRole('heading', { name: /Anime de /i })).toBeVisible();
 });
 
+test('upcoming release pages render and are indexed', async ({ page, request }) => {
+  await page.goto('/estrenos/proxima-semana');
+  await expect(page.getByRole('heading', { name: /Estrenos de anime de la próxima semana/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/estrenos/proxima-semana',
+  );
+  await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
+
+  await page.goto('/estrenos/proximo-mes');
+  await expect(page.getByRole('heading', { name: /Estrenos de anime del próximo mes/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/estrenos/proximo-mes',
+  );
+
+  const sitemapIndex = await request.get('/sitemap-index.xml');
+  expect(sitemapIndex.ok()).toBe(true);
+  const sitemapIndexText = await sitemapIndex.text();
+  const sitemapPath = sitemapIndexText.match(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/)?.[1];
+  expect(sitemapPath).toBeTruthy();
+
+  const sitemap = await request.get(sitemapPath!);
+  expect(sitemap.ok()).toBe(true);
+  const sitemapText = await sitemap.text();
+  expect(sitemapText).toContain('https://dondeanime.com/estrenos/proxima-semana');
+  expect(sitemapText).toContain('https://dondeanime.com/estrenos/proximo-mes');
+});
+
 test('search index, robots and sitemap are generated', async ({ request }) => {
   const searchIndex = await request.get('/search-index.json');
   expect(searchIndex.ok()).toBe(true);

@@ -1,8 +1,13 @@
 package com.dondeanime.backend.anime;
 
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
@@ -52,6 +57,36 @@ public class AnimeController {
         return repository.findAll().stream()
                 .map(AnimeSummaryDto::from)
                 .toList();
+    }
+
+    /**
+     * Próximos estrenos con fecha completa, ordenados por startDate asc.
+     * Solo incluye anime con año, mes y día: si AniList devuelve fecha
+     * parcial no podemos prometer "próxima semana" con precisión.
+     */
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<UpcomingAnimeDto>> upcoming(@RequestParam(defaultValue = "7") int days) {
+        if (days < 1 || days > 365) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        LocalDate until = today.plusDays(days);
+
+        List<UpcomingAnimeDto> upcoming = repository.findAll().stream()
+                .map(AnimeController::withStartDate)
+                .flatMap(Optional::stream)
+                .filter(item -> !item.startDate().isBefore(today) && !item.startDate().isAfter(until))
+                .sorted(Comparator
+                        .comparing(AnimeWithStartDate::startDate)
+                        .thenComparing(
+                                item -> popularityOrZero(item.anime()),
+                                Comparator.reverseOrder())
+                        .thenComparing(item -> titleOrSlug(item.anime())))
+                .map(item -> UpcomingAnimeDto.from(item.anime()))
+                .toList();
+
+        return ResponseEntity.ok(upcoming);
     }
 
     /**
@@ -107,4 +142,33 @@ public class AnimeController {
         int processed = providerSyncService.syncAll();
         return Map.of("processed", processed);
     }
+
+    private static Optional<AnimeWithStartDate> withStartDate(Anime anime) {
+        if (anime.getStartYear() == null || anime.getStartMonth() == null || anime.getStartDay() == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new AnimeWithStartDate(
+                    anime,
+                    LocalDate.of(anime.getStartYear(), anime.getStartMonth(), anime.getStartDay())));
+        } catch (DateTimeException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static int popularityOrZero(Anime anime) {
+        return anime.getPopularity() == null ? 0 : anime.getPopularity();
+    }
+
+    private static String titleOrSlug(Anime anime) {
+        if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().isBlank()) {
+            return anime.getTitleEnglish();
+        }
+        if (anime.getTitleRomaji() != null && !anime.getTitleRomaji().isBlank()) {
+            return anime.getTitleRomaji();
+        }
+        return anime.getSlug() == null ? "" : anime.getSlug();
+    }
+
+    private record AnimeWithStartDate(Anime anime, LocalDate startDate) {}
 }
