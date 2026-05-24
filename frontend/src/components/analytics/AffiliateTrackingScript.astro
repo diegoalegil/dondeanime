@@ -1,0 +1,45 @@
+---
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<script define:vars={{ apiUrl }}>
+  (() => {
+    if (window.__dondeAnimeAffiliateTracking) return;
+    window.__dondeAnimeAffiliateTracking = true;
+
+    const sendTracking = (payload) => {
+      const url = `${apiUrl}/api/track/affiliate`;
+      const body = JSON.stringify(payload);
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      }
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      }).catch(() => {});
+    };
+
+    document.addEventListener('click', (event) => {
+      const link = event.target?.closest?.('[data-affiliate-link="true"]');
+      if (!link) return;
+
+      const providerSlug = link.getAttribute('data-affiliate-provider') ?? '';
+      const country = link.getAttribute('data-affiliate-country') ?? '';
+      const animeSlug = link.getAttribute('data-affiliate-anime') ?? '';
+      if (!providerSlug || !country || !animeSlug) return;
+
+      sendTracking({ providerSlug, country, animeSlug });
+
+      if (typeof window.plausible === 'function') {
+        window.plausible('Affiliate Click', {
+          props: { provider: providerSlug, country },
+        });
+      }
+    });
+  })();
+</script>

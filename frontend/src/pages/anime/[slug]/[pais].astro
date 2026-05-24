@@ -6,6 +6,7 @@ import MetaList from '@/components/anime/MetaList.astro';
 import CountrySwitcher from '@/components/ui/CountrySwitcher.astro';
 import ProviderRow from '@/components/providers/ProviderRow.astro';
 import NotAvailableInCountry from '@/components/providers/NotAvailableInCountry.astro';
+import AdSlot from '@/components/ads/AdSlot.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import AlternateLangs from '@/components/seo/AlternateLangs.astro';
@@ -81,7 +82,7 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
         Dónde ver <span class="text-accent-violet">{title}</span> en {country.name}
       </h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {providers.map((p) => <ProviderRow provider={p} />)}
+        {providers.map((p) => <ProviderRow provider={p} animeSlug={slug!} />)}
       </div>
     </section>
   ) : (
@@ -92,6 +93,8 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
       availableInCountries={availableInCountries}
     />
   )}
+
+  <AdSlot position="sidebar" />
 
   <AnimeSynopsis description={detail.anime.description} />
   <MetaList anime={detail.anime} />
