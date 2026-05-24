@@ -6,6 +6,7 @@ import MetaList from '@/components/anime/MetaList.astro';
 import CountrySwitcher from '@/components/ui/CountrySwitcher.astro';
 import ProviderRow from '@/components/providers/ProviderRow.astro';
 import NotAvailableInCountry from '@/components/providers/NotAvailableInCountry.astro';
+import AvailabilityAlertForm from '@/components/alerts/AvailabilityAlertForm.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import AlternateLangs from '@/components/seo/AlternateLangs.astro';
@@ -85,12 +86,20 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
       </div>
     </section>
   ) : (
-    <NotAvailableInCountry
-      animeSlug={slug!}
-      animeTitle={title}
-      countrySlug={countrySlug}
-      availableInCountries={availableInCountries}
-    />
+    <>
+      <NotAvailableInCountry
+        animeSlug={slug!}
+        animeTitle={title}
+        countrySlug={countrySlug}
+        availableInCountries={availableInCountries}
+      />
+      <AvailabilityAlertForm
+        animeSlug={slug!}
+        animeTitle={title}
+        countryIso={country.iso}
+        countryName={country.name}
+      />
+    </>
   )}
 
   <AnimeSynopsis description={detail.anime.description} />
