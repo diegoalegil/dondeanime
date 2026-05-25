@@ -1,38 +1,37 @@
 package com.dondeanime.backend.affiliate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-class AffiliateLinkServiceTest {
+import com.dondeanime.backend.AbstractIntegrationTest;
 
-    private final AffiliateLinkRepository linkRepository = org.mockito.Mockito.mock(AffiliateLinkRepository.class);
-    private final AffiliateClickEventRepository clickEventRepository = org.mockito.Mockito.mock(AffiliateClickEventRepository.class);
-    private final PlausibleStatsClient plausibleStatsClient = org.mockito.Mockito.mock(PlausibleStatsClient.class);
+@SpringBootTest
+class AffiliateLinkServiceTest extends AbstractIntegrationTest {
 
-    private final AffiliateLinkService service = new AffiliateLinkService(
-            linkRepository,
-            clickEventRepository,
-            plausibleStatsClient);
+    @Autowired
+    private AffiliateLinkRepository linkRepository;
+
+    @Autowired
+    private AffiliateClickEventRepository clickEventRepository;
+
+    @Autowired
+    private AffiliateLinkService service;
+
+    @BeforeEach
+    void cleanDatabase() {
+        clickEventRepository.deleteAll();
+        linkRepository.deleteAll();
+    }
 
     @Test
     void saveLinkNormalizesProviderAndCountry() {
-        when(linkRepository.findByProviderSlugAndCountryCode("crunchyroll", "ES"))
-                .thenReturn(Optional.empty());
-        when(linkRepository.save(any(AffiliateLink.class))).thenAnswer(invocation -> {
-            AffiliateLink link = invocation.getArgument(0);
-            link.setId(1L);
-            return link;
-        });
-
         AffiliateLinkDto dto = service.saveLink(new AffiliateLinkRequest(
                 " Crunchyroll ",
                 "es",
@@ -43,42 +42,50 @@ class AffiliateLinkServiceTest {
         assertThat(dto.countryCode()).isEqualTo("ES");
         assertThat(dto.affiliateUrl()).isEqualTo("https://example.com/cr");
         assertThat(dto.active()).isTrue();
+
+        Optional<AffiliateLink> stored = linkRepository.findByProviderSlugAndCountryCode("crunchyroll", "ES");
+        assertThat(stored)
+                .isPresent()
+                .get()
+                .extracting(AffiliateLink::getClickCount)
+                .isEqualTo(0);
     }
 
     @Test
     void trackClickIncrementsLinkAndStoresEvent() {
-        AffiliateLink link = link();
-        when(linkRepository.findByProviderSlugAndCountryCodeAndActiveTrue("crunchyroll", "ES"))
-                .thenReturn(Optional.of(link));
-        when(linkRepository.incrementClickCount(eq("crunchyroll"), eq("ES"), any(Instant.class)))
-                .thenReturn(1);
+        linkRepository.saveAndFlush(link());
 
         service.trackClick(new AffiliateTrackRequest(
                 "Crunchyroll",
                 "es",
                 "attack-on-titan"));
 
-        verify(linkRepository).incrementClickCount(eq("crunchyroll"), eq("ES"), any(Instant.class));
-        verify(clickEventRepository).save(any(AffiliateClickEvent.class));
+        AffiliateLink stored = linkRepository.findByProviderSlugAndCountryCode("crunchyroll", "ES")
+                .orElseThrow();
+        assertThat(stored.getClickCount()).isEqualTo(1);
+        assertThat(clickEventRepository.findAll())
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getAffiliateLinkId()).isEqualTo(stored.getId());
+                    assertThat(event.getProviderSlug()).isEqualTo("crunchyroll");
+                    assertThat(event.getCountryCode()).isEqualTo("ES");
+                    assertThat(event.getAnimeSlug()).isEqualTo("attack-on-titan");
+                });
     }
 
     @Test
     void trackClickIsNoOpWhenLinkDoesNotExist() {
-        when(linkRepository.findByProviderSlugAndCountryCodeAndActiveTrue("crunchyroll", "ES"))
-                .thenReturn(Optional.empty());
-
         service.trackClick(new AffiliateTrackRequest(
                 "crunchyroll",
                 "ES",
                 "attack-on-titan"));
 
-        verify(linkRepository, never()).incrementClickCount(any(), any(), any());
-        verify(clickEventRepository, never()).save(any());
+        assertThat(linkRepository.findAll()).isEmpty();
+        assertThat(clickEventRepository.findAll()).isEmpty();
     }
 
     private static AffiliateLink link() {
         AffiliateLink link = new AffiliateLink();
-        link.setId(10L);
         link.setProviderSlug("crunchyroll");
         link.setCountryCode("ES");
         link.setAffiliateUrl("https://example.com/cr");
