@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.client.RestClient;
 
+import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
@@ -75,6 +76,7 @@ class CatalogSchedulerMetricsTest {
         return new CatalogScheduler(
                 syncService,
                 matchingService,
+                mock(AnimeDescriptionEnricher.class),
                 providerSyncService,
                 RestClient.builder(),
                 registry,
@@ -91,6 +93,7 @@ class CatalogSchedulerMetricsTest {
         return new CatalogScheduler(
                 syncService,
                 matchingService,
+                mock(AnimeDescriptionEnricher.class),
                 providerSyncService,
                 RestClient.builder(),
                 registry,
