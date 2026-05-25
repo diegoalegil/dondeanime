@@ -13,6 +13,9 @@ import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+
 /**
  * Jobs programados que mantienen el catálogo al día sin intervención manual.
  *
@@ -45,6 +48,7 @@ public class CatalogScheduler {
     private final AnimeDescriptionEnricher descriptionEnricher;
     private final ProviderSyncService providerSyncService;
     private final RestClient restClient;
+    private final MeterRegistry meterRegistry;
     private final String vercelDeployHook;
 
     public CatalogScheduler(
@@ -53,12 +57,14 @@ public class CatalogScheduler {
             AnimeDescriptionEnricher descriptionEnricher,
             ProviderSyncService providerSyncService,
             RestClient.Builder restClientBuilder,
+            MeterRegistry meterRegistry,
             @Value("${vercel.deploy-hook:}") String vercelDeployHook) {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.descriptionEnricher = descriptionEnricher;
         this.providerSyncService = providerSyncService;
         this.restClient = restClientBuilder.build();
+        this.meterRegistry = meterRegistry;
         this.vercelDeployHook = vercelDeployHook;
     }
 
@@ -66,12 +72,15 @@ public class CatalogScheduler {
     public void syncAniList() {
         log.info("[scheduler] syncAniList: iniciando");
         boolean ok = false;
+        Timer.Sample sample = Timer.start(meterRegistry);
         try {
             int n = syncService.syncPopular(100);
             log.info("[scheduler] syncAniList: completado, {} anime", n);
             ok = true;
+            recordSuccess("anilist", sample);
         } catch (Exception e) {
             log.error("[scheduler] syncAniList: ERROR", e);
+            recordError("anilist", sample);
         }
         if (ok) {
             triggerVercelRebuild();
@@ -81,26 +90,32 @@ public class CatalogScheduler {
     @Scheduled(cron = "${dondeanime.cron.match-tmdb:0 0 4 * * *}")
     public void matchTmdb() {
         log.info("[scheduler] matchTmdb: iniciando");
+        Timer.Sample sample = Timer.start(meterRegistry);
         try {
             int n = matchingService.matchAll();
             log.info("[scheduler] matchTmdb: completado, {} match nuevos", n);
             int enriched = descriptionEnricher.enrichMissingSpanishDescriptions();
             log.info("[scheduler] matchTmdb: {} descripciones es-ES nuevas", enriched);
+            recordSuccess("match", sample);
         } catch (Exception e) {
             log.error("[scheduler] matchTmdb: ERROR", e);
+            recordError("match", sample);
         }
     }
 
     @Scheduled(cron = "${dondeanime.cron.sync-providers:0 0 5 * * *}")
     public void syncProviders() {
         log.info("[scheduler] syncProviders: iniciando");
+        Timer.Sample sample = Timer.start(meterRegistry);
         boolean ok = false;
         try {
             int n = providerSyncService.syncAll();
             log.info("[scheduler] syncProviders: completado, {} procesados", n);
             ok = true;
+            recordSuccess("providers", sample);
         } catch (Exception e) {
             log.error("[scheduler] syncProviders: ERROR", e);
+            recordError("providers", sample);
         }
         if (ok) {
             triggerVercelRebuild();
@@ -130,5 +145,15 @@ public class CatalogScheduler {
         } catch (Exception e) {
             log.error("[scheduler] Error disparando Vercel deploy hook: {}", e.getMessage());
         }
+    }
+
+    private void recordSuccess(String job, Timer.Sample sample) {
+        meterRegistry.counter("dondeanime.scheduler." + job + ".success.count").increment();
+        sample.stop(meterRegistry.timer("dondeanime.scheduler." + job + ".duration"));
+    }
+
+    private void recordError(String job, Timer.Sample sample) {
+        meterRegistry.counter("dondeanime.scheduler." + job + ".error.count").increment();
+        sample.stop(meterRegistry.timer("dondeanime.scheduler." + job + ".duration"));
     }
 }
