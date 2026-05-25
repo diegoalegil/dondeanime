@@ -149,6 +149,7 @@ export const buildOrganizationSchema = () => ({
   '@type': 'Organization',
   name: t('brand.name'),
   url: `${SITE_URL}${localizedPath('/')}`,
+  availableLanguage: ['es', 'en'],
   logo: {
     '@type': 'ImageObject',
     url: absoluteUrl('/og-default.png'),

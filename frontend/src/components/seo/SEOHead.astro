@@ -29,6 +29,7 @@ const ogImage = image ?? `${siteUrl}/og-default.png`;
 const activeLocale = localeFromPath(Astro.url.pathname);
 setLocale(activeLocale);
 const ogLocale = activeLocale === 'en' ? 'en_US' : locale ?? 'es_ES';
+const ogLocaleAlternates = activeLocale === 'en' ? ['es_ES'] : ['en_US'];
 const alternates = localeAlternates(cleanPathname || '/');
 ---
 <title>{title}</title>
@@ -42,6 +43,9 @@ const alternates = localeAlternates(cleanPathname || '/');
 <meta property="og:image" content={ogImage} />
 <meta property="og:site_name" content={t('brand.name')} />
 <meta property="og:locale" content={ogLocale} />
+{ogLocaleAlternates.map((alternateLocale) => (
+  <meta property="og:locale:alternate" content={alternateLocale} />
+))}
 
 {alternates.map((alternate) => (
   <link rel="alternate" hreflang={alternate.hreflang} href={new URL(alternate.path, siteUrl).toString()} />

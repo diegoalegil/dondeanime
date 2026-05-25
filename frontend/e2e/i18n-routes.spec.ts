@@ -17,6 +17,8 @@ test('English routes render translated UI under /en with locale alternates', asy
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { name: /Find where to watch/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://dondeanime.com/en');
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'en_US');
+  await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute('content', 'es_ES');
   await expectLocaleAlternates(page, {
     es: 'https://dondeanime.com/',
     en: 'https://dondeanime.com/en',
