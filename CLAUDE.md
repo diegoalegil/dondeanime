@@ -297,6 +297,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
 Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte.
+Web Push usa `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` y `PUBLIC_VAPID_PUBLIC_KEY`; por defecto vacías para mantener push apagado hasta generar claves reales.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.
@@ -395,6 +396,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | DELETE | `/api/admin/affiliate-links/{id}` | Borrar link afiliado (Basic Auth) |
 | GET | `/api/admin/dashboard` | Métricas de clicks y Plausible (Basic Auth) |
 | POST | `/api/track/affiliate` | Incrementar click afiliado y registrar evento |
+| POST | `/api/push/subscribe` | Guardar subscription Web Push pública |
 
 ---
 
@@ -491,6 +493,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | DELETE | `/api/admin/affiliate-links/{id}` | Borra link afiliado |
 | GET | `/api/admin/dashboard` | Dashboard monetización/analítica |
 | POST | `/api/track/affiliate` | Tracking público de click afiliado |
+| POST | `/api/push/subscribe` | Guarda subscription Web Push del navegador |
 
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
