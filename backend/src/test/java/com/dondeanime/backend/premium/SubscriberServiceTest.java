@@ -54,6 +54,32 @@ class SubscriberServiceTest {
     }
 
     @Test
+    void findActiveStripeCustomerIdReturnsCustomerForActivePremiumSubscriber() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(60), NOW.plusSeconds(60));
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findActiveStripeCustomerId(" Diego@Example.com "))
+                .contains("cus_test_123");
+    }
+
+    @Test
+    void findActiveStripeCustomerIdIgnoresExpiredSubscriber() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), NOW.minusSeconds(1));
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findActiveStripeCustomerId("diego@example.com")).isEmpty();
+    }
+
+    @Test
+    void findActiveStripeCustomerIdIgnoresSubscriberWithoutCustomerId() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        subscriber.setStripeCustomerId(" ");
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findActiveStripeCustomerId("diego@example.com")).isEmpty();
+    }
+
+    @Test
     void upsertPremiumCreatesNormalizedSubscriber() {
         when(subscriberRepository.findByStripeCustomerId("cus_test_123")).thenReturn(Optional.empty());
         when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.empty());

@@ -38,6 +38,21 @@ public class SubscriberService {
                 .isPresent();
     }
 
+    @Transactional(readOnly = true)
+    public Optional<String> findActiveStripeCustomerId(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail.isBlank()) {
+            return Optional.empty();
+        }
+
+        Instant now = Instant.now(clock);
+        return subscriberRepository.findByEmail(normalizedEmail)
+                .filter(subscriber -> isActive(subscriber, now))
+                .map(Subscriber::getStripeCustomerId)
+                .map(SubscriberService::normalizeStripeCustomerId)
+                .filter(customerId -> !customerId.isBlank());
+    }
+
     @Transactional
     public Subscriber upsertPremium(
             String email,

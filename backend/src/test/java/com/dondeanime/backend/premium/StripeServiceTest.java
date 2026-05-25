@@ -29,7 +29,8 @@ class StripeServiceTest {
             "price_test_123",
             "whsec_test_123",
             "https://dondeanime.com/premium?success=1",
-            "https://dondeanime.com/premium?canceled=1");
+            "https://dondeanime.com/premium?canceled=1",
+            "https://dondeanime.com/premium");
 
     @Test
     void createCheckoutSessionBuildsStripeCommand() throws Exception {
@@ -54,11 +55,38 @@ class StripeServiceTest {
                 "price_test_123",
                 "whsec_test_123",
                 "success",
-                "cancel");
+                "cancel",
+                "portal");
 
         assertThatThrownBy(() -> unconfigured.createCheckoutSession("diego@example.com"))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e ->
                         assertThat(e.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE));
+    }
+
+    @Test
+    void createCustomerPortalSessionBuildsStripeCommand() throws Exception {
+        when(subscriberService.findActiveStripeCustomerId("diego@example.com"))
+                .thenReturn(java.util.Optional.of("cus_test_123"));
+        when(stripeGateway.createCustomerPortalSession(any(StripePortalCommand.class)))
+                .thenReturn("https://billing.stripe.test/session");
+
+        String url = service.createCustomerPortalSession(" Diego@Example.com ");
+
+        assertThat(url).isEqualTo("https://billing.stripe.test/session");
+        ArgumentCaptor<StripePortalCommand> captor = ArgumentCaptor.forClass(StripePortalCommand.class);
+        verify(stripeGateway).createCustomerPortalSession(captor.capture());
+        assertThat(captor.getValue().customerId()).isEqualTo("cus_test_123");
+        assertThat(captor.getValue().returnUrl()).isEqualTo("https://dondeanime.com/premium");
+    }
+
+    @Test
+    void createCustomerPortalSessionReturnsNotFoundForUnknownPremiumEmail() {
+        when(subscriberService.findActiveStripeCustomerId("diego@example.com"))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.createCustomerPortalSession("diego@example.com"))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e ->
+                        assertThat(e.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
     }
 
     @Test
