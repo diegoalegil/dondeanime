@@ -24,6 +24,11 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet" />
       </label>
 
+      <label class="mt-4 hidden" data-totp-field>
+        <span class="mb-1 block text-sm font-medium text-fg-secondary">Codigo 2FA</span>
+        <input name="totpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet" />
+      </label>
+
       <button type="submit" class="mt-5 w-full rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
         Entrar
       </button>
@@ -35,6 +40,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const root = document.querySelector('[data-admin-login]');
     const form = document.querySelector('[data-login-form]');
     const status = document.querySelector('[data-login-status]');
+    const totpField = document.querySelector('[data-totp-field]');
     const apiUrl = root?.getAttribute('data-api-url') ?? '';
     const tokenKey = 'dondeanime-admin-token';
 
@@ -61,16 +67,24 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         body: JSON.stringify({
           username: String(data.get('username') ?? ''),
           password: String(data.get('password') ?? ''),
+          totpCode: String(data.get('totpCode') ?? ''),
         }),
       });
+      const payload = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         localStorage.removeItem(tokenKey);
+        if (payload?.error === 'totp_required') {
+          totpField?.classList.remove('hidden');
+          form.querySelector('[name="totpCode"]')?.focus();
+          setStatus('Introduce el codigo de Google Authenticator.', 'danger');
+          return;
+        }
         setStatus('Credenciales incorrectas.', 'danger');
         return;
       }
 
-      const session = await response.json();
+      const session = payload;
       localStorage.setItem(tokenKey, session.token);
       setStatus('Sesión iniciada.', 'success');
       window.location.href = nextUrl();
