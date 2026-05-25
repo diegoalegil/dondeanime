@@ -10,6 +10,39 @@ const expectedPartitionSitemaps = [
   '/sitemap-combinatoria.xml',
 ];
 
+const seasonOrder: Record<string, number> = { winter: 0, spring: 1, summer: 2, fall: 3 };
+const seasonLabelPattern: Record<string, string> = {
+  winter: 'Invierno',
+  spring: 'Primavera',
+  summer: 'Verano',
+  fall: 'Oto.o',
+};
+
+const currentSeasonPath = (date: Date) => {
+  const month = date.getUTCMonth() + 1;
+  const season = month <= 3 ? 'winter' : month <= 6 ? 'spring' : month <= 9 ? 'summer' : 'fall';
+  return `/temporada/${date.getUTCFullYear()}/${season}`;
+};
+
+const expectedHomeSeasonPath = async (request: APIRequestContext) => {
+  const sitemap = await request.get('/sitemap-temporadas.xml');
+  expect(sitemap.ok()).toBe(true);
+  const paths = [...(await sitemap.text()).matchAll(/https:\/\/dondeanime\.com(\/temporada\/(\d{4})\/(winter|spring|summer|fall))/g)]
+    .map((match) => ({
+      path: match[1],
+      year: Number(match[2]),
+      season: match[3],
+    }));
+
+  const current = currentSeasonPath(new Date());
+  if (paths.some((item) => item.path === current)) return current;
+
+  return [...paths].sort((a, b) => {
+    if (a.year !== b.year) return b.year - a.year;
+    return seasonOrder[b.season] - seasonOrder[a.season];
+  })[0].path;
+};
+
 const sitemapPathsFromIndex = async (request: APIRequestContext, path = '/sitemap-index.xml') => {
   const sitemapIndex = await request.get(path);
   expect(sitemapIndex.ok()).toBe(true);
@@ -63,6 +96,18 @@ test('home renders the static catalog and links to an anime detail page', async 
     'href',
     /https:\/\/dondeanime\.com\/anime\/[^/]+$/,
   );
+});
+
+test('home highlights the current season or falls back to latest populated season', async ({ page, request }) => {
+  const expectedPath = await expectedHomeSeasonPath(request);
+  const [, year, season] = expectedPath.match(/^\/temporada\/(\d{4})\/([a-z]+)$/)!;
+
+  await page.goto('/');
+
+  await expect(page.getByRole('heading', {
+    name: new RegExp(`Estrenos de ${seasonLabelPattern[season]} ${year}`),
+  })).toBeVisible();
+  await expect(page.locator(`main a[href="${expectedPath}"]`)).toBeVisible();
 });
 
 test('country, platform, genre and season hubs have working static routes', async ({ page }) => {

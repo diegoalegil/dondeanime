@@ -31,6 +31,7 @@ public class AnimeController {
     private final AnimeSyncService syncService;
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
+    private final AnimeDescriptionEnricher descriptionEnricher;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -40,6 +41,7 @@ public class AnimeController {
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
+            AnimeDescriptionEnricher descriptionEnricher,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService) {
@@ -47,6 +49,7 @@ public class AnimeController {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
+        this.descriptionEnricher = descriptionEnricher;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -130,7 +133,8 @@ public class AnimeController {
     @PostMapping("/match")
     public Map<String, Integer> match() {
         int matched = matchingService.matchAll();
-        return Map.of("matched", matched);
+        int descriptionsEnriched = descriptionEnricher.enrichMissingSpanishDescriptions();
+        return Map.of("matched", matched, "descriptionsEnriched", descriptionsEnriched);
     }
 
     /**

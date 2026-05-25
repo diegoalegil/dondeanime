@@ -13,13 +13,14 @@ class AnimeDetailDtoTest {
     void spanishOverrideWinsOverAnilistValue() {
         Anime anime = anime();
 
-        AnimeOverride descriptionOverride = override(anime, "description", "Descripción propia");
-        AnimeOverride titleOverride = override(anime, "title_english", "Título propio");
+        AnimeOverride descriptionOverride = override(anime, "description", "Descripcion propia");
+        AnimeOverride titleOverride = override(anime, "title_english", "Titulo propio");
 
         AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of(descriptionOverride, titleOverride));
 
-        assertThat(dto.description()).isEqualTo("Descripción propia");
-        assertThat(dto.titleEnglish()).isEqualTo("Título propio");
+        assertThat(dto.description()).isEqualTo("Descripcion propia");
+        assertThat(dto.descriptionTranslationPending()).isFalse();
+        assertThat(dto.titleEnglish()).isEqualTo("Titulo propio");
         assertThat(dto.titleRomaji()).isEqualTo("Shingeki no Kyojin");
     }
 
@@ -29,9 +30,21 @@ class AnimeDetailDtoTest {
 
         AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of());
 
-        assertThat(dto.description()).isEqualTo("Descripción AniList");
+        assertThat(dto.description()).isEqualTo("Descripcion AniList");
+        assertThat(dto.descriptionTranslationPending()).isTrue();
         assertThat(dto.titleEnglish()).isEqualTo("Attack on Titan");
         assertThat(dto.titleRomaji()).isEqualTo("Shingeki no Kyojin");
+    }
+
+    @Test
+    void spanishDescriptionWinsOverAnilistValue() {
+        Anime anime = anime();
+        anime.setDescriptionEs("Descripcion TMDb en espanol");
+
+        AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of());
+
+        assertThat(dto.description()).isEqualTo("Descripcion TMDb en espanol");
+        assertThat(dto.descriptionTranslationPending()).isFalse();
     }
 
     @Test
@@ -42,7 +55,8 @@ class AnimeDetailDtoTest {
 
         AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of(override));
 
-        assertThat(dto.description()).isEqualTo("Descripción AniList");
+        assertThat(dto.description()).isEqualTo("Descripcion AniList");
+        assertThat(dto.descriptionTranslationPending()).isTrue();
     }
 
     private static Anime anime() {
@@ -52,7 +66,7 @@ class AnimeDetailDtoTest {
         anime.setSlug("attack-on-titan");
         anime.setTitleEnglish("Attack on Titan");
         anime.setTitleRomaji("Shingeki no Kyojin");
-        anime.setDescription("Descripción AniList");
+        anime.setDescription("Descripcion AniList");
         anime.setFormat("TV");
         anime.setStatus("FINISHED");
         return anime;

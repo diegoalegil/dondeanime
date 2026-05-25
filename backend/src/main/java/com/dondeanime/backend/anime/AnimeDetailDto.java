@@ -17,6 +17,7 @@ public record AnimeDetailDto(
         String titleEnglish,
         String titleRomaji,
         String description,
+        boolean descriptionTranslationPending,
         String format,
         String status,
         Integer episodes,
@@ -46,12 +47,21 @@ public record AnimeDetailDto(
                         AnimeOverride::getFieldValue,
                         (first, ignored) -> first));
 
+        String overrideDescription = blankToNull(overrideByField.get("description"));
+        String spanishDescription = blankToNull(a.getDescriptionEs());
+        String originalDescription = blankToNull(a.getDescription());
+        String publicDescription = firstNonBlank(overrideDescription, spanishDescription, originalDescription);
+        boolean translationPending = overrideDescription == null
+                && spanishDescription == null
+                && originalDescription != null;
+
         return new AnimeDetailDto(
                 a.getAnilistId(),
                 a.getSlug(),
                 overrideByField.getOrDefault("title_english", a.getTitleEnglish()),
                 overrideByField.getOrDefault("title_romaji", a.getTitleRomaji()),
-                overrideByField.getOrDefault("description", a.getDescription()),
+                publicDescription,
+                translationPending,
                 a.getFormat(),
                 a.getStatus(),
                 a.getEpisodes(),
@@ -69,5 +79,22 @@ public record AnimeDetailDto(
                 a.getSeason(),
                 a.getSeasonYear()
         );
+    }
+
+    private static String firstNonBlank(String... values) {
+        for (String value : values) {
+            String normalized = blankToNull(value);
+            if (normalized != null) {
+                return normalized;
+            }
+        }
+        return null;
+    }
+
+    private static String blankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value;
     }
 }

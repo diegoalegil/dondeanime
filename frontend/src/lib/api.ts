@@ -39,6 +39,7 @@ export interface AnimeDetail {
     titleEnglish: string;
     titleRomaji: string;
     description: string | null;
+    descriptionTranslationPending: boolean;
     format: string;
     status: string;
     episodes: number | null;

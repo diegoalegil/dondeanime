@@ -1,13 +1,21 @@
 ---
 interface Props {
   description: string | null;
+  translationPending?: boolean;
 }
 
-const { description } = Astro.props;
+const { description, translationPending = false } = Astro.props;
 ---
 {description && (
   <section class="mx-auto max-w-6xl px-4 py-8">
-    <h2 class="mb-4 text-lg font-semibold text-fg-primary">Sinopsis</h2>
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+      <h2 class="text-lg font-semibold text-fg-primary">Sinopsis</h2>
+      {translationPending && (
+        <span class="rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-200">
+          Pendiente de traducción editorial
+        </span>
+      )}
+    </div>
     <div
       class="max-w-3xl text-base leading-relaxed text-fg-secondary"
       set:html={description}
