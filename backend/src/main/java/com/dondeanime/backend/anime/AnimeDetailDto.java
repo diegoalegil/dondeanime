@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dondeanime.backend.character.CharacterDto;
 import com.dondeanime.backend.studio.StudioDto;
 
 /**
@@ -37,7 +38,8 @@ public record AnimeDetailDto(
         Set<String> genres,
         List<StudioDto> studios,
         String season,
-        Integer seasonYear
+        Integer seasonYear,
+        List<CharacterDto> characters
 ) {
     public static AnimeDetailDto from(Anime a) {
         return from(a, List.of());
@@ -85,7 +87,12 @@ public record AnimeDetailDto(
                         .map(StudioDto::from)
                         .toList(),
                 a.getSeason(),
-                a.getSeasonYear()
+                a.getSeasonYear(),
+                a.getCharacterRoles().stream()
+                        .sorted((left, right) -> left.getCharacter().getName()
+                                .compareToIgnoreCase(right.getCharacter().getName()))
+                        .map(CharacterDto::from)
+                        .toList()
         );
     }
 

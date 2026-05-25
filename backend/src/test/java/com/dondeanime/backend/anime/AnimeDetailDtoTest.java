@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import com.dondeanime.backend.character.AnimeCharacter;
+import com.dondeanime.backend.character.AnimeCharacterRole;
 import com.dondeanime.backend.studio.Studio;
 
 class AnimeDetailDtoTest {
@@ -81,6 +83,20 @@ class AnimeDetailDtoTest {
         assertThat(dto.studios().getFirst().animationStudio()).isTrue();
     }
 
+    @Test
+    void includesPublicCharacterData() {
+        Anime anime = anime();
+        anime.replaceCharacterRoles(List.of(characterRole(40882L, "Eren Yeager", "https://img.example/eren.jpg")));
+
+        AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of());
+
+        assertThat(dto.characters()).hasSize(1);
+        assertThat(dto.characters().getFirst().anilistId()).isEqualTo(40882L);
+        assertThat(dto.characters().getFirst().name()).isEqualTo("Eren Yeager");
+        assertThat(dto.characters().getFirst().image()).isEqualTo("https://img.example/eren.jpg");
+        assertThat(dto.characters().getFirst().role()).isEqualTo("MAIN");
+    }
+
     private static Anime anime() {
         Anime anime = new Anime();
         anime.setId(1L);
@@ -104,5 +120,17 @@ class AnimeDetailDtoTest {
         override.setUpdatedAt(Instant.now());
         override.setUpdatedBy("admin");
         return override;
+    }
+
+    private static AnimeCharacterRole characterRole(Long anilistId, String name, String image) {
+        AnimeCharacter character = new AnimeCharacter();
+        character.setAnilistId(anilistId);
+        character.setName(name);
+        character.setImage(image);
+
+        AnimeCharacterRole role = new AnimeCharacterRole();
+        role.setCharacter(character);
+        role.setRole("MAIN");
+        return role;
     }
 }

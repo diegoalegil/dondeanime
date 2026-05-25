@@ -22,5 +22,6 @@ public record AniListMedia(
         List<String> genres,
         AniListStudioConnection studios,
         String season,
-        Integer seasonYear
+        Integer seasonYear,
+        AniListCharacterConnection characters
 ) {}
