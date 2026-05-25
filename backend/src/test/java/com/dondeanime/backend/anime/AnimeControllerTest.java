@@ -75,7 +75,7 @@ class AnimeControllerTest {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
         when(animeRepository.findAll()).thenReturn(List.of(a));
 
-        mvc.perform(get("/api/anime"))
+        mvc.perform(get("/api/v1/anime"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
@@ -104,7 +104,7 @@ class AnimeControllerTest {
 
         when(animeRepository.findAll()).thenReturn(List.of(later, outside, partialDate, early, past));
 
-        mvc.perform(get("/api/anime/upcoming?days=7"))
+        mvc.perform(get("/api/v1/anime/upcoming?days=7"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].slug").value("early"))
@@ -116,7 +116,7 @@ class AnimeControllerTest {
 
     @Test
     void upcomingRejectsInvalidDays() throws Exception {
-        mvc.perform(get("/api/anime/upcoming?days=0"))
+        mvc.perform(get("/api/v1/anime/upcoming?days=0"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -131,7 +131,7 @@ class AnimeControllerTest {
         when(affiliateLinkService.toProviderDto(provider)).thenReturn(ProviderDto.from(provider, "https://example.com"));
         when(overrideService.findSpanishOverrides(a)).thenReturn(List.of());
 
-        mvc.perform(get("/api/anime/attack-on-titan"))
+        mvc.perform(get("/api/v1/anime/attack-on-titan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.anime.slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$.watchProvidersByCountry").isMap())
@@ -142,7 +142,7 @@ class AnimeControllerTest {
     void getBySlugUnknownReturns404() throws Exception {
         when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
 
-        mvc.perform(get("/api/anime/inexistente"))
+        mvc.perform(get("/api/v1/anime/inexistente"))
                 .andExpect(status().isNotFound());
     }
 
@@ -151,7 +151,7 @@ class AnimeControllerTest {
         when(matchingService.matchAll()).thenReturn(3);
         when(descriptionEnricher.enrichMissingSpanishDescriptions()).thenReturn(2);
 
-        mvc.perform(post("/api/anime/match"))
+        mvc.perform(post("/api/v1/anime/match"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.matched").value(3))
                 .andExpect(jsonPath("$.descriptionsEnriched").value(2));

@@ -24,7 +24,7 @@ import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
 @RestController
-@RequestMapping("/api/anime")
+@RequestMapping("/api/v1/anime")
 public class AnimeController {
 
     private final AnimeRepository repository;
