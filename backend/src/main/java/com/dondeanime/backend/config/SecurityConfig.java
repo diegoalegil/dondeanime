@@ -67,8 +67,8 @@ public class SecurityConfig {
                 HttpMethod.POST.name(),
                 HttpMethod.DELETE.name(),
                 HttpMethod.OPTIONS.name()));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setExposedHeaders(List.of("WWW-Authenticate"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-API-Key"));
+        configuration.setExposedHeaders(List.of("WWW-Authenticate", "X-RateLimit-Limit", "X-RateLimit-Remaining"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
