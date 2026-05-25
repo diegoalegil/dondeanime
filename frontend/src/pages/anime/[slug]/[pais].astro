@@ -15,6 +15,7 @@ import { getAllAnime, getAnimeBySlug } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { t } from '@/i18n';
 
 export async function getStaticPaths() {
   const all = await getAllAnime();
@@ -44,11 +45,11 @@ const availableInCountries = COUNTRY_SLUGS.filter((s) => {
 
 const platformNames = providers.map((p) => p.providerName).join(', ');
 const seoTitle = hasProviders
-  ? `Dónde ver ${title} en ${country.name} — ${platformNames} | DondeAnime`
-  : `${title} en ${country.name} — Dónde verlo en streaming | DondeAnime`;
+  ? t('anime.country.seo.availableTitle', { title, country: country.name, platforms: platformNames })
+  : t('anime.country.seo.unavailableTitle', { title, country: country.name });
 const seoDescription = hasProviders
-  ? `${title} está disponible en ${country.name} en: ${platformNames}. Encuentra todas las plataformas de streaming.`
-  : `${title} no está disponible en plataformas de ${country.name} todavía. Mira en qué otros países hispanoamericanos puedes verlo.`;
+  ? t('anime.country.seo.availableDescription', { title, country: country.name, platforms: platformNames })
+  : t('anime.country.seo.unavailableDescription', { title, country: country.name });
 
 const pageUrl = absoluteUrl(`/anime/${slug}/${countrySlug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
@@ -71,7 +72,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
+      { name: t('breadcrumbs.home'), url: '/' },
       { name: title, url: `/anime/${slug}` },
       { name: country.name, url: `/anime/${slug}/${countrySlug}` },
     ]}
@@ -82,7 +83,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   {hasProviders ? (
     <section class="mx-auto max-w-6xl px-4 py-8">
       <h2 class="mb-6 text-lg font-semibold text-fg-primary">
-        Dónde ver <span class="text-accent-violet">{title}</span> en {country.name}
+        {t('anime.country.whereToWatch', { title, country: country.name })}
       </h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.map((p) => <ProviderRow provider={p} animeSlug={slug!} />)}
@@ -118,7 +119,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
       href={`/anime/${slug}`}
       class="inline-flex items-center gap-2 text-sm text-fg-muted transition-colors hover:text-accent-violet"
     >
-      Ver todas las plataformas en todos los países →
+      {t('anime.country.allPlatforms')} →
     </a>
   </section>
 </BaseLayout>

@@ -3,6 +3,7 @@ import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, type PlatformSlug } from '@/lib/platforms';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { buildOrganizationSchema } from '@/lib/seo';
+import { t } from '@/i18n';
 
 const year = new Date().getFullYear();
 const organizationSchema = buildOrganizationSchema();
@@ -14,25 +15,25 @@ const featuredPlatforms: PlatformSlug[] = [
   'disney-plus',
 ];
 const featuredGenres = [
-  { slug: 'action', name: 'Acción' },
-  { slug: 'drama', name: 'Drama' },
-  { slug: 'comedy', name: 'Comedia' },
-  { slug: 'adventure', name: 'Aventura' },
-  { slug: 'romance', name: 'Romance' },
+  { slug: 'action', name: t('footer.genre.action') },
+  { slug: 'drama', name: t('footer.genre.drama') },
+  { slug: 'comedy', name: t('footer.genre.comedy') },
+  { slug: 'adventure', name: t('footer.genre.adventure') },
+  { slug: 'romance', name: t('footer.genre.romance') },
 ];
 ---
 <footer class="mt-16 border-t border-surface-2 bg-surface-1">
   <div class="mx-auto max-w-6xl px-4 py-12">
     <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
       <div>
-        <p class="text-base font-semibold brand-gradient-text">DondeAnime</p>
+        <p class="text-base font-semibold brand-gradient-text">{t('brand.name')}</p>
         <p class="mt-3 text-sm text-fg-muted">
-          Dónde y cuándo ver cada anime en streaming, por país.
+          {t('footer.tagline')}
         </p>
       </div>
 
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">Países</h3>
+        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">{t('footer.countries')}</h3>
         <ul class="mt-3 space-y-2 text-sm">
           {COUNTRY_SLUGS.map((slug) => {
             const c = COUNTRIES[slug];
@@ -49,7 +50,7 @@ const featuredGenres = [
       </div>
 
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">Plataformas</h3>
+        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">{t('footer.platforms')}</h3>
         <ul class="mt-3 space-y-2 text-sm">
           {featuredPlatforms.map((slug) => (
             <li>
@@ -62,7 +63,7 @@ const featuredGenres = [
       </div>
 
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">Géneros</h3>
+        <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-secondary">{t('footer.genres')}</h3>
         <ul class="mt-3 space-y-2 text-sm">
           {featuredGenres.map((g) => (
             <li>
@@ -76,14 +77,14 @@ const featuredGenres = [
     </div>
 
     <div class="mt-10 flex flex-col gap-3 border-t border-surface-2 pt-6 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between">
-      <p>&copy; {year} DondeAnime. Datos vía AniList y TMDb.</p>
+      <p>&copy; {year} {t('brand.name')}. {t('footer.dataAttribution')}</p>
       <p class="sm:text-right">
-        <a href="/legal/privacidad" class="transition-colors hover:text-fg-primary">Privacidad</a>
-        <span class="mx-2">·</span>
-        Esta web contiene enlaces de afiliado.
-        <a href="/legal/afiliados" class="transition-colors hover:text-fg-primary">Más info</a>
-        <span class="mx-2">·</span>
-        No alojamos contenido.
+        <a href="/legal/privacidad" class="transition-colors hover:text-fg-primary">{t('footer.privacy')}</a>
+        <span class="mx-2">&middot;</span>
+        {t('footer.affiliateDisclosure')}
+        <a href="/legal/afiliados" class="transition-colors hover:text-fg-primary">{t('footer.moreInfo')}</a>
+        <span class="mx-2">&middot;</span>
+        {t('footer.noHosting')}
       </p>
     </div>
   </div>

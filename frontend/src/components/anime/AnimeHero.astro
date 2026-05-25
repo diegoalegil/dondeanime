@@ -1,6 +1,7 @@
 ---
 import type { AnimeDetail } from '@/lib/api';
 import { formatType, formatStatus } from '@/lib/format';
+import { t } from '@/i18n';
 
 interface Props {
   anime: AnimeDetail['anime'];
@@ -51,7 +52,7 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
           )}
           {anime.episodes !== null && (
             <span class="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-fg-secondary">
-              {anime.episodes} {anime.episodes === 1 ? 'episodio' : 'episodios'}
+              {anime.episodes} {anime.episodes === 1 ? t('anime.hero.episode.one') : t('anime.hero.episode.other')}
             </span>
           )}
           <span class="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-fg-secondary">

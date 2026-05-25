@@ -31,7 +31,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>
-      // Anti-FOIT: aplicar tema guardado antes del primer paint
+      // Anti-FOIT: apply saved theme before first paint.
       try {
         const stored = localStorage.getItem('dondeanime-theme');
         if (stored === 'light' || stored === 'dark') {

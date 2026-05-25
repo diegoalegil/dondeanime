@@ -1,5 +1,6 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
+import { formatType } from '@/lib/format';
 
 interface Props {
   anime: AnimeSummary;
@@ -36,7 +37,7 @@ if (score !== null) {
         {title}
       </h3>
       <p class="mt-1 text-xs text-fg-muted">
-        {anime.year ?? '—'} · {anime.format}
+        {anime.year ?? '—'} &middot; {formatType(anime.format)}
       </p>
     </div>
   </a>

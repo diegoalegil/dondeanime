@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
+import { t } from '@/i18n';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -42,7 +43,7 @@ const blogPostingSchema = {
   },
   publisher: {
     '@type': 'Organization',
-    name: 'DondeAnime',
+    name: t('brand.name'),
     logo: {
       '@type': 'ImageObject',
       url: absoluteUrl('/og-default.png'),
@@ -51,7 +52,7 @@ const blogPostingSchema = {
 };
 ---
 <BaseLayout
-  title={`${post.data.title} | DondeAnime`}
+  title={t('blog.post.title', { title: post.data.title })}
   description={post.data.description}
   canonical={pageUrl}
   type="article"
@@ -60,8 +61,8 @@ const blogPostingSchema = {
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Blog', url: '/blog' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.blog'), url: '/blog' },
       { name: post.data.title, url: `/blog/${post.id}` },
     ]}
   />

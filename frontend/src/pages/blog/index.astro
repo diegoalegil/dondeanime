@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
+import { t } from '@/i18n';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
@@ -14,24 +15,24 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
 });
 ---
 <BaseLayout
-  title="Blog editorial | DondeAnime"
-  description="Archivo editorial de DondeAnime para guías y piezas futuras sobre anime en streaming."
+  title={t('blog.index.title')}
+  description={t('blog.index.description')}
   canonical={absoluteUrl('/blog')}
 >
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Blog', url: '/blog' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.blog'), url: '/blog' },
     ]}
   />
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
-    <p class="text-xs uppercase tracking-wide text-accent-violet">Editorial</p>
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('breadcrumbs.blog')}</p>
     <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
-      Blog <span class="brand-gradient-text">DondeAnime</span>
+      {t('blog.index.headingPrefix')} <span class="brand-gradient-text">{t('brand.name')}</span>
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      Estructura preparada para publicar guías y análisis cuando Diego añada el contenido.
+      {t('blog.index.subtitle')}
     </p>
   </section>
 
@@ -53,7 +54,7 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
           href={`/blog/${post.id}`}
           class="mt-5 inline-flex text-sm font-medium text-accent-violet transition-colors hover:text-accent-pink"
         >
-          Leer artículo
+          {t('blog.index.readArticle')}
         </a>
       </article>
     ))}

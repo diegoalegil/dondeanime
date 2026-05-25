@@ -7,6 +7,7 @@ import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { t } from '@/i18n';
 
 export async function getStaticPaths() {
   const paths: Array<{ params: { plataforma: string; pais: string } }> = [];
@@ -31,9 +32,18 @@ const platform = getPlatform(plataforma!);
 const displayName = platform?.name ?? providerSummary?.providerName ?? plataforma!;
 
 const anime = await getAnimeByProvider(plataforma!, country.iso);
+const animePlural = anime.length === 1 ? '' : 's';
 
-const seoTitle = `Anime en ${displayName} ${country.name} — ${anime.length} series | DondeAnime`;
-const seoDescription = `Catálogo completo de anime en ${displayName} ${country.name}: ${anime.length} series y películas disponibles. Encuentra qué ver hoy.`;
+const seoTitle = t('platformCountry.seo.title', {
+  platform: displayName,
+  country: country.name,
+  count: anime.length,
+});
+const seoDescription = t('platformCountry.seo.description', {
+  platform: displayName,
+  country: country.name,
+  count: anime.length,
+});
 
 const pageUrl = absoluteUrl(`/plataforma/${plataforma}/${countrySlug}`);
 const itemListSchema = buildItemListSchema(
@@ -42,7 +52,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${a.slug}/${countrySlug}`),
   })),
   pageUrl,
-  `Anime en ${displayName} ${country.name}`,
+  t('platformCountry.schema.name', { platform: displayName, country: country.name }),
 );
 ---
 <BaseLayout
@@ -54,7 +64,7 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
+      { name: t('breadcrumbs.home'), url: '/' },
       { name: displayName, url: `/plataforma/${plataforma}` },
       { name: country.name, url: `/plataforma/${plataforma}/${countrySlug}` },
     ]}
@@ -71,15 +81,15 @@ const itemListSchema = buildItemListSchema(
       )}
       <div>
         <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
-          Anime en {displayName}
-          <span class="text-fg-muted">·</span>
+          {t('platformCountry.headingPrefix')} {displayName}
+          <span class="text-fg-muted">&middot;</span>
           <span class="inline-flex items-center gap-2">
             <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
             {country.name}
           </span>
         </h1>
         <p class="mt-2 text-sm text-fg-muted">
-          {anime.length} anime disponible{anime.length === 1 ? '' : 's'}
+          {t('platformCountry.availableCount', { count: anime.length, plural: animePlural })}
         </p>
       </div>
     </div>
@@ -88,7 +98,7 @@ const itemListSchema = buildItemListSchema(
   <section class="mx-auto max-w-6xl px-4 pb-20">
     {anime.length === 0 ? (
       <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
-        No tenemos anime catalogados en {displayName} {country.name} ahora mismo.
+        {t('platformCountry.empty', { platform: displayName, country: country.name })}
       </p>
     ) : (
       <AnimeGrid anime={anime} />
