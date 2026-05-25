@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import { getCollection } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
 
@@ -35,7 +36,7 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
     </p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-4 px-4 pb-20 md:grid-cols-2">
+  <section class="mx-auto grid max-w-6xl gap-4 px-4 pb-12 md:grid-cols-2">
     {posts.map((post) => (
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <p class="text-sm text-fg-muted">
@@ -58,4 +59,6 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
       </article>
     ))}
   </section>
+
+  <NewsletterForm />
 </BaseLayout>
