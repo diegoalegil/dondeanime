@@ -104,6 +104,7 @@ class OpenApiDocumentationTest {
         mvc.perform(get("/v3/api-docs.yaml/public-v1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("openapi:")))
+                .andExpect(content().string(containsString("ApiKeyAuth")))
                 .andExpect(content().string(containsString("/api/v1/anime")))
                 .andExpect(content().string(not(containsString("/api/v1/anime/match"))))
                 .andExpect(content().string(not(containsString("/api/admin"))));
