@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/seasons")
+@RequestMapping("/api/v1/seasons")
 public class SeasonController {
 
     /** Seasons válidas en AniList. Anti-fat-fingers en el path param. */

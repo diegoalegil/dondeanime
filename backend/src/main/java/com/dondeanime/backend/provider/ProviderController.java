@@ -12,7 +12,7 @@ import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
 
 @RestController
-@RequestMapping("/api/providers")
+@RequestMapping("/api/v1/providers")
 public class ProviderController {
 
     private final WatchProviderRepository providerRepository;
