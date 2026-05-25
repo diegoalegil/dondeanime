@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dondeanime.backend.email.EmailService;
 import com.stripe.exception.SignatureVerificationException;
 
 class StripeServiceTest {
@@ -22,9 +23,11 @@ class StripeServiceTest {
 
     private final StripeGateway stripeGateway = mock(StripeGateway.class);
     private final SubscriberService subscriberService = mock(SubscriberService.class);
+    private final EmailService emailService = mock(EmailService.class);
     private final StripeService service = new StripeService(
             stripeGateway,
             subscriberService,
+            emailService,
             "sk_test_123",
             "price_test_123",
             "whsec_test_123",
@@ -51,6 +54,7 @@ class StripeServiceTest {
         StripeService unconfigured = new StripeService(
                 stripeGateway,
                 subscriberService,
+                emailService,
                 "",
                 "price_test_123",
                 "whsec_test_123",
@@ -109,6 +113,31 @@ class StripeServiceTest {
                 NOW,
                 NOW.plusSeconds(2_592_000),
                 null);
+        verify(emailService).sendPremiumWelcomeEmail(
+                "diego@example.com",
+                "PREMIUM",
+                "https://dondeanime.com/premium");
+    }
+
+    @Test
+    void handleWebhookSendsReceiptForPaidInvoice() throws Exception {
+        when(stripeGateway.constructWebhookEvent("{}", "sig", "whsec_test_123"))
+                .thenReturn(new StripeWebhookEvent(
+                        "invoice.payment_succeeded",
+                        "diego@example.com",
+                        "cus_test_123",
+                        NOW,
+                        null));
+
+        String received = service.handleWebhook("{}", "sig");
+
+        assertThat(received).isEqualTo("invoice.payment_succeeded");
+        verify(subscriberService).recordPaymentSucceeded("diego@example.com", "cus_test_123", NOW);
+        verify(emailService).sendPremiumReceiptEmail(
+                "diego@example.com",
+                "PREMIUM",
+                NOW.toString(),
+                "https://dondeanime.com/premium");
     }
 
     @Test

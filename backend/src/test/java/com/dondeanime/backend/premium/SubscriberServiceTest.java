@@ -96,6 +96,37 @@ class SubscriberServiceTest {
     }
 
     @Test
+    void findEmailByStripeCustomerIdReturnsNormalizedEmail() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        subscriber.setEmail("Diego@Example.com");
+        when(subscriberRepository.findByStripeCustomerId("cus_test_123")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findEmailByStripeCustomerId(" cus_test_123 "))
+                .contains("diego@example.com");
+    }
+
+    @Test
+    void findDueCancellationEmailsDelegatesToRepository() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), NOW.minusSeconds(2_592_000));
+        when(subscriberRepository.findDueCancellationEmails(NOW.minusSeconds(2_592_000)))
+                .thenReturn(List.of(subscriber));
+
+        assertThat(service.findDueCancellationEmails(NOW.minusSeconds(2_592_000)))
+                .containsExactly(subscriber);
+    }
+
+    @Test
+    void markCancellationEmailSentStoresTimestamp() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), NOW.minusSeconds(2_592_000));
+        when(subscriberRepository.findById(10L)).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.markCancellationEmailSent(10L, NOW)).isTrue();
+
+        assertThat(subscriber.getCancellationEmailSentAt()).isEqualTo(NOW);
+        verify(subscriberRepository).save(subscriber);
+    }
+
+    @Test
     void canAccessAdminDashboardAllowsActivePatronTier() {
         Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
         subscriber.setPlanTier("patron");

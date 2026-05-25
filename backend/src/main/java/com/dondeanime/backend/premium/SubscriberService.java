@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -122,6 +123,7 @@ public class SubscriberService {
         subscriber.setSubscribedAt(subscribedAt == null ? Instant.now(clock) : subscribedAt);
         subscriber.setExpiresAt(expiresAt);
         subscriber.setLastPaymentAt(lastPaymentAt);
+        subscriber.setCancellationEmailSentAt(null);
         return subscriberRepository.save(subscriber);
     }
 
@@ -134,6 +136,38 @@ public class SubscriberService {
         return subscriberRepository.findByStripeCustomerId(normalizedCustomerId)
                 .map(subscriber -> {
                     subscriber.setExpiresAt(canceledAt == null ? Instant.now(clock) : canceledAt);
+                    subscriber.setCancellationEmailSentAt(null);
+                    subscriberRepository.save(subscriber);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findEmailByStripeCustomerId(String stripeCustomerId) {
+        String normalizedCustomerId = normalizeStripeCustomerId(stripeCustomerId);
+        if (normalizedCustomerId.isBlank()) {
+            return Optional.empty();
+        }
+        return subscriberRepository.findByStripeCustomerId(normalizedCustomerId)
+                .map(Subscriber::getEmail)
+                .map(SubscriberService::normalizeEmail)
+                .filter(email -> !email.isBlank());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subscriber> findDueCancellationEmails(Instant cutoff) {
+        return subscriberRepository.findDueCancellationEmails(cutoff);
+    }
+
+    @Transactional
+    public boolean markCancellationEmailSent(Long subscriberId, Instant sentAt) {
+        if (subscriberId == null) {
+            return false;
+        }
+        return subscriberRepository.findById(subscriberId)
+                .map(subscriber -> {
+                    subscriber.setCancellationEmailSentAt(sentAt == null ? Instant.now(clock) : sentAt);
                     subscriberRepository.save(subscriber);
                     return true;
                 })

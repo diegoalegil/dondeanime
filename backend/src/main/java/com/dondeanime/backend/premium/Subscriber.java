@@ -41,6 +41,9 @@ public class Subscriber {
     @Column(name = "last_payment_at")
     private Instant lastPaymentAt;
 
+    @Column(name = "cancellation_email_sent_at")
+    private Instant cancellationEmailSentAt;
+
     public Subscriber() {
     }
 
@@ -98,5 +101,13 @@ public class Subscriber {
 
     public void setLastPaymentAt(Instant lastPaymentAt) {
         this.lastPaymentAt = lastPaymentAt;
+    }
+
+    public Instant getCancellationEmailSentAt() {
+        return cancellationEmailSentAt;
+    }
+
+    public void setCancellationEmailSentAt(Instant cancellationEmailSentAt) {
+        this.cancellationEmailSentAt = cancellationEmailSentAt;
     }
 }
