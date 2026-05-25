@@ -1,10 +1,14 @@
 package com.dondeanime.backend.admin.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +16,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.config.SecurityConfig;
@@ -36,8 +41,16 @@ class AdminAuthControllerTest {
     @Autowired
     private AdminJwtService adminJwtService;
 
+    @MockitoBean
+    private AdminUserRepository adminUserRepository;
+
+    @MockitoBean
+    private AdminTotpService adminTotpService;
+
     @Test
     void loginReturnsBearerToken() throws Exception {
+        stubAdminUser(null);
+
         mvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -51,12 +64,41 @@ class AdminAuthControllerTest {
 
     @Test
     void loginRejectsBadPassword() throws Exception {
+        stubAdminUser(null);
+
         mvc.perform(post("/api/admin/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"admin","password":"bad"}
                                 """))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginRequiresTotpCodeWhenEnabled() throws Exception {
+        stubAdminUser("SECRET");
+
+        mvc.perform(post("/api/admin/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"admin","password":"secret"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("totp_required"));
+    }
+
+    @Test
+    void loginAcceptsValidTotpCodeWhenEnabled() throws Exception {
+        stubAdminUser("SECRET");
+        when(adminTotpService.isValidCode("SECRET", "123456")).thenReturn(true);
+
+        mvc.perform(post("/api/admin/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"admin","password":"secret","totpCode":"123456"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
     }
 
     @Test
@@ -68,6 +110,7 @@ class AdminAuthControllerTest {
 
     @Test
     void bearerTokenAuthenticatesAdminRequest() throws Exception {
+        stubAdminUser(null);
         String token = adminJwtService.createAdminSession().token();
 
         mvc.perform(get("/api/admin/anything")
@@ -75,5 +118,13 @@ class AdminAuthControllerTest {
                 .andExpect(status().isNotFound());
 
         assertThat(adminJwtService.isValidAdminToken(token)).isTrue();
+    }
+
+    private void stubAdminUser(String totpSecret) {
+        AdminUser adminUser = new AdminUser();
+        adminUser.setUsername("admin");
+        adminUser.setTotpSecret(totpSecret);
+        when(adminUserRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(adminUserRepository.save(any(AdminUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 }
