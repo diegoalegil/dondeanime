@@ -82,6 +82,40 @@ class AffiliateLinkAdminControllerTest {
     }
 
     @Test
+    void bulkImportWithCredentials() throws Exception {
+        when(affiliateLinkService.bulkImport(any(String.class)))
+                .thenReturn(new AffiliateBulkImportResult(1, List.of(dto())));
+
+        mvc.perform(post("/api/admin/affiliate-links/bulk")
+                        .header("Authorization", bearerToken())
+                        .contentType("text/csv")
+                        .content("""
+                                provider_slug,country_code,url,active
+                                crunchyroll,ES,https://example.com/cr,true
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.imported").value(1))
+                .andExpect(jsonPath("$.links[0].providerSlug").value("crunchyroll"));
+    }
+
+    @Test
+    void bulkImportReturnsValidationErrors() throws Exception {
+        when(affiliateLinkService.bulkImport(any(String.class)))
+                .thenThrow(new AffiliateBulkImportException(List.of(
+                        new AffiliateBulkImportError(2, "provider_slug+country_code no existe en catálogo"))));
+
+        mvc.perform(post("/api/admin/affiliate-links/bulk")
+                        .header("Authorization", bearerToken())
+                        .contentType("text/csv")
+                        .content("""
+                                provider_slug,country_code,url,active
+                                unknown,ES,https://example.com/cr,true
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].line").value(2));
+    }
+
+    @Test
     void deleteAffiliateLinkWithCredentials() throws Exception {
         mvc.perform(delete("/api/admin/affiliate-links/1")
                         .header("Authorization", bearerToken()))

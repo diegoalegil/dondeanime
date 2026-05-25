@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +36,19 @@ public class AffiliateLinkAdminController {
         return affiliateLinkService.saveLink(request);
     }
 
+    @PostMapping("/bulk")
+    public AffiliateBulkImportResult bulkImport(@RequestBody String csv) {
+        return affiliateLinkService.bulkImport(csv);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         affiliateLinkService.deleteLink(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(AffiliateBulkImportException.class)
+    public ResponseEntity<AffiliateBulkImportErrorResponse> bulkImportError(AffiliateBulkImportException exception) {
+        return ResponseEntity.badRequest().body(new AffiliateBulkImportErrorResponse(exception.getErrors()));
     }
 }
