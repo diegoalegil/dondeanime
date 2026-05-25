@@ -19,6 +19,7 @@ export default defineConfig({
     : [['list']],
   use: {
     baseURL,
+    locale: 'es-ES',
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
   },
