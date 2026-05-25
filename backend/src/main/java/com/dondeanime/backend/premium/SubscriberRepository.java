@@ -2,6 +2,7 @@ package com.dondeanime.backend.premium;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,4 +21,13 @@ public interface SubscriberRepository extends JpaRepository<Subscriber, Long> {
               and (subscriber.expiresAt is null or subscriber.expiresAt > :now)
             """)
     Set<String> findActivePremiumEmails(Collection<String> emails, Instant now);
+
+    @Query("""
+            select subscriber from Subscriber subscriber
+            where subscriber.expiresAt is not null
+              and subscriber.expiresAt <= :cutoff
+              and subscriber.cancellationEmailSentAt is null
+            order by subscriber.expiresAt asc
+            """)
+    List<Subscriber> findDueCancellationEmails(Instant cutoff);
 }
