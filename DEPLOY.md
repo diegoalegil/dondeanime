@@ -327,6 +327,32 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```
 
+Verificación semanal de backups:
+
+```bash
+# Ejecutar manualmente
+cd /opt/dondeanime
+scripts/vps/verify-backup.sh
+
+# Instalar cron semanal, domingos a las 04:00 UTC
+sudo bash scripts/vps/verify-backup.sh --install-cron
+```
+
+El verificador descarga el último backup de R2, lo restaura en un Postgres
+temporal (`dondeanime_backup_verify`) ligado a `127.0.0.1:5444` y compara filas
+en `anime`, `watch_provider` y `affiliate_link`. La restauración nunca se hace
+sobre `dondeanime_postgres_prod`; producción solo se lee con `count(*)`.
+
+Variables opcionales:
+
+```env
+BACKUP_VERIFY_DIR=/opt/dondeanime/backup-verification
+BACKUP_VERIFY_MIN_RATIO_PERCENT=95
+```
+
+Si `TELEGRAM_ENABLED=true`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` están
+configurados, un fallo en la verificación manda alerta al mismo bot operativo.
+
 ### Hardening SSH y fail2ban
 
 El hardening queda preparado en repo, pero se aplica manualmente desde el VPS
