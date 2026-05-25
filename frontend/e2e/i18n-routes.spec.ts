@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+const testBaseURL = `http://127.0.0.1:${Number(process.env.PLAYWRIGHT_PORT ?? 4321)}`;
+
 const expectLocaleAlternates = async (
   page: import('@playwright/test').Page,
   expected: { es: string; en: string; default: string },
@@ -54,4 +56,35 @@ test('English country, platform and combo routes map back to Spanish canonicals'
     en: 'https://dondeanime.com/en/anime/action/on/crunchyroll',
     default: 'https://dondeanime.com/anime/action/en/crunchyroll',
   });
+});
+
+test('language switcher stores a manual preference cookie', async ({ page, context }) => {
+  await context.clearCookies();
+  await page.goto('/en');
+
+  await expect(page.getByRole('link', { name: 'English' })).toHaveAttribute('aria-current', 'true');
+  await expect(page.getByRole('link', { name: 'Spanish' })).toHaveAttribute('href', '/');
+
+  await page.getByRole('link', { name: 'Spanish' }).click();
+  await page.waitForURL(`${testBaseURL}/`);
+
+  const cookies = await context.cookies();
+  expect(cookies).toEqual(expect.arrayContaining([
+    expect.objectContaining({ name: 'dondeanime-locale', value: 'es' }),
+  ]));
+
+  await page.goto('/en');
+  await page.waitForURL(`${testBaseURL}/`);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+});
+
+test('English browser locale redirects first public visit to /en', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'en-US' });
+  const page = await context.newPage();
+
+  await page.goto(`${testBaseURL}/`);
+  await page.waitForURL(`${testBaseURL}/en`);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
+  await context.close();
 });
