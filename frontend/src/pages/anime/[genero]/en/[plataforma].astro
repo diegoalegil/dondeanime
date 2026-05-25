@@ -8,7 +8,9 @@ import { getAnimeByProvider, getGenres, getProviders } from '@/lib/api';
 import { COUNTRIES } from '@/lib/countries';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 interface Props {
   genreName: string;

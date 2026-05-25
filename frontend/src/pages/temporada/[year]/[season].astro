@@ -6,7 +6,9 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getSeasons, getAnimeBySeason } from '@/lib/api';
 import { formatSeason } from '@/lib/format';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const seasons = await getSeasons();

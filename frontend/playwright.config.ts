@@ -26,7 +26,7 @@ export default defineConfig({
     command: `npm run build && npm run preview -- --host 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: 300_000,
     env: {
       ...process.env,
       PUBLIC_API_URL: publicApiUrl,

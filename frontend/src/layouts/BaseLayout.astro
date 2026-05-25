@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
+import { localeFromPath, setLocale } from '@/i18n';
 
 interface Props {
   title: string;
@@ -15,6 +16,8 @@ interface Props {
 }
 
 const props = Astro.props;
+const activeLocale = localeFromPath(Astro.url.pathname);
+setLocale(activeLocale);
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === 'true';
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? 'dondeanime.com';
 const plausibleScriptUrl = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_URL ?? 'https://plausible.io/js/script.js';
@@ -24,7 +27,7 @@ const adsenseEnabled =
 const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
 ---
 <!doctype html>
-<html lang="es" data-theme="dark">
+<html lang={activeLocale} data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

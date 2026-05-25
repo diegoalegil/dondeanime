@@ -1,4 +1,4 @@
-import { t, type I18nKey } from '@/i18n';
+import { getLocale, t, type I18nKey } from '@/i18n';
 
 const FORMAT_LABEL_KEYS: Record<string, I18nKey> = {
   TV: 'format.type.TV',
@@ -77,12 +77,13 @@ export const formatDate = (
   if (month === null) return String(year);
   const monthLabel = MONTH_KEYS[month] ? t(MONTH_KEYS[month]) : '';
   if (day === null) return `${monthLabel} ${year}`;
+  if (getLocale() === 'en') return `${monthLabel} ${day}, ${year}`;
   return `${day} ${monthLabel} ${year}`;
 };
 
 export const formatNumber = (value: number | null): string => {
   if (value === null) return '—';
-  return new Intl.NumberFormat('es-ES').format(value);
+  return new Intl.NumberFormat(getLocale() === 'en' ? 'en-US' : 'es-ES').format(value);
 };
 
 export const formatSeasonYear = (

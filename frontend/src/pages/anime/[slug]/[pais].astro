@@ -15,7 +15,10 @@ import { getAllAnime, getAnimeBySlug } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { canonicalCountrySlug, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const all = await getAllAnime();
@@ -27,8 +30,10 @@ export async function getStaticPaths() {
 }
 
 const { slug, pais } = Astro.params;
-const countrySlug = pais as CountrySlug;
+const countrySlug = canonicalCountrySlug(pais);
+if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
 const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
 
 const detail = await getAnimeBySlug(slug!);
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
@@ -45,11 +50,11 @@ const availableInCountries = COUNTRY_SLUGS.filter((s) => {
 
 const platformNames = providers.map((p) => p.providerName).join(', ');
 const seoTitle = hasProviders
-  ? t('anime.country.seo.availableTitle', { title, country: country.name, platforms: platformNames })
-  : t('anime.country.seo.unavailableTitle', { title, country: country.name });
+  ? t('anime.country.seo.availableTitle', { title, country: countryName, platforms: platformNames })
+  : t('anime.country.seo.unavailableTitle', { title, country: countryName });
 const seoDescription = hasProviders
-  ? t('anime.country.seo.availableDescription', { title, country: country.name, platforms: platformNames })
-  : t('anime.country.seo.unavailableDescription', { title, country: country.name });
+  ? t('anime.country.seo.availableDescription', { title, country: countryName, platforms: platformNames })
+  : t('anime.country.seo.unavailableDescription', { title, country: countryName });
 
 const pageUrl = absoluteUrl(`/anime/${slug}/${countrySlug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
@@ -74,7 +79,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
     items={[
       { name: t('breadcrumbs.home'), url: '/' },
       { name: title, url: `/anime/${slug}` },
-      { name: country.name, url: `/anime/${slug}/${countrySlug}` },
+      { name: countryName, url: `/anime/${slug}/${countrySlug}` },
     ]}
   />
   <AnimeHero anime={detail.anime} />
@@ -83,7 +88,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   {hasProviders ? (
     <section class="mx-auto max-w-6xl px-4 py-8">
       <h2 class="mb-6 text-lg font-semibold text-fg-primary">
-        {t('anime.country.whereToWatch', { title, country: country.name })}
+        {t('anime.country.whereToWatch', { title, country: countryName })}
       </h2>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.map((p) => <ProviderRow provider={p} animeSlug={slug!} />)}
@@ -101,7 +106,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
         animeSlug={slug!}
         animeTitle={title}
         countryIso={country.iso}
-        countryName={country.name}
+        countryName={countryName}
       />
     </>
   )}
@@ -116,7 +121,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 
   <section class="mx-auto max-w-6xl px-4 py-8">
     <a
-      href={`/anime/${slug}`}
+      href={localizedPath(`/anime/${slug}`)}
       class="inline-flex items-center gap-2 text-sm text-fg-muted transition-colors hover:text-accent-violet"
     >
       {t('anime.country.allPlatforms')} →

@@ -1,6 +1,7 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
 import { formatType } from '@/lib/format';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 interface Props {
   anime: AnimeSummary;
@@ -18,7 +19,7 @@ if (score !== null) {
 }
 ---
 <article class="group">
-  <a href={`/anime/${anime.slug}`} class="block">
+  <a href={localizedPath(`/anime/${anime.slug}`)} class="block">
     <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
       <img
         src={anime.coverImage}

@@ -6,22 +6,27 @@ import { getProvidersByCountry } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { canonicalCountrySlug, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   return COUNTRY_SLUGS.map((s) => ({ params: { pais: s } }));
 }
 
 const { pais } = Astro.params;
-const countrySlug = pais as CountrySlug;
+const countrySlug = canonicalCountrySlug(pais);
+if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
 const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
 
 const rawProviders = await getProvidersByCountry(country.iso);
 const providers = rawProviders.filter((p) => !isHiddenVariant(p.slug));
 
-const seoTitle = t('countryPage.seo.title', { country: country.name });
+const seoTitle = t('countryPage.seo.title', { country: countryName });
 const seoDescription = t('countryPage.seo.description', {
-  country: country.name,
+  country: countryName,
   platforms: providers.slice(0, 5).map((p) => p.providerName).join(', '),
 });
 
@@ -32,7 +37,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/plataforma/${p.slug}/${countrySlug}`),
   })),
   pageUrl,
-  t('countryPage.schema.name', { country: country.name }),
+  t('countryPage.schema.name', { country: countryName }),
 );
 ---
 <BaseLayout
@@ -45,7 +50,7 @@ const itemListSchema = buildItemListSchema(
   <Breadcrumbs
     items={[
       { name: t('breadcrumbs.home'), url: '/' },
-      { name: country.name, url: `/pais/${countrySlug}` },
+      { name: countryName, url: `/pais/${countrySlug}` },
     ]}
   />
 
@@ -53,14 +58,14 @@ const itemListSchema = buildItemListSchema(
     <div class="flex items-center gap-4">
       <span class={`fi fi-${country.flagCode} rounded text-3xl`} aria-hidden="true"></span>
       <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
-        {t('countryPage.heading', { country: country.name })}
+        {t('countryPage.heading', { country: countryName })}
       </h1>
     </div>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
       {t('countryPage.providerCount', {
         count: providers.length,
         plural: providers.length === 1 ? '' : 's',
-        country: country.name,
+        country: countryName,
       })}
     </p>
   </section>
@@ -73,7 +78,7 @@ const itemListSchema = buildItemListSchema(
         const displayName = platform?.name ?? p.providerName;
         return (
           <a
-            href={`/plataforma/${p.slug}/${countrySlug}`}
+            href={localizedPath(`/plataforma/${p.slug}/${countrySlug}`)}
             class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
           >
             <div class="flex items-center gap-4">
