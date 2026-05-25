@@ -13,7 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+import com.dondeanime.backend.studio.Studio;
 
 @Entity
 @Table(name = "anime")
@@ -100,6 +106,17 @@ public class Anime {
 
     @Column(name = "season_year")
     private Integer seasonYear;
+
+    @ManyToMany
+    @JoinTable(
+            name = "anime_studio",
+            joinColumns = @JoinColumn(name = "anime_id"),
+            inverseJoinColumns = @JoinColumn(name = "studio_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_anime_studio",
+                    columnNames = {"anime_id", "studio_id"}))
+    @OrderBy("name ASC")
+    private Set<Studio> studios = new HashSet<>();
 
     public Anime() {
     }
@@ -302,6 +319,14 @@ public class Anime {
 
     public void setSeasonYear(Integer seasonYear) {
         this.seasonYear = seasonYear;
+    }
+
+    public Set<Studio> getStudios() {
+        return studios;
+    }
+
+    public void setStudios(Set<Studio> studios) {
+        this.studios = studios;
     }
 
 }

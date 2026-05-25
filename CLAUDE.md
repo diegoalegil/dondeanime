@@ -487,6 +487,8 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/genres/{slug}` | Anime de un género, ordenados por popularidad |
 | GET | `/api/seasons` | Lista de temporadas con count (`SeasonSummaryDto[]`) |
 | GET | `/api/seasons/{year}/{season}` | Anime de una temporada (400 si season inválida) |
+| GET | `/api/studios` | Listado de estudios con count |
+| GET | `/api/studios/{slug}` | Anime de un estudio, ordenados por popularidad |
 | GET | `/api/sitemap` | Todos los slugs/ids para que el frontend genere sitemap.xml |
 | POST | `/api/admin/anime/{slug}/override` | Crea/actualiza override editorial. Devuelve `AnimeDetailDto` refrescado |
 | DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Borra override y vuelve al valor AniList |
