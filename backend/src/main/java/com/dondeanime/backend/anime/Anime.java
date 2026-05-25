@@ -12,11 +12,18 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "anime")
+@Table(
+        name = "anime",
+        indexes = {
+                @Index(name = "idx_anime_season_year", columnList = "season, season_year"),
+                @Index(name = "idx_anime_popularity_desc", columnList = "popularity DESC")
+        }
+)
 public class Anime {
 
     @Id
@@ -87,7 +94,11 @@ public class Anime {
      * EAGER para que cuando devolvamos JSON estén ya cargados.
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "anime_genre", joinColumns = @JoinColumn(name = "anime_id"))
+    @CollectionTable(
+            name = "anime_genre",
+            joinColumns = @JoinColumn(name = "anime_id"),
+            indexes = @Index(name = "idx_anime_genre_genre", columnList = "genre")
+    )
     @Column(name = "genre", length = 50, nullable = false)
     private Set<String> genres = new HashSet<>();
 
