@@ -1,7 +1,8 @@
 ---
+import { t } from '@/i18n';
 ---
-<div class="relative" data-search-root>
-  <label class="sr-only" for="search-input">Buscar anime</label>
+<div class="relative" data-search-root data-no-results={t('search.noResults')}>
+  <label class="sr-only" for="search-input">{t('search.label')}</label>
   <div class="flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-3 py-1.5">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +21,7 @@
     <input
       id="search-input"
       type="search"
-      placeholder="Buscar anime..."
+      placeholder={t('search.placeholder')}
       autocomplete="off"
       class="w-32 bg-transparent text-sm text-fg-primary placeholder:text-fg-muted focus:outline-none md:w-48"
       data-search-input
@@ -83,7 +84,7 @@
         .slice(0, 8);
 
       if (matches.length === 0) {
-        panel.innerHTML = '<p class="px-4 py-3 text-sm text-fg-muted">Sin resultados</p>';
+        panel.innerHTML = `<p class="px-4 py-3 text-sm text-fg-muted">${root.dataset.noResults}</p>`;
         panel.classList.remove('hidden');
         return;
       }

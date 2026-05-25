@@ -6,6 +6,8 @@ interface Props {
   countryName: string;
 }
 
+import { t } from '@/i18n';
+
 const { animeSlug, animeTitle, countryIso, countryName } = Astro.props;
 const apiUrl = import.meta.env.PUBLIC_API_URL;
 ---
@@ -15,13 +17,16 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
   data-api-url={apiUrl}
   data-anime-slug={animeSlug}
   data-country={countryIso}
+  data-status-creating={t('alert.creating')}
+  data-status-success={t('alert.success')}
+  data-status-error={t('alert.error')}
 >
   <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h2 class="text-lg font-semibold text-fg-primary">Aviso de disponibilidad</h2>
+        <h2 class="text-lg font-semibold text-fg-primary">{t('alert.title')}</h2>
         <p class="mt-1 text-sm text-fg-muted">
-          Recibe un correo cuando {animeTitle} aparezca en plataformas de {countryName}.
+          {t('alert.description', { title: animeTitle, country: countryName })}
         </p>
       </div>
       <button
@@ -29,13 +34,13 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
         data-open-alert
       >
-        Avisarme
+        {t('alert.open')}
       </button>
     </div>
 
     <form class="mt-5 hidden grid gap-4 md:grid-cols-[1fr_auto]" data-alert-panel>
       <label class="block">
-        <span class="mb-1 block text-sm font-medium text-fg-secondary">Email</span>
+        <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('alert.email')}</span>
         <input
           name="email"
           type="email"
@@ -48,12 +53,12 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         type="submit"
         class="self-end rounded-md bg-accent-pink px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
       >
-        Crear alerta
+        {t('alert.submit')}
       </button>
       <label class="flex gap-2 text-sm text-fg-muted md:col-span-2">
         <input type="checkbox" required class="mt-1" />
         <span>
-          Acepto la <a href="/legal/privacidad" class="text-accent-violet hover:underline">política de privacidad</a>.
+          {t('alert.privacyPrefix')} <a href="/legal/privacidad" class="text-accent-violet hover:underline">{t('alert.privacyLink')}</a>.
         </span>
       </label>
       <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
@@ -65,6 +70,9 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       const apiUrl = root.getAttribute('data-api-url') ?? '';
       const animeSlug = root.getAttribute('data-anime-slug') ?? '';
       const country = root.getAttribute('data-country') ?? '';
+      const creatingMessage = root.getAttribute('data-status-creating') ?? '';
+      const successMessage = root.getAttribute('data-status-success') ?? '';
+      const errorMessage = root.getAttribute('data-status-error') ?? '';
       const openButton = root.querySelector('[data-open-alert]');
       const panel = root.querySelector('[data-alert-panel]');
       const status = root.querySelector('[data-alert-status]');
@@ -87,7 +95,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         const data = new FormData(form);
         const email = String(data.get('email') ?? '').trim();
 
-        setStatus('Creando alerta...');
+        setStatus(creatingMessage);
         try {
           const response = await fetch(`${apiUrl}/api/subscriptions`, {
             method: 'POST',
@@ -100,9 +108,9 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           }
 
           form.reset();
-          setStatus('Te hemos enviado un correo de confirmación.', 'success');
+          setStatus(successMessage, 'success');
         } catch {
-          setStatus('No se pudo crear la alerta. Inténtalo de nuevo.', 'danger');
+          setStatus(errorMessage, 'danger');
         }
       });
     });

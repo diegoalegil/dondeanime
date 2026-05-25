@@ -1,46 +1,57 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { t } from '@/i18n';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL;
 ---
 <BaseLayout
-  title="Dashboard admin — DondeAnime"
-  description="Dashboard de métricas de DondeAnime."
+  title={t('admin.dashboard.title')}
+  description={t('admin.dashboard.description')}
 >
   <meta slot="head" name="robots" content="noindex, nofollow" />
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Admin', url: '/admin' },
-      { name: 'Dashboard', url: '/admin/dashboard' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.admin'), url: '/admin' },
+      { name: t('admin.dashboard'), url: '/admin/dashboard' },
     ]}
   />
 
-  <section class="mx-auto max-w-6xl px-4 py-8" data-dashboard data-api-url={apiUrl}>
+  <section
+    class="mx-auto max-w-6xl px-4 py-8"
+    data-dashboard
+    data-api-url={apiUrl}
+    data-status-loading={t('admin.status.loading')}
+    data-status-loaded={t('admin.status.loaded')}
+    data-status-wrong-credentials={t('admin.status.wrongCredentials')}
+    data-status-dashboard-load-error={t('admin.status.dashboardLoadError')}
+    data-status-login-required-metrics={t('admin.status.loginRequiredMetrics')}
+    data-label-empty={t('admin.dashboard.empty')}
+  >
     <header class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
-        <h1 class="mt-1 text-3xl font-semibold text-fg-primary">Dashboard</h1>
+        <p class="text-xs font-semibold uppercase text-accent-violet">{t('admin.eyebrow')}</p>
+        <h1 class="mt-1 text-3xl font-semibold text-fg-primary">{t('admin.dashboard')}</h1>
       </div>
       <a href="/admin/affiliate-links" class="text-sm text-fg-muted transition-colors hover:text-accent-violet">
-        Gestionar enlaces afiliados →
+        {t('admin.dashboard.manageAffiliates')} ->
       </a>
     </header>
 
     <form class="mb-6 rounded-lg border border-surface-2 bg-surface-1 p-4" data-login-form>
       <div class="grid gap-3 sm:grid-cols-[9rem_12rem_auto]">
         <label>
-          <span class="mb-1 block text-xs font-medium text-fg-secondary">Usuario</span>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">{t('admin.username')}</span>
           <input name="username" autocomplete="username" value="admin" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
         </label>
         <label>
-          <span class="mb-1 block text-xs font-medium text-fg-secondary">Contraseña</span>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">{t('admin.password')}</span>
           <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
         </label>
         <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
-          Entrar
+          {t('admin.login')}
         </button>
       </div>
       <p class="mt-2 min-h-5 text-sm text-fg-muted" data-status></p>
@@ -48,26 +59,26 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
 
     <div class="grid gap-4 md:grid-cols-2">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-        <p class="text-sm text-fg-muted">Clicks afiliados últimos 7 días</p>
+        <p class="text-sm text-fg-muted">{t('admin.dashboard.clicks7')}</p>
         <p class="mt-2 text-3xl font-semibold text-fg-primary" data-clicks-7>0</p>
       </article>
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-        <p class="text-sm text-fg-muted">Clicks afiliados últimos 30 días</p>
+        <p class="text-sm text-fg-muted">{t('admin.dashboard.clicks30')}</p>
         <p class="mt-2 text-3xl font-semibold text-fg-primary" data-clicks-30>0</p>
       </article>
     </div>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-        <h2 class="text-base font-semibold text-fg-primary">Anime con más clicks</h2>
+        <h2 class="text-base font-semibold text-fg-primary">{t('admin.dashboard.topAnimeClicks')}</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-affiliate-anime></div>
       </article>
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-        <h2 class="text-base font-semibold text-fg-primary">Links con más clicks</h2>
+        <h2 class="text-base font-semibold text-fg-primary">{t('admin.dashboard.topLinks')}</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-links></div>
       </article>
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-        <h2 class="text-base font-semibold text-fg-primary">Anime más visitados</h2>
+        <h2 class="text-base font-semibold text-fg-primary">{t('admin.dashboard.topVisited')}</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-pages></div>
       </article>
     </div>
@@ -76,6 +87,14 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
   <script>
     const root = document.querySelector('[data-dashboard]');
     const apiUrl = root?.getAttribute('data-api-url') ?? '';
+    const messages = {
+      loading: root?.getAttribute('data-status-loading') ?? '',
+      loaded: root?.getAttribute('data-status-loaded') ?? '',
+      wrongCredentials: root?.getAttribute('data-status-wrong-credentials') ?? '',
+      dashboardLoadError: root?.getAttribute('data-status-dashboard-load-error') ?? '',
+      loginRequiredMetrics: root?.getAttribute('data-status-login-required-metrics') ?? '',
+      empty: root?.getAttribute('data-label-empty') ?? '',
+    };
     const tokenKey = 'dondeanime-admin-token';
     const form = document.querySelector('[data-login-form]');
     const status = document.querySelector('[data-status]');
@@ -106,10 +125,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         <span class="font-semibold text-fg-primary">${escapeHtml(value)}</span>
       </div>`;
 
-    const empty = '<p class="text-sm text-fg-muted">Sin datos todavía.</p>';
+    const empty = () => `<p class="text-sm text-fg-muted">${messages.empty}</p>`;
 
     async function loadDashboard() {
-      setStatus('Cargando...');
+      setStatus(messages.loading);
       const response = await fetch(`${apiUrl}/api/admin/dashboard`, {
         headers: authHeaders(),
       });
@@ -123,16 +142,16 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       document.querySelector('[data-top-affiliate-anime]').innerHTML =
         data.topAffiliateAnime?.length
           ? data.topAffiliateAnime.map((item) => row(item.animeSlug, item.clicks)).join('')
-          : empty;
+          : empty();
       document.querySelector('[data-top-links]').innerHTML =
         data.topAffiliateLinks?.length
-          ? data.topAffiliateLinks.map((item) => row(`${item.providerSlug} · ${item.countryCode}`, item.clickCount)).join('')
-          : empty;
+          ? data.topAffiliateLinks.map((item) => row(`${item.providerSlug} - ${item.countryCode}`, item.clickCount)).join('')
+          : empty();
       document.querySelector('[data-top-pages]').innerHTML =
         data.topVisitedAnime?.length
           ? data.topVisitedAnime.map((item) => row(item.path, item.visitors)).join('')
-          : empty;
-      setStatus('Datos cargados.', 'success');
+          : empty();
+      setStatus(messages.loaded, 'success');
     }
 
     form?.addEventListener('submit', async (event) => {
@@ -141,14 +160,14 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
       loadDashboard().catch(() => {
         sessionStorage.removeItem(tokenKey);
-        setStatus('Credenciales incorrectas.', 'danger');
+        setStatus(messages.wrongCredentials, 'danger');
       });
     });
 
     if (sessionStorage.getItem(tokenKey)) {
-      loadDashboard().catch(() => setStatus('No se pudo cargar el dashboard.', 'danger'));
+      loadDashboard().catch(() => setStatus(messages.dashboardLoadError, 'danger'));
     } else {
-      setStatus('Inicia sesión para ver métricas.');
+      setStatus(messages.loginRequiredMetrics);
     }
   </script>
 </BaseLayout>

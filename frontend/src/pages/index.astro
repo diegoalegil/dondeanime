@@ -8,6 +8,7 @@ import { formatSeason } from '@/lib/format';
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
 import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
+import { t } from '@/i18n';
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
@@ -56,12 +57,12 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${a.slug}`),
   })),
   absoluteUrl('/'),
-  'Catálogo de anime en streaming',
+  t('home.itemListName'),
 );
 ---
 <BaseLayout
-  title="DondeAnime — Dónde ver anime en streaming en español"
-  description="Encuentra dónde ver cada anime en Crunchyroll, Netflix, Prime Video y otras plataformas. Catálogo actualizado para España, México, Argentina, Colombia y Chile."
+  title={t('home.title')}
+  description={t('home.description')}
 >
   <JsonLd slot="head" data={websiteSchema} />
   <JsonLd slot="head" data={faqSchema} />
@@ -69,18 +70,18 @@ const itemListSchema = buildItemListSchema(
 
   <section class="mx-auto max-w-6xl px-4 pt-16 pb-12">
     <h1 class="text-4xl font-semibold tracking-tight md:text-6xl">
-      Encuentra dónde ver
-      <span class="brand-gradient-text">cada anime</span>
+      {t('home.hero.line1')}
+      <span class="brand-gradient-text">{t('home.hero.highlight')}</span>
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      Catálogo actualizado de estrenos y plataformas en España, México, Argentina, Colombia y Chile.
+      {t('home.hero.subtitle')}
     </p>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
     <div class="mb-5 flex items-baseline justify-between">
-      <h2 class="text-2xl font-semibold">Tendencia ahora</h2>
-      <span class="text-sm text-fg-muted">Top {trending.length}</span>
+      <h2 class="text-2xl font-semibold">{t('home.trending')}</h2>
+      <span class="text-sm text-fg-muted">{t('home.topCount', { count: trending.length })}</span>
     </div>
     <AnimeGrid anime={trending} />
   </section>
@@ -89,13 +90,13 @@ const itemListSchema = buildItemListSchema(
     <section class="mx-auto max-w-6xl px-4 pb-12">
       <div class="mb-5 flex items-baseline justify-between">
         <h2 class="text-2xl font-semibold">
-          Estrenos de {formatSeason(homeSeason.season)} {homeSeason.year}
+          {t('home.seasonPremieres', { season: formatSeason(homeSeason.season), year: homeSeason.year })}
         </h2>
         <a
           href={`/temporada/${homeSeason.year}/${homeSeason.season.toLowerCase()}`}
           class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
         >
-          Ver temporada →
+          {t('home.viewSeason')} →
         </a>
       </div>
       <AnimeGrid anime={homeSeasonAnime} />
@@ -106,13 +107,13 @@ const itemListSchema = buildItemListSchema(
     <section class="mx-auto max-w-6xl px-4 pb-12">
       <div class="mb-5 flex items-baseline justify-between">
         <h2 class="text-2xl font-semibold">
-          Lo mejor en <span class="brand-gradient-text">{topGenre.name}</span>
+          {t('home.bestInGenrePrefix')} <span class="brand-gradient-text">{topGenre.name}</span>
         </h2>
         <a
           href={`/genero/${topGenre.slug}`}
           class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
         >
-          Ver género →
+          {t('home.viewGenre')} →
         </a>
       </div>
       <AnimeGrid anime={topGenreAnime} />
@@ -120,7 +121,7 @@ const itemListSchema = buildItemListSchema(
   )}
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
-    <h2 class="mb-5 text-2xl font-semibold">Explora por país</h2>
+    <h2 class="mb-5 text-2xl font-semibold">{t('home.exploreByCountry')}</h2>
     <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {COUNTRY_SLUGS.map((slug) => {
         const c = COUNTRIES[slug];
@@ -138,7 +139,7 @@ const itemListSchema = buildItemListSchema(
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
-    <h2 class="mb-5 text-2xl font-semibold">Plataformas destacadas</h2>
+    <h2 class="mb-5 text-2xl font-semibold">{t('home.featuredPlatforms')}</h2>
     <div class="flex flex-wrap gap-2">
       {featuredPlatforms.map((slug) => (
         <a
@@ -152,7 +153,7 @@ const itemListSchema = buildItemListSchema(
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
-    <h2 class="mb-5 text-2xl font-semibold">Mejores por año</h2>
+    <h2 class="mb-5 text-2xl font-semibold">{t('home.bestByYear')}</h2>
     <div class="flex flex-wrap gap-2">
       {BEST_ANIME_YEARS_DESC.map((year) => (
         <a
@@ -166,7 +167,7 @@ const itemListSchema = buildItemListSchema(
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
-    <h2 class="mb-5 text-2xl font-semibold">Preguntas frecuentes</h2>
+    <h2 class="mb-5 text-2xl font-semibold">{t('home.faq')}</h2>
     <div class="grid gap-3 md:grid-cols-2">
       {HOME_FAQS.map((faq) => (
         <details class="rounded-lg border border-surface-2 bg-surface-1 p-4">
@@ -181,8 +182,8 @@ const itemListSchema = buildItemListSchema(
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
     <div class="mb-5 flex items-baseline justify-between">
-      <h2 class="text-2xl font-semibold">Catálogo completo</h2>
-      <span class="text-sm text-fg-muted">{anime.length} anime</span>
+      <h2 class="text-2xl font-semibold">{t('home.fullCatalog')}</h2>
+      <span class="text-sm text-fg-muted">{t('home.animeCount', { count: anime.length })}</span>
     </div>
     <AnimeGrid anime={anime} />
   </section>

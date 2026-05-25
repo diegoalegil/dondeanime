@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { AnimeDetail, WatchProvider } from './api';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL;
@@ -15,24 +16,24 @@ export interface FAQItem {
 
 export const HOME_FAQS: FAQItem[] = [
   {
-    question: '¿Dónde puedo ver anime online de forma legal?',
-    answer: 'Puedes revisar plataformas con licencia como Crunchyroll, Netflix, Prime Video, Disney+ y HBO Max. DondeAnime cruza cada anime con las plataformas detectadas por país.',
+    question: t('faq.legal.question'),
+    answer: t('faq.legal.answer'),
   },
   {
-    question: '¿Dónde ver anime gratis legalmente?',
-    answer: 'Algunas plataformas publican episodios gratis o catálogos con anuncios según el país. Cuando el proveedor aparece como gratuito o incluido en streaming, DondeAnime lo muestra en la ficha.',
+    question: t('faq.free.question'),
+    answer: t('faq.free.answer'),
   },
   {
-    question: '¿Qué plataforma tiene más anime?',
-    answer: 'Depende del país y del catálogo vigente. Crunchyroll suele concentrar mucho anime, pero Netflix, Prime Video y otras plataformas cambian sus licencias con frecuencia.',
+    question: t('faq.platform.question'),
+    answer: t('faq.platform.answer'),
   },
   {
-    question: '¿Cada cuánto se actualiza el catálogo?',
-    answer: 'El catálogo se actualiza automáticamente con datos de AniList y TMDb. Las páginas públicas se regeneran cuando hay cambios relevantes en anime o disponibilidad.',
+    question: t('faq.update.question'),
+    answer: t('faq.update.answer'),
   },
   {
-    question: '¿Por qué un anime no aparece disponible en mi país?',
-    answer: 'Las licencias de streaming cambian por región. Un anime puede estar disponible en otro país, llegar más tarde o no tener proveedor detectado todavía.',
+    question: t('faq.unavailable.question'),
+    answer: t('faq.unavailable.answer'),
   },
 ];
 
@@ -101,7 +102,7 @@ export const buildAnimeReviewSchema = (
   return {
     '@context': 'https://schema.org',
     '@type': 'Review',
-    name: `Puntuación media de ${name}`,
+    name: t('seo.review.name', { name }),
     itemReviewed: {
       '@type': 'TVSeries',
       name,
@@ -115,10 +116,10 @@ export const buildAnimeReviewSchema = (
     },
     publisher: {
       '@type': 'Organization',
-      name: 'DondeAnime',
+      name: t('brand.name'),
       url: SITE_URL,
     },
-    reviewBody: `Puntuación media de ${name} en AniList, convertida a escala 0-10.`,
+    reviewBody: t('seo.review.body', { name }),
     reviewRating: {
       '@type': 'Rating',
       ratingValue: ratingValue(anime.averageScore),
@@ -142,7 +143,7 @@ export const buildBreadcrumbSchema = (items: BreadcrumbItem[]) => ({
 export const buildWebSiteSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'DondeAnime',
+  name: t('brand.name'),
   url: SITE_URL,
   potentialAction: {
     '@type': 'SearchAction',
@@ -157,7 +158,7 @@ export const buildWebSiteSchema = () => ({
 export const buildOrganizationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'DondeAnime',
+  name: t('brand.name'),
   url: SITE_URL,
   logo: {
     '@type': 'ImageObject',

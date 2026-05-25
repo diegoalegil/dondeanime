@@ -1,6 +1,7 @@
 ---
 import type { UpcomingAnime } from '@/lib/api';
 import { formatDate, formatStatus, formatType } from '@/lib/format';
+import { t } from '@/i18n';
 
 interface Props {
   anime: UpcomingAnime[];
@@ -17,6 +18,9 @@ const isoDate = (item: UpcomingAnime): string => {
 <ol class="grid gap-4">
   {anime.map((item) => {
     const title = item.titleEnglish || item.titleRomaji;
+    const episodeLabel = item.episodes === null
+      ? t('anime.upcoming.unknownEpisodes')
+      : `${item.episodes} ${t(item.episodes === 1 ? 'anime.hero.episode.one' : 'anime.hero.episode.other')}`;
 
     return (
       <li class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[6rem_5rem_1fr] sm:items-start">
@@ -42,11 +46,7 @@ const isoDate = (item: UpcomingAnime): string => {
             {title}
           </a>
           <p class="mt-2 text-sm text-fg-muted">
-            {formatType(item.format)} · {formatStatus(item.status)} · {
-              item.episodes === null
-                ? 'Episodios sin dato'
-                : `${item.episodes} episodio${item.episodes === 1 ? '' : 's'}`
-            }
+            {formatType(item.format)} &middot; {formatStatus(item.status)} &middot; {episodeLabel}
           </p>
           {item.genres.length > 0 && (
             <div class="mt-4 flex flex-wrap gap-2">
