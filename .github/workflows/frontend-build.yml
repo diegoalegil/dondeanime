@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate i18n dictionaries
+        run: npm run validate:i18n
+
       - name: Build frontend
         run: npm run build
 

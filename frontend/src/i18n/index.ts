@@ -1,10 +1,12 @@
 import es from './es.json';
+import en from './en.json';
 
-export type Locale = 'es';
+export type Locale = 'es' | 'en';
 export type I18nKey = keyof typeof es;
 
 const dictionaries = {
   es,
+  en,
 } satisfies Record<Locale, Record<string, string>>;
 
 let activeLocale: Locale = 'es';

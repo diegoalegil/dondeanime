@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "validate:i18n": "node scripts/validate-i18n.mjs",
     "validate:jsonld": "node scripts/validate-jsonld.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
