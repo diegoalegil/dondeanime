@@ -2,8 +2,11 @@ package com.dondeanime.backend.premium;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SubscriberService {
+
+    private static final Set<String> DASHBOARD_ACCESS_TIERS = Set.of("PATRON", "PATRON_PLUS", "PATRON_HIGH");
 
     private final SubscriberRepository subscriberRepository;
     private final Clock clock;
@@ -51,6 +56,41 @@ public class SubscriberService {
                 .map(Subscriber::getStripeCustomerId)
                 .map(SubscriberService::normalizeStripeCustomerId)
                 .filter(customerId -> !customerId.isBlank());
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> findActivePremiumEmails(Collection<String> emails) {
+        if (emails == null || emails.isEmpty()) {
+            return Set.of();
+        }
+
+        Set<String> normalizedEmails = emails.stream()
+                .map(SubscriberService::normalizeEmail)
+                .filter(email -> !email.isBlank())
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        if (normalizedEmails.isEmpty()) {
+            return Set.of();
+        }
+
+        return subscriberRepository.findActivePremiumEmails(normalizedEmails, Instant.now(clock)).stream()
+                .map(SubscriberService::normalizeEmail)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean canAccessAdminDashboard(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail.isBlank()) {
+            return false;
+        }
+
+        Instant now = Instant.now(clock);
+        return subscriberRepository.findByEmail(normalizedEmail)
+                .filter(subscriber -> isActive(subscriber, now))
+                .map(Subscriber::getPlanTier)
+                .map(SubscriberService::normalizeTier)
+                .filter(DASHBOARD_ACCESS_TIERS::contains)
+                .isPresent();
     }
 
     @Transactional
@@ -120,6 +160,10 @@ public class SubscriberService {
 
     static String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String normalizeTier(String planTier) {
+        return planTier == null ? "" : planTier.trim().toUpperCase(Locale.ROOT);
     }
 
     private Optional<Subscriber> findExisting(String normalizedEmail, String normalizedCustomerId) {

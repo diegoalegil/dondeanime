@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -77,6 +79,38 @@ class SubscriberServiceTest {
         when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
 
         assertThat(service.findActiveStripeCustomerId("diego@example.com")).isEmpty();
+    }
+
+    @Test
+    void findActivePremiumEmailsNormalizesAndDelegatesToRepository() {
+        when(subscriberRepository.findActivePremiumEmails(
+                Set.of("diego@example.com", "ana@example.com"),
+                NOW))
+                .thenReturn(Set.of("DIEGO@example.com"));
+
+        assertThat(service.findActivePremiumEmails(List.of(
+                " Diego@Example.com ",
+                "ana@example.com",
+                " ")))
+                .containsExactly("diego@example.com");
+    }
+
+    @Test
+    void canAccessAdminDashboardAllowsActivePatronTier() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        subscriber.setPlanTier("patron");
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.canAccessAdminDashboard("diego@example.com")).isTrue();
+    }
+
+    @Test
+    void canAccessAdminDashboardRejectsRegularPremiumTier() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        subscriber.setPlanTier("PREMIUM");
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.canAccessAdminDashboard("diego@example.com")).isFalse();
     }
 
     @Test
