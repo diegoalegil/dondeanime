@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +24,12 @@ public class NotificationDashboardService {
     private final ObjectMapper objectMapper;
     private final Clock clock;
 
+    @Autowired
     public NotificationDashboardService(
             PushSubscriptionRepository pushSubscriptionRepository,
             SubscriptionRepository subscriptionRepository,
-            WebPushService webPushService,
-            ObjectMapper objectMapper) {
-        this(pushSubscriptionRepository, subscriptionRepository, webPushService, objectMapper, Clock.systemUTC());
+            WebPushService webPushService) {
+        this(pushSubscriptionRepository, subscriptionRepository, webPushService, new ObjectMapper(), Clock.systemUTC());
     }
 
     NotificationDashboardService(

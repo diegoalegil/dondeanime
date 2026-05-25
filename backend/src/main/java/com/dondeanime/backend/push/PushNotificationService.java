@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,12 @@ public class PushNotificationService {
     private final ObjectMapper objectMapper;
     private final Clock clock;
 
+    @Autowired
     public PushNotificationService(
             SubscriptionRepository subscriptionRepository,
             PushSubscriptionRepository pushSubscriptionRepository,
-            WebPushService webPushService,
-            ObjectMapper objectMapper) {
-        this(subscriptionRepository, pushSubscriptionRepository, webPushService, objectMapper, Clock.systemUTC());
+            WebPushService webPushService) {
+        this(subscriptionRepository, pushSubscriptionRepository, webPushService, new ObjectMapper(), Clock.systemUTC());
     }
 
     PushNotificationService(
