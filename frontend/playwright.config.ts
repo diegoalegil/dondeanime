@@ -4,6 +4,7 @@ const port = Number(process.env.PLAYWRIGHT_PORT ?? 4321);
 const baseURL = `http://127.0.0.1:${port}`;
 const publicApiUrl = process.env.PUBLIC_API_URL ?? 'https://api.dondeanime.com';
 const publicSiteUrl = process.env.PUBLIC_SITE_URL ?? 'https://dondeanime.com';
+const publicStripePublishableKey = process.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test_REEMPLAZAR';
 
 export default defineConfig({
   testDir: './e2e',
@@ -31,6 +32,7 @@ export default defineConfig({
       ...process.env,
       PUBLIC_API_URL: publicApiUrl,
       PUBLIC_SITE_URL: publicSiteUrl,
+      PUBLIC_STRIPE_PUBLISHABLE_KEY: publicStripePublishableKey,
     },
   },
   projects: [
