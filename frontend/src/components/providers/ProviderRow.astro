@@ -4,6 +4,7 @@ import PlatformBadge from './PlatformBadge.astro';
 import { formatProviderType } from '@/lib/format';
 import { getPlatform } from '@/lib/platforms';
 import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 interface Props {
   provider: WatchProvider;
@@ -12,7 +13,7 @@ interface Props {
 
 const { provider, animeSlug = '' } = Astro.props;
 const platform = getPlatform(provider.providerSlug);
-const href = provider.affiliateUrl ?? platform?.url ?? `/plataforma/${provider.providerSlug}`;
+const href = provider.affiliateUrl ?? platform?.url ?? localizedPath(`/plataforma/${provider.providerSlug}`);
 const isAffiliate = Boolean(provider.affiliateUrl);
 
 const typeClass =

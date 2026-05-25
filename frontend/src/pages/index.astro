@@ -3,12 +3,15 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
-import { HOME_FAQS, buildFAQPageSchema, buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { getHomeFaqs, buildFAQPageSchema, buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { formatSeason } from '@/lib/format';
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
 import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
 import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
@@ -49,8 +52,9 @@ const homeSeasonAnime = homeSeason
 
 const featuredPlatforms: PlatformSlug[] = ['crunchyroll', 'netflix', 'amazon-prime-video', 'hbo-max', 'disney-plus'];
 
+const homeFaqs = getHomeFaqs();
 const websiteSchema = buildWebSiteSchema();
-const faqSchema = buildFAQPageSchema(HOME_FAQS);
+const faqSchema = buildFAQPageSchema(homeFaqs);
 const itemListSchema = buildItemListSchema(
   anime.slice(0, 20).map((a) => ({
     name: a.titleEnglish || a.titleRomaji,
@@ -93,7 +97,7 @@ const itemListSchema = buildItemListSchema(
           {t('home.seasonPremieres', { season: formatSeason(homeSeason.season), year: homeSeason.year })}
         </h2>
         <a
-          href={`/temporada/${homeSeason.year}/${homeSeason.season.toLowerCase()}`}
+          href={localizedPath(`/temporada/${homeSeason.year}/${homeSeason.season.toLowerCase()}`)}
           class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
         >
           {t('home.viewSeason')} →
@@ -110,7 +114,7 @@ const itemListSchema = buildItemListSchema(
           {t('home.bestInGenrePrefix')} <span class="brand-gradient-text">{topGenre.name}</span>
         </h2>
         <a
-          href={`/genero/${topGenre.slug}`}
+          href={localizedPath(`/genero/${topGenre.slug}`)}
           class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
         >
           {t('home.viewGenre')} →
@@ -127,11 +131,11 @@ const itemListSchema = buildItemListSchema(
         const c = COUNTRIES[slug];
         return (
           <a
-            href={`/pais/${slug}`}
+            href={localizedPath(`/pais/${slug}`)}
             class="flex items-center gap-3 rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/40"
           >
             <span class={`fi fi-${c.flagCode} rounded text-lg`} aria-hidden="true"></span>
-            <span class="text-sm font-semibold text-fg-primary">{c.name}</span>
+            <span class="text-sm font-semibold text-fg-primary">{localizedCountryName(slug)}</span>
           </a>
         );
       })}
@@ -143,7 +147,7 @@ const itemListSchema = buildItemListSchema(
     <div class="flex flex-wrap gap-2">
       {featuredPlatforms.map((slug) => (
         <a
-          href={`/plataforma/${slug}`}
+          href={localizedPath(`/plataforma/${slug}`)}
           class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
         >
           {PLATFORMS[slug].name}
@@ -157,7 +161,7 @@ const itemListSchema = buildItemListSchema(
     <div class="flex flex-wrap gap-2">
       {BEST_ANIME_YEARS_DESC.map((year) => (
         <a
-          href={`/mejores/${year}`}
+          href={localizedPath(`/mejores/${year}`)}
           class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
         >
           {year}
@@ -169,7 +173,7 @@ const itemListSchema = buildItemListSchema(
   <section class="mx-auto max-w-6xl px-4 pb-12">
     <h2 class="mb-5 text-2xl font-semibold">{t('home.faq')}</h2>
     <div class="grid gap-3 md:grid-cols-2">
-      {HOME_FAQS.map((faq) => (
+      {homeFaqs.map((faq) => (
         <details class="rounded-lg border border-surface-2 bg-surface-1 p-4">
           <summary class="cursor-pointer text-sm font-semibold text-fg-primary">
             {faq.question}

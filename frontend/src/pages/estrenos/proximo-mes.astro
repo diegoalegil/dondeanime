@@ -5,7 +5,9 @@ import UpcomingAnimeList from '@/components/anime/UpcomingAnimeList.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getUpcomingAnime } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 const anime = await getUpcomingAnime(30);
 

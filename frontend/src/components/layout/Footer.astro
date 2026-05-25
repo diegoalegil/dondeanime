@@ -4,6 +4,7 @@ import { PLATFORMS, type PlatformSlug } from '@/lib/platforms';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { buildOrganizationSchema } from '@/lib/seo';
 import { t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
 
 const year = new Date().getFullYear();
 const organizationSchema = buildOrganizationSchema();
@@ -39,9 +40,9 @@ const featuredGenres = [
             const c = COUNTRIES[slug];
             return (
               <li>
-                <a href={`/pais/${slug}`} class="flex items-center gap-2 text-fg-muted transition-colors hover:text-fg-primary">
+                <a href={localizedPath(`/pais/${slug}`)} class="flex items-center gap-2 text-fg-muted transition-colors hover:text-fg-primary">
                   <span class={`fi fi-${c.flagCode} rounded`} aria-hidden="true"></span>
-                  {c.name}
+                  {localizedCountryName(slug)}
                 </a>
               </li>
             );
@@ -54,7 +55,7 @@ const featuredGenres = [
         <ul class="mt-3 space-y-2 text-sm">
           {featuredPlatforms.map((slug) => (
             <li>
-              <a href={`/plataforma/${slug}`} class="text-fg-muted transition-colors hover:text-fg-primary">
+              <a href={localizedPath(`/plataforma/${slug}`)} class="text-fg-muted transition-colors hover:text-fg-primary">
                 {PLATFORMS[slug].name}
               </a>
             </li>
@@ -67,7 +68,7 @@ const featuredGenres = [
         <ul class="mt-3 space-y-2 text-sm">
           {featuredGenres.map((g) => (
             <li>
-              <a href={`/genero/${g.slug}`} class="text-fg-muted transition-colors hover:text-fg-primary">
+              <a href={localizedPath(`/genero/${g.slug}`)} class="text-fg-muted transition-colors hover:text-fg-primary">
                 {g.name}
               </a>
             </li>
@@ -79,10 +80,10 @@ const featuredGenres = [
     <div class="mt-10 flex flex-col gap-3 border-t border-surface-2 pt-6 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between">
       <p>&copy; {year} {t('brand.name')}. {t('footer.dataAttribution')}</p>
       <p class="sm:text-right">
-        <a href="/legal/privacidad" class="transition-colors hover:text-fg-primary">{t('footer.privacy')}</a>
+        <a href={localizedPath('/legal/privacidad')} class="transition-colors hover:text-fg-primary">{t('footer.privacy')}</a>
         <span class="mx-2">&middot;</span>
         {t('footer.affiliateDisclosure')}
-        <a href="/legal/afiliados" class="transition-colors hover:text-fg-primary">{t('footer.moreInfo')}</a>
+        <a href={localizedPath('/legal/afiliados')} class="transition-colors hover:text-fg-primary">{t('footer.moreInfo')}</a>
         <span class="mx-2">&middot;</span>
         {t('footer.noHosting')}
       </p>
