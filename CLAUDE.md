@@ -495,6 +495,13 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | POST | `/api/track/affiliate` | Tracking público de click afiliado |
 | POST | `/api/push/subscribe` | Guarda subscription Web Push del navegador |
 
+### Endpoints admin de notificaciones
+
+| Método | Path | Descripción |
+|---|---|---|
+| GET | `/api/admin/notifications/stats` | Dashboard de push subscriptions, alertas 24h y tasa de entrega |
+| POST | `/api/admin/notifications/test` | Enviar test push a una subscription concreta |
+
 ### Modelado de datos
 - **Records de Java 21** para DTOs externos (AniList): inmutables, concisos, Jackson los parsea sin config.
 - **Un record por archivo**, todos `public`: convención Java, y necesario para usarlos desde paquetes hermanos (el service que está en `anime/` necesita `AniListMedia` que vive en `anime/anilist/`).

@@ -1,5 +1,6 @@
 package com.dondeanime.backend.subscription;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
             Long userId,
             Long animeId,
             String countryCode);
+
+    long countByNotifiedAtAfter(Instant notifiedAt);
 
     @Query("""
             SELECT COUNT(s) FROM Subscription s

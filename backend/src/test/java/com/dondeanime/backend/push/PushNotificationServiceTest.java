@@ -22,8 +22,6 @@ import com.dondeanime.backend.subscription.AppUser;
 import com.dondeanime.backend.subscription.Subscription;
 import com.dondeanime.backend.subscription.SubscriptionRepository;
 
-import tools.jackson.databind.ObjectMapper;
-
 class PushNotificationServiceTest {
 
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
@@ -32,8 +30,7 @@ class PushNotificationServiceTest {
     private final PushNotificationService service = new PushNotificationService(
             subscriptionRepository,
             pushSubscriptionRepository,
-            webPushService,
-            new ObjectMapper());
+            webPushService);
 
     @Test
     void sendsPushOnlyToPendingAlertEmailsInCountry() {

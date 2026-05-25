@@ -1,0 +1,229 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<BaseLayout
+  title="Notificaciones admin - DondeAnime"
+  description="Panel admin de notificaciones de DondeAnime."
+>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Admin', url: '/admin' },
+      { name: 'Notificaciones', url: '/admin/notifications' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 py-8" data-notifications-dashboard data-api-url={apiUrl}>
+    <header class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
+        <h1 class="mt-1 text-3xl font-semibold text-fg-primary">Notificaciones</h1>
+      </div>
+      <div class="flex flex-wrap gap-3 text-sm">
+        <a href="/admin/dashboard" class="text-fg-muted transition-colors hover:text-accent-violet">
+          Dashboard
+        </a>
+        <a href="/admin/affiliate-links" class="text-fg-muted transition-colors hover:text-accent-violet">
+          Afiliados
+        </a>
+      </div>
+    </header>
+
+    <form class="mb-6 rounded-lg border border-surface-2 bg-surface-1 p-4" data-login-form>
+      <div class="grid gap-3 sm:grid-cols-[9rem_12rem_auto_auto]">
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Usuario</span>
+          <input name="username" autocomplete="username" value="admin" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Password</span>
+          <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
+          Entrar
+        </button>
+        <button type="button" class="self-end rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary" data-refresh>
+          Recargar
+        </button>
+      </div>
+      <p class="mt-2 min-h-5 text-sm text-fg-muted" data-status></p>
+    </form>
+
+    <div class="grid gap-4 md:grid-cols-4">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Subscriptions activas</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-active-subscriptions>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Alertas 24h</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-alerts-24>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Entrega push</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-delivery-rate>0%</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">VAPID</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-push-configured>No</p>
+      </article>
+    </div>
+
+    <section class="mt-6">
+      <div class="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-fg-primary">Push subscriptions</h2>
+          <p class="text-sm text-fg-muted" data-delivery-summary>0 intentos registrados.</p>
+        </div>
+      </div>
+      <div class="grid gap-3" data-subscriptions></div>
+    </section>
+  </section>
+
+  <script>
+    const root = document.querySelector('[data-notifications-dashboard]');
+    const apiUrl = root?.getAttribute('data-api-url') ?? '';
+    const tokenKey = 'dondeanime-admin-token';
+    const form = document.querySelector('[data-login-form]');
+    const status = document.querySelector('[data-status]');
+    const list = document.querySelector('[data-subscriptions]');
+    const refresh = document.querySelector('[data-refresh]');
+
+    const setStatus = (message, tone = 'muted') => {
+      if (!status) return;
+      status.textContent = message;
+      status.className = `mt-2 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
+    const authHeaders = () => {
+      const token = sessionStorage.getItem(tokenKey);
+      return token ? { Authorization: `Basic ${token}` } : {};
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+
+    const formatDate = (value) => {
+      if (!value) return 'Nunca';
+      return new Intl.DateTimeFormat('es-ES', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      }).format(new Date(value));
+    };
+
+    const renderSubscriptions = (subscriptions) => {
+      if (!list) return;
+      if (!subscriptions?.length) {
+        list.innerHTML = '<p class="text-sm text-fg-muted">Sin subscriptions push todavia.</p>';
+        return;
+      }
+      list.innerHTML = subscriptions.map((item) => `
+        <article class="grid gap-3 rounded-md border border-surface-2 bg-surface-0 p-4 lg:grid-cols-[1.2fr_0.5fr_1fr_auto] lg:items-center">
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-fg-primary">${escapeHtml(item.userEmail)}</p>
+            <p class="mt-1 truncate text-xs text-fg-muted">${escapeHtml(item.createdAt ? `Alta ${formatDate(item.createdAt)}` : 'Alta sin fecha')}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase text-fg-muted">Pais</p>
+            <p class="text-sm font-semibold text-fg-primary">${escapeHtml(item.countryIso)}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <p class="text-xs uppercase text-fg-muted">OK</p>
+              <p class="font-semibold text-success">${escapeHtml(item.deliverySuccessCount ?? 0)}</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase text-fg-muted">Fallos</p>
+              <p class="font-semibold text-danger">${escapeHtml(item.deliveryFailureCount ?? 0)}</p>
+            </div>
+            <div class="col-span-2 text-xs text-fg-muted">
+              Ultima OK: ${escapeHtml(formatDate(item.lastDeliveredAt))} - ultimo fallo: ${escapeHtml(formatDate(item.lastFailedAt))}
+            </div>
+          </div>
+          <button
+            type="button"
+            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-primary transition-colors hover:border-accent-violet hover:text-accent-violet"
+            data-test-push="${escapeHtml(item.id)}"
+          >
+            Test push
+          </button>
+        </article>
+      `).join('');
+    };
+
+    async function loadStats() {
+      setStatus('Cargando...');
+      const response = await fetch(`${apiUrl}/api/admin/notifications/stats`, {
+        headers: authHeaders(),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      document.querySelector('[data-active-subscriptions]').textContent = data.activeSubscriptions ?? 0;
+      document.querySelector('[data-alerts-24]').textContent = data.alertsSentLast24Hours ?? 0;
+      document.querySelector('[data-delivery-rate]').textContent = `${Number(data.deliveryRatePercent ?? 0).toFixed(1)}%`;
+      document.querySelector('[data-push-configured]').textContent = data.pushConfigured ? 'Si' : 'No';
+      document.querySelector('[data-delivery-summary]').textContent =
+        `${data.deliveryAttempts ?? 0} intentos: ${data.deliverySuccesses ?? 0} OK, ${data.deliveryFailures ?? 0} fallos.`;
+      renderSubscriptions(data.subscriptions);
+      setStatus('Datos cargados.', 'success');
+    }
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
+      loadStats().catch(() => {
+        sessionStorage.removeItem(tokenKey);
+        setStatus('Credenciales incorrectas.', 'danger');
+      });
+    });
+
+    refresh?.addEventListener('click', () => {
+      loadStats().catch(() => setStatus('No se pudo cargar notificaciones.', 'danger'));
+    });
+
+    list?.addEventListener('click', async (event) => {
+      const button = event.target instanceof Element ? event.target.closest('[data-test-push]') : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      const subscriptionId = Number(button.getAttribute('data-test-push'));
+      button.disabled = true;
+      setStatus('Enviando test push...');
+      try {
+        const response = await fetch(`${apiUrl}/api/admin/notifications/test`, {
+          method: 'POST',
+          headers: {
+            ...authHeaders(),
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ subscriptionId }),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const result = await response.json();
+        setStatus(result.message ?? 'Test push procesado.', result.sent ? 'success' : 'danger');
+        await loadStats();
+      } catch {
+        setStatus('No se pudo enviar test push.', 'danger');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    if (sessionStorage.getItem(tokenKey)) {
+      loadStats().catch(() => setStatus('No se pudo cargar notificaciones.', 'danger'));
+    } else {
+      setStatus('Inicia sesion para ver notificaciones.');
+    }
+  </script>
+</BaseLayout>
