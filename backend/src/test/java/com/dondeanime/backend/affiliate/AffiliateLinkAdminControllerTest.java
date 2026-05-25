@@ -3,7 +3,6 @@ package com.dondeanime.backend.affiliate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest({
@@ -29,11 +29,15 @@ import com.dondeanime.backend.config.SecurityConfig;
         AffiliateTrackingController.class,
         AffiliateDashboardController.class
 })
-@Import(SecurityConfig.class)
+@Import({
+        SecurityConfig.class,
+        AdminJwtService.class
+})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class AffiliateLinkAdminControllerTest {
 
@@ -42,6 +46,9 @@ class AffiliateLinkAdminControllerTest {
 
     @MockitoBean
     private AffiliateLinkService affiliateLinkService;
+
+    @Autowired
+    private AdminJwtService adminJwtService;
 
     @Test
     void adminAffiliateLinksRequireAuth() throws Exception {
@@ -54,7 +61,7 @@ class AffiliateLinkAdminControllerTest {
         when(affiliateLinkService.listLinks()).thenReturn(List.of(dto()));
 
         mvc.perform(get("/api/admin/affiliate-links")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].providerSlug").value("crunchyroll"))
                 .andExpect(jsonPath("$[0].countryCode").value("ES"));
@@ -65,7 +72,7 @@ class AffiliateLinkAdminControllerTest {
         when(affiliateLinkService.saveLink(any(AffiliateLinkRequest.class))).thenReturn(dto());
 
         mvc.perform(post("/api/admin/affiliate-links")
-                        .with(httpBasic("admin", "secret"))
+                        .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"providerSlug":"crunchyroll","country":"ES","affiliateUrl":"https://example.com/cr","active":true}
@@ -77,7 +84,7 @@ class AffiliateLinkAdminControllerTest {
     @Test
     void deleteAffiliateLinkWithCredentials() throws Exception {
         mvc.perform(delete("/api/admin/affiliate-links/1")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isNoContent());
 
         verify(affiliateLinkService).deleteLink(1L);
@@ -111,5 +118,9 @@ class AffiliateLinkAdminControllerTest {
                 true,
                 Instant.now(),
                 Instant.now());
+    }
+
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 }
