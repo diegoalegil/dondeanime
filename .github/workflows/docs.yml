@@ -25,3 +25,9 @@ jobs:
 
       - name: Validate disaster recovery doc
         run: bash scripts/vps/validate-disaster-recovery-doc.sh
+
+      - name: Validate secrets rotation doc
+        run: |
+          if [ -f SECRETS-ROTATION.md ]; then
+            bash scripts/vps/validate-secrets-rotation-doc.sh
+          fi
