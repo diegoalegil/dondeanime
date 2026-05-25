@@ -58,6 +58,9 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   <AnimeHero anime={detail.anime} />
   <ProvidersByCountry providersByCountry={detail.watchProvidersByCountry} animeSlug={slug!} />
   <AdSlot position="inline" />
-  <AnimeSynopsis description={detail.anime.description} />
+  <AnimeSynopsis
+    description={detail.anime.description}
+    translationPending={detail.anime.descriptionTranslationPending}
+  />
   <MetaList anime={detail.anime} />
 </BaseLayout>

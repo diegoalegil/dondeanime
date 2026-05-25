@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
@@ -41,6 +42,7 @@ public class CatalogScheduler {
 
     private final AnimeSyncService syncService;
     private final AnimeMatchingService matchingService;
+    private final AnimeDescriptionEnricher descriptionEnricher;
     private final ProviderSyncService providerSyncService;
     private final RestClient restClient;
     private final String vercelDeployHook;
@@ -48,11 +50,13 @@ public class CatalogScheduler {
     public CatalogScheduler(
             AnimeSyncService syncService,
             AnimeMatchingService matchingService,
+            AnimeDescriptionEnricher descriptionEnricher,
             ProviderSyncService providerSyncService,
             RestClient.Builder restClientBuilder,
             @Value("${vercel.deploy-hook:}") String vercelDeployHook) {
         this.syncService = syncService;
         this.matchingService = matchingService;
+        this.descriptionEnricher = descriptionEnricher;
         this.providerSyncService = providerSyncService;
         this.restClient = restClientBuilder.build();
         this.vercelDeployHook = vercelDeployHook;
@@ -80,6 +84,8 @@ public class CatalogScheduler {
         try {
             int n = matchingService.matchAll();
             log.info("[scheduler] matchTmdb: completado, {} match nuevos", n);
+            int enriched = descriptionEnricher.enrichMissingSpanishDescriptions();
+            log.info("[scheduler] matchTmdb: {} descripciones es-ES nuevas", enriched);
         } catch (Exception e) {
             log.error("[scheduler] matchTmdb: ERROR", e);
         }

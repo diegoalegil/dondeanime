@@ -55,6 +55,17 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findBySeasonYearAndSeason(int year, String season);
 
     /**
+     * Anime con match TMDb pero sin descripción localizada en español.
+     */
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.tmdbId IS NOT NULL
+            AND (a.descriptionEs IS NULL OR TRIM(a.descriptionEs) = '')
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findWithTmdbIdAndMissingDescriptionEs();
+
+    /**
      * Lista de slugs activos (para sitemap).
      */
     @Query("SELECT a.slug FROM Anime a WHERE a.slug IS NOT NULL ORDER BY a.slug")

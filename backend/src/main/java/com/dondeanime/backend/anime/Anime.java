@@ -41,6 +41,9 @@ public class Anime {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "description_es", columnDefinition = "TEXT")
+    private String descriptionEs;
+
     @Column(length = 20)
     private String format; // TV, MOVIE, OVA, ONA, SPECIAL, MUSIC
 
@@ -155,6 +158,14 @@ public class Anime {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDescriptionEs() {
+        return descriptionEs;
+    }
+
+    public void setDescriptionEs(String descriptionEs) {
+        this.descriptionEs = descriptionEs;
     }
 
     public String getFormat() {
