@@ -1,8 +1,12 @@
 package com.dondeanime.backend.anime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -104,6 +108,25 @@ class AnimeControllerTest {
 
         mvc.perform(get("/api/anime/inexistente"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void syncAcceptsFiveHundredAnime() throws Exception {
+        when(syncService.syncPopular(500)).thenReturn(500);
+
+        mvc.perform(post("/api/anime/sync").param("count", "500"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.synced").value(500));
+
+        verify(syncService).syncPopular(500);
+    }
+
+    @Test
+    void syncRejectsCountsAboveSprintLimit() throws Exception {
+        mvc.perform(post("/api/anime/sync").param("count", "501"))
+                .andExpect(status().isBadRequest());
+
+        verify(syncService, never()).syncPopular(anyInt());
     }
 
     private static Anime makeAnime(String slug, String titleEnglish) {

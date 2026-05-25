@@ -292,6 +292,11 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 curl -X POST https://api.dondeanime.com/api/anime/sync
 curl -X POST https://api.dondeanime.com/api/anime/match
 curl -X POST https://api.dondeanime.com/api/anime/sync-providers
+
+# Migración Sprint 8: subir catálogo de producción a 500 anime
+curl -X POST https://api.dondeanime.com/api/anime/sync?count=500
+curl -X POST https://api.dondeanime.com/api/anime/match
+curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 ```
 
 ### Variables de entorno producción
@@ -465,7 +470,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 |---|---|---|
 | GET | `/api/anime` | Lista plana (`AnimeSummaryDto[]`) |
 | GET | `/api/anime/{slug}` | Detalle + providers agrupados por país (`AnimeDetailResponse`) |
-| POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100) |
+| POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100, máximo 500) |
 | POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |
 | POST | `/api/anime/sync-providers` | Refresca la tabla `watch_provider` desde TMDb |
 | GET | `/api/providers` | Lista global de plataformas con count (`ProviderSummaryDto[]`) |
