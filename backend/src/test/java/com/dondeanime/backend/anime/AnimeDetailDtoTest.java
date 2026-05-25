@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+
+import com.dondeanime.backend.studio.Studio;
 
 class AnimeDetailDtoTest {
 
@@ -43,6 +46,24 @@ class AnimeDetailDtoTest {
         AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of(override));
 
         assertThat(dto.description()).isEqualTo("Descripción AniList");
+    }
+
+    @Test
+    void includesPublicStudioData() {
+        Anime anime = anime();
+        Studio studio = new Studio();
+        studio.setAnilistId(858L);
+        studio.setName("WIT Studio");
+        studio.setSlug("wit-studio");
+        studio.setAnimationStudio(true);
+        anime.setStudios(Set.of(studio));
+
+        AnimeDetailDto dto = AnimeDetailDto.from(anime, List.of());
+
+        assertThat(dto.studios()).hasSize(1);
+        assertThat(dto.studios().getFirst().slug()).isEqualTo("wit-studio");
+        assertThat(dto.studios().getFirst().name()).isEqualTo("WIT Studio");
+        assertThat(dto.studios().getFirst().animationStudio()).isTrue();
     }
 
     private static Anime anime() {

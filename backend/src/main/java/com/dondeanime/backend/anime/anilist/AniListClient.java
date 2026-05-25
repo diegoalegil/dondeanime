@@ -34,6 +34,7 @@ public class AniListClient {
               coverImage { large }
               bannerImage
               genres
+              studios { nodes { id name isAnimationStudio } }
               season
               seasonYear
             }
