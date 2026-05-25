@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -49,6 +50,7 @@ public class CatalogScheduler {
     private final ProviderSyncService providerSyncService;
     private final RestClient restClient;
     private final MeterRegistry meterRegistry;
+    private final ApplicationEventPublisher eventPublisher;
     private final String vercelDeployHook;
 
     public CatalogScheduler(
@@ -58,6 +60,7 @@ public class CatalogScheduler {
             ProviderSyncService providerSyncService,
             RestClient.Builder restClientBuilder,
             MeterRegistry meterRegistry,
+            ApplicationEventPublisher eventPublisher,
             @Value("${vercel.deploy-hook:}") String vercelDeployHook) {
         this.syncService = syncService;
         this.matchingService = matchingService;
@@ -65,6 +68,7 @@ public class CatalogScheduler {
         this.providerSyncService = providerSyncService;
         this.restClient = restClientBuilder.build();
         this.meterRegistry = meterRegistry;
+        this.eventPublisher = eventPublisher;
         this.vercelDeployHook = vercelDeployHook;
     }
 
@@ -81,6 +85,7 @@ public class CatalogScheduler {
         } catch (Exception e) {
             log.error("[scheduler] syncAniList: ERROR", e);
             recordError("anilist", sample);
+            publishJobFailure("anilist", e);
         }
         if (ok) {
             triggerVercelRebuild();
@@ -100,6 +105,7 @@ public class CatalogScheduler {
         } catch (Exception e) {
             log.error("[scheduler] matchTmdb: ERROR", e);
             recordError("match", sample);
+            publishJobFailure("match", e);
         }
     }
 
@@ -116,6 +122,7 @@ public class CatalogScheduler {
         } catch (Exception e) {
             log.error("[scheduler] syncProviders: ERROR", e);
             recordError("providers", sample);
+            publishJobFailure("providers", e);
         }
         if (ok) {
             triggerVercelRebuild();
@@ -155,5 +162,13 @@ public class CatalogScheduler {
     private void recordError(String job, Timer.Sample sample) {
         meterRegistry.counter("dondeanime.scheduler." + job + ".error.count").increment();
         sample.stop(meterRegistry.timer("dondeanime.scheduler." + job + ".duration"));
+    }
+
+    private void publishJobFailure(String job, Exception error) {
+        try {
+            eventPublisher.publishEvent(new SchedulerJobFailedEvent(job, error));
+        } catch (RuntimeException alertError) {
+            log.error("[scheduler] no se pudo publicar alerta de fallo para '{}'", job, alertError);
+        }
     }
 }
