@@ -40,7 +40,7 @@ public class AnimeAdminController {
             @PathVariable String slug,
             @Valid @RequestBody AnimeOverrideRequest request,
             Principal principal) {
-        return animeRepository.findBySlug(slug)
+        return animeRepository.findBySlugWithCharacters(slug)
                 .map(anime -> {
                     overrideService.saveOverride(
                             anime,
@@ -60,7 +60,7 @@ public class AnimeAdminController {
             @PathVariable String slug,
             @RequestParam(name = "field") String fieldName,
             @RequestParam(defaultValue = AnimeOverrideService.DEFAULT_LOCALE) String locale) {
-        return animeRepository.findBySlug(slug)
+        return animeRepository.findBySlugWithCharacters(slug)
                 .map(anime -> {
                     overrideService.deleteOverride(anime, fieldName, locale);
                     return ResponseEntity.ok(AnimeDetailDto.from(

@@ -17,6 +17,14 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
     Optional<Anime> findBySlugWithStudios(String slug);
 
+    @EntityGraph(attributePaths = {"characterRoles", "characterRoles.character"})
+    @Query("SELECT a FROM Anime a WHERE a.anilistId = :anilistId")
+    Optional<Anime> findByAnilistIdWithCharacters(Long anilistId);
+
+    @EntityGraph(attributePaths = {"genres", "studios", "characterRoles", "characterRoles.character"})
+    @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
+    Optional<Anime> findBySlugWithCharacters(String slug);
+
     /**
      * Anime disponibles en una plataforma concreta en un país concreto.
      * El slug del provider sigue la convención de ProviderSummaryDto:
