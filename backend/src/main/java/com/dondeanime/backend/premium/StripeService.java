@@ -20,6 +20,7 @@ public class StripeService {
     private final String webhookSecret;
     private final String successUrl;
     private final String cancelUrl;
+    private final String portalReturnUrl;
 
     public StripeService(
             StripeGateway stripeGateway,
@@ -28,7 +29,8 @@ public class StripeService {
             @Value("${STRIPE_PRICE_ID:}") String priceId,
             @Value("${STRIPE_WEBHOOK_SECRET:}") String webhookSecret,
             @Value("${STRIPE_SUCCESS_URL:https://dondeanime.com/premium?success=1}") String successUrl,
-            @Value("${STRIPE_CANCEL_URL:https://dondeanime.com/premium?canceled=1}") String cancelUrl) {
+            @Value("${STRIPE_CANCEL_URL:https://dondeanime.com/premium?canceled=1}") String cancelUrl,
+            @Value("${STRIPE_PORTAL_RETURN_URL:https://dondeanime.com/premium}") String portalReturnUrl) {
         this.stripeGateway = stripeGateway;
         this.subscriberService = subscriberService;
         this.apiKey = apiKey;
@@ -36,6 +38,7 @@ public class StripeService {
         this.webhookSecret = webhookSecret;
         this.successUrl = successUrl;
         this.cancelUrl = cancelUrl;
+        this.portalReturnUrl = portalReturnUrl;
     }
 
     public String createCheckoutSession(String email) {
@@ -67,6 +70,24 @@ public class StripeService {
         }
     }
 
+    public String createCustomerPortalSession(String email) {
+        String normalizedEmail = SubscriberService.normalizeEmail(email);
+        if (normalizedEmail.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email requerido");
+        }
+        assertStripeConfigured();
+        String customerId = subscriberService.findActiveStripeCustomerId(normalizedEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suscripcion Premium no encontrada"));
+        try {
+            return stripeGateway.createCustomerPortalSession(new StripePortalCommand(
+                    apiKey,
+                    customerId,
+                    portalReturnUrl));
+        } catch (StripeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Stripe no pudo crear Customer Portal", e);
+        }
+    }
+
     public String handleWebhook(String payload, String signature) {
         StripeWebhookEvent event = verifyWebhookSignature(payload, signature);
         Instant eventTime = event.eventTime() == null ? Instant.now() : event.eventTime();
@@ -95,8 +116,15 @@ public class StripeService {
     }
 
     private void assertCheckoutConfigured() {
+        assertStripeConfigured();
         if (apiKey == null || apiKey.isBlank() || priceId == null || priceId.isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Stripe Checkout no configurado");
+        }
+    }
+
+    private void assertStripeConfigured() {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Stripe no configurado");
         }
     }
 }

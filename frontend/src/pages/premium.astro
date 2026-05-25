@@ -117,6 +117,13 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
         >
           Ir a checkout
         </button>
+        <button
+          type="button"
+          class="w-full rounded-md border border-surface-2 px-4 py-2.5 text-sm font-semibold text-fg-secondary transition-colors hover:border-warning hover:text-warning"
+          data-premium-portal-button
+        >
+          Gestionar suscripci&oacute;n
+        </button>
         <p class="min-h-5 text-sm text-fg-muted" data-premium-status></p>
       </form>
 
@@ -131,6 +138,7 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
     const apiUrl = root?.getAttribute('data-api-url') ?? '';
     const stripeKey = root?.getAttribute('data-stripe-key') ?? '';
     const form = document.querySelector('[data-premium-checkout-form]');
+    const portalButton = document.querySelector('[data-premium-portal-button]');
     const status = document.querySelector('[data-premium-status]');
 
     const setStatus = (message, tone = 'muted') => {
@@ -148,7 +156,33 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
       setStatus('Premium activo en este navegador.', 'success');
     } else if (params.get('canceled') === '1') {
       setStatus('Checkout cancelado. No se ha cambiado tu plan.');
+    } else if (params.get('manage') === '1') {
+      setStatus('Introduce tu email para abrir el portal de cliente.');
+    } else if (params.get('portal') === '1') {
+      setStatus('Portal de cliente cerrado.');
     }
+
+    const currentEmail = () => {
+      if (!(form instanceof HTMLFormElement)) return '';
+      const data = new FormData(form);
+      return String(data.get('email') ?? '').trim();
+    };
+
+    const redirectToPremiumUrl = async (path, email) => {
+      const response = await fetch(`${apiUrl}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) return false;
+
+      const body = await response.json();
+      if (!body.url) return false;
+
+      window.location.href = body.url;
+      return true;
+    };
 
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -163,8 +197,7 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
         return;
       }
 
-      const data = new FormData(form);
-      const email = String(data.get('email') ?? '').trim();
+      const email = currentEmail();
       if (!email) {
         setStatus('Introduce un email.', 'danger');
         return;
@@ -175,24 +208,27 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
       } catch (error) {}
 
       setStatus('Creando checkout...');
-      const response = await fetch(`${apiUrl}/api/premium/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
+      if (!(await redirectToPremiumUrl('/api/premium/checkout', email))) {
         setStatus('No se pudo crear el checkout.', 'danger');
+      }
+    });
+
+    portalButton?.addEventListener('click', async () => {
+      if (!apiUrl) {
+        setStatus('API no configurada.', 'danger');
         return;
       }
 
-      const body = await response.json();
-      if (!body.url) {
-        setStatus('Checkout sin URL de Stripe.', 'danger');
+      const email = currentEmail();
+      if (!email) {
+        setStatus('Introduce un email.', 'danger');
         return;
       }
 
-      window.location.href = body.url;
+      setStatus('Abriendo portal de cliente...');
+      if (!(await redirectToPremiumUrl('/api/premium/portal', email))) {
+        setStatus('No se pudo abrir el portal para ese email.', 'danger');
+      }
     });
   </script>
 </BaseLayout>

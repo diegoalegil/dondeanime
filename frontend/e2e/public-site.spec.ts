@@ -308,7 +308,7 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   expect(rssText).toContain('https://dondeanime.com/blog/placeholder-lista-editorial');
 });
 
-test('premium page creates Stripe checkout in test mode and stores premium state', async ({ page }) => {
+test('premium page creates Stripe checkout and customer portal sessions in test mode', async ({ page }) => {
   await page.route('**/api/premium/checkout', async (route) => {
     const corsHeaders = {
       'access-control-allow-origin': '*',
@@ -331,6 +331,28 @@ test('premium page creates Stripe checkout in test mode and stores premium state
       body: JSON.stringify({ url: '/premium?success=1' }),
     });
   });
+  await page.route('**/api/premium/portal', async (route) => {
+    const corsHeaders = {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'POST, OPTIONS',
+      'access-control-allow-headers': 'content-type',
+    };
+
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
+
+    const payload = route.request().postDataJSON();
+    expect(payload).toEqual({ email: 'premium@dondeanime.test' });
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: corsHeaders,
+      body: JSON.stringify({ url: '/premium?portal=1' }),
+    });
+  });
 
   await page.goto('/premium');
 
@@ -346,6 +368,11 @@ test('premium page creates Stripe checkout in test mode and stores premium state
   await page.waitForURL('**/premium?success=1');
   await expect(page.locator('[data-premium-status]')).toContainText('Premium activo');
   expect(await page.evaluate(() => localStorage.getItem('dondeanime-premium'))).toBe('true');
+
+  await page.getByLabel('Email').fill('premium@dondeanime.test');
+  await page.getByRole('button', { name: 'Gestionar suscripción' }).click();
+  await page.waitForURL('**/premium?portal=1');
+  await expect(page.locator('[data-premium-status]')).toContainText('Portal de cliente cerrado');
 });
 
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
