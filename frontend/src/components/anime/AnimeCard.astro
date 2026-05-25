@@ -1,11 +1,13 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
+import AnimePicture from './AnimePicture.astro';
 
 interface Props {
   anime: AnimeSummary;
+  priority?: boolean;
 }
 
-const { anime } = Astro.props;
+const { anime, priority = false } = Astro.props;
 const title = anime.titleEnglish || anime.titleRomaji;
 const score = anime.averageScore;
 
@@ -19,11 +21,15 @@ if (score !== null) {
 <article class="group">
   <a href={`/anime/${anime.slug}`} class="block">
     <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
-      <img
+      <AnimePicture
         src={anime.coverImage}
         alt={title}
-        loading="lazy"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        width={320}
+        height={480}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : undefined}
+        class="block h-full w-full"
+        imgClass="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
       />
       {score !== null && (
         <span class={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-semibold backdrop-blur-md ${scoreClass}`}>
