@@ -48,6 +48,7 @@ export interface AnimeDetail {
     slug: string;
     titleEnglish: string;
     titleRomaji: string;
+    trailerYoutubeId?: string | null;
     description: string | null;
     descriptionTranslationPending: boolean;
     format: string;

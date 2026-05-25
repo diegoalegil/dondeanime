@@ -103,8 +103,8 @@ DondeAnime/
         │   │   ├── ProviderDto.java           # DTO público
         │   │   └── ProviderSummaryDto.java    # DTO agregado con count
         │   └── anime/
-        │       ├── Anime.java                 # entidad JPA (22 campos: +genres, season, seasonYear)
-        │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers
+        │       ├── Anime.java                 # entidad JPA (23 campos: +genres, season, seasonYear, trailerYoutubeId)
+        │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers, /sync-trailers
         │       ├── AnimeRepository.java       # + findByProviderSlugAndCountry, findByGenreSlug, etc.
         │       ├── AnimeSyncService.java
         │       ├── AnimeMatchingService.java
@@ -480,6 +480,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100, máximo 500) |
 | POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |
 | POST | `/api/anime/sync-providers` | Refresca la tabla `watch_provider` desde TMDb |
+| POST | `/api/anime/sync-trailers` | Refresca el primer trailer YouTube desde TMDb |
 | GET | `/api/providers` | Lista global de plataformas con count (`ProviderSummaryDto[]`) |
 | GET | `/api/providers?country=ES` | Mismo, filtrado por país |
 | GET | `/api/providers/{slug}/{country}` | Anime disponibles en esa plataforma en ese país |

@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeHero from '@/components/anime/AnimeHero.astro';
 import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
+import TrailerEmbed from '@/components/anime/TrailerEmbed.astro';
 import MetaList from '@/components/anime/MetaList.astro';
 import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
 import AdSlot from '@/components/ads/AdSlot.astro';
@@ -57,6 +58,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   />
   <AnimeHero anime={detail.anime} />
   <ProvidersByCountry providersByCountry={detail.watchProvidersByCountry} animeSlug={slug!} />
+  <TrailerEmbed youtubeId={detail.anime.trailerYoutubeId} title={title} />
   <AdSlot position="inline" />
   <AnimeSynopsis
     description={detail.anime.description}

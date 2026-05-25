@@ -34,6 +34,7 @@ public class AnimeController {
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
     private final AnimeDescriptionEnricher descriptionEnricher;
+    private final TrailerSyncService trailerSyncService;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -44,6 +45,7 @@ public class AnimeController {
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
             AnimeDescriptionEnricher descriptionEnricher,
+            TrailerSyncService trailerSyncService,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService) {
@@ -52,6 +54,7 @@ public class AnimeController {
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
         this.descriptionEnricher = descriptionEnricher;
+        this.trailerSyncService = trailerSyncService;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -64,11 +67,6 @@ public class AnimeController {
                 .toList();
     }
 
-    /**
-     * Próximos estrenos con fecha completa, ordenados por startDate asc.
-     * Solo incluye anime con año, mes y día: si AniList devuelve fecha
-     * parcial no podemos prometer "próxima semana" con precisión.
-     */
     @GetMapping("/upcoming")
     public ResponseEntity<List<UpcomingAnimeDto>> upcoming(@RequestParam(defaultValue = "7") int days) {
         if (days < 1 || days > 365) {
@@ -94,10 +92,6 @@ public class AnimeController {
         return ResponseEntity.ok(upcoming);
     }
 
-    /**
-     * Detalle de un anime + sus watch providers agrupados por país.
-     * 404 si el slug no existe.
-     */
     @GetMapping("/{slug}")
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
         return repository.findBySlugWithStudios(slug)
@@ -116,12 +110,6 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Dispara el sync de AniList. Manual durante desarrollo; el scheduler
-     * lo ejecuta cada 12h en producción.
-     *
-     * Ejemplo: POST /api/anime/sync?count=500
-     */
     @PostMapping("/sync")
     public Map<String, Integer> sync(@RequestParam(defaultValue = "100") int count) {
         if (count < 1 || count > AnimeSyncService.MAX_POPULAR_SYNC_COUNT) {
@@ -133,10 +121,6 @@ public class AnimeController {
         return Map.of("synced", synced);
     }
 
-    /**
-     * Cruza cada anime con su id de TMDb. Skip si ya está matcheado.
-     * Tarda ~30s para 100 anime, ~2.5min para 500 (300ms entre requests).
-     */
     @PostMapping("/match")
     public Map<String, Integer> match() {
         int matched = matchingService.matchAll();
@@ -144,13 +128,15 @@ public class AnimeController {
         return Map.of("matched", matched, "descriptionsEnriched", descriptionsEnriched);
     }
 
-    /**
-     * Sincroniza watch providers desde TMDb para cada anime con tmdbId.
-     * Tarda ~30s para 100 anime, ~2.5min para 500.
-     */
     @PostMapping("/sync-providers")
     public Map<String, Integer> syncProviders() {
         int processed = providerSyncService.syncAll();
+        return Map.of("processed", processed);
+    }
+
+    @PostMapping("/sync-trailers")
+    public Map<String, Integer> syncTrailers() {
+        int processed = trailerSyncService.syncAll();
         return Map.of("processed", processed);
     }
 
