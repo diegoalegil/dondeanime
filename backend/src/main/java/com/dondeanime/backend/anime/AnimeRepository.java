@@ -3,6 +3,7 @@ package com.dondeanime.backend.anime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,6 +12,10 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     Optional<Anime> findByAnilistId(Long anilistId);
 
     Optional<Anime> findBySlug(String slug);
+
+    @EntityGraph(attributePaths = {"genres", "studios"})
+    @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
+    Optional<Anime> findBySlugWithStudios(String slug);
 
     /**
      * Anime disponibles en una plataforma concreta en un país concreto.
@@ -43,6 +48,17 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
     List<Anime> findByGenreSlug(String genreSlug);
+
+    /**
+     * Anime producidos por un estudio concreto.
+     */
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            JOIN a.studios s
+            WHERE s.slug = :studioSlug
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByStudioSlug(String studioSlug);
 
     /**
      * Anime de una temporada concreta (ej. WINTER 2024).
