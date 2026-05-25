@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class ApiKeyService {
     private final ApiKeyRepository repository;
     private final Clock clock;
 
+    @Autowired
     public ApiKeyService(ApiKeyRepository repository) {
         this(repository, Clock.systemUTC());
     }
