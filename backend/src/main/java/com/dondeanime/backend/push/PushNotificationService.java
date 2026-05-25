@@ -1,5 +1,6 @@
 package com.dondeanime.backend.push;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.provider.WatchProvider;
+import com.dondeanime.backend.premium.SubscriberService;
 import com.dondeanime.backend.subscription.CountryCatalog;
 import com.dondeanime.backend.subscription.SubscriptionRepository;
 
@@ -29,6 +31,7 @@ public class PushNotificationService {
     private final PushSubscriptionRepository pushSubscriptionRepository;
     private final PushSubscriptionCleanupService cleanupService;
     private final WebPushService webPushService;
+    private final SubscriberService subscriberService;
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -36,12 +39,14 @@ public class PushNotificationService {
             SubscriptionRepository subscriptionRepository,
             PushSubscriptionRepository pushSubscriptionRepository,
             PushSubscriptionCleanupService cleanupService,
-            WebPushService webPushService) {
+            WebPushService webPushService,
+            SubscriberService subscriberService) {
         this(
                 subscriptionRepository,
                 pushSubscriptionRepository,
                 cleanupService,
                 webPushService,
+                subscriberService,
                 new ObjectMapper());
     }
 
@@ -50,11 +55,13 @@ public class PushNotificationService {
             PushSubscriptionRepository pushSubscriptionRepository,
             PushSubscriptionCleanupService cleanupService,
             WebPushService webPushService,
+            SubscriberService subscriberService,
             ObjectMapper objectMapper) {
         this.subscriptionRepository = subscriptionRepository;
         this.pushSubscriptionRepository = pushSubscriptionRepository;
         this.cleanupService = cleanupService;
         this.webPushService = webPushService;
+        this.subscriberService = subscriberService;
         this.objectMapper = objectMapper;
     }
 
@@ -71,11 +78,13 @@ public class PushNotificationService {
             return 0;
         }
 
-        List<PushSubscription> pushSubscriptions = pushSubscriptionRepository
-                .findByCountryIsoAndUserEmailInOrderByCreatedAtAsc(normalizedCountry, pendingEmails);
+        List<PushSubscription> pushSubscriptions = new ArrayList<>(pushSubscriptionRepository
+                .findByCountryIsoAndUserEmailInOrderByCreatedAtAsc(normalizedCountry, pendingEmails));
         if (pushSubscriptions.isEmpty()) {
             return 0;
         }
+        Set<String> premiumEmails = subscriberService.findActivePremiumEmails(pendingEmails);
+        pushSubscriptions.sort(priorityComparator(premiumEmails));
 
         String payload = payloadFor(anime, normalizedCountry, providers);
         int sent = 0;
@@ -103,6 +112,20 @@ public class PushNotificationService {
 
     private boolean recordDelivery(PushSubscription subscription, int status) {
         return cleanupService.recordDeliveryResult(subscription, status);
+    }
+
+    private static Comparator<PushSubscription> priorityComparator(Set<String> premiumEmails) {
+        Set<String> safePremiumEmails = premiumEmails == null ? Set.of() : premiumEmails;
+        return Comparator
+                .comparing((PushSubscription subscription) ->
+                        !safePremiumEmails.contains(normalizeEmail(subscription.getUserEmail())))
+                .thenComparing(
+                        PushSubscription::getCreatedAt,
+                        Comparator.nullsLast(Comparator.naturalOrder()));
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }
 
     private String payloadFor(Anime anime, String countryCode, List<WatchProvider> providers) {

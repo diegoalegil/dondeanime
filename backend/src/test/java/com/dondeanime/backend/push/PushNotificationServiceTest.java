@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -15,11 +16,14 @@ import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import com.dondeanime.backend.anime.Anime;
+import com.dondeanime.backend.premium.SubscriberService;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.subscription.AppUser;
 import com.dondeanime.backend.subscription.Subscription;
@@ -35,11 +39,13 @@ class PushNotificationServiceTest {
             pushSubscriptionRepository,
             Clock.fixed(NOW, ZoneOffset.UTC));
     private final WebPushService webPushService = mock(WebPushService.class);
+    private final SubscriberService subscriberService = mock(SubscriberService.class);
     private final PushNotificationService service = new PushNotificationService(
             subscriptionRepository,
             pushSubscriptionRepository,
             cleanupService,
-            webPushService);
+            webPushService,
+            subscriberService);
 
     @Test
     void sendsPushOnlyToPendingAlertEmailsInCountry() {
@@ -51,6 +57,7 @@ class PushNotificationServiceTest {
                 eq("ES"),
                 anyCollection()))
                 .thenReturn(List.of(push));
+        when(subscriberService.findActivePremiumEmails(anyCollection())).thenReturn(Set.of());
         when(webPushService.send(eq(push), anyString())).thenReturn(Optional.of(201));
 
         int sent = service.notifyNewProviders(anime, "es", List.of(
@@ -95,6 +102,7 @@ class PushNotificationServiceTest {
                 eq("MX"),
                 anyCollection()))
                 .thenReturn(List.of(accepted, rejected));
+        when(subscriberService.findActivePremiumEmails(anyCollection())).thenReturn(Set.of());
         when(webPushService.send(eq(accepted), anyString())).thenReturn(Optional.of(201));
         when(webPushService.send(eq(rejected), anyString())).thenReturn(Optional.of(500));
 
@@ -112,12 +120,37 @@ class PushNotificationServiceTest {
                 eq("ES"),
                 anyCollection()))
                 .thenReturn(List.of(bounced));
+        when(subscriberService.findActivePremiumEmails(anyCollection())).thenReturn(Set.of());
         when(webPushService.send(eq(bounced), anyString())).thenReturn(Optional.of(410));
 
         int sent = service.notifyNewProviders(anime(), "ES", List.of(provider("Crunchyroll")));
 
         assertThat(sent).isZero();
         verify(pushSubscriptionRepository).delete(bounced);
+    }
+
+    @Test
+    void sendsPremiumPushSubscriptionsBeforeFreeSubscriptions() {
+        PushSubscription free = pushSubscription("free@example.com");
+        free.setCreatedAt(NOW.minusSeconds(120));
+        PushSubscription premium = pushSubscription("premium@example.com");
+        premium.setCreatedAt(NOW);
+        when(subscriptionRepository.findPendingAlerts(1L, "ES"))
+                .thenReturn(List.of(subscription("free@example.com"), subscription("premium@example.com")));
+        when(pushSubscriptionRepository.findByCountryIsoAndUserEmailInOrderByCreatedAtAsc(
+                eq("ES"),
+                anyCollection()))
+                .thenReturn(List.of(free, premium));
+        when(subscriberService.findActivePremiumEmails(anyCollection())).thenReturn(Set.of("premium@example.com"));
+        when(webPushService.send(eq(free), anyString())).thenReturn(Optional.of(201));
+        when(webPushService.send(eq(premium), anyString())).thenReturn(Optional.of(201));
+
+        int sent = service.notifyNewProviders(anime(), "ES", List.of(provider("Crunchyroll")));
+
+        assertThat(sent).isEqualTo(2);
+        InOrder inOrder = inOrder(webPushService);
+        inOrder.verify(webPushService).send(eq(premium), anyString());
+        inOrder.verify(webPushService).send(eq(free), anyString());
     }
 
     private static Anime anime() {

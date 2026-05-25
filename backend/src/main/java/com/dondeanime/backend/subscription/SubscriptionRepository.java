@@ -16,6 +16,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     long countByNotifiedAtAfter(Instant notifiedAt);
 
+    long countByUser_IdAndNotifiedAtIsNull(Long userId);
+
     @Query("""
             SELECT COUNT(s) FROM Subscription s
             JOIN s.user u
