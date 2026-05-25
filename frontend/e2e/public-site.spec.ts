@@ -345,11 +345,14 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   const homeTypes = homeJson.map((schema) => schema['@type']);
   expect(homeTypes).toContain('FAQPage');
   expect(homeTypes).toContain('Organization');
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'es_ES');
+  await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute('content', 'en_US');
 
   const faq = homeJson.find((schema) => schema['@type'] === 'FAQPage');
   expect(faq.mainEntity).toHaveLength(5);
 
   const organization = homeJson.find((schema) => schema['@type'] === 'Organization');
+  expect(organization.availableLanguage).toEqual(['es', 'en']);
   expect(organization.logo.url).toBe('https://dondeanime.com/og-default.png');
   expect(organization.sameAs.length).toBeGreaterThan(0);
 
