@@ -329,7 +329,7 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] `ProviderSyncService` con delete+insert por anime via `TransactionTemplate`
 - [x] Endpoints `POST /api/anime/match`, `POST /api/anime/sync-providers`, `GET /api/anime/{slug}`
 - [x] Probado end-to-end: 84 matches de 100, 949 providers en BD, Attack on Titan en España devuelve Crunchyroll + Netflix + Prime Video (semana 3 cerrada, día 6)
-- [x] Scheduler `@Scheduled` con 3 jobs (sync AniList 12h, match 24h, providers 24h), toggle `scheduling.enabled` para activar/desactivar en local vs prod (semana 4 cerrada, día 7)
+- [x] Scheduler `@Scheduled` con jobs de catálogo (sync AniList 12h, match 24h, providers 24h) y limpieza diaria de push subscriptions, toggle `scheduling.enabled` para activar/desactivar en local vs prod (semana 4 cerrada, día 7; limpieza push añadida en sprint 14)
 - [x] Entidad `Anime` ampliada con `genres` (@ElementCollection → tabla anime_genre), `season` y `seasonYear`. Re-sync rellenó los 100 anime.
 - [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
@@ -444,8 +444,8 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 
 ### Scheduler (semana 4)
 - **`@ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")`** sobre el bean entero. Si la property no está o es `false`, el bean ni se crea: en local nunca dispara syncs accidentales. En producción se activa con `scheduling.enabled=true`.
-- **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron Unix de 5. Defaults espaciados: AniList 3am/3pm, match 4am, providers 5am, para no solapar.
-- **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` permite cambiar el cron en `.env` sin recompilar.
+- **Cron expressions de Spring**: 6 campos (segundo, minuto, hora, día, mes, día semana). Distinto de cron Unix de 5. Defaults espaciados: AniList 3am/3pm, match 4am, providers 5am, limpieza push 2:30am, para no solapar.
+- **Cron override vía properties**: `${dondeanime.cron.sync-anilist:default}` y `${dondeanime.cron.cleanup-push-subscriptions:default}` permiten cambiar crons en `.env` sin recompilar.
 - **Deploy hook tras AniList y providers**: el scheduler dispara `vercel.deploy-hook` al terminar bien `syncAniList` y `syncProviders`, para que las páginas estáticas de estrenos y providers se regeneren con datos frescos.
 - **Try/catch dentro de cada job**: un error en uno NO impide que el siguiente cron del mismo job se ejecute más tarde, ni afecta a los otros jobs.
 

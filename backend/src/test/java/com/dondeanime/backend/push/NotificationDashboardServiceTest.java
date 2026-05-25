@@ -26,10 +26,14 @@ class NotificationDashboardServiceTest {
 
     private final PushSubscriptionRepository pushSubscriptionRepository = mock(PushSubscriptionRepository.class);
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
+    private final PushSubscriptionCleanupService cleanupService = new PushSubscriptionCleanupService(
+            pushSubscriptionRepository,
+            Clock.fixed(NOW, ZoneOffset.UTC));
     private final WebPushService webPushService = mock(WebPushService.class);
     private final NotificationDashboardService service = new NotificationDashboardService(
             pushSubscriptionRepository,
             subscriptionRepository,
+            cleanupService,
             webPushService,
             new ObjectMapper(),
             Clock.fixed(NOW, ZoneOffset.UTC));
@@ -90,6 +94,20 @@ class NotificationDashboardServiceTest {
         assertThat(response.sent()).isFalse();
         assertThat(response.statusCode()).isNull();
         assertThat(subscription.getDeliverySuccessCount()).isNull();
+    }
+
+    @Test
+    void testPushDeletesBouncingSubscription() {
+        PushSubscription subscription = pushSubscription(5L, "diego@example.com", "ES");
+        when(pushSubscriptionRepository.findById(5L)).thenReturn(Optional.of(subscription));
+        when(webPushService.send(eq(subscription), anyString())).thenReturn(Optional.of(404));
+
+        NotificationTestResponse response = service.sendTestPush(5L);
+
+        assertThat(response.sent()).isFalse();
+        assertThat(response.statusCode()).isEqualTo(404);
+        assertThat(response.message()).isEqualTo("Subscription push caducada y eliminada.");
+        verify(pushSubscriptionRepository).delete(subscription);
     }
 
     private static PushSubscription pushSubscription(Long id, String email, String countryIso) {

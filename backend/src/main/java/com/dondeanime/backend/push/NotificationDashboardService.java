@@ -21,6 +21,7 @@ public class NotificationDashboardService {
     private final PushSubscriptionRepository pushSubscriptionRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final WebPushService webPushService;
+    private final PushSubscriptionCleanupService cleanupService;
     private final ObjectMapper objectMapper;
     private final Clock clock;
 
@@ -28,18 +29,27 @@ public class NotificationDashboardService {
     public NotificationDashboardService(
             PushSubscriptionRepository pushSubscriptionRepository,
             SubscriptionRepository subscriptionRepository,
+            PushSubscriptionCleanupService cleanupService,
             WebPushService webPushService) {
-        this(pushSubscriptionRepository, subscriptionRepository, webPushService, new ObjectMapper(), Clock.systemUTC());
+        this(
+                pushSubscriptionRepository,
+                subscriptionRepository,
+                cleanupService,
+                webPushService,
+                new ObjectMapper(),
+                Clock.systemUTC());
     }
 
     NotificationDashboardService(
             PushSubscriptionRepository pushSubscriptionRepository,
             SubscriptionRepository subscriptionRepository,
+            PushSubscriptionCleanupService cleanupService,
             WebPushService webPushService,
             ObjectMapper objectMapper,
             Clock clock) {
         this.pushSubscriptionRepository = pushSubscriptionRepository;
         this.subscriptionRepository = subscriptionRepository;
+        this.cleanupService = cleanupService;
         this.webPushService = webPushService;
         this.objectMapper = objectMapper;
         this.clock = clock;
@@ -79,16 +89,14 @@ public class NotificationDashboardService {
             if (status == null) {
                 return new NotificationTestResponse(false, null, "Web Push no configurado.");
             }
-            subscription.recordDeliveryResult(status, Instant.now(clock));
-            pushSubscriptionRepository.save(subscription);
+            boolean deleted = cleanupService.recordDeliveryResult(subscription, status);
             boolean sent = status >= 200 && status < 300;
             return new NotificationTestResponse(
                     sent,
                     status,
-                    sent ? "Push test enviado." : "Push test rechazado.");
+                    testPushMessage(sent, deleted));
         } catch (Exception e) {
-            subscription.recordDeliveryResult(0, Instant.now(clock));
-            pushSubscriptionRepository.save(subscription);
+            cleanupService.recordDeliveryResult(subscription, 0);
             return new NotificationTestResponse(false, 0, "No se pudo enviar push test.");
         }
     }
@@ -107,5 +115,12 @@ public class NotificationDashboardService {
 
     private static int count(Integer value) {
         return value == null ? 0 : value;
+    }
+
+    private static String testPushMessage(boolean sent, boolean deleted) {
+        if (sent) {
+            return "Push test enviado.";
+        }
+        return deleted ? "Subscription push caducada y eliminada." : "Push test rechazado.";
     }
 }
