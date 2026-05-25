@@ -327,6 +327,47 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```
 
+### Hardening SSH y fail2ban
+
+El hardening queda preparado en repo, pero se aplica manualmente desde el VPS
+despuÃ©s de revisar el PR. No lo ejecuta CI y no se ejecuta desde una sesiÃ³n
+local.
+
+Aplica:
+
+```bash
+ssh deploy@IP_VPS
+cd /opt/dondeanime
+git pull
+sudo bash scripts/vps/setup-hardening.sh
+```
+
+El script hace tres cambios:
+
+- Instala y activa `fail2ban` con jail `sshd`, `maxretry=3`, `findtime=10m` y `bantime=1h`.
+- Ajusta `/etc/ssh/sshd_config`: `PasswordAuthentication no`, `PermitRootLogin no`, `MaxAuthTries 3`, `PubkeyAuthentication yes`.
+- Activa `unattended-upgrades` para parches automÃ¡ticos de seguridad.
+
+Antes de cerrar la sesiÃ³n SSH actual, abre otra terminal y verifica que el
+login como `deploy` sigue funcionando:
+
+```bash
+ssh deploy@IP_VPS
+```
+
+Verifica el estado:
+
+```bash
+cd /opt/dondeanime
+sudo bash scripts/vps/setup-hardening.sh --check
+sudo fail2ban-client status sshd
+sudo sshd -T | grep -E '^(passwordauthentication|permitrootlogin|maxauthtries)'
+systemctl status unattended-upgrades --no-pager
+```
+
+Si `sshd -t` falla, el script no reinicia SSH. Deja backup automÃ¡tico en
+`/etc/ssh/sshd_config.dondeanime.<timestamp>.bak`.
+
 ### Disparar sync manual
 
 ```bash
