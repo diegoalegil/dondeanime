@@ -9,14 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-@DataJpaTest(properties = {
-        "tmdb.api-key=test",
-        "admin.username=admin",
-        "admin.password=secret",
-        "spring.jpa.hibernate.ddl-auto=create-drop",
-        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
-})
-class AnimeOverrideRepositoryTest {
+import com.dondeanime.backend.AbstractIntegrationTest;
+
+@DataJpaTest
+class AnimeOverrideRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private AnimeRepository animeRepository;
