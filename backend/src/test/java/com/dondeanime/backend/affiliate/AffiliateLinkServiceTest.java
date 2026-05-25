@@ -8,20 +8,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+
+import com.dondeanime.backend.provider.WatchProviderRepository;
 
 class AffiliateLinkServiceTest {
 
     private final AffiliateLinkRepository linkRepository = org.mockito.Mockito.mock(AffiliateLinkRepository.class);
     private final AffiliateClickEventRepository clickEventRepository = org.mockito.Mockito.mock(AffiliateClickEventRepository.class);
     private final PlausibleStatsClient plausibleStatsClient = org.mockito.Mockito.mock(PlausibleStatsClient.class);
+    private final WatchProviderRepository watchProviderRepository = org.mockito.Mockito.mock(WatchProviderRepository.class);
 
     private final AffiliateLinkService service = new AffiliateLinkService(
             linkRepository,
             clickEventRepository,
-            plausibleStatsClient);
+            plausibleStatsClient,
+            watchProviderRepository);
 
     @Test
     void saveLinkNormalizesProviderAndCountry() {
@@ -76,6 +81,41 @@ class AffiliateLinkServiceTest {
         verify(clickEventRepository, never()).save(any());
     }
 
+    @Test
+    void bulkImportValidatesProviderCountryAndSavesRows() {
+        when(watchProviderRepository.aggregateProviderCountries())
+                .thenReturn(List.of(providerCountry("Crunchyroll", "ES")));
+        when(linkRepository.findByProviderSlugAndCountryCode("crunchyroll", "ES"))
+                .thenReturn(Optional.empty());
+        when(linkRepository.save(any(AffiliateLink.class))).thenAnswer(invocation -> {
+            AffiliateLink link = invocation.getArgument(0);
+            link.setId(1L);
+            return link;
+        });
+
+        AffiliateBulkImportResult result = service.bulkImport("""
+                provider_slug,country_code,url,active
+                crunchyroll,ES,https://example.com/cr,true
+                """);
+
+        assertThat(result.imported()).isEqualTo(1);
+        assertThat(result.links().getFirst().providerSlug()).isEqualTo("crunchyroll");
+    }
+
+    @Test
+    void bulkImportRejectsUnknownProviderCountry() {
+        when(watchProviderRepository.aggregateProviderCountries())
+                .thenReturn(List.of(providerCountry("Netflix", "ES")));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.bulkImport("""
+                provider_slug,country_code,url,active
+                crunchyroll,ES,https://example.com/cr,true
+                """))
+                .isInstanceOf(AffiliateBulkImportException.class)
+                .extracting(exception -> ((AffiliateBulkImportException) exception).getErrors().getFirst().message())
+                .isEqualTo("provider_slug+country_code no existe en catálogo");
+    }
+
     private static AffiliateLink link() {
         AffiliateLink link = new AffiliateLink();
         link.setId(10L);
@@ -87,5 +127,19 @@ class AffiliateLinkServiceTest {
         link.setCreatedAt(Instant.now());
         link.setUpdatedAt(Instant.now());
         return link;
+    }
+
+    private static WatchProviderRepository.ProviderCountryAggregation providerCountry(String providerName, String countryCode) {
+        return new WatchProviderRepository.ProviderCountryAggregation() {
+            @Override
+            public String getProviderName() {
+                return providerName;
+            }
+
+            @Override
+            public String getCountryCode() {
+                return countryCode;
+            }
+        };
     }
 }
