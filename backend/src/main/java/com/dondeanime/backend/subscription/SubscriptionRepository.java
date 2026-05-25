@@ -14,6 +14,18 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
             String countryCode);
 
     @Query("""
+            SELECT COUNT(s) FROM Subscription s
+            JOIN s.user u
+            JOIN s.anime a
+            WHERE a.id = :animeId
+              AND s.countryCode = :countryCode
+              AND s.notifiedAt IS NULL
+              AND u.confirmedAt IS NOT NULL
+              AND u.unsubscribedAt IS NULL
+            """)
+    long countPendingAlerts(Long animeId, String countryCode);
+
+    @Query("""
             SELECT s FROM Subscription s
             JOIN FETCH s.user u
             JOIN FETCH s.anime a
