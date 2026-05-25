@@ -3,7 +3,6 @@ package com.dondeanime.backend.anime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
-import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
@@ -48,18 +46,6 @@ class AnimeControllerTest {
 
     @MockitoBean
     private AnimeRepository animeRepository;
-
-    @MockitoBean
-    private AnimeSyncService syncService;
-
-    @MockitoBean
-    private AnimeMatchingService matchingService;
-
-    @MockitoBean
-    private ProviderSyncService providerSyncService;
-
-    @MockitoBean
-    private AnimeDescriptionEnricher descriptionEnricher;
 
     @MockitoBean
     private WatchProviderRepository providerRepository;
@@ -144,17 +130,6 @@ class AnimeControllerTest {
 
         mvc.perform(get("/api/v1/anime/inexistente"))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void matchAlsoEnrichesSpanishDescriptions() throws Exception {
-        when(matchingService.matchAll()).thenReturn(3);
-        when(descriptionEnricher.enrichMissingSpanishDescriptions()).thenReturn(2);
-
-        mvc.perform(post("/api/v1/anime/match"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.matched").value(3))
-                .andExpect(jsonPath("$.descriptionsEnriched").value(2));
     }
 
     private static Anime makeAnime(String slug, String titleEnglish) {
