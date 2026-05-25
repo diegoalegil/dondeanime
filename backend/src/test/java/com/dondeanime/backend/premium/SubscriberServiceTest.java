@@ -2,6 +2,7 @@ package com.dondeanime.backend.premium;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -11,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class SubscriberServiceTest {
 
@@ -49,6 +51,48 @@ class SubscriberServiceTest {
         assertThat(service.isPremium(" ")).isFalse();
 
         verifyNoInteractions(subscriberRepository);
+    }
+
+    @Test
+    void upsertPremiumCreatesNormalizedSubscriber() {
+        when(subscriberRepository.findByStripeCustomerId("cus_test_123")).thenReturn(Optional.empty());
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.empty());
+
+        service.upsertPremium(
+                " Diego@Example.com ",
+                "cus_test_123",
+                "premium",
+                NOW,
+                NOW.plusSeconds(2_592_000),
+                NOW);
+
+        ArgumentCaptor<Subscriber> captor = ArgumentCaptor.forClass(Subscriber.class);
+        verify(subscriberRepository).save(captor.capture());
+        assertThat(captor.getValue().getEmail()).isEqualTo("diego@example.com");
+        assertThat(captor.getValue().getStripeCustomerId()).isEqualTo("cus_test_123");
+        assertThat(captor.getValue().getPlanTier()).isEqualTo("PREMIUM");
+    }
+
+    @Test
+    void cancelByStripeCustomerIdSetsExpiry() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        when(subscriberRepository.findByStripeCustomerId("cus_test_123")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.cancelByStripeCustomerId("cus_test_123", NOW)).isTrue();
+
+        assertThat(subscriber.getExpiresAt()).isEqualTo(NOW);
+        verify(subscriberRepository).save(subscriber);
+    }
+
+    @Test
+    void recordPaymentSucceededUpdatesLastPayment() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), null);
+        when(subscriberRepository.findByStripeCustomerId("cus_test_123")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.recordPaymentSucceeded(null, "cus_test_123", NOW)).isTrue();
+
+        assertThat(subscriber.getLastPaymentAt()).isEqualTo(NOW);
+        verify(subscriberRepository).save(subscriber);
     }
 
     private static Subscriber subscriber(Instant subscribedAt, Instant expiresAt) {
