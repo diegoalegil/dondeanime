@@ -1,7 +1,5 @@
 package com.dondeanime.backend.push;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,29 +27,35 @@ public class PushNotificationService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final PushSubscriptionRepository pushSubscriptionRepository;
+    private final PushSubscriptionCleanupService cleanupService;
     private final WebPushService webPushService;
     private final ObjectMapper objectMapper;
-    private final Clock clock;
 
     @Autowired
     public PushNotificationService(
             SubscriptionRepository subscriptionRepository,
             PushSubscriptionRepository pushSubscriptionRepository,
+            PushSubscriptionCleanupService cleanupService,
             WebPushService webPushService) {
-        this(subscriptionRepository, pushSubscriptionRepository, webPushService, new ObjectMapper(), Clock.systemUTC());
+        this(
+                subscriptionRepository,
+                pushSubscriptionRepository,
+                cleanupService,
+                webPushService,
+                new ObjectMapper());
     }
 
     PushNotificationService(
             SubscriptionRepository subscriptionRepository,
             PushSubscriptionRepository pushSubscriptionRepository,
+            PushSubscriptionCleanupService cleanupService,
             WebPushService webPushService,
-            ObjectMapper objectMapper,
-            Clock clock) {
+            ObjectMapper objectMapper) {
         this.subscriptionRepository = subscriptionRepository;
         this.pushSubscriptionRepository = pushSubscriptionRepository;
+        this.cleanupService = cleanupService;
         this.webPushService = webPushService;
         this.objectMapper = objectMapper;
-        this.clock = clock;
     }
 
     public int notifyNewProviders(Anime anime, String countryCode, List<WatchProvider> providers) {
@@ -82,8 +86,12 @@ public class PushNotificationService {
                     recordDelivery(subscription, status);
                     sent++;
                 } else if (status > 0) {
-                    recordDelivery(subscription, status);
-                    log.warn("Push no aceptado endpoint={} status={}", subscription.getEndpoint(), status);
+                    boolean deleted = recordDelivery(subscription, status);
+                    if (deleted) {
+                        log.warn("Push subscription eliminada endpoint={} status={}", subscription.getEndpoint(), status);
+                    } else {
+                        log.warn("Push no aceptado endpoint={} status={}", subscription.getEndpoint(), status);
+                    }
                 }
             } catch (Exception e) {
                 recordDelivery(subscription, 0);
@@ -93,9 +101,8 @@ public class PushNotificationService {
         return sent;
     }
 
-    private void recordDelivery(PushSubscription subscription, int status) {
-        subscription.recordDeliveryResult(status, Instant.now(clock));
-        pushSubscriptionRepository.save(subscription);
+    private boolean recordDelivery(PushSubscription subscription, int status) {
+        return cleanupService.recordDeliveryResult(subscription, status);
     }
 
     private String payloadFor(Anime anime, String countryCode, List<WatchProvider> providers) {
