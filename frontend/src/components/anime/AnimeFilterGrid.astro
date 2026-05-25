@@ -1,0 +1,178 @@
+---
+import type { AnimeSummary } from '@/lib/api';
+import AnimeCard from './AnimeCard.astro';
+
+interface Props {
+  anime: AnimeSummary[];
+  emptyText?: string;
+}
+
+const { anime, emptyText = 'No hay anime con esos filtros.' } = Astro.props;
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const genres = [...new Map(
+  anime
+    .flatMap((item) => item.genres)
+    .map((genre) => [slugify(genre), genre] as const),
+).entries()]
+  .sort((a, b) => a[1].localeCompare(b[1], 'es'));
+
+const years = [...new Set(
+  anime
+    .map((item) => item.year)
+    .filter((year): year is number => year !== null),
+)].sort((a, b) => b - a);
+---
+<div data-filter-root>
+  <div class="mb-5 grid gap-3 rounded-lg border border-surface-2 bg-surface-1 p-4 md:grid-cols-[1fr_1fr_1fr_auto]">
+    <label class="block text-sm font-medium text-fg-secondary">
+      Género
+      <select
+        class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
+        name="genero"
+        data-filter-genre
+      >
+        <option value="">Todos</option>
+        {genres.map(([slug, label]) => <option value={slug}>{label}</option>)}
+      </select>
+    </label>
+
+    <label class="block text-sm font-medium text-fg-secondary">
+      Año
+      <select
+        class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
+        name="year"
+        data-filter-year
+      >
+        <option value="">Todos</option>
+        {years.map((year) => <option value={String(year)}>{year}</option>)}
+      </select>
+    </label>
+
+    <label class="block text-sm font-medium text-fg-secondary">
+      Score mínimo
+      <select
+        class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
+        name="score"
+        data-filter-score
+      >
+        <option value="">Cualquiera</option>
+        <option value="60">60+</option>
+        <option value="70">70+</option>
+        <option value="80">80+</option>
+      </select>
+    </label>
+
+    <a
+      href={Astro.url.pathname}
+      class="flex h-10 items-center justify-center self-end rounded-md border border-surface-2 px-4 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-violet/40 hover:text-fg-primary"
+      data-filter-reset
+    >
+      Limpiar
+    </a>
+  </div>
+
+  <p class="mb-5 text-sm text-fg-muted" data-filter-count>
+    {anime.length} resultado{anime.length === 1 ? '' : 's'}
+  </p>
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
+    {anime.map((item) => (
+      <div
+        data-filter-card
+        data-genres={item.genres.map(slugify).join(' ')}
+        data-year={item.year ?? ''}
+        data-score={item.averageScore ?? ''}
+      >
+        <AnimeCard anime={item} />
+      </div>
+    ))}
+  </div>
+
+  <p class="mt-6 hidden rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary" data-filter-empty>
+    {emptyText}
+  </p>
+</div>
+
+<script>
+  const FILTER_KEYS = ['genero', 'year', 'score'];
+
+  const syncRobotsMeta = () => {
+    const params = new URLSearchParams(window.location.search);
+    const active = FILTER_KEYS.filter((key) => params.get(key)).length;
+    const existing = document.querySelector('meta[name="robots"][data-filter-robots]');
+
+    if (active >= 2) {
+      const meta = existing ?? document.createElement('meta');
+      meta.setAttribute('name', 'robots');
+      meta.setAttribute('content', 'noindex');
+      meta.setAttribute('data-filter-robots', 'true');
+      if (!existing) document.head.append(meta);
+      return;
+    }
+
+    existing?.remove();
+  };
+
+  const visibleCount = (root: HTMLElement) =>
+    root.querySelectorAll('[data-filter-card]:not(.hidden)').length;
+
+  const applyFilters = (root: HTMLElement) => {
+    const genre = (root.querySelector('[data-filter-genre]') as HTMLSelectElement | null)?.value ?? '';
+    const year = (root.querySelector('[data-filter-year]') as HTMLSelectElement | null)?.value ?? '';
+    const score = Number((root.querySelector('[data-filter-score]') as HTMLSelectElement | null)?.value ?? 0);
+
+    for (const card of root.querySelectorAll('[data-filter-card]') as NodeListOf<HTMLElement>) {
+      const genres = (card.dataset.genres ?? '').split(' ').filter(Boolean);
+      const matchesGenre = !genre || genres.includes(genre);
+      const matchesYear = !year || card.dataset.year === year;
+      const cardScore = Number(card.dataset.score || 0);
+      const matchesScore = !score || cardScore >= score;
+      card.classList.toggle('hidden', !(matchesGenre && matchesYear && matchesScore));
+    }
+
+    const count = root.querySelector('[data-filter-count]');
+    const total = visibleCount(root);
+    if (count) count.textContent = `${total} resultado${total === 1 ? '' : 's'}`;
+
+    const empty = root.querySelector('[data-filter-empty]');
+    empty?.classList.toggle('hidden', total !== 0);
+    syncRobotsMeta();
+  };
+
+  const updateUrl = (root: HTMLElement) => {
+    const params = new URLSearchParams(window.location.search);
+
+    for (const key of FILTER_KEYS) {
+      const select = root.querySelector(`[name="${key}"]`) as HTMLSelectElement | null;
+      const value = select?.value ?? '';
+      if (value) params.set(key, value);
+      else params.delete(key);
+    }
+
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+  };
+
+  for (const root of document.querySelectorAll('[data-filter-root]') as NodeListOf<HTMLElement>) {
+    const params = new URLSearchParams(window.location.search);
+
+    for (const key of FILTER_KEYS) {
+      const select = root.querySelector(`[name="${key}"]`) as HTMLSelectElement | null;
+      if (select) select.value = params.get(key) ?? '';
+      select?.addEventListener('change', () => {
+        updateUrl(root);
+        applyFilters(root);
+      });
+    }
+
+    applyFilters(root);
+  }
+</script>

@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import AnimeFilterGrid from '@/components/anime/AnimeFilterGrid.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { getProvidersByCountry } from '@/lib/api';
+import FilterRobotsNoindex from '@/components/seo/FilterRobotsNoindex.astro';
+import { getAnimeByProvider, getProvidersByCountry } from '@/lib/api';
+import type { AnimeSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
@@ -17,6 +20,21 @@ const country = COUNTRIES[countrySlug];
 
 const rawProviders = await getProvidersByCountry(country.iso);
 const providers = rawProviders.filter((p) => !isHiddenVariant(p.slug));
+const animeBySlug = new Map<string, AnimeSummary>();
+
+for (const provider of providers) {
+  const providerAnime = await getAnimeByProvider(provider.slug, country.iso);
+  for (const item of providerAnime) {
+    animeBySlug.set(item.slug, item);
+  }
+}
+
+const anime = [...animeBySlug.values()].sort((a, b) => {
+  const popularityA = a.popularity ?? 0;
+  const popularityB = b.popularity ?? 0;
+  if (popularityA !== popularityB) return popularityB - popularityA;
+  return (a.titleEnglish || a.titleRomaji).localeCompare(b.titleEnglish || b.titleRomaji, 'es');
+});
 
 const seoTitle = `Anime en streaming en ${country.name} — Plataformas disponibles | DondeAnime`;
 const seoDescription = `Descubre todas las plataformas de streaming con anime en ${country.name}: ${providers.slice(0, 5).map((p) => p.providerName).join(', ')} y más.`;
@@ -37,6 +55,7 @@ const itemListSchema = buildItemListSchema(
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={itemListSchema} />
+  <FilterRobotsNoindex slot="head" />
 
   <Breadcrumbs
     items={[
@@ -87,5 +106,16 @@ const itemListSchema = buildItemListSchema(
         );
       })}
     </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <h2 class="mb-6 text-2xl font-semibold">Anime disponibles en {country.name}</h2>
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No tenemos anime catalogados en {country.name} ahora mismo.
+      </p>
+    ) : (
+      <AnimeFilterGrid anime={anime} emptyText={`No hay anime en ${country.name} con esos filtros.`} />
+    )}
   </section>
 </BaseLayout>
