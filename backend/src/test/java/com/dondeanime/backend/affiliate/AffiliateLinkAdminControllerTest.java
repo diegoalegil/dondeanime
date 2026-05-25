@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -140,6 +141,28 @@ class AffiliateLinkAdminControllerTest {
     void dashboardRequiresAuth() throws Exception {
         mvc.perform(get("/api/admin/dashboard"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void dashboardWithCredentialsReturnsExtendedMetrics() throws Exception {
+        when(affiliateLinkService.dashboard()).thenReturn(new AffiliateDashboardDto(
+                3L,
+                9L,
+                List.of(new AffiliateAnimeClicksDto("frieren", 4L)),
+                List.of(dto()),
+                List.of(new PlausiblePageMetricDto("/anime/frieren", 20L)),
+                List.of(new AffiliateDailyClicksDto(LocalDate.of(2026, 5, 25), 2L)),
+                List.of(new AffiliatePlatformConversionDto("crunchyroll", 4L, 100L, 0.04)),
+                List.of(new AffiliateCountryClicksDto("ES", 5L)),
+                List.of(new AvailabilityAnimeChangesDto("frieren", 2L))));
+
+        mvc.perform(get("/api/admin/dashboard")
+                        .header("Authorization", bearerToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clicksByDay[0].clicks").value(2))
+                .andExpect(jsonPath("$.platformConversions[0].conversionRate").value(0.04))
+                .andExpect(jsonPath("$.topClickCountries[0].countryCode").value("ES"))
+                .andExpect(jsonPath("$.topAvailabilityChanges[0].changes").value(2));
     }
 
     private static AffiliateLinkDto dto() {

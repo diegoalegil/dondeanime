@@ -7,5 +7,9 @@ public record AffiliateDashboardDto(
         Long clicksLast30Days,
         List<AffiliateAnimeClicksDto> topAffiliateAnime,
         List<AffiliateLinkDto> topAffiliateLinks,
-        List<PlausiblePageMetricDto> topVisitedAnime
+        List<PlausiblePageMetricDto> topVisitedAnime,
+        List<AffiliateDailyClicksDto> clicksByDay,
+        List<AffiliatePlatformConversionDto> platformConversions,
+        List<AffiliateCountryClicksDto> topClickCountries,
+        List<AvailabilityAnimeChangesDto> topAvailabilityChanges
 ) {}

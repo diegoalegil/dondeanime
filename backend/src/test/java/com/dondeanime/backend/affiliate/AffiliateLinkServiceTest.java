@@ -7,12 +7,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
 class AffiliateLinkServiceTest {
@@ -21,12 +25,17 @@ class AffiliateLinkServiceTest {
     private final AffiliateClickEventRepository clickEventRepository = org.mockito.Mockito.mock(AffiliateClickEventRepository.class);
     private final PlausibleStatsClient plausibleStatsClient = org.mockito.Mockito.mock(PlausibleStatsClient.class);
     private final WatchProviderRepository watchProviderRepository = org.mockito.Mockito.mock(WatchProviderRepository.class);
+    private final AvailabilityChangeEventRepository availabilityChangeEventRepository =
+            org.mockito.Mockito.mock(AvailabilityChangeEventRepository.class);
+    private final Clock clock = Clock.fixed(Instant.parse("2026-05-25T12:00:00Z"), ZoneOffset.UTC);
 
     private final AffiliateLinkService service = new AffiliateLinkService(
             linkRepository,
             clickEventRepository,
             plausibleStatsClient,
-            watchProviderRepository);
+            watchProviderRepository,
+            availabilityChangeEventRepository,
+            clock);
 
     @Test
     void saveLinkNormalizesProviderAndCountry() {
@@ -116,6 +125,37 @@ class AffiliateLinkServiceTest {
                 .isEqualTo("provider_slug+country_code no existe en catálogo");
     }
 
+    @Test
+    void dashboardReturnsExtendedMetrics() {
+        when(clickEventRepository.countByClickedAtAfter(any(Instant.class))).thenReturn(7L, 30L);
+        when(clickEventRepository.findTopAnimeClicks(any(Instant.class), any()))
+                .thenReturn(List.of(animeClicks("frieren", 9L)));
+        when(linkRepository.findTop10ByOrderByClickCountDescProviderSlugAscCountryCodeAsc())
+                .thenReturn(List.of(link()));
+        when(plausibleStatsClient.topAnimePages30Days())
+                .thenReturn(List.of(new PlausiblePageMetricDto("/anime/frieren", 120L)));
+        when(plausibleStatsClient.animeDetailPageviews30Days()).thenReturn(200L);
+        when(clickEventRepository.countClicksByDay(any(Instant.class)))
+                .thenReturn(List.of(dailyClicks(LocalDate.of(2026, 5, 24), 4L)));
+        when(clickEventRepository.findTopProviderClicks(any(Instant.class), any()))
+                .thenReturn(List.of(providerClicks("crunchyroll", 10L)));
+        when(clickEventRepository.findTopCountryClicks(any(Instant.class), any()))
+                .thenReturn(List.of(countryClicks("ES", 8L)));
+        when(availabilityChangeEventRepository.findTopAnimeChanges(any(Instant.class), any()))
+                .thenReturn(List.of(availabilityChanges("frieren", 3L)));
+
+        AffiliateDashboardDto dashboard = service.dashboard();
+
+        assertThat(dashboard.clicksLast7Days()).isEqualTo(7L);
+        assertThat(dashboard.clicksLast30Days()).isEqualTo(30L);
+        assertThat(dashboard.clicksByDay()).hasSize(30);
+        assertThat(dashboard.clicksByDay().getLast().date()).isEqualTo(LocalDate.of(2026, 5, 25));
+        assertThat(dashboard.clicksByDay().get(28).clicks()).isEqualTo(4L);
+        assertThat(dashboard.platformConversions().getFirst().conversionRate()).isEqualTo(0.05);
+        assertThat(dashboard.topClickCountries().getFirst().countryCode()).isEqualTo("ES");
+        assertThat(dashboard.topAvailabilityChanges().getFirst().changes()).isEqualTo(3L);
+    }
+
     private static AffiliateLink link() {
         AffiliateLink link = new AffiliateLink();
         link.setId(10L);
@@ -139,6 +179,78 @@ class AffiliateLinkServiceTest {
             @Override
             public String getCountryCode() {
                 return countryCode;
+            }
+        };
+    }
+
+    private static AffiliateClickEventRepository.DailyClickProjection dailyClicks(LocalDate date, Long clicks) {
+        return new AffiliateClickEventRepository.DailyClickProjection() {
+            @Override
+            public LocalDate getClickDate() {
+                return date;
+            }
+
+            @Override
+            public Long getClicks() {
+                return clicks;
+            }
+        };
+    }
+
+    private static AffiliateClickEventRepository.AnimeClickProjection animeClicks(String animeSlug, Long clicks) {
+        return new AffiliateClickEventRepository.AnimeClickProjection() {
+            @Override
+            public String getAnimeSlug() {
+                return animeSlug;
+            }
+
+            @Override
+            public Long getClicks() {
+                return clicks;
+            }
+        };
+    }
+
+    private static AffiliateClickEventRepository.ProviderClickProjection providerClicks(String providerSlug, Long clicks) {
+        return new AffiliateClickEventRepository.ProviderClickProjection() {
+            @Override
+            public String getProviderSlug() {
+                return providerSlug;
+            }
+
+            @Override
+            public Long getClicks() {
+                return clicks;
+            }
+        };
+    }
+
+    private static AffiliateClickEventRepository.CountryClickProjection countryClicks(String countryCode, Long clicks) {
+        return new AffiliateClickEventRepository.CountryClickProjection() {
+            @Override
+            public String getCountryCode() {
+                return countryCode;
+            }
+
+            @Override
+            public Long getClicks() {
+                return clicks;
+            }
+        };
+    }
+
+    private static AvailabilityChangeEventRepository.AnimeAvailabilityChangeProjection availabilityChanges(
+            String animeSlug,
+            Long changes) {
+        return new AvailabilityChangeEventRepository.AnimeAvailabilityChangeProjection() {
+            @Override
+            public String getAnimeSlug() {
+                return animeSlug;
+            }
+
+            @Override
+            public Long getChanges() {
+                return changes;
             }
         };
     }

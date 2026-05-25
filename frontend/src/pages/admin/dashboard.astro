@@ -98,6 +98,21 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </article>
     </div>
 
+    <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Clicks por dia</h2>
+        <div class="mt-4 h-72">
+          <canvas data-clicks-chart></canvas>
+        </div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Conversion por plataforma</h2>
+        <div class="mt-4 h-72">
+          <canvas data-conversion-chart></canvas>
+        </div>
+      </article>
+    </div>
+
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Anime con más clicks</h2>
@@ -110,6 +125,17 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Anime más visitados</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-pages></div>
+      </article>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Paises con mas clicks</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-countries></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Cambios de availability</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-availability></div>
       </article>
     </div>
   </section>
@@ -126,6 +152,9 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const twofaSetup = document.querySelector('[data-twofa-setup]');
     const twofaDisable = document.querySelector('[data-twofa-disable]');
     const twofaVerifyForm = document.querySelector('[data-twofa-verify-form]');
+    let chartLoader;
+    let clicksChart;
+    let conversionChart;
 
     const setStatus = (message, tone = 'muted') => {
       if (!status) return;
@@ -163,6 +192,96 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
 
     const empty = '<p class="text-sm text-fg-muted">Sin datos todavía.</p>';
 
+    const formatPercent = (value) => `${((Number(value) || 0) * 100).toFixed(2)}%`;
+
+    const loadChart = async () => {
+      if (!chartLoader) {
+        chartLoader = import('chart.js').then(({ Chart, registerables }) => {
+          Chart.register(...registerables);
+          return Chart;
+        });
+      }
+      return chartLoader;
+    };
+
+    async function renderCharts(data) {
+      const Chart = await loadChart();
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            ticks: { color: '#a1a1aa', maxRotation: 0 },
+            grid: { color: 'rgba(161, 161, 170, 0.12)' },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#a1a1aa', precision: 0 },
+            grid: { color: 'rgba(161, 161, 170, 0.12)' },
+          },
+        },
+      };
+
+      const clicksCanvas = document.querySelector('[data-clicks-chart]');
+      if (clicksCanvas) {
+        clicksChart?.destroy();
+        clicksChart = new Chart(clicksCanvas, {
+          type: 'line',
+          data: {
+            labels: (data.clicksByDay ?? []).map((item) => item.date.slice(5)),
+            datasets: [{
+              data: (data.clicksByDay ?? []).map((item) => item.clicks ?? 0),
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.18)',
+              fill: true,
+              tension: 0.32,
+            }],
+          },
+          options: chartOptions,
+        });
+      }
+
+      const conversionCanvas = document.querySelector('[data-conversion-chart]');
+      if (conversionCanvas) {
+        conversionChart?.destroy();
+        conversionChart = new Chart(conversionCanvas, {
+          type: 'bar',
+          data: {
+            labels: (data.platformConversions ?? []).map((item) => item.providerSlug),
+            datasets: [{
+              data: (data.platformConversions ?? []).map((item) => (item.conversionRate ?? 0) * 100),
+              backgroundColor: '#ec4899',
+              borderRadius: 6,
+            }],
+          },
+          options: {
+            ...chartOptions,
+            plugins: {
+              ...chartOptions.plugins,
+              tooltip: {
+                callbacks: {
+                  label: (context) => formatPercent(Number(context.raw) / 100),
+                },
+              },
+            },
+            scales: {
+              ...chartOptions.scales,
+              y: {
+                ...chartOptions.scales.y,
+                ticks: {
+                  ...chartOptions.scales.y.ticks,
+                  callback: (value) => `${value}%`,
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+
     async function loadDashboard() {
       setStatus('Cargando...');
       const response = await fetch(`${apiUrl}/api/admin/dashboard`, {
@@ -187,6 +306,15 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         data.topVisitedAnime?.length
           ? data.topVisitedAnime.map((item) => row(item.path, item.visitors)).join('')
           : empty;
+      document.querySelector('[data-top-countries]').innerHTML =
+        data.topClickCountries?.length
+          ? data.topClickCountries.map((item) => row(item.countryCode, item.clicks)).join('')
+          : empty;
+      document.querySelector('[data-top-availability]').innerHTML =
+        data.topAvailabilityChanges?.length
+          ? data.topAvailabilityChanges.map((item) => row(item.animeSlug, item.changes)).join('')
+          : empty;
+      await renderCharts(data);
       setStatus('Datos cargados.', 'success');
     }
 
