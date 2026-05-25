@@ -3,6 +3,7 @@ import type { WatchProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
 import ProviderRow from './ProviderRow.astro';
+import { t } from '@/i18n';
 
 interface Props {
   providersByCountry: Record<string, WatchProvider[]>;
@@ -21,11 +22,11 @@ const blocks = COUNTRY_SLUGS.map((slug: CountrySlug) => {
 const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
 ---
 <section class="mx-auto max-w-6xl px-4 py-8">
-  <h2 class="mb-6 text-lg font-semibold text-fg-primary">Dónde verlo</h2>
+  <h2 class="mb-6 text-lg font-semibold text-fg-primary">{t('anime.providers.title')}</h2>
 
   {!hasAnyProvider && (
     <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
-      No tenemos información de plataformas para este anime todavía.
+      {t('anime.providers.noInfo')}
     </p>
   )}
 
@@ -41,11 +42,11 @@ const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
             href={`/anime/${Astro.params.slug}/${slug}`}
             class="text-xs text-fg-muted transition-colors hover:text-accent-violet"
           >
-            Ver más
+            {t('anime.providers.viewMore')}
           </a>
         </header>
         {providers.length === 0 ? (
-          <p class="text-sm text-fg-muted">No disponible</p>
+          <p class="text-sm text-fg-muted">{t('anime.providers.notAvailable')}</p>
         ) : (
           <div class="space-y-2">
             {providers.map((p) => <ProviderRow provider={p} animeSlug={animeSlug} />)}

@@ -8,15 +8,16 @@ import {
 import { BEST_ANIME_YEARS } from './bestYears';
 import { COUNTRIES, COUNTRY_SLUGS } from './countries';
 import { isHiddenVariant } from './platforms';
+import { t } from '@/i18n';
 
 export const SITEMAP_ENTRIES = [
-  { name: 'Anime', path: '/sitemap-anime.xml' },
-  { name: 'Paises', path: '/sitemap-paises.xml' },
-  { name: 'Plataformas', path: '/sitemap-plataformas.xml' },
-  { name: 'Generos', path: '/sitemap-generos.xml' },
-  { name: 'Temporadas', path: '/sitemap-temporadas.xml' },
-  { name: 'Mejores', path: '/sitemap-mejores.xml' },
-  { name: 'Combinatoria', path: '/sitemap-combinatoria.xml' },
+  { name: t('sitemap.anime'), path: '/sitemap-anime.xml' },
+  { name: t('sitemap.countries'), path: '/sitemap-paises.xml' },
+  { name: t('sitemap.platforms'), path: '/sitemap-plataformas.xml' },
+  { name: t('sitemap.genres'), path: '/sitemap-generos.xml' },
+  { name: t('sitemap.seasons'), path: '/sitemap-temporadas.xml' },
+  { name: t('sitemap.best'), path: '/sitemap-mejores.xml' },
+  { name: t('sitemap.combinations'), path: '/sitemap-combinatoria.xml' },
 ] as const;
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
