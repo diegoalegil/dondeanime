@@ -9,6 +9,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +27,18 @@ import com.dondeanime.backend.subscription.SubscriptionRepository;
 
 class PushNotificationServiceTest {
 
+    private static final Instant NOW = Instant.parse("2026-05-25T10:00:00Z");
+
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private final PushSubscriptionRepository pushSubscriptionRepository = mock(PushSubscriptionRepository.class);
+    private final PushSubscriptionCleanupService cleanupService = new PushSubscriptionCleanupService(
+            pushSubscriptionRepository,
+            Clock.fixed(NOW, ZoneOffset.UTC));
     private final WebPushService webPushService = mock(WebPushService.class);
     private final PushNotificationService service = new PushNotificationService(
             subscriptionRepository,
             pushSubscriptionRepository,
+            cleanupService,
             webPushService);
 
     @Test
@@ -92,6 +101,23 @@ class PushNotificationServiceTest {
         int sent = service.notifyNewProviders(anime(), "mx", List.of(provider("Crunchyroll")));
 
         assertThat(sent).isEqualTo(1);
+    }
+
+    @Test
+    void deletesBouncingSubscriptionsWhenPushReturnsGone() {
+        PushSubscription bounced = pushSubscription("diego@example.com");
+        when(subscriptionRepository.findPendingAlerts(1L, "ES"))
+                .thenReturn(List.of(subscription("diego@example.com")));
+        when(pushSubscriptionRepository.findByCountryIsoAndUserEmailInOrderByCreatedAtAsc(
+                eq("ES"),
+                anyCollection()))
+                .thenReturn(List.of(bounced));
+        when(webPushService.send(eq(bounced), anyString())).thenReturn(Optional.of(410));
+
+        int sent = service.notifyNewProviders(anime(), "ES", List.of(provider("Crunchyroll")));
+
+        assertThat(sent).isZero();
+        verify(pushSubscriptionRepository).delete(bounced);
     }
 
     private static Anime anime() {
