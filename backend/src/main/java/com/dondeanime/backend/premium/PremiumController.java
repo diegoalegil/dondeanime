@@ -24,6 +24,11 @@ public class PremiumController {
         return new PremiumCheckoutResponse(stripeService.createCheckoutSession(request.email()));
     }
 
+    @PostMapping("/portal")
+    public PremiumPortalResponse portal(@Valid @RequestBody PremiumPortalRequest request) {
+        return new PremiumPortalResponse(stripeService.createCustomerPortalSession(request.email()));
+    }
+
     @PostMapping("/webhook")
     public ResponseEntity<PremiumWebhookResponse> webhook(
             @RequestBody String payload,

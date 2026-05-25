@@ -40,6 +40,18 @@ public class StripeGateway {
         return Session.create(params, options).getUrl();
     }
 
+    public String createCustomerPortalSession(StripePortalCommand command) throws StripeException {
+        com.stripe.param.billingportal.SessionCreateParams params =
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(command.customerId())
+                        .setReturnUrl(command.returnUrl())
+                        .build();
+        RequestOptions options = RequestOptions.builder()
+                .setApiKey(command.apiKey())
+                .build();
+        return com.stripe.model.billingportal.Session.create(params, options).getUrl();
+    }
+
     public StripeWebhookEvent constructWebhookEvent(
             String payload,
             String signature,
