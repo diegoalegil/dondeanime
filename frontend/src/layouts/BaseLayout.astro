@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
 import { localeFromPath, setLocale } from '@/i18n';
+import { localizedPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
 
 interface Props {
   title: string;
@@ -18,6 +19,12 @@ interface Props {
 const props = Astro.props;
 const activeLocale = localeFromPath(Astro.url.pathname);
 setLocale(activeLocale);
+const publicLanguageRoute = !Astro.url.pathname.startsWith('/admin') && !Astro.url.pathname.startsWith('/api');
+const spanishPath = spanishPathFromLocalized(Astro.url.pathname);
+const languageRoutes = {
+  es: spanishPath,
+  en: localizedPath(spanishPath, 'en'),
+};
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === 'true';
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? 'dondeanime.com';
 const plausibleScriptUrl = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_URL ?? 'https://plausible.io/js/script.js';
@@ -42,6 +49,30 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
         }
       } catch (e) {}
     </script>
+    {publicLanguageRoute && (
+      <script is:inline define:vars={{ languageRoutes }}>
+        try {
+          const normalizePath = (path) => path.replace(/\/+$/, '') || '/';
+          const withLocationSuffix = (path) => `${path}${window.location.search}${window.location.hash}`;
+          const cookieMatch = document.cookie.match(/(?:^|;\s*)dondeanime-locale=(es|en)(?:;|$)/);
+          const preferredLocale = cookieMatch?.[1];
+          const currentPath = normalizePath(window.location.pathname);
+          const targetForPreference = preferredLocale ? normalizePath(languageRoutes[preferredLocale]) : null;
+
+          if (preferredLocale && targetForPreference && currentPath !== targetForPreference) {
+            window.location.replace(withLocationSuffix(languageRoutes[preferredLocale]));
+          } else if (!preferredLocale && !localStorage.getItem('dondeanime-locale-auto-checked')) {
+            localStorage.setItem('dondeanime-locale-auto-checked', '1');
+            const browserLocale = navigator.language || navigator.languages?.[0] || '';
+            const shouldUseEnglish = browserLocale.toLowerCase().startsWith('en');
+
+            if (shouldUseEnglish && !currentPath.startsWith('/en')) {
+              window.location.replace(withLocationSuffix(languageRoutes.en));
+            }
+          }
+        } catch (e) {}
+      </script>
+    )}
     <SEOHead {...props} />
     {plausibleEnabled && (
       <>
