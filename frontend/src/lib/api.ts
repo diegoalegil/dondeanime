@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.PUBLIC_API_URL;
+const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
 
 export interface AnimeSummary {
   anilistId: number;

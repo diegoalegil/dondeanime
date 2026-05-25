@@ -36,8 +36,8 @@
 <script>
   interface SearchEntry {
     slug: string;
-    en: string;
-    jp: string;
+    en: string | null;
+    jp: string | null;
     year: number | null;
     format: string;
     cover: string;
@@ -49,22 +49,27 @@
 
   if (root && input && panel) {
     let index: SearchEntry[] | null = null;
-    let loading = false;
+    let loadPromise: Promise<void> | null = null;
 
-    const normalize = (s: string) =>
-      s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const normalize = (s: string | null | undefined) =>
+      (s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-    const load = async () => {
-      if (index || loading) return;
-      loading = true;
-      try {
-        const res = await fetch('/search-index.json');
-        index = await res.json();
-      } catch (e) {
-        console.error('Search index failed:', e);
-      } finally {
-        loading = false;
-      }
+    const load = () => {
+      if (index) return Promise.resolve();
+      if (loadPromise) return loadPromise;
+
+      loadPromise = (async () => {
+        try {
+          const res = await fetch('/search-index.json');
+          index = await res.json();
+        } catch (e) {
+          console.error('Search index failed:', e);
+        } finally {
+          loadPromise = null;
+        }
+      })();
+
+      return loadPromise;
     };
 
     const render = (q: string) => {
@@ -89,16 +94,17 @@
       }
 
       panel.innerHTML = matches
-        .map(
-          (a) => `
+        .map((a) => {
+          const title = a.en || a.jp || a.slug;
+          return `
           <a href="/anime/${a.slug}" class="flex items-center gap-3 border-b border-surface-2/50 px-3 py-2 last:border-b-0 transition-colors hover:bg-surface-2">
             <img src="${a.cover}" alt="" loading="lazy" class="h-12 w-9 rounded object-cover ring-1 ring-surface-2" />
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-semibold text-fg-primary">${a.en}</p>
+              <p class="truncate text-sm font-semibold text-fg-primary">${title}</p>
               <p class="truncate text-xs text-fg-muted">${a.year ?? '—'} · ${a.format}</p>
             </div>
-          </a>`,
-        )
+          </a>`;
+        })
         .join('');
       panel.classList.remove('hidden');
     };
