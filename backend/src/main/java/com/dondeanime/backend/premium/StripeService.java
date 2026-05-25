@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dondeanime.backend.email.EmailService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 
@@ -15,6 +16,7 @@ public class StripeService {
 
     private final StripeGateway stripeGateway;
     private final SubscriberService subscriberService;
+    private final EmailService emailService;
     private final String apiKey;
     private final String priceId;
     private final String webhookSecret;
@@ -25,6 +27,7 @@ public class StripeService {
     public StripeService(
             StripeGateway stripeGateway,
             SubscriberService subscriberService,
+            EmailService emailService,
             @Value("${STRIPE_SECRET_KEY:}") String apiKey,
             @Value("${STRIPE_PRICE_ID:}") String priceId,
             @Value("${STRIPE_WEBHOOK_SECRET:}") String webhookSecret,
@@ -33,6 +36,7 @@ public class StripeService {
             @Value("${STRIPE_PORTAL_RETURN_URL:https://dondeanime.com/premium}") String portalReturnUrl) {
         this.stripeGateway = stripeGateway;
         this.subscriberService = subscriberService;
+        this.emailService = emailService;
         this.apiKey = apiKey;
         this.priceId = priceId;
         this.webhookSecret = webhookSecret;
@@ -92,20 +96,33 @@ public class StripeService {
         StripeWebhookEvent event = verifyWebhookSignature(payload, signature);
         Instant eventTime = event.eventTime() == null ? Instant.now() : event.eventTime();
         switch (event.type()) {
-            case "customer.subscription.created", "customer.subscription.updated" -> subscriberService.upsertPremium(
-                    event.email(),
-                    event.customerId(),
-                    "PREMIUM",
-                    eventTime,
-                    event.currentPeriodEnd(),
-                    null);
+            case "customer.subscription.created" -> {
+                subscriberService.upsertPremium(
+                        event.email(),
+                        event.customerId(),
+                        "PREMIUM",
+                        eventTime,
+                        event.currentPeriodEnd(),
+                        null);
+                sendWelcomeEmail(event);
+            }
+            case "customer.subscription.updated" -> subscriberService.upsertPremium(
+                        event.email(),
+                        event.customerId(),
+                        "PREMIUM",
+                        eventTime,
+                        event.currentPeriodEnd(),
+                        null);
             case "customer.subscription.deleted" -> subscriberService.cancelByStripeCustomerId(
-                    event.customerId(),
-                    eventTime);
-            case "invoice.payment_succeeded" -> subscriberService.recordPaymentSucceeded(
-                    event.email(),
-                    event.customerId(),
-                    eventTime);
+                        event.customerId(),
+                        eventTime);
+            case "invoice.payment_succeeded" -> {
+                subscriberService.recordPaymentSucceeded(
+                        event.email(),
+                        event.customerId(),
+                        eventTime);
+                sendReceiptEmail(event, eventTime);
+            }
             case "invoice.payment_failed" -> {
                 // Stripe retries failed invoices; access is revoked by subscription.deleted if it never recovers.
             }
@@ -113,6 +130,28 @@ public class StripeService {
             }
         }
         return event.type();
+    }
+
+    private void sendWelcomeEmail(StripeWebhookEvent event) {
+        String email = resolveEmail(event);
+        if (!email.isBlank()) {
+            emailService.sendPremiumWelcomeEmail(email, "PREMIUM", portalReturnUrl);
+        }
+    }
+
+    private void sendReceiptEmail(StripeWebhookEvent event, Instant paidAt) {
+        String email = resolveEmail(event);
+        if (!email.isBlank()) {
+            emailService.sendPremiumReceiptEmail(email, "PREMIUM", paidAt.toString(), portalReturnUrl);
+        }
+    }
+
+    private String resolveEmail(StripeWebhookEvent event) {
+        String email = SubscriberService.normalizeEmail(event.email());
+        if (!email.isBlank()) {
+            return email;
+        }
+        return subscriberService.findEmailByStripeCustomerId(event.customerId()).orElse("");
     }
 
     private void assertCheckoutConfigured() {
