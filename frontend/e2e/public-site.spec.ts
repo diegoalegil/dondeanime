@@ -10,6 +10,16 @@ const expectedPartitionSitemaps = [
   '/sitemap-combinatoria.xml',
 ];
 
+const expectedLanguageSitemaps = [
+  '/sitemap-es.xml',
+  '/sitemap-en.xml',
+];
+
+const expectedSitemapIndexPaths = [
+  ...expectedLanguageSitemaps,
+  ...expectedPartitionSitemaps,
+];
+
 const seasonOrder: Record<string, number> = { winter: 0, spring: 1, summer: 2, fall: 3 };
 const seasonLabelPattern: Record<string, string> = {
   winter: 'Invierno',
@@ -49,7 +59,7 @@ const sitemapPathsFromIndex = async (request: APIRequestContext, path = '/sitema
   const sitemapIndexText = await sitemapIndex.text();
 
   expect(sitemapIndexText).toContain('<sitemapindex');
-  expect(expectedPartitionSitemaps.every((sitemapPath) =>
+  expect(expectedSitemapIndexPaths.every((sitemapPath) =>
     sitemapIndexText.includes(`https://dondeanime.com${sitemapPath}`),
   )).toBe(true);
 
@@ -238,14 +248,33 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
 
   const robots = await request.get('/robots.txt');
   expect(robots.ok()).toBe(true);
-  expect(await robots.text()).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
+  const robotsText = await robots.text();
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-es.xml');
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-en.xml');
 
   const sitemapPaths = await sitemapPathsFromIndex(request);
-  expect(sitemapPaths).toEqual(expectedPartitionSitemaps);
+  expect(sitemapPaths).toEqual(expectedSitemapIndexPaths);
 
   const sitemapAlias = await request.get('/sitemap.xml');
   expect(sitemapAlias.ok()).toBe(true);
   expect(await sitemapAlias.text()).toContain('<sitemapindex');
+
+  const spanishSitemap = await request.get('/sitemap-es.xml');
+  const spanishSitemapText = await spanishSitemap.text();
+  expect(spanishSitemap.ok()).toBe(true);
+  expect(spanishSitemapText).toContain('https://dondeanime.com/');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/blog/placeholder-guia-editorial');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/privacidad');
+
+  const englishSitemap = await request.get('/sitemap-en.xml');
+  const englishSitemapText = await englishSitemap.text();
+  expect(englishSitemap.ok()).toBe(true);
+  expect(englishSitemapText).toContain('https://dondeanime.com/en');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/country/spain');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/upcoming/next-week');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/blog/placeholder-guia-editorial');
+  expect(englishSitemapText).not.toContain('https://dondeanime.com/en/pais/espana');
 
   const animeSitemap = await request.get('/sitemap-anime.xml');
   const animeUrls = [...(await animeSitemap.text()).matchAll(/<url>/g)];

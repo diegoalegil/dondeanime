@@ -5,12 +5,19 @@ import {
   getProvidersByCountry,
   getSeasons,
 } from './api';
+import { getCollection } from 'astro:content';
 import { BEST_ANIME_YEARS } from './bestYears';
 import { COUNTRIES, COUNTRY_SLUGS } from './countries';
+import { localizedPath } from './localizedRoutes';
 import { isHiddenVariant } from './platforms';
 import { t } from '@/i18n';
 
-export const SITEMAP_ENTRIES = [
+export const LANGUAGE_SITEMAP_ENTRIES = [
+  { name: 'Spanish', path: '/sitemap-es.xml' },
+  { name: 'English', path: '/sitemap-en.xml' },
+] as const;
+
+export const PARTITION_SITEMAP_ENTRIES = [
   { name: t('sitemap.anime'), path: '/sitemap-anime.xml' },
   { name: t('sitemap.countries'), path: '/sitemap-paises.xml' },
   { name: t('sitemap.platforms'), path: '/sitemap-plataformas.xml' },
@@ -18,6 +25,11 @@ export const SITEMAP_ENTRIES = [
   { name: t('sitemap.seasons'), path: '/sitemap-temporadas.xml' },
   { name: t('sitemap.best'), path: '/sitemap-mejores.xml' },
   { name: t('sitemap.combinations'), path: '/sitemap-combinatoria.xml' },
+] as const;
+
+export const SITEMAP_ENTRIES = [
+  ...LANGUAGE_SITEMAP_ENTRIES,
+  ...PARTITION_SITEMAP_ENTRIES,
 ] as const;
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
@@ -74,6 +86,18 @@ ${urls}
 export const animeSitemapPaths = async (): Promise<string[]> => {
   const anime = await getAllAnime();
   return anime.map((item) => `/anime/${item.slug}`);
+};
+
+export const staticSitemapPaths = async (): Promise<string[]> => {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+  return [
+    '/',
+    '/blog',
+    ...posts.map((post) => `/blog/${post.id}`),
+    '/legal/privacidad',
+    '/legal/afiliados',
+  ];
 };
 
 export const countrySitemapPaths = async (): Promise<string[]> => {
@@ -139,3 +163,37 @@ export const combinationSitemapPaths = async (): Promise<string[]> => {
     topProviders.map((provider) => `/anime/${genre.slug}/en/${provider.slug}`),
   );
 };
+
+export const spanishSitemapPaths = async (): Promise<string[]> => {
+  const [
+    staticPaths,
+    animePaths,
+    countryPaths,
+    platformPaths,
+    genrePaths,
+    seasonPaths,
+    combinationPaths,
+  ] = await Promise.all([
+    staticSitemapPaths(),
+    animeSitemapPaths(),
+    countrySitemapPaths(),
+    platformSitemapPaths(),
+    genreSitemapPaths(),
+    seasonSitemapPaths(),
+    combinationSitemapPaths(),
+  ]);
+
+  return [
+    ...staticPaths,
+    ...animePaths,
+    ...countryPaths,
+    ...platformPaths,
+    ...genrePaths,
+    ...seasonPaths,
+    ...bestYearSitemapPaths(),
+    ...combinationPaths,
+  ];
+};
+
+export const englishSitemapPaths = async (): Promise<string[]> =>
+  (await spanishSitemapPaths()).map((path) => localizedPath(path, 'en'));
