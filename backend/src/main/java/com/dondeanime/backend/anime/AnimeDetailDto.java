@@ -5,12 +5,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Vista completa de un anime para la página de detalle.
  *
  * Incluye todo lo de AnimeSummaryDto más descripción larga, fechas
  * detalladas y banner. Sigue ocultando id interno, syncedAt y tmdbId.
  */
+@Schema(description = "Vista completa de una ficha publica de anime")
 public record AnimeDetailDto(
         Long anilistId,
         String slug,
