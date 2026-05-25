@@ -338,8 +338,12 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] **Sprint 1 mergeado:** tabla `anime_override`, overrides editoriales en `AnimeDetailDto`, HTTP Basic para `/api/admin/**`, CORS cerrado para frontend, endpoints admin POST/DELETE/GET y panel Astro `/admin` + `/admin/anime/[slug]`.
 - [x] **Sprint 3 mergeado:** tabla `affiliate_link`, tracking público de clicks, eventos para métricas 7/30 días, dashboard admin, links externos con `affiliateUrl`, Plausible preparado, AdSlot condicional y disclosure legal.
 - [x] **CI básico (Sprint 4):** GitHub Actions para `./mvnw test` con Postgres 16 de servicio y `npm run build` del frontend con variables públicas de producción.
-- [ ] **PRÓXIMO:** Sprints de Codex pendientes de mergear (Sprint 2 alertas email, Sprint 4 e2e Playwright, Sprint 4 backups Postgres, Sprint 4 operación Cloudflare).
-- [ ] Mejora continua paralela restante (tests E2E con Playwright, Cloudflare Email Routing, backups BD automáticos, page rules cache, etc.)
+- [x] **Sprint 9 mergeado (25 mayo 2026):** SEO masivo. PRs 9.1-9.6: rankings anuales (`/mejores/[year]`), combinatoria género×plataforma (`/anime/[gen]/en/[plat]`), estrenos próximos, JSON-LD expandido (FAQPage, Review, Organization, ItemList), sitemap index particionado (7 sitemaps temáticos), blog editorial estructura (MDX + RSS, sin contenido).
+- [x] **Hotfix HF mergeado:** temporada actual dinámica (HF-1) + descripciones es-ES vía TMDb con fallback 3 capas (HF-2). HF-3 (frontend redesign) sigue pendiente de aprobación humana, solo está la auditoría en `frontend/REDESIGN-NOTES.md`.
+- [ ] **Sprints 5, 6, 7, 8 con PRs apilados:** todos los PRs individuales (5+5+5+5 = 20) están abiertos esperando merge a sus respectivas ramas de sprint. Diego no ha podido revisar uno a uno. Codex tiene autorización a partir de la siguiente sesión para auto-mergear con squash si CI está verde, y abrir el PR final `sprint-N → main` esperando review humano.
+- [ ] **Sprint 10 en curso:** PR 10.1 (Postgres tsvector) mergeado a `sprint-10`. PR 10.2 (search endpoint) abierto. Faltan 10.3 (rate limiting), 10.4 (autocomplete), 10.5 (filtros combinados).
+- [ ] **Sprints 11, 12 pendientes** (ver `CODEX-BACKLOG-V2.md`).
+- [ ] **Sprints 13-20 detallados en `CODEX-BACKLOG-V3.md`** para sesiones largas de Codex.
 
 ---
 
