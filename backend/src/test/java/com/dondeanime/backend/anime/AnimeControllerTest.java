@@ -23,20 +23,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
+import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
-/**
- * Tests del AnimeController con MockMvc. Carga solo el slice de
- * Spring MVC y mockea todos los beans que el controller inyecta.
- *
- * No toca BD ni APIs externas: las queries y los services están
- * sustituidos por Mockito.
- */
 @WebMvcTest(AnimeController.class)
 @Import(SecurityConfig.class)
 @TestPropertySource(properties = {
@@ -65,6 +58,9 @@ class AnimeControllerTest {
     private AnimeDescriptionEnricher descriptionEnricher;
 
     @MockitoBean
+    private TrailerSyncService trailerSyncService;
+
+    @MockitoBean
     private WatchProviderRepository providerRepository;
 
     @MockitoBean
@@ -83,7 +79,6 @@ class AnimeControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
-                // El DTO no debe exponer id interno ni tmdbId ni syncedAt.
                 .andExpect(jsonPath("$[0].id").doesNotExist())
                 .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
                 .andExpect(jsonPath("$[0].syncedAt").doesNotExist());
@@ -137,6 +132,7 @@ class AnimeControllerTest {
         mvc.perform(get("/api/anime/attack-on-titan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.anime.slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$.anime.trailerYoutubeId").value("abc123DEF45"))
                 .andExpect(jsonPath("$.watchProvidersByCountry").isMap())
                 .andExpect(jsonPath("$.watchProvidersByCountry.ES[0].affiliateUrl").value("https://example.com"));
     }
@@ -179,10 +175,20 @@ class AnimeControllerTest {
         verify(syncService, never()).syncPopular(anyInt());
     }
 
+    @Test
+    void syncTrailersReturnsProcessedCount() throws Exception {
+        when(trailerSyncService.syncAll()).thenReturn(42);
+
+        mvc.perform(post("/api/anime/sync-trailers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.processed").value(42));
+    }
+
     private static Anime makeAnime(String slug, String titleEnglish) {
         Anime a = new Anime();
         a.setId(1L);
         a.setAnilistId(123L);
+        a.setTrailerYoutubeId("abc123DEF45");
         a.setSlug(slug);
         a.setTitleEnglish(titleEnglish);
         a.setFormat("TV");
