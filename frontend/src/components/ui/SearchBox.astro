@@ -34,84 +34,20 @@
 </div>
 
 <script>
-  interface SearchEntry {
-    slug: string;
-    en: string;
-    jp: string;
-    year: number | null;
-    format: string;
-    cover: string;
-  }
-
   const root = document.querySelector('[data-search-root]') as HTMLElement | null;
   const input = root?.querySelector('[data-search-input]') as HTMLInputElement | null;
-  const panel = root?.querySelector('[data-search-results]') as HTMLElement | null;
 
-  if (root && input && panel) {
-    let index: SearchEntry[] | null = null;
-    let loading = false;
+  if (root && input) {
+    let booting = false;
 
-    const normalize = (s: string) =>
-      s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-
-    const load = async () => {
-      if (index || loading) return;
-      loading = true;
-      try {
-        const res = await fetch('/search-index.json');
-        index = await res.json();
-      } catch (e) {
-        console.error('Search index failed:', e);
-      } finally {
-        loading = false;
-      }
+    const bootSearch = async () => {
+      if (booting || root.dataset.searchReady === 'true') return;
+      booting = true;
+      const { initSearchBox } = await import('@/scripts/search-box');
+      await initSearchBox(root);
     };
 
-    const render = (q: string) => {
-      if (!index || !q.trim()) {
-        panel.classList.add('hidden');
-        panel.innerHTML = '';
-        return;
-      }
-      const qn = normalize(q);
-      const matches = index
-        .filter((a) =>
-          normalize(a.en).includes(qn) ||
-          normalize(a.jp).includes(qn) ||
-          a.slug.includes(qn),
-        )
-        .slice(0, 8);
-
-      if (matches.length === 0) {
-        panel.innerHTML = '<p class="px-4 py-3 text-sm text-fg-muted">Sin resultados</p>';
-        panel.classList.remove('hidden');
-        return;
-      }
-
-      panel.innerHTML = matches
-        .map(
-          (a) => `
-          <a href="/anime/${a.slug}" class="flex items-center gap-3 border-b border-surface-2/50 px-3 py-2 last:border-b-0 transition-colors hover:bg-surface-2">
-            <img src="${a.cover}" alt="" loading="lazy" class="h-12 w-9 rounded object-cover ring-1 ring-surface-2" />
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-semibold text-fg-primary">${a.en}</p>
-              <p class="truncate text-xs text-fg-muted">${a.year ?? '—'} · ${a.format}</p>
-            </div>
-          </a>`,
-        )
-        .join('');
-      panel.classList.remove('hidden');
-    };
-
-    input.addEventListener('focus', () => { void load(); });
-    input.addEventListener('input', () => {
-      void load().then(() => render(input.value));
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!root.contains(e.target as Node)) {
-        panel.classList.add('hidden');
-      }
-    });
+    input.addEventListener('focus', () => { void bootSearch(); }, { once: true });
+    input.addEventListener('input', () => { void bootSearch(); }, { once: true });
   }
 </script>

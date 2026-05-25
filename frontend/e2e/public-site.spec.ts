@@ -73,6 +73,23 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(await sitemap.text()).toContain('<sitemapindex');
 });
 
+test('search index is loaded lazily when the user searches', async ({ page }) => {
+  const searchIndexRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/search-index.json') {
+      searchIndexRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/');
+  expect(searchIndexRequests).toHaveLength(0);
+
+  await page.getByPlaceholder('Buscar anime...').fill('naruto');
+
+  await expect(page.locator('[data-search-results] a[href^="/anime/"]').first()).toBeVisible();
+  expect(searchIndexRequests).toHaveLength(1);
+});
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

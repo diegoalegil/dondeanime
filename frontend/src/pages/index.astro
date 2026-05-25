@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
 import { buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { formatSeason } from '@/lib/format';
@@ -134,7 +135,7 @@ const itemListSchema = buildItemListSchema(
             href={`/pais/${slug}`}
             class="flex items-center gap-3 rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/40"
           >
-            <span class={`fi fi-${c.flagCode} rounded text-lg`} aria-hidden="true"></span>
+            <CountryFlag country={c} />
             <span class="text-sm font-semibold text-fg-primary">{c.name}</span>
           </a>
         );

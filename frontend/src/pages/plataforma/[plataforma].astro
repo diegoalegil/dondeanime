@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getProvidersByCountry, type ProviderSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -94,7 +95,7 @@ const itemListSchema = buildItemListSchema(
             class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
           >
             <div class="flex items-center gap-3">
-              <span class={`fi fi-${country.flagCode} rounded text-xl`} aria-hidden="true"></span>
+              <CountryFlag country={country} />
               <div>
                 <h3 class="text-base font-semibold text-fg-primary">{country.name}</h3>
                 <p class="mt-0.5 text-sm text-fg-muted">{provider.animeCount} anime</p>
@@ -105,7 +106,7 @@ const itemListSchema = buildItemListSchema(
         ) : (
           <div class="flex items-center justify-between rounded-xl border border-surface-2/50 bg-surface-1/50 p-5 opacity-60">
             <div class="flex items-center gap-3">
-              <span class={`fi fi-${country.flagCode} rounded text-xl grayscale`} aria-hidden="true"></span>
+              <CountryFlag country={country} muted />
               <div>
                 <h3 class="text-base font-semibold text-fg-secondary">{country.name}</h3>
                 <p class="mt-0.5 text-sm text-fg-muted">No disponible</p>

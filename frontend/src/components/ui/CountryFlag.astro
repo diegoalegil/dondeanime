@@ -1,0 +1,18 @@
+---
+import type { CountryInfo } from '@/lib/countries';
+
+interface Props {
+  country: Pick<CountryInfo, 'iso' | 'name'>;
+  muted?: boolean;
+  class?: string;
+}
+
+const { country, muted = false, class: className = '' } = Astro.props;
+---
+<span
+  class={`inline-flex h-5 min-w-7 items-center justify-center rounded border border-surface-2 bg-surface-2 px-1.5 text-[10px] font-semibold leading-none tracking-normal ${muted ? 'text-fg-muted' : 'text-fg-secondary'} ${className}`}
+  title={country.name}
+  aria-hidden="true"
+>
+  {country.iso}
+</span>

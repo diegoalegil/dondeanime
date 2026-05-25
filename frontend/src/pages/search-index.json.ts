@@ -5,7 +5,7 @@ export const GET: APIRoute = async () => {
   const anime = await getAllAnime();
   const index = anime.map((a) => ({
     slug: a.slug,
-    en: a.titleEnglish,
+    en: a.titleEnglish ?? a.titleRomaji ?? a.slug,
     jp: a.titleRomaji,
     year: a.year,
     format: a.format,
