@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import AnimeFilterGrid from '@/components/anime/AnimeFilterGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import FilterRobotsNoindex from '@/components/seo/FilterRobotsNoindex.astro';
 import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -51,6 +52,7 @@ const itemListSchema = buildItemListSchema(
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={itemListSchema} />
+  <FilterRobotsNoindex slot="head" />
 
   <Breadcrumbs
     items={[
@@ -91,7 +93,7 @@ const itemListSchema = buildItemListSchema(
         No tenemos anime catalogados en {displayName} {country.name} ahora mismo.
       </p>
     ) : (
-      <AnimeGrid anime={anime} />
+      <AnimeFilterGrid anime={anime} emptyText={`No hay anime en ${displayName} ${country.name} con esos filtros.`} />
     )}
   </section>
 </BaseLayout>
