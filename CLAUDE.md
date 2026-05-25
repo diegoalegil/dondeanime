@@ -297,7 +297,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
 Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte.
-Web Push usa `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` y `PUBLIC_VAPID_PUBLIC_KEY`; por defecto vacías para mantener push apagado hasta generar claves reales.
+Web Push usa `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` y `PUBLIC_VAPID_PUBLIC_KEY`; por defecto vacías para mantener push apagado hasta generar claves reales. Generar con `npx web-push generate-vapid-keys --json` y copiar la public key también a `PUBLIC_VAPID_PUBLIC_KEY`.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.

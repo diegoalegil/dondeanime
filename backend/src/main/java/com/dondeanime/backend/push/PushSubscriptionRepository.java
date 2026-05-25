@@ -1,5 +1,6 @@
 package com.dondeanime.backend.push;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,4 +11,8 @@ public interface PushSubscriptionRepository extends JpaRepository<PushSubscripti
     Optional<PushSubscription> findByEndpoint(String endpoint);
 
     List<PushSubscription> findByCountryIsoOrderByCreatedAtAsc(String countryIso);
+
+    List<PushSubscription> findByCountryIsoAndUserEmailInOrderByCreatedAtAsc(
+            String countryIso,
+            Collection<String> userEmails);
 }
