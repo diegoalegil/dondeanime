@@ -67,7 +67,7 @@ public class CatalogScheduler {
         log.info("[scheduler] syncAniList: iniciando");
         boolean ok = false;
         try {
-            int n = syncService.syncPopular(100);
+            int n = syncService.syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
             log.info("[scheduler] syncAniList: completado, {} anime", n);
             ok = true;
         } catch (Exception e) {

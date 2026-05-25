@@ -31,6 +31,8 @@ import com.dondeanime.backend.anime.anilist.AniListTitle;
 @Service
 public class AnimeSyncService {
 
+    public static final int MAX_POPULAR_SYNC_COUNT = 500;
+
     private static final Logger log = LoggerFactory.getLogger(AnimeSyncService.class);
 
     private final AniListClient client;
@@ -42,6 +44,10 @@ public class AnimeSyncService {
     }
 
     public int syncPopular(int count) {
+        if (count < 1 || count > MAX_POPULAR_SYNC_COUNT) {
+            throw new IllegalArgumentException("count debe estar entre 1 y " + MAX_POPULAR_SYNC_COUNT);
+        }
+
         log.info("Sync AniList iniciado: pidiendo top {} por popularidad", count);
         List<AniListMedia> medias = client.fetchPopular(count);
         log.info("AniList devolvió {} anime", medias.size());
