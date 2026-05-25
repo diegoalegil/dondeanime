@@ -35,6 +35,12 @@ public class AlertService {
         this.emailService = emailService;
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasPendingAlerts(Long animeId, String countryCode) {
+        String normalizedCountry = CountryCatalog.normalizeCountry(countryCode);
+        return subscriptionRepository.countPendingAlerts(animeId, normalizedCountry) > 0;
+    }
+
     @Transactional
     public int notifyNewProviders(Anime anime, Map<String, List<WatchProvider>> providersByCountry) {
         if (providersByCountry == null || providersByCountry.isEmpty()) {
