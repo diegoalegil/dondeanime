@@ -107,8 +107,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     };
 
     const authHeaders = () => {
-      const token = sessionStorage.getItem(tokenKey);
-      return token ? { Authorization: `Basic ${token}` } : {};
+      const token = localStorage.getItem(tokenKey);
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const escapeHtml = (value) => String(value ?? '')
@@ -156,16 +156,30 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     loginForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(loginForm);
-      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: String(data.get('username') ?? ''),
+          password: String(data.get('password') ?? ''),
+        }),
+      });
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        setStatus('Credenciales incorrectas.', 'danger');
+        return;
+      }
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       loadLinks().catch(() => {
-        sessionStorage.removeItem(tokenKey);
+        localStorage.removeItem(tokenKey);
         setStatus('Credenciales incorrectas.', 'danger');
       });
     });
 
     linkForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!sessionStorage.getItem(tokenKey)) {
+      if (!localStorage.getItem(tokenKey)) {
         setStatus('Inicia sesión antes de guardar.', 'danger');
         return;
       }
@@ -196,7 +210,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       setStatus('Link borrado.', 'success');
     });
 
-    if (sessionStorage.getItem(tokenKey)) {
+    if (localStorage.getItem(tokenKey)) {
       loadLinks().catch(() => setStatus('No se pudieron cargar los links.', 'danger'));
     } else {
       setStatus('Inicia sesión para gestionar links.');
