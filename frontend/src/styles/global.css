@@ -57,3 +57,58 @@ body {
   background-clip: text;
   color: transparent;
 }
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  animation: skeleton-shimmer 1.35s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-fg-primary) 10%, transparent),
+    transparent
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+[data-navigation-skeleton] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.25rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+[data-navigation-skeleton][data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after,
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  [data-navigation-skeleton] {
+    transition: none;
+  }
+}
