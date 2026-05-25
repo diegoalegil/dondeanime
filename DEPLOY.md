@@ -368,6 +368,51 @@ systemctl status unattended-upgrades --no-pager
 Si `sshd -t` falla, el script no reinicia SSH. Deja backup automÃ¡tico en
 `/etc/ssh/sshd_config.dondeanime.<timestamp>.bak`.
 
+### Monitoreo externo UptimeRobot
+
+Sprint 11 usa UptimeRobot en free tier para vigilar desde fuera del VPS. Los
+monitores esperados son:
+
+| Nombre | URL | Intervalo |
+|---|---|---|
+| DondeAnime frontend | `https://dondeanime.com` | 5 min |
+| DondeAnime API anime | `https://api.dondeanime.com/api/anime` | 5 min |
+| DondeAnime API health | `https://api.dondeanime.com/actuator/health` | 5 min |
+
+La alerta Telegram se configura en UptimeRobot como alert contact. Para
+localizar el ID:
+
+```bash
+cd /opt/dondeanime
+UPTIMEROBOT_API_KEY=... bash scripts/vps/setup-uptimerobot-monitors.sh --list-contacts
+```
+
+Crear los monitores:
+
+```bash
+cd /opt/dondeanime
+UPTIMEROBOT_API_KEY=... \
+UPTIMEROBOT_ALERT_CONTACT_IDS=123456 \
+bash scripts/vps/setup-uptimerobot-monitors.sh
+```
+
+Antes de ejecutar contra la API real:
+
+```bash
+UPTIMEROBOT_API_KEY=dummy \
+UPTIMEROBOT_ALERT_CONTACT_IDS=123456 \
+bash scripts/vps/setup-uptimerobot-monitors.sh --dry-run
+```
+
+Notas:
+
+- UptimeRobot `type=1` es monitor HTTP(S).
+- `interval=300` equivale a check cada 5 minutos.
+- `alert_contacts` usa el formato `contactId_0_0`; en free tier el threshold
+  y la recurrencia se mantienen en `0`.
+- Si Diego prefiere hacerlo por UI, debe crear los mismos 3 monitores HTTP(S),
+  intervalo 5 min, y asignar el contacto Telegram monitor por monitor.
+
 ### Disparar sync manual
 
 ```bash
