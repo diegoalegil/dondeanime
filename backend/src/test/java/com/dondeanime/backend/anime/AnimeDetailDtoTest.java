@@ -35,6 +35,7 @@ class AnimeDetailDtoTest {
         assertThat(dto.description()).isEqualTo("Descripción AniList");
         assertThat(dto.titleEnglish()).isEqualTo("Attack on Titan");
         assertThat(dto.titleRomaji()).isEqualTo("Shingeki no Kyojin");
+        assertThat(dto.trailerYoutubeId()).isEqualTo("abc123DEF45");
     }
 
     @Test
@@ -73,6 +74,7 @@ class AnimeDetailDtoTest {
         anime.setSlug("attack-on-titan");
         anime.setTitleEnglish("Attack on Titan");
         anime.setTitleRomaji("Shingeki no Kyojin");
+        anime.setTrailerYoutubeId("abc123DEF45");
         anime.setDescription("Descripción AniList");
         anime.setFormat("TV");
         anime.setStatus("FINISHED");
