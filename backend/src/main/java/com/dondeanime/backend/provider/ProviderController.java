@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/providers")
+@Tag(name = "Providers", description = "Plataformas de streaming por pais")
 public class ProviderController {
 
     private final WatchProviderRepository providerRepository;
@@ -29,6 +33,7 @@ public class ProviderController {
      * Sin parámetro, agrega a nivel global (todos los países).
      */
     @GetMapping
+    @Operation(summary = "Lista plataformas", description = "Agrega plataformas globales o filtradas por pais.")
     public List<ProviderSummaryDto> list(@RequestParam(required = false) String country) {
         List<WatchProviderRepository.ProviderAggregation> rows = country == null
                 ? providerRepository.aggregateAllProviders()
@@ -44,6 +49,7 @@ public class ProviderController {
      * Ejemplo: GET /api/providers/crunchyroll/ES
      */
     @GetMapping("/{slug}/{country}")
+    @Operation(summary = "Lista anime por plataforma y pais", description = "Devuelve anime disponibles en una plataforma concreta para un pais.")
     public List<AnimeSummaryDto> animesByProviderAndCountry(
             @PathVariable String slug,
             @PathVariable String country) {

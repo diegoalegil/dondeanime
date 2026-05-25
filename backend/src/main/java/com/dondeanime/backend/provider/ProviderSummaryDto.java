@@ -1,5 +1,7 @@
 package com.dondeanime.backend.provider;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Plataforma de streaming agregada a nivel global (sin país).
  * El frontend la usa para listar todas las plataformas que cubrimos
@@ -9,6 +11,7 @@ package com.dondeanime.backend.provider;
  * animeCount es el número de anime distintos que están en este provider
  * (sumando todos los países).
  */
+@Schema(description = "Plataforma de streaming agregada")
 public record ProviderSummaryDto(
         String slug,
         String providerName,
