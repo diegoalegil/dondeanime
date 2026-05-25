@@ -1,4 +1,6 @@
 ---
+import PushSubscribeButton from './PushSubscribeButton.astro';
+
 interface Props {
   animeSlug: string;
   animeTitle: string;
@@ -58,6 +60,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </label>
       <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
     </form>
+
+    <PushSubscribeButton countryIso={countryIso} />
   </div>
 
   <script>
