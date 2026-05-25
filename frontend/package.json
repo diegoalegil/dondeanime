@@ -20,7 +20,6 @@
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.7",
-    "flag-icons": "^7.5.0",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
