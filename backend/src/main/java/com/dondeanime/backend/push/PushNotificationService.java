@@ -1,5 +1,7 @@
 package com.dondeanime.backend.push;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,7 +13,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.provider.WatchProvider;
@@ -29,19 +30,29 @@ public class PushNotificationService {
     private final PushSubscriptionRepository pushSubscriptionRepository;
     private final WebPushService webPushService;
     private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     public PushNotificationService(
             SubscriptionRepository subscriptionRepository,
             PushSubscriptionRepository pushSubscriptionRepository,
             WebPushService webPushService,
             ObjectMapper objectMapper) {
+        this(subscriptionRepository, pushSubscriptionRepository, webPushService, objectMapper, Clock.systemUTC());
+    }
+
+    PushNotificationService(
+            SubscriptionRepository subscriptionRepository,
+            PushSubscriptionRepository pushSubscriptionRepository,
+            WebPushService webPushService,
+            ObjectMapper objectMapper,
+            Clock clock) {
         this.subscriptionRepository = subscriptionRepository;
         this.pushSubscriptionRepository = pushSubscriptionRepository;
         this.webPushService = webPushService;
         this.objectMapper = objectMapper;
+        this.clock = clock;
     }
 
-    @Transactional(readOnly = true)
     public int notifyNewProviders(Anime anime, String countryCode, List<WatchProvider> providers) {
         String normalizedCountry = CountryCatalog.normalizeCountry(countryCode);
         Set<String> pendingEmails = subscriptionRepository.findPendingAlerts(anime.getId(), normalizedCountry).stream()
@@ -67,15 +78,23 @@ public class PushNotificationService {
             try {
                 int status = webPushService.send(subscription, payload).orElse(0);
                 if (status >= 200 && status < 300) {
+                    recordDelivery(subscription, status);
                     sent++;
                 } else if (status > 0) {
+                    recordDelivery(subscription, status);
                     log.warn("Push no aceptado endpoint={} status={}", subscription.getEndpoint(), status);
                 }
             } catch (Exception e) {
+                recordDelivery(subscription, 0);
                 log.error("No se pudo enviar push endpoint={}: {}", subscription.getEndpoint(), e.getMessage());
             }
         }
         return sent;
+    }
+
+    private void recordDelivery(PushSubscription subscription, int status) {
+        subscription.recordDeliveryResult(status, Instant.now(clock));
+        pushSubscriptionRepository.save(subscription);
     }
 
     private String payloadFor(Anime anime, String countryCode, List<WatchProvider> providers) {
