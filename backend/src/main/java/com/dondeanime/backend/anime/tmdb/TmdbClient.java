@@ -49,6 +49,16 @@ public class TmdbClient {
                 .body(TmdbSearchResponse.class);
     }
 
+    public TmdbTvDetailsResponse getTvDetails(Long tmdbId, String language) {
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/tv/{id}")
+                        .queryParam("language", language)
+                        .build(tmdbId))
+                .retrieve()
+                .body(TmdbTvDetailsResponse.class);
+    }
+
     /**
      * Devuelve los watch providers de una serie por país.
      * El Map devuelto tiene como clave el código ISO de país.

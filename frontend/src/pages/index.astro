@@ -11,6 +11,12 @@ import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
+const currentSeasonFor = (date: Date) => {
+  const month = date.getUTCMonth() + 1;
+  const season = month <= 3 ? 'WINTER' : month <= 6 ? 'SPRING' : month <= 9 ? 'SUMMER' : 'FALL';
+  return { year: date.getUTCFullYear(), season };
+};
+
 const [anime, genres, seasons] = await Promise.all([
   getAllAnime(),
   getGenres(),
@@ -25,12 +31,19 @@ const trending = [...anime]
 const topGenre = genres[0];
 const topGenreAnime = topGenre ? (await getAnimeByGenre(topGenre.slug)).slice(0, 12) : [];
 
-const latestSeason = [...seasons].sort((a, b) => {
+const seasonsByRecency = [...seasons].sort((a, b) => {
   if (a.year !== b.year) return b.year - a.year;
   return (SEASON_ORDER[b.season] ?? 0) - (SEASON_ORDER[a.season] ?? 0);
-})[0];
-const latestSeasonAnime = latestSeason
-  ? (await getAnimeBySeason(latestSeason.year, latestSeason.season.toLowerCase())).slice(0, 12)
+});
+
+const currentSeason = currentSeasonFor(new Date());
+const homeSeason = seasons.find((s) =>
+  s.year === currentSeason.year
+  && s.season === currentSeason.season
+  && s.animeCount > 0
+) ?? seasonsByRecency.find((s) => s.animeCount > 0);
+const homeSeasonAnime = homeSeason
+  ? (await getAnimeBySeason(homeSeason.year, homeSeason.season.toLowerCase())).slice(0, 12)
   : [];
 
 const featuredPlatforms: PlatformSlug[] = ['crunchyroll', 'netflix', 'amazon-prime-video', 'hbo-max', 'disney-plus'];
@@ -72,20 +85,20 @@ const itemListSchema = buildItemListSchema(
     <AnimeGrid anime={trending} />
   </section>
 
-  {latestSeason && latestSeasonAnime.length > 0 && (
+  {homeSeason && homeSeasonAnime.length > 0 && (
     <section class="mx-auto max-w-6xl px-4 pb-12">
       <div class="mb-5 flex items-baseline justify-between">
         <h2 class="text-2xl font-semibold">
-          Estrenos de {formatSeason(latestSeason.season)} {latestSeason.year}
+          Estrenos de {formatSeason(homeSeason.season)} {homeSeason.year}
         </h2>
         <a
-          href={`/temporada/${latestSeason.year}/${latestSeason.season.toLowerCase()}`}
+          href={`/temporada/${homeSeason.year}/${homeSeason.season.toLowerCase()}`}
           class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
         >
           Ver temporada →
         </a>
       </div>
-      <AnimeGrid anime={latestSeasonAnime} />
+      <AnimeGrid anime={homeSeasonAnime} />
     </section>
   )}
 
