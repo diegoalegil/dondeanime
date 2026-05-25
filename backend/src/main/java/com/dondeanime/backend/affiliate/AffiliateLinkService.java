@@ -1,18 +1,25 @@
 package com.dondeanime.backend.affiliate;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
 import com.dondeanime.backend.provider.WatchProvider;
@@ -25,16 +32,22 @@ public class AffiliateLinkService {
     private final AffiliateClickEventRepository clickEventRepository;
     private final PlausibleStatsClient plausibleStatsClient;
     private final WatchProviderRepository watchProviderRepository;
+    private final AvailabilityChangeEventRepository availabilityChangeEventRepository;
+    private final Clock clock;
 
     public AffiliateLinkService(
             AffiliateLinkRepository linkRepository,
             AffiliateClickEventRepository clickEventRepository,
             PlausibleStatsClient plausibleStatsClient,
-            WatchProviderRepository watchProviderRepository) {
+            WatchProviderRepository watchProviderRepository,
+            AvailabilityChangeEventRepository availabilityChangeEventRepository,
+            Clock clock) {
         this.linkRepository = linkRepository;
         this.clickEventRepository = clickEventRepository;
         this.plausibleStatsClient = plausibleStatsClient;
         this.watchProviderRepository = watchProviderRepository;
+        this.availabilityChangeEventRepository = availabilityChangeEventRepository;
+        this.clock = clock;
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +62,7 @@ public class AffiliateLinkService {
     public AffiliateLinkDto saveLink(AffiliateLinkRequest request) {
         String providerSlug = normalizeProviderSlug(request.providerSlug());
         String countryCode = normalizeCountry(request.country());
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
 
         AffiliateLink link = linkRepository.findByProviderSlugAndCountryCode(providerSlug, countryCode)
                 .orElseGet(() -> {
@@ -106,7 +119,7 @@ public class AffiliateLinkService {
         String providerSlug = normalizeProviderSlug(request.providerSlug());
         String countryCode = normalizeCountry(request.country());
         String animeSlug = normalizeAnimeSlug(request.animeSlug());
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
 
         Optional<AffiliateLink> link = linkRepository
                 .findByProviderSlugAndCountryCodeAndActiveTrue(providerSlug, countryCode);
@@ -130,9 +143,10 @@ public class AffiliateLinkService {
 
     @Transactional(readOnly = true)
     public AffiliateDashboardDto dashboard() {
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
         Instant sevenDaysAgo = now.minus(7, ChronoUnit.DAYS);
         Instant thirtyDaysAgo = now.minus(30, ChronoUnit.DAYS);
+        Long detailViews = plausibleStatsClient.animeDetailPageviews30Days();
 
         List<AffiliateAnimeClicksDto> topAnime = clickEventRepository
                 .findTopAnimeClicks(thirtyDaysAgo, PageRequest.of(0, 10))
@@ -145,12 +159,57 @@ public class AffiliateLinkService {
                 .map(AffiliateLinkDto::from)
                 .toList();
 
+        List<AffiliateDailyClicksDto> clicksByDay = clicksByDay(thirtyDaysAgo);
+        List<AffiliatePlatformConversionDto> platformConversions = clickEventRepository
+                .findTopProviderClicks(thirtyDaysAgo, PageRequest.of(0, 10))
+                .stream()
+                .map(row -> new AffiliatePlatformConversionDto(
+                        row.getProviderSlug(),
+                        row.getClicks(),
+                        detailViews,
+                        conversionRate(row.getClicks(), detailViews)))
+                .toList();
+        List<AffiliateCountryClicksDto> topClickCountries = clickEventRepository
+                .findTopCountryClicks(thirtyDaysAgo, PageRequest.of(0, 10))
+                .stream()
+                .map(row -> new AffiliateCountryClicksDto(row.getCountryCode(), row.getClicks()))
+                .toList();
+        List<AvailabilityAnimeChangesDto> topAvailabilityChanges = availabilityChangeEventRepository
+                .findTopAnimeChanges(thirtyDaysAgo, PageRequest.of(0, 10))
+                .stream()
+                .map(row -> new AvailabilityAnimeChangesDto(row.getAnimeSlug(), row.getChanges()))
+                .toList();
+
         return new AffiliateDashboardDto(
                 clickEventRepository.countByClickedAtAfter(sevenDaysAgo),
                 clickEventRepository.countByClickedAtAfter(thirtyDaysAgo),
                 topAnime,
                 topLinks,
-                plausibleStatsClient.topAnimePages30Days());
+                plausibleStatsClient.topAnimePages30Days(),
+                clicksByDay,
+                platformConversions,
+                topClickCountries,
+                topAvailabilityChanges);
+    }
+
+    private List<AffiliateDailyClicksDto> clicksByDay(Instant since) {
+        Map<LocalDate, Long> clicksByDate = new HashMap<>();
+        for (AffiliateClickEventRepository.DailyClickProjection row : clickEventRepository.countClicksByDay(since)) {
+            clicksByDate.put(row.getClickDate(), row.getClicks());
+        }
+
+        LocalDate today = LocalDate.now(clock.withZone(ZoneOffset.UTC));
+        return IntStream.rangeClosed(0, 29)
+                .mapToObj(offset -> today.minusDays(29L - offset))
+                .map(date -> new AffiliateDailyClicksDto(date, clicksByDate.getOrDefault(date, 0L)))
+                .toList();
+    }
+
+    private static Double conversionRate(Long clicks, Long detailViews) {
+        if (clicks == null || detailViews == null || detailViews == 0) {
+            return 0.0;
+        }
+        return clicks.doubleValue() / detailViews.doubleValue();
     }
 
     static String normalizeProviderSlug(String value) {
