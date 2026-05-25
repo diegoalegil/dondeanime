@@ -8,7 +8,10 @@ import { BEST_ANIME_YEARS } from '@/lib/bestYears';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders, getPlatform } from '@/lib/platforms';
 import { formatType } from '@/lib/format';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 interface Props {
   topAnime: AnimeSummary[];
@@ -139,7 +142,7 @@ const itemListSchema = buildItemListSchema(
               <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet sm:h-12 sm:w-16">
                 #{index + 1}
               </div>
-              <a href={`/anime/${anime.slug}`} class="block w-24 sm:w-full">
+              <a href={localizedPath(`/anime/${anime.slug}`)} class="block w-24 sm:w-full">
                 <img
                   src={anime.coverImage}
                   alt={title}
@@ -149,7 +152,7 @@ const itemListSchema = buildItemListSchema(
               </a>
               <div class="min-w-0">
                 <a
-                  href={`/anime/${anime.slug}`}
+                  href={localizedPath(`/anime/${anime.slug}`)}
                   class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
                 >
                   {title}
@@ -166,7 +169,7 @@ const itemListSchema = buildItemListSchema(
                   <div class="mt-4 flex flex-wrap gap-2">
                     {visibleProviders.map((provider) => (
                       <a
-                        href={`/plataforma/${provider.slug}`}
+                        href={localizedPath(`/plataforma/${provider.slug}`)}
                         class="inline-flex min-h-10 items-center gap-2 rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
                         data-provider-chip
                       >

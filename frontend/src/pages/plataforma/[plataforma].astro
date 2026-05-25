@@ -6,7 +6,10 @@ import { getProvidersByCountry, type ProviderSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const lists = await Promise.all(
@@ -40,19 +43,21 @@ const firstProvider = availableEntries[0]?.provider;
 const displayName = platform?.name ?? firstProvider?.providerName ?? plataforma!;
 const logoUrl = firstProvider?.logoUrl;
 const totalAnime = availableEntries.reduce((sum, a) => sum + a.provider.animeCount, 0);
-const countryPlural = availableEntries.length === 1 ? '' : 'es';
+const countryCountLabel = t(
+  availableEntries.length === 1 ? 'platform.countryCount.one' : 'platform.countryCount.other',
+  { count: availableEntries.length },
+);
 
 const seoTitle = t('platform.seo.title', { platform: displayName });
 const seoDescription = t('platform.seo.description', {
   platform: displayName,
-  count: availableEntries.length,
-  plural: countryPlural,
+  countryCount: countryCountLabel,
 });
 
 const pageUrl = absoluteUrl(`/plataforma/${plataforma}`);
 const itemListSchema = buildItemListSchema(
   availableEntries.map((a) => ({
-    name: `${displayName} ${a.country.name}`,
+    name: `${displayName} ${localizedCountryName(a.slug)}`,
     url: absoluteUrl(`/plataforma/${plataforma}/${a.slug}`),
   })),
   pageUrl,
@@ -84,7 +89,7 @@ const itemListSchema = buildItemListSchema(
           {t('platform.headingPrefix')} {displayName}
         </h1>
         <p class="mt-2 text-sm text-fg-muted">
-          {t('platform.total', { animeCount: totalAnime, countryCount: availableEntries.length, plural: countryPlural })}
+          {t('platform.total', { animeCount: totalAnime, countryCount: countryCountLabel })}
         </p>
       </div>
     </div>
@@ -96,13 +101,13 @@ const itemListSchema = buildItemListSchema(
       {availability.map(({ slug, country, provider }) => (
         provider ? (
           <a
-            href={`/plataforma/${plataforma}/${slug}`}
+            href={localizedPath(`/plataforma/${plataforma}/${slug}`)}
             class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
           >
             <div class="flex items-center gap-3">
               <span class={`fi fi-${country.flagCode} rounded text-xl`} aria-hidden="true"></span>
               <div>
-                <h3 class="text-base font-semibold text-fg-primary">{country.name}</h3>
+                <h3 class="text-base font-semibold text-fg-primary">{localizedCountryName(slug)}</h3>
                 <p class="mt-0.5 text-sm text-fg-muted">{t('platform.animeCount', { count: provider.animeCount })}</p>
               </div>
             </div>
@@ -113,7 +118,7 @@ const itemListSchema = buildItemListSchema(
             <div class="flex items-center gap-3">
               <span class={`fi fi-${country.flagCode} rounded text-xl grayscale`} aria-hidden="true"></span>
               <div>
-                <h3 class="text-base font-semibold text-fg-secondary">{country.name}</h3>
+                <h3 class="text-base font-semibold text-fg-secondary">{localizedCountryName(slug)}</h3>
                 <p class="mt-0.5 text-sm text-fg-muted">{t('platform.notAvailable')}</p>
               </div>
             </div>

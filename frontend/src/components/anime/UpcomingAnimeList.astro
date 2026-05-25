@@ -2,6 +2,7 @@
 import type { UpcomingAnime } from '@/lib/api';
 import { formatDate, formatStatus, formatType } from '@/lib/format';
 import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 interface Props {
   anime: UpcomingAnime[];
@@ -30,7 +31,7 @@ const isoDate = (item: UpcomingAnime): string => {
         >
           {formatDate(item.startYear, item.startMonth, item.startDay)}
         </time>
-        <a href={`/anime/${item.slug}`} class="block w-24 sm:w-full">
+        <a href={localizedPath(`/anime/${item.slug}`)} class="block w-24 sm:w-full">
           <img
             src={item.coverImage}
             alt={title}
@@ -40,7 +41,7 @@ const isoDate = (item: UpcomingAnime): string => {
         </a>
         <div class="min-w-0">
           <a
-            href={`/anime/${item.slug}`}
+            href={localizedPath(`/anime/${item.slug}`)}
             class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
           >
             {title}

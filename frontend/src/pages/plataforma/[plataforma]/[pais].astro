@@ -7,7 +7,10 @@ import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+import { canonicalCountrySlug, localizedCountryName } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const paths: Array<{ params: { plataforma: string; pais: string } }> = [];
@@ -23,8 +26,10 @@ export async function getStaticPaths() {
 }
 
 const { plataforma, pais } = Astro.params;
-const countrySlug = pais as CountrySlug;
+const countrySlug = canonicalCountrySlug(pais);
+if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
 const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
 
 const providersList = await getProvidersByCountry(country.iso);
 const providerSummary = providersList.find((p) => p.slug === plataforma);
@@ -36,12 +41,12 @@ const animePlural = anime.length === 1 ? '' : 's';
 
 const seoTitle = t('platformCountry.seo.title', {
   platform: displayName,
-  country: country.name,
+  country: countryName,
   count: anime.length,
 });
 const seoDescription = t('platformCountry.seo.description', {
   platform: displayName,
-  country: country.name,
+  country: countryName,
   count: anime.length,
 });
 
@@ -52,7 +57,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${a.slug}/${countrySlug}`),
   })),
   pageUrl,
-  t('platformCountry.schema.name', { platform: displayName, country: country.name }),
+  t('platformCountry.schema.name', { platform: displayName, country: countryName }),
 );
 ---
 <BaseLayout
@@ -66,7 +71,7 @@ const itemListSchema = buildItemListSchema(
     items={[
       { name: t('breadcrumbs.home'), url: '/' },
       { name: displayName, url: `/plataforma/${plataforma}` },
-      { name: country.name, url: `/plataforma/${plataforma}/${countrySlug}` },
+      { name: countryName, url: `/plataforma/${plataforma}/${countrySlug}` },
     ]}
   />
 
@@ -85,7 +90,7 @@ const itemListSchema = buildItemListSchema(
           <span class="text-fg-muted">&middot;</span>
           <span class="inline-flex items-center gap-2">
             <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
-            {country.name}
+            {countryName}
           </span>
         </h1>
         <p class="mt-2 text-sm text-fg-muted">
@@ -98,7 +103,7 @@ const itemListSchema = buildItemListSchema(
   <section class="mx-auto max-w-6xl px-4 pb-20">
     {anime.length === 0 ? (
       <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
-        {t('platformCountry.empty', { platform: displayName, country: country.name })}
+        {t('platformCountry.empty', { platform: displayName, country: countryName })}
       </p>
     ) : (
       <AnimeGrid anime={anime} />

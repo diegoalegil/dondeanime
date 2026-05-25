@@ -11,7 +11,9 @@ import AlternateLangs from '@/components/seo/AlternateLangs.astro';
 import { getAllAnime, getAnimeBySlug } from '@/lib/api';
 import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
-import { t } from '@/i18n';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const all = await getAllAnime();

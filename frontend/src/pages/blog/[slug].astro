@@ -4,7 +4,9 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, getLocale, t } from '@/i18n';
+
+setLocale('es');
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -24,6 +26,7 @@ const { Content } = await render(post);
 const pageUrl = absoluteUrl(`/blog/${post.id}`);
 const published = post.data.pubDate.toISOString();
 const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const activeLocale = getLocale();
 
 const blogPostingSchema = {
   '@context': 'https://schema.org',
@@ -32,7 +35,7 @@ const blogPostingSchema = {
   description: post.data.description,
   datePublished: published,
   dateModified: modified,
-  inLanguage: 'es',
+  inLanguage: activeLocale,
   mainEntityOfPage: {
     '@type': 'WebPage',
     '@id': pageUrl,
@@ -69,7 +72,7 @@ const blogPostingSchema = {
 
   <article class="mx-auto max-w-3xl px-4 pt-8 pb-20">
     <p class="text-sm text-fg-muted">
-      {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(post.data.pubDate)}
+      {new Intl.DateTimeFormat(activeLocale === 'en' ? 'en-US' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(post.data.pubDate)}
     </p>
     <h1 class="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
       {post.data.title}

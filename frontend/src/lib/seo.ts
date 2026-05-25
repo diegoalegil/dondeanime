@@ -1,5 +1,6 @@
 import { t } from '@/i18n';
 import type { AnimeDetail, WatchProvider } from './api';
+import { localizedPath } from './localizedRoutes';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL;
 const DEFAULT_ORGANIZATION_SAME_AS = 'https://github.com/diegoalegil';
@@ -14,30 +15,18 @@ export interface FAQItem {
   answer: string;
 }
 
-export const HOME_FAQS: FAQItem[] = [
-  {
-    question: t('faq.legal.question'),
-    answer: t('faq.legal.answer'),
-  },
-  {
-    question: t('faq.free.question'),
-    answer: t('faq.free.answer'),
-  },
-  {
-    question: t('faq.platform.question'),
-    answer: t('faq.platform.answer'),
-  },
-  {
-    question: t('faq.update.question'),
-    answer: t('faq.update.answer'),
-  },
-  {
-    question: t('faq.unavailable.question'),
-    answer: t('faq.unavailable.answer'),
-  },
+export const getHomeFaqs = (): FAQItem[] => [
+  { question: t('faq.legal.question'), answer: t('faq.legal.answer') },
+  { question: t('faq.free.question'), answer: t('faq.free.answer') },
+  { question: t('faq.platform.question'), answer: t('faq.platform.answer') },
+  { question: t('faq.update.question'), answer: t('faq.update.answer') },
+  { question: t('faq.unavailable.question'), answer: t('faq.unavailable.answer') },
 ];
 
-export const absoluteUrl = (path: string): string => `${SITE_URL}${path}`;
+const isAssetPath = (path: string): boolean => /\.[a-z0-9]+$/i.test(path.split('?')[0] ?? path);
+
+export const absoluteUrl = (path: string): string =>
+  `${SITE_URL}${isAssetPath(path) ? path : localizedPath(path)}`;
 
 const stripHtml = (s: string): string => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
@@ -149,7 +138,7 @@ export const buildWebSiteSchema = () => ({
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: `${SITE_URL}/?q={search_term_string}`,
+      urlTemplate: `${SITE_URL}${localizedPath('/')}?q={search_term_string}`,
     },
     'query-input': 'required name=search_term_string',
   },
@@ -159,7 +148,7 @@ export const buildOrganizationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: t('brand.name'),
-  url: SITE_URL,
+  url: `${SITE_URL}${localizedPath('/')}`,
   logo: {
     '@type': 'ImageObject',
     url: absoluteUrl('/og-default.png'),

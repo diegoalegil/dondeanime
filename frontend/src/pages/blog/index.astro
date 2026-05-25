@@ -3,12 +3,15 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
-import { t } from '@/i18n';
+import { setLocale, getLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-const formatDate = new Intl.DateTimeFormat('es-ES', {
+const formatDate = new Intl.DateTimeFormat(getLocale() === 'en' ? 'en-US' : 'es-ES', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -43,7 +46,7 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
           {formatDate.format(post.data.pubDate)}
         </p>
         <h2 class="mt-3 text-2xl font-semibold tracking-tight">
-          <a href={`/blog/${post.id}`} class="transition-colors hover:text-accent-violet">
+          <a href={localizedPath(`/blog/${post.id}`)} class="transition-colors hover:text-accent-violet">
             {post.data.title}
           </a>
         </h2>
@@ -51,7 +54,7 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
           {post.data.description}
         </p>
         <a
-          href={`/blog/${post.id}`}
+          href={localizedPath(`/blog/${post.id}`)}
           class="mt-5 inline-flex text-sm font-medium text-accent-violet transition-colors hover:text-accent-pink"
         >
           {t('blog.index.readArticle')}
