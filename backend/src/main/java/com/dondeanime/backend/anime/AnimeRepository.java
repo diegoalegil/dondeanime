@@ -13,7 +13,14 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
 
     Optional<Anime> findByAnilistId(Long anilistId);
 
+    @EntityGraph(attributePaths = "genres")
     Optional<Anime> findBySlug(String slug);
+
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
+            """)
+    List<Anime> findAllWithGenres();
 
     @EntityGraph(attributePaths = "tags")
     @Query("SELECT a FROM Anime a WHERE a.id = :id")
@@ -29,6 +36,7 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      */
     @Query("""
             SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.id IN (
                 SELECT wp.animeId FROM WatchProvider wp
                 WHERE LOWER(REPLACE(wp.providerName, ' ', '-')) = :providerSlug
@@ -46,6 +54,7 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @Query("""
             SELECT DISTINCT a FROM Anime a
             JOIN a.genres g
+            LEFT JOIN FETCH a.genres
             WHERE LOWER(REPLACE(g, ' ', '-')) = :genreSlug
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
@@ -55,7 +64,8 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      * Anime de una temporada concreta (ej. WINTER 2024).
      */
     @Query("""
-            SELECT a FROM Anime a
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.seasonYear = :year AND a.season = :season
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)

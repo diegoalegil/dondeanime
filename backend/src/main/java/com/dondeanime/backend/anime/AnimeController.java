@@ -60,7 +60,7 @@ public class AnimeController {
 
     @GetMapping
     public List<AnimeSummaryDto> getAll() {
-        return repository.findAll().stream()
+        return repository.findAllWithGenres().stream()
                 .map(AnimeSummaryDto::from)
                 .toList();
     }

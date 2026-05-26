@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -76,10 +77,12 @@ class AnimeControllerTest {
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
-        when(animeRepository.findAll()).thenReturn(List.of(a));
+        when(animeRepository.findAllWithGenres()).thenReturn(List.of(a));
 
-        mvc.perform(get("/api/anime"))
+        mvc.perform(get("/api/anime")
+                        .header("X-Request-Id", "req-test"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("X-Request-Id", "req-test"))
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
