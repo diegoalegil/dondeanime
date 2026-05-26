@@ -3,7 +3,6 @@ package com.dondeanime.backend.push;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,14 +20,19 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest(NotificationAdminController.class)
-@Import(SecurityConfig.class)
+@Import({
+        SecurityConfig.class,
+        AdminJwtService.class
+})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class NotificationAdminControllerTest {
 
@@ -37,6 +41,9 @@ class NotificationAdminControllerTest {
 
     @MockitoBean
     private NotificationDashboardService notificationDashboardService;
+
+    @Autowired
+    private AdminJwtService adminJwtService;
 
     @Test
     void statsRequiresAuth() throws Exception {
@@ -49,7 +56,7 @@ class NotificationAdminControllerTest {
         when(notificationDashboardService.stats()).thenReturn(stats());
 
         mvc.perform(get("/api/admin/notifications/stats")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.activeSubscriptions").value(1))
                 .andExpect(jsonPath("$.alertsSentLast24Hours").value(3))
@@ -71,7 +78,7 @@ class NotificationAdminControllerTest {
                 .thenReturn(new NotificationTestResponse(true, 201, "Push test enviado."));
 
         mvc.perform(post("/api/admin/notifications/test")
-                        .with(httpBasic("admin", "secret"))
+                        .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"subscriptionId\":1}"))
                 .andExpect(status().isOk())
@@ -79,6 +86,10 @@ class NotificationAdminControllerTest {
                 .andExpect(jsonPath("$.statusCode").value(201));
 
         verify(notificationDashboardService).sendTestPush(1L);
+    }
+
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 
     private static NotificationStatsDto stats() {
