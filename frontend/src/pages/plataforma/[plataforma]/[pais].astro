@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import AnimeFilterGrid from '@/components/anime/AnimeFilterGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import FilterRobotsNoindex from '@/components/seo/FilterRobotsNoindex.astro';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -66,6 +68,7 @@ const itemListSchema = buildItemListSchema(
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={itemListSchema} />
+  <FilterRobotsNoindex slot="head" />
 
   <Breadcrumbs
     items={[
@@ -89,7 +92,7 @@ const itemListSchema = buildItemListSchema(
           {t('platformCountry.headingPrefix')} {displayName}
           <span class="text-fg-muted">&middot;</span>
           <span class="inline-flex items-center gap-2">
-            <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+            <CountryFlag country={country} />
             {countryName}
           </span>
         </h1>
@@ -106,7 +109,7 @@ const itemListSchema = buildItemListSchema(
         {t('platformCountry.empty', { platform: displayName, country: countryName })}
       </p>
     ) : (
-      <AnimeGrid anime={anime} />
+      <AnimeFilterGrid anime={anime} emptyText={`No hay anime en ${displayName} ${country.name} con esos filtros.`} />
     )}
   </section>
 </BaseLayout>

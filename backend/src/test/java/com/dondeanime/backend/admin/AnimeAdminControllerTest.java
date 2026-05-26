@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,14 +27,19 @@ import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeOverride;
 import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.AnimeRepository;
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest(AnimeAdminController.class)
-@Import(SecurityConfig.class)
+@Import({
+        SecurityConfig.class,
+        AdminJwtService.class
+})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class AnimeAdminControllerTest {
 
@@ -48,8 +52,11 @@ class AnimeAdminControllerTest {
     @MockitoBean
     private AnimeOverrideService overrideService;
 
+    @Autowired
+    private AdminJwtService adminJwtService;
+
     @Test
-    void adminEndpointRequiresBasicAuth() throws Exception {
+    void adminEndpointRequiresBearerToken() throws Exception {
         mvc.perform(post("/api/admin/anime/attack-on-titan/override")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -67,7 +74,7 @@ class AnimeAdminControllerTest {
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of(override));
 
         mvc.perform(post("/api/admin/anime/attack-on-titan/override")
-                        .with(httpBasic("admin", "secret"))
+                        .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"fieldName":"description","fieldValue":"Descripción propia","locale":"es"}
@@ -94,7 +101,7 @@ class AnimeAdminControllerTest {
         mvc.perform(delete("/api/admin/anime/attack-on-titan/override")
                         .queryParam("field", "description")
                         .queryParam("locale", "es")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value("Descripción AniList"));
 
@@ -111,7 +118,7 @@ class AnimeAdminControllerTest {
         when(overrideService.originalValue(any(), eq("title_english"))).thenReturn("Attack on Titan");
 
         mvc.perform(get("/api/admin/anime/attack-on-titan/overrides")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].fieldName").value("title_english"))
@@ -141,5 +148,9 @@ class AnimeAdminControllerTest {
         override.setUpdatedAt(Instant.now());
         override.setUpdatedBy("admin");
         return override;
+    }
+
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 }

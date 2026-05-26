@@ -1,5 +1,5 @@
 import { t } from '@/i18n';
-import type { AnimeDetail, WatchProvider } from './api';
+import type { AnimeDetail, AnimeSummary, WatchProvider } from './api';
 import { localizedPath } from './localizedRoutes';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL;
@@ -187,3 +187,36 @@ export const buildItemListSchema = (
     url: item.url,
   })),
 });
+
+export const buildRelatedAnimeSchema = (
+  source: AnimeDetail['anime'],
+  related: AnimeSummary[],
+  pageUrl: string,
+) => {
+  if (related.length === 0) return undefined;
+
+  const sourceName = titleFor(source);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Anime similares a ${sourceName}`,
+    url: pageUrl,
+    about: {
+      '@type': 'TVSeries',
+      name: sourceName,
+      url: pageUrl,
+    },
+    numberOfItems: related.length,
+    itemListElement: related.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'TVSeries',
+        name: item.titleEnglish || item.titleRomaji,
+        url: absoluteUrl(`/anime/${item.slug}`),
+        image: item.coverImage,
+      },
+    })),
+  };
+};

@@ -234,10 +234,10 @@ const fieldPanels = [
       }`;
     };
 
-    const getToken = () => sessionStorage.getItem(tokenKey);
+    const getToken = () => localStorage.getItem(tokenKey);
     const authHeaders = () => {
       const token = getToken();
-      return token ? { Authorization: `Basic ${token}` } : {};
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const asText = (value) => value ?? '';
@@ -266,7 +266,7 @@ const fieldPanels = [
           setLoginStatus(messages.sessionActive, 'success');
         } catch (error) {
           if (error.status === 401) {
-            sessionStorage.removeItem(tokenKey);
+            localStorage.removeItem(tokenKey);
             setLoginStatus(messages.wrongCredentials, 'danger');
           }
         }
@@ -345,13 +345,22 @@ const fieldPanels = [
       const data = new FormData(loginForm);
       const username = String(data.get('username') ?? '');
       const password = String(data.get('password') ?? '');
-      const token = btoa(`${username}:${password}`);
-
-      sessionStorage.setItem(tokenKey, token);
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        setLoginStatus(messages.wrongCredentials, 'danger');
+        return;
+      }
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       try {
         await loadEditor();
       } catch (error) {
-        sessionStorage.removeItem(tokenKey);
+        localStorage.removeItem(tokenKey);
         setLoginStatus(messages.wrongCredentials, 'danger');
       }
     });
