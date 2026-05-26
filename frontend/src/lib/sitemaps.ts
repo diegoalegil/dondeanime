@@ -11,7 +11,13 @@ import { COUNTRIES, COUNTRY_SLUGS } from './countries';
 import { localizedPath } from './localizedRoutes';
 import { isHiddenVariant } from './platforms';
 import { t } from '@/i18n';
-import { DURATION_MINUTES, EPISODE_LIMITS, durationPath, episodeLimitPath } from './programmaticSeo';
+import {
+  DURATION_MINUTES,
+  EPISODE_LIMITS,
+  beginnerGenrePath,
+  durationPath,
+  episodeLimitPath,
+} from './programmaticSeo';
 
 export const LANGUAGE_SITEMAP_ENTRIES = [
   { name: 'Spanish', path: '/sitemap-es.xml' },
@@ -165,8 +171,9 @@ export const combinationSitemapPaths = async (): Promise<string[]> => {
   );
   const durationPaths = DURATION_MINUTES.map((minutes) => durationPath(minutes));
   const episodeLimitPaths = EPISODE_LIMITS.map((maxEpisodes) => episodeLimitPath(maxEpisodes));
+  const beginnerGenrePaths = genres.map((genre) => beginnerGenrePath(genre.slug));
 
-  return [...genreProviderPaths, ...durationPaths, ...episodeLimitPaths];
+  return [...genreProviderPaths, ...durationPaths, ...episodeLimitPaths, ...beginnerGenrePaths];
 };
 
 export const spanishSitemapPaths = async (): Promise<string[]> => {

@@ -35,6 +35,12 @@ const fieldPanels = [
     helper: t('admin.editor.publicDescriptionValue'),
     input: 'textarea',
   },
+  {
+    name: 'beginner_recommendation',
+    title: t('admin.editor.beginnerRecommendationField'),
+    helper: t('admin.editor.beginnerRecommendationHelper'),
+    input: 'textarea',
+  },
 ];
 ---
 <BaseLayout
@@ -216,6 +222,7 @@ const fieldPanels = [
       title_english: 'titleEnglish',
       title_romaji: 'titleRomaji',
       description: 'description',
+      beginner_recommendation: null,
     };
 
     const setGlobalStatus = (message, tone = 'muted') => {
@@ -278,8 +285,8 @@ const fieldPanels = [
         const fieldName = panel.getAttribute('data-field-panel');
         const apiField = apiFieldByOverride[fieldName];
         const override = overrideByField.get(fieldName);
-        const originalValue = override?.originalValue ?? detail.anime[apiField];
-        const effectiveValue = override?.fieldValue ?? detail.anime[apiField];
+        const originalValue = override?.originalValue ?? (apiField ? detail.anime[apiField] : '');
+        const effectiveValue = override?.fieldValue ?? (apiField ? detail.anime[apiField] : '');
         const displayEffective = fieldName === 'description' ? stripHtml(effectiveValue) : asText(effectiveValue);
 
         panel.querySelector('[data-original]').value = fieldName === 'description'
