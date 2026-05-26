@@ -12,6 +12,7 @@ const knownTypes = new Set([
   'ItemList',
   'Organization',
   'Review',
+  'Service',
   'TVSeries',
   'WebSite',
 ]);
@@ -126,6 +127,13 @@ function validateNode(node, file) {
       if (!isRecord(node.itemReviewed)) errors.push(`${rel(file)}: Review.itemReviewed debe existir`);
       if (!isRecord(node.author)) errors.push(`${rel(file)}: Review.author debe existir`);
       requireRating(node, 'reviewRating', file, type);
+    }
+    if (type === 'Service') {
+      requireString(node, 'name', file, type);
+      requireString(node, 'url', file, type);
+      requireString(node, 'serviceType', file, type);
+      requireString(node, 'description', file, type);
+      if (!isRecord(node.provider)) errors.push(`${rel(file)}: Service.provider debe existir`);
     }
     if (type === 'FAQPage') {
       requireArray(node, 'mainEntity', file, type);
