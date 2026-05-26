@@ -69,6 +69,7 @@ class FlywayMigrationTest {
                 "anime_genre",
                 "anime_override",
                 "app_user",
+                "availability_change_event",
                 "email_token",
                 "newsletter_subscriber",
                 "newsletter_token",
