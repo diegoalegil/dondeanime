@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest(StudioController.class)
@@ -36,6 +37,9 @@ class StudioControllerTest {
 
     @MockitoBean
     private AnimeRepository animeRepository;
+
+    @MockitoBean
+    private AdminJwtService adminJwtService;
 
     @Test
     void listReturnsStudiosWithCounts() throws Exception {
