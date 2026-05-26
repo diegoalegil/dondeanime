@@ -26,6 +26,7 @@ public class AniListClient {
               startDate { year month day }
               endDate { year month day }
               episodes
+              duration
               format
               status
               averageScore
