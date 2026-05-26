@@ -1,0 +1,49 @@
+---
+import { localeFromPath, t, type Locale } from '@/i18n';
+import { localizedPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
+
+const activeLocale = localeFromPath(Astro.url.pathname);
+const spanishPath = spanishPathFromLocalized(Astro.url.pathname);
+
+const options: Array<{ locale: Locale; code: string; label: string; href: string }> = [
+  { locale: 'es', code: 'ES', label: t('header.language.es'), href: localizedPath(spanishPath, 'es') },
+  { locale: 'en', code: 'EN', label: t('header.language.en'), href: localizedPath(spanishPath, 'en') },
+];
+---
+<nav
+  class="flex h-9 items-center rounded-md border border-surface-2 bg-surface-1 p-0.5 text-xs font-semibold"
+  aria-label={t('header.language.label')}
+>
+  {options.map((option) => {
+    const active = option.locale === activeLocale;
+    return (
+      <a
+        href={option.href}
+        class:list={[
+          'grid h-7 min-w-8 place-items-center rounded px-2 transition-colors',
+          active
+            ? 'bg-surface-2 text-fg-primary'
+            : 'text-fg-muted hover:bg-surface-2/70 hover:text-fg-primary',
+        ]}
+        aria-label={option.label}
+        aria-current={active ? 'true' : undefined}
+        title={option.label}
+        data-locale-switch={option.locale}
+      >
+        {option.code}
+      </a>
+    );
+  })}
+</nav>
+
+<script>
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+
+    const link = event.target.closest('[data-locale-switch]');
+    const locale = link?.getAttribute('data-locale-switch');
+    if (locale !== 'es' && locale !== 'en') return;
+
+    document.cookie = `dondeanime-locale=${locale}; Max-Age=31536000; Path=/; SameSite=Lax`;
+  });
+</script>

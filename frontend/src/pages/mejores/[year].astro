@@ -7,6 +7,11 @@ import { getAllAnime, getAnimeBySlug } from '@/lib/api';
 import { BEST_ANIME_YEARS } from '@/lib/bestYears';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders, getPlatform } from '@/lib/platforms';
+import { formatType } from '@/lib/format';
+import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 interface Props {
   topAnime: AnimeSummary[];
@@ -78,10 +83,13 @@ const rankedAnime = topAnime.map((anime) => ({
   providers: summarizeProviders(detailBySlug.get(anime.slug)!),
 }));
 
-const seoTitle = `Mejores anime de ${yearNum} - Top ${topAnime.length} para ver en streaming | DondeAnime`;
+const seoTitle = t('bestYear.seo.title', { year: yearNum, count: topAnime.length });
 const seoDescription = topAnime.length > 0
-  ? `Ranking de los mejores anime de ${yearNum} por popularidad: ${topAnime.slice(0, 5).map((anime) => anime.titleEnglish || anime.titleRomaji).join(', ')} y más.`
-  : `Ranking de anime de ${yearNum} para ver en streaming en plataformas hispanoamericanas.`;
+  ? t('bestYear.seo.description.populated', {
+      year: yearNum,
+      titles: topAnime.slice(0, 5).map((anime) => anime.titleEnglish || anime.titleRomaji).join(', '),
+    })
+  : t('bestYear.seo.description.empty', { year: yearNum });
 
 const pageUrl = absoluteUrl(`/mejores/${year}`);
 const itemListSchema = buildItemListSchema(
@@ -90,7 +98,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${anime.slug}`),
   })),
   pageUrl,
-  `Mejores anime de ${yearNum}`,
+  t('bestYear.schema.name', { year: yearNum }),
 );
 ---
 <BaseLayout title={seoTitle} description={seoDescription}>
@@ -98,26 +106,26 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Mejores anime', url: '/' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.bestAnime'), url: '/' },
       { name: String(year), url: `/mejores/${year}` },
     ]}
   />
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
-    <p class="text-xs uppercase tracking-wide text-accent-violet">Ranking anual</p>
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('bestYear.eyebrow')}</p>
     <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
-      Mejores anime de <span class="brand-gradient-text">{year}</span>
+      {t('bestYear.headingPrefix')} <span class="brand-gradient-text">{year}</span>
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      Top {topAnime.length} por popularidad de {totalInYear} anime catalogados de {year}.
+      {t('bestYear.summary', { count: topAnime.length, total: totalInYear, year: year! })}
     </p>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
     {rankedAnime.length === 0 ? (
       <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
-        No tenemos anime catalogados de este año todavía.
+        {t('bestYear.empty')}
       </p>
     ) : (
       <ol class="grid gap-4">
@@ -134,7 +142,7 @@ const itemListSchema = buildItemListSchema(
               <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet sm:h-12 sm:w-16">
                 #{index + 1}
               </div>
-              <a href={`/anime/${anime.slug}`} class="block w-24 sm:w-full">
+              <a href={localizedPath(`/anime/${anime.slug}`)} class="block w-24 sm:w-full">
                 <img
                   src={anime.coverImage}
                   alt={title}
@@ -144,24 +152,24 @@ const itemListSchema = buildItemListSchema(
               </a>
               <div class="min-w-0">
                 <a
-                  href={`/anime/${anime.slug}`}
+                  href={localizedPath(`/anime/${anime.slug}`)}
                   class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
                 >
                   {title}
                 </a>
                 <p class="mt-2 text-sm text-fg-muted">
-                  {anime.format} · Popularidad {anime.popularity ?? 'sin dato'} · Nota {anime.averageScore ?? 'sin dato'}
+                  {formatType(anime.format)} &middot; {t('bestYear.popularity')} {anime.popularity ?? t('bestYear.noData')} &middot; {t('bestYear.score')} {anime.averageScore ?? t('bestYear.noData')}
                 </p>
 
                 {visibleProviders.length === 0 ? (
                   <p class="mt-4 text-sm text-fg-secondary">
-                    Sin plataformas actuales en los países cubiertos.
+                    {t('bestYear.noProviders')}
                   </p>
                 ) : (
                   <div class="mt-4 flex flex-wrap gap-2">
                     {visibleProviders.map((provider) => (
                       <a
-                        href={`/plataforma/${provider.slug}`}
+                        href={localizedPath(`/plataforma/${provider.slug}`)}
                         class="inline-flex min-h-10 items-center gap-2 rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
                         data-provider-chip
                       >
@@ -173,13 +181,13 @@ const itemListSchema = buildItemListSchema(
                         />
                         <span>{provider.name}</span>
                         <span class="text-xs text-fg-muted">
-                          {provider.countryCount} {provider.countryCount === 1 ? 'país' : 'países'}
+                          {provider.countryCount} {t(provider.countryCount === 1 ? 'bestYear.country.one' : 'bestYear.country.other')}
                         </span>
                       </a>
                     ))}
                     {hiddenProviderCount > 0 && (
                       <span class="inline-flex min-h-10 items-center rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-muted">
-                        +{hiddenProviderCount} más
+                        {t('bestYear.more', { count: hiddenProviderCount })}
                       </span>
                     )}
                   </div>

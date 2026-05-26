@@ -296,7 +296,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
-Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte.
+Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte, `TELEGRAM_ENABLED=false` por defecto, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` solo si se activan alertas críticas.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.

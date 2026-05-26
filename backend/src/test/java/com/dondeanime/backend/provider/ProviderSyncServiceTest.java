@@ -38,12 +38,14 @@ class ProviderSyncServiceTest {
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         AlertService alertService = mock(AlertService.class);
         ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        AvailabilityChangeService availabilityChangeService = mock(AvailabilityChangeService.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
                 animeRepository,
                 providerRepository,
                 alertService,
                 eventPublisher,
+                availabilityChangeService,
                 transactionManager());
 
         when(animeRepository.findAll()).thenReturn(List.of(anime));
@@ -71,12 +73,14 @@ class ProviderSyncServiceTest {
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         AlertService alertService = mock(AlertService.class);
         ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        AvailabilityChangeService availabilityChangeService = mock(AvailabilityChangeService.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
                 animeRepository,
                 providerRepository,
                 alertService,
                 eventPublisher,
+                availabilityChangeService,
                 transactionManager());
 
         when(animeRepository.findAll()).thenReturn(List.of(anime));

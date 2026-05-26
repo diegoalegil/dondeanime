@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<testcontainers.version>1.20.6</testcontainers.version>
+		<jacoco.version>0.8.13</jacoco.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -61,6 +63,24 @@
 			<artifactId>stripe-java</artifactId>
 			<version>25.5.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j_jdk17-core</artifactId>
+			<version>8.14.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.giffing.bucket4j.spring.boot.starter</groupId>
+			<artifactId>bucket4j-spring-boot-starter</artifactId>
+			<version>0.14.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,6 +92,25 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-flyway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -96,6 +135,18 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -151,6 +202,89 @@
 									<artifactId>lombok</artifactId>
 								</path>
 							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<!-- Docker 29 rechaza clientes con API demasiado antigua; 1.40 mantiene compatibilidad amplia. -->
+						<api.version>1.40</api.version>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>com/dondeanime/backend/BackendApplication.class</exclude>
+						<exclude>com/dondeanime/backend/config/**</exclude>
+						<exclude>com/dondeanime/backend/scheduling/**</exclude>
+						<exclude>com/dondeanime/backend/**/*Dto.class</exclude>
+						<exclude>com/dondeanime/backend/**/*Dto$*.class</exclude>
+						<exclude>com/dondeanime/backend/**/*Request.class</exclude>
+						<exclude>com/dondeanime/backend/**/*Response.class</exclude>
+						<exclude>com/dondeanime/backend/**/*Response$*.class</exclude>
+						<exclude>com/dondeanime/backend/anime/Anime.class</exclude>
+						<exclude>com/dondeanime/backend/anime/AnimeOverride.class</exclude>
+						<exclude>com/dondeanime/backend/anime/AnimeSyncService.class</exclude>
+						<exclude>com/dondeanime/backend/anime/anilist/**</exclude>
+						<exclude>com/dondeanime/backend/anime/tmdb/TmdbClient.class</exclude>
+						<exclude>com/dondeanime/backend/anime/tmdb/TmdbCountryProviders.class</exclude>
+						<exclude>com/dondeanime/backend/anime/tmdb/TmdbProvider.class</exclude>
+						<exclude>com/dondeanime/backend/anime/tmdb/TmdbSearchResult.class</exclude>
+						<exclude>com/dondeanime/backend/provider/WatchProvider.class</exclude>
+						<exclude>com/dondeanime/backend/provider/ProviderSyncService.class</exclude>
+						<exclude>com/dondeanime/backend/provider/ProviderSyncService$*.class</exclude>
+						<exclude>com/dondeanime/backend/affiliate/AffiliateClickEvent.class</exclude>
+						<exclude>com/dondeanime/backend/affiliate/AffiliateLink.class</exclude>
+						<exclude>com/dondeanime/backend/affiliate/PlausibleStatsClient.class</exclude>
+						<exclude>com/dondeanime/backend/affiliate/PlausibleQueryResponse.class</exclude>
+						<exclude>com/dondeanime/backend/affiliate/PlausibleQueryResponse$*.class</exclude>
+						<exclude>com/dondeanime/backend/subscription/AppUser.class</exclude>
+						<exclude>com/dondeanime/backend/subscription/ConfirmedSubscription.class</exclude>
+						<exclude>com/dondeanime/backend/subscription/EmailToken.class</exclude>
+						<exclude>com/dondeanime/backend/subscription/IssuedEmailToken.class</exclude>
+						<exclude>com/dondeanime/backend/subscription/Subscription.class</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.70</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
 						</configuration>
 					</execution>
 				</executions>

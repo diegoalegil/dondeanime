@@ -35,6 +35,7 @@ public class AnimeController {
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
+    private final RecommendationService recommendationService;
 
     public AnimeController(
             AnimeRepository repository,
@@ -44,7 +45,8 @@ public class AnimeController {
             AnimeDescriptionEnricher descriptionEnricher,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
-            AffiliateLinkService affiliateLinkService) {
+            AffiliateLinkService affiliateLinkService,
+            RecommendationService recommendationService) {
         this.repository = repository;
         this.syncService = syncService;
         this.matchingService = matchingService;
@@ -53,11 +55,12 @@ public class AnimeController {
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping
     public List<AnimeSummaryDto> getAll() {
-        return repository.findAll().stream()
+        return repository.findAllWithGenres().stream()
                 .map(AnimeSummaryDto::from)
                 .toList();
     }
@@ -90,6 +93,16 @@ public class AnimeController {
                 .toList();
 
         return ResponseEntity.ok(upcoming);
+    }
+
+    @GetMapping("/{slug}/similar")
+    public ResponseEntity<List<AnimeSummaryDto>> getSimilar(@PathVariable String slug) {
+        return repository.findBySlug(slug)
+                .map(anime -> ResponseEntity.ok(
+                        recommendationService.findSimilar(anime.getId(), 10).stream()
+                                .map(AnimeSummaryDto::from)
+                                .toList()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
