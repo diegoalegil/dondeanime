@@ -316,6 +316,18 @@ test('offline page and service worker are generated', async ({ request }) => {
   expect(serviceWorkerText).toContain("request.mode === 'navigate'");
 });
 
+test('alert background sync is generated in the service worker', async ({ request }) => {
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+
+  expect(serviceWorkerText).toContain("const ALERT_SYNC_TAG = 'dondeanime-alerts-sync'");
+  expect(serviceWorkerText).toContain("const ALERT_DB_NAME = 'dondeanime-alerts'");
+  expect(serviceWorkerText).toContain("self.addEventListener('sync'");
+  expect(serviceWorkerText).toContain("fetch(alert.endpoint");
+  expect(serviceWorkerText).toContain("self.registration.showNotification('Alerta enviada'");
+});
+
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
   await page.goto('/blog');
 
