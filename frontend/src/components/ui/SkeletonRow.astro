@@ -1,0 +1,20 @@
+---
+import SkeletonCard from './SkeletonCard.astro';
+
+interface Props {
+  count?: number;
+  compact?: boolean;
+}
+
+const { count = 6, compact = false } = Astro.props;
+const items = Array.from({ length: count });
+---
+<section class="mx-auto max-w-6xl px-4 py-8" aria-hidden="true">
+  <div class="mb-5 flex items-baseline justify-between">
+    <div class="skeleton-shimmer h-7 w-44 rounded bg-surface-2"></div>
+    <div class="skeleton-shimmer h-4 w-16 rounded bg-surface-2"></div>
+  </div>
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-6">
+    {items.map(() => <SkeletonCard compact={compact} />)}
+  </div>
+</section>

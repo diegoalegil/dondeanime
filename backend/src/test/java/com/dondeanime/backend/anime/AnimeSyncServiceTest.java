@@ -26,6 +26,7 @@ import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
 import com.dondeanime.backend.anime.anilist.AniListStudio;
 import com.dondeanime.backend.anime.anilist.AniListStudioConnection;
+import com.dondeanime.backend.anime.anilist.AniListTag;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
 import com.dondeanime.backend.character.AnimeCharacter;
 import com.dondeanime.backend.character.AnimeCharacterRepository;
@@ -71,7 +72,7 @@ class AnimeSyncServiceTest {
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         StudioRepository studioRepository = mock(StudioRepository.class);
         AnimeCharacterRepository characterRepository = mock(AnimeCharacterRepository.class);
-        AniListMedia media = mediaWithStudio();
+        AniListMedia media = media(List.of(new AniListStudio(858L, "WIT Studio", true)), List.of(), List.of());
 
         when(client.fetchPopular(1)).thenReturn(List.of(media));
         when(animeRepository.findByAnilistIdWithCharacters(16498L)).thenReturn(Optional.empty());
@@ -99,10 +100,10 @@ class AnimeSyncServiceTest {
 
     @Test
     void syncPopularStoresMainCharactersFromAnilist() {
-        AniListMedia media = mediaWithCharacters(List.of(
+        AniListMedia media = media(List.of(), List.of(
                 edge(40882L, "Eren Yeager", "https://img.example/eren.jpg"),
                 edge(40881L, "Mikasa Ackerman", "https://img.example/mikasa.jpg")
-        ));
+        ), List.of());
 
         AniListClient client = mock(AniListClient.class);
         when(client.fetchPopular(1)).thenReturn(List.of(media));
@@ -130,7 +131,7 @@ class AnimeSyncServiceTest {
 
     @Test
     void syncPopularLimitsCharactersToSix() {
-        AniListMedia media = mediaWithCharacters(List.of(
+        AniListMedia media = media(List.of(), List.of(
                 edge(1L, "Uno", null),
                 edge(2L, "Dos", null),
                 edge(3L, "Tres", null),
@@ -138,7 +139,7 @@ class AnimeSyncServiceTest {
                 edge(5L, "Cinco", null),
                 edge(6L, "Seis", null),
                 edge(7L, "Siete", null)
-        ));
+        ), List.of());
 
         AniListClient client = mock(AniListClient.class);
         when(client.fetchPopular(1)).thenReturn(List.of(media));
@@ -157,17 +158,38 @@ class AnimeSyncServiceTest {
         assertThat(captor.getValue().getCharacterRoles()).hasSize(6);
     }
 
-    private static AniListMedia mediaWithStudio() {
-        return media(List.of(
-                new AniListStudio(858L, "WIT Studio", true)
-        ), List.of());
+    @Test
+    void syncPopularPersistsAniListTags() {
+        AniListClient client = mock(AniListClient.class);
+        AnimeRepository repository = mock(AnimeRepository.class);
+        StudioRepository studioRepository = mock(StudioRepository.class);
+        AnimeCharacterRepository characterRepository = mock(AnimeCharacterRepository.class);
+        AniListMedia media = media(
+                List.of(),
+                List.of(),
+                List.of(new AniListTag("Time Travel", 94), new AniListTag("Alternate Universe", 71)));
+
+        when(client.fetchPopular(1)).thenReturn(List.of(media));
+        when(repository.findByAnilistIdWithCharacters(16498L)).thenReturn(Optional.empty());
+        when(repository.findBySlug("attack-on-titan")).thenReturn(Optional.empty());
+        when(repository.save(any(Anime.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        int saved = new AnimeSyncService(client, repository, studioRepository, characterRepository).syncPopular(1);
+
+        ArgumentCaptor<Anime> animeCaptor = ArgumentCaptor.forClass(Anime.class);
+        verify(repository).save(animeCaptor.capture());
+
+        assertThat(saved).isEqualTo(1);
+        assertThat(animeCaptor.getValue().getTags())
+                .containsExactlyInAnyOrder(
+                        new AnimeTag("Time Travel", 94),
+                        new AnimeTag("Alternate Universe", 71));
     }
 
-    private static AniListMedia mediaWithCharacters(List<AniListCharacterEdge> characterEdges) {
-        return media(List.of(), characterEdges);
-    }
-
-    private static AniListMedia media(List<AniListStudio> studios, List<AniListCharacterEdge> characterEdges) {
+    private static AniListMedia media(
+            List<AniListStudio> studios,
+            List<AniListCharacterEdge> characterEdges,
+            List<AniListTag> tags) {
         return new AniListMedia(
                 16498L,
                 new AniListTitle("Shingeki no Kyojin", "Attack on Titan"),
@@ -185,8 +207,8 @@ class AnimeSyncServiceTest {
                 new AniListStudioConnection(studios),
                 "SPRING",
                 2013,
-                new AniListCharacterConnection(characterEdges)
-        );
+                new AniListCharacterConnection(characterEdges),
+                tags);
     }
 
     private static AniListCharacterEdge edge(Long id, String name, String image) {

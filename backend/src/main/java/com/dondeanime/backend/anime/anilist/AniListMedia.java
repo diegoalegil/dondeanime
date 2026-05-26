@@ -23,5 +23,6 @@ public record AniListMedia(
         AniListStudioConnection studios,
         String season,
         Integer seasonYear,
-        AniListCharacterConnection characters
+        AniListCharacterConnection characters,
+        List<AniListTag> tags
 ) {}

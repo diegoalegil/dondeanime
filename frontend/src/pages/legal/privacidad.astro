@@ -1,39 +1,28 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 ---
 <BaseLayout
-  title="Privacidad — DondeAnime"
-  description="Política de privacidad de DondeAnime."
+  title={t('legal.privacy.title')}
+  description={t('legal.privacy.description')}
 >
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Privacidad', url: '/legal/privacidad' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('legal.privacy.heading'), url: '/legal/privacidad' },
     ]}
   />
 
   <section class="mx-auto max-w-3xl px-4 py-10">
-    <h1 class="text-3xl font-semibold text-fg-primary">Privacidad</h1>
+    <h1 class="text-3xl font-semibold text-fg-primary">{t('legal.privacy.heading')}</h1>
     <div class="mt-6 space-y-5 text-sm leading-7 text-fg-secondary">
-      <p>
-        DondeAnime guarda tu email solo si creas una alerta de disponibilidad.
-        Lo usamos para enviarte la confirmación y, si confirmas, un aviso cuando
-        el anime solicitado aparezca en plataformas del país elegido.
-      </p>
-      <p>
-        Guardamos el email, la fecha de alta, la fecha de confirmación, las
-        alertas creadas y la fecha de baja si decides cancelar. No vendemos ni
-        cedemos estos datos.
-      </p>
-      <p>
-        Cada correo de alerta incluye un enlace para darte de baja y otro para
-        borrar tus datos asociados a las alertas.
-      </p>
-      <p>
-        Para cualquier petición de acceso, rectificación o borrado también puedes
-        escribir a contacto@dondeanime.com.
-      </p>
+      <p>{t('legal.privacy.paragraph1')}</p>
+      <p>{t('legal.privacy.paragraph2')}</p>
+      <p>{t('legal.privacy.paragraph3')}</p>
+      <p>{t('legal.privacy.paragraph4')}</p>
     </div>
   </section>
 </BaseLayout>

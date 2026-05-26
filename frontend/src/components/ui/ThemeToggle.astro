@@ -1,9 +1,10 @@
 ---
+import { t } from '@/i18n';
 ---
 <button
   id="theme-toggle"
   type="button"
-  aria-label="Cambiar tema"
+  aria-label={t('header.theme.toggle')}
   class="flex h-9 w-9 items-center justify-center rounded-md border border-surface-2 bg-surface-1 text-fg-secondary transition-colors hover:border-accent-violet/40 hover:text-fg-primary"
 >
   <svg

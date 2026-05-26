@@ -83,6 +83,7 @@ tmp/
 # ===== Cobertura de tests =====
 coverage/
 .nyc_output/
+.lighthouseci/
 playwright-report/
 test-results/
 
