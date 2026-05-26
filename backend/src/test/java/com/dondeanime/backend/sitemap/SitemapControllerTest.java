@@ -15,16 +15,18 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
 @WebMvcTest(SitemapController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, AdminJwtService.class})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class SitemapControllerTest {
 
