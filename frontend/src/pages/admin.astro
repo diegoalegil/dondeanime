@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import PremiumBadge from '@/components/premium/PremiumBadge.astro';
 import { getAllAnime } from '@/lib/api';
 import { t } from '@/i18n';
 
@@ -27,6 +28,9 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <div class="mb-5">
         <p class="text-xs font-semibold uppercase text-accent-violet">{t('admin.eyebrow')}</p>
         <h1 class="mt-1 text-2xl font-semibold text-fg-primary">{t('admin.panel')}</h1>
+        <div class="mt-3">
+          <PremiumBadge />
+        </div>
       </div>
 
       <nav class="mb-5 grid gap-2 text-sm">
@@ -35,6 +39,12 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         </a>
         <a href="/admin/affiliate-links" class="rounded-md border border-surface-2 px-3 py-2 text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary">
           {t('admin.affiliateLinks')}
+        </a>
+        <a href="/admin/notifications" class="rounded-md border border-surface-2 px-3 py-2 text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary">
+          Notificaciones
+        </a>
+        <a href="/premium?manage=1" class="rounded-md border border-surface-2 px-3 py-2 text-fg-secondary transition-colors hover:border-warning hover:text-warning">
+          Gestionar Premium
         </a>
       </nav>
 

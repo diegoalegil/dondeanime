@@ -115,6 +115,67 @@ public class ResendEmailService implements EmailService {
         send(email, subject, html, text);
     }
 
+    @Override
+    public void sendPremiumWelcomeEmail(String email, String planTier, String manageUrl) {
+        String safePlanTier = escapeHtml(planTier);
+        String safeManageUrl = escapeHtml(manageUrl);
+        String subject = "Premium DondeAnime activado";
+        String html = """
+                <p>Hola.</p>
+                <p>Tu plan <strong>%s</strong> de DondeAnime ya esta activo.</p>
+                <p>Puedes gestionar la suscripcion, tarjeta y facturas desde <a href="%s">tu panel Premium</a>.</p>
+                """.formatted(safePlanTier, safeManageUrl);
+        String text = """
+                Tu plan %s de DondeAnime ya esta activo.
+
+                Gestion: %s
+                """.formatted(planTier, manageUrl).trim();
+
+        send(email, subject, html, text);
+    }
+
+    @Override
+    public void sendPremiumReceiptEmail(String email, String planTier, String paidAt, String manageUrl) {
+        String safePlanTier = escapeHtml(planTier);
+        String safePaidAt = escapeHtml(paidAt);
+        String safeManageUrl = escapeHtml(manageUrl);
+        String subject = "Recibo Premium DondeAnime";
+        String html = """
+                <p>Hola.</p>
+                <p>Hemos registrado el pago de tu plan <strong>%s</strong>.</p>
+                <p>Fecha registrada: <strong>%s</strong>.</p>
+                <p>Stripe guarda el recibo fiscal completo en <a href="%s">tu portal de cliente</a>.</p>
+                """.formatted(safePlanTier, safePaidAt, safeManageUrl);
+        String text = """
+                Hemos registrado el pago de tu plan %s.
+                Fecha registrada: %s
+
+                Recibo y gestion: %s
+                """.formatted(planTier, paidAt, manageUrl).trim();
+
+        send(email, subject, html, text);
+    }
+
+    @Override
+    public void sendPremiumCancellationEmail(String email, String planTier, String premiumUrl) {
+        String safePlanTier = escapeHtml(planTier);
+        String safePremiumUrl = escapeHtml(premiumUrl);
+        String subject = "Vuelve cuando quieras a Premium";
+        String html = """
+                <p>Hola.</p>
+                <p>Hace unas semanas se cancelo tu plan <strong>%s</strong> de DondeAnime.</p>
+                <p>Gracias por haber apoyado el proyecto. Si algun dia quieres volver, puedes hacerlo desde <a href="%s">Premium DondeAnime</a>.</p>
+                """.formatted(safePlanTier, safePremiumUrl);
+        String text = """
+                Hace unas semanas se cancelo tu plan %s de DondeAnime.
+                Gracias por haber apoyado el proyecto. Vuelve cuando quieras:
+
+                %s
+                """.formatted(planTier, premiumUrl).trim();
+
+        send(email, subject, html, text);
+    }
+
     private void send(String email, String subject, String html, String text) {
         if (!enabled) {
             log.info("Resend desactivado: email a '{}' con asunto '{}' no enviado", email, subject);
