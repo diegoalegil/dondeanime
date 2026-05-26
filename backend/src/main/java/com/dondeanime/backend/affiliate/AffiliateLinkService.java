@@ -19,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dondeanime.backend.anime.RecommendationClickDto;
+import com.dondeanime.backend.anime.RecommendationEventRepository;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
@@ -33,6 +35,7 @@ public class AffiliateLinkService {
     private final PlausibleStatsClient plausibleStatsClient;
     private final WatchProviderRepository watchProviderRepository;
     private final AvailabilityChangeEventRepository availabilityChangeEventRepository;
+    private final RecommendationEventRepository recommendationEventRepository;
     private final Clock clock;
 
     public AffiliateLinkService(
@@ -41,12 +44,14 @@ public class AffiliateLinkService {
             PlausibleStatsClient plausibleStatsClient,
             WatchProviderRepository watchProviderRepository,
             AvailabilityChangeEventRepository availabilityChangeEventRepository,
+            RecommendationEventRepository recommendationEventRepository,
             Clock clock) {
         this.linkRepository = linkRepository;
         this.clickEventRepository = clickEventRepository;
         this.plausibleStatsClient = plausibleStatsClient;
         this.watchProviderRepository = watchProviderRepository;
         this.availabilityChangeEventRepository = availabilityChangeEventRepository;
+        this.recommendationEventRepository = recommendationEventRepository;
         this.clock = clock;
     }
 
@@ -179,6 +184,14 @@ public class AffiliateLinkService {
                 .stream()
                 .map(row -> new AvailabilityAnimeChangesDto(row.getAnimeSlug(), row.getChanges()))
                 .toList();
+        List<RecommendationClickDto> topRecommendationClicks = recommendationEventRepository
+                .findTopRecommendationClicks(thirtyDaysAgo, PageRequest.of(0, 10))
+                .stream()
+                .map(row -> new RecommendationClickDto(
+                        row.getSourceAnimeSlug(),
+                        row.getTargetAnimeSlug(),
+                        row.getClicks()))
+                .toList();
 
         return new AffiliateDashboardDto(
                 clickEventRepository.countByClickedAtAfter(sevenDaysAgo),
@@ -189,7 +202,8 @@ public class AffiliateLinkService {
                 clicksByDay,
                 platformConversions,
                 topClickCountries,
-                topAvailabilityChanges);
+                topAvailabilityChanges,
+                topRecommendationClicks);
     }
 
     private List<AffiliateDailyClicksDto> clicksByDay(Instant since) {

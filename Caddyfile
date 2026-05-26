@@ -16,29 +16,38 @@
 # ============================================================
 
 api.dondeanime.com {
-    # Reverse proxy al contenedor backend (nombre de servicio en
-    # docker-compose.prod.yml). Caddy resuelve el DNS Docker.
-    reverse_proxy backend:8080
+	# Actuator queda disponible solo dentro de la red Docker llamando
+	# directamente al backend. Desde internet no se proxea.
+	@actuator path /actuator /actuator/*
+	handle @actuator {
+		respond 404
+	}
 
-    # Compresión: brotli y gzip según lo que pida el cliente.
-    encode zstd gzip
+	# Reverse proxy al contenedor backend (nombre de servicio en
+	# docker-compose.prod.yml). Caddy resuelve el DNS Docker.
+	handle {
+		reverse_proxy backend:8080
+	}
 
-    # Logs estructurados a stdout (Docker captura).
-    log {
-        output stdout
-        format json
-        level INFO
-    }
+	# Compresión: brotli y gzip según lo que pida el cliente.
+	encode zstd gzip
 
-    # Headers de seguridad razonables para una API pública.
-    header {
-        # Evita que el navegador adivine MIME types.
-        X-Content-Type-Options "nosniff"
-        # No queremos que la API se renderice en iframes.
-        X-Frame-Options "DENY"
-        # Política de referrer mínima.
-        Referrer-Policy "no-referrer"
-        # Quita la cabecera Server por defecto que delata Caddy.
-        -Server
-    }
+	# Logs estructurados a stdout (Docker captura).
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+
+	# Headers de seguridad razonables para una API pública.
+	header {
+		# Evita que el navegador adivine MIME types.
+		X-Content-Type-Options "nosniff"
+		# No queremos que la API se renderice en iframes.
+		X-Frame-Options "DENY"
+		# Política de referrer mínima.
+		Referrer-Policy "no-referrer"
+		# Quita la cabecera Server por defecto que delata Caddy.
+		-Server
+	}
 }

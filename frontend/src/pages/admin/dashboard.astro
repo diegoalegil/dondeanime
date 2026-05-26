@@ -113,7 +113,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </article>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+    <div class="mt-6 grid gap-6 lg:grid-cols-4">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Anime con más clicks</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-affiliate-anime></div>
@@ -125,6 +125,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Anime más visitados</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-pages></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Recomendaciones con mas clicks</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-recommendations></div>
       </article>
     </div>
 
@@ -305,6 +309,12 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       document.querySelector('[data-top-pages]').innerHTML =
         data.topVisitedAnime?.length
           ? data.topVisitedAnime.map((item) => row(item.path, item.visitors)).join('')
+          : empty;
+      document.querySelector('[data-top-recommendations]').innerHTML =
+        data.topRecommendationClicks?.length
+          ? data.topRecommendationClicks
+              .map((item) => row(`${item.sourceAnimeSlug} -> ${item.targetAnimeSlug}`, item.clicks))
+              .join('')
           : empty;
       document.querySelector('[data-top-countries]').innerHTML =
         data.topClickCountries?.length

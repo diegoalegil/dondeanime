@@ -8,14 +8,17 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestClient;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 
 import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
+
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 class CatalogSchedulerTest {
 
@@ -39,6 +42,8 @@ class CatalogSchedulerTest {
                 descriptionEnricher,
                 providerSyncService,
                 restClientBuilder,
+                new SimpleMeterRegistry(),
+                mock(ApplicationEventPublisher.class),
                 "https://vercel.example/deploy");
 
         scheduler.syncAniList();
@@ -59,6 +64,8 @@ class CatalogSchedulerTest {
                 descriptionEnricher,
                 providerSyncService,
                 RestClient.builder(),
+                new SimpleMeterRegistry(),
+                mock(ApplicationEventPublisher.class),
                 "");
 
         scheduler.matchTmdb();
