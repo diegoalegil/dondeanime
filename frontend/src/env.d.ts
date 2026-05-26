@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_API_URL: string;
+  readonly PUBLIC_DATA_API_URL?: string;
   readonly PUBLIC_SITE_URL: string;
   readonly PUBLIC_PLAUSIBLE_ENABLED?: string;
   readonly PUBLIC_PLAUSIBLE_DOMAIN?: string;
