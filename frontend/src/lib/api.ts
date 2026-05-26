@@ -8,6 +8,7 @@ export interface AnimeSummary {
   format: string;
   status: string;
   episodes: number | null;
+  episodeDuration: number | null;
   year: number | null;
   averageScore: number | null;
   popularity: number | null;
@@ -120,3 +121,15 @@ export const getSeasons = () => fetchJson<SeasonSummary[]>('/api/seasons');
 
 export const getAnimeBySeason = (year: number, season: string) =>
   fetchJson<AnimeSummary[]>(`/api/seasons/${year}/${season}`);
+
+export const getAnimeByDuration = async (minutes: number) => {
+  const res = await fetch(`${API_URL}/api/anime/duration/${minutes}`);
+  if (res.status === 404) {
+    const allAnime = await getAllAnime();
+    return allAnime.filter((anime) => anime.episodeDuration === minutes);
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/anime/duration/${minutes} failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<AnimeSummary[]>;
+};

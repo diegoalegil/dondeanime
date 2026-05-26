@@ -55,6 +55,16 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findBySeasonYearAndSeason(int year, String season);
 
     /**
+     * Anime con una duracion media concreta por episodio, en minutos.
+     */
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.episodeDuration = :minutes
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByEpisodeDuration(int minutes);
+
+    /**
      * Anime con match TMDb pero sin descripción localizada en español.
      */
     @Query("""

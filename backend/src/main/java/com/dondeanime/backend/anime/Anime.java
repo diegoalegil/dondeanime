@@ -52,6 +52,9 @@ public class Anime {
 
     private Integer episodes;
 
+    @Column(name = "episode_duration")
+    private Integer episodeDuration;
+
     @Column(name = "start_year")
     private Integer startYear;
 
@@ -190,6 +193,14 @@ public class Anime {
 
     public void setEpisodes(Integer episodes) {
         this.episodes = episodes;
+    }
+
+    public Integer getEpisodeDuration() {
+        return episodeDuration;
+    }
+
+    public void setEpisodeDuration(Integer episodeDuration) {
+        this.episodeDuration = episodeDuration;
     }
 
     public Integer getStartYear() {

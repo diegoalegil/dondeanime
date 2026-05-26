@@ -193,6 +193,31 @@ test('genre and platform combination pages filter anime and are indexed', async 
   expect(comboUrls).toContain('https://dondeanime.com/anime/action/en/crunchyroll');
 });
 
+test('duration pages render and are indexed', async ({ page, request }) => {
+  await page.goto('/anime/duracion/24');
+
+  await expect(page.getByRole('heading', { name: /Anime de 24 minutos/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/anime/duracion/24',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Anime de 24 minutos por capitulo',
+    itemListElement: expect.any(Array),
+  }));
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  for (const minutes of [12, 22, 24, 25, 45, 60]) {
+    expect(allSitemapText).toContain(`https://dondeanime.com/anime/duracion/${minutes}`);
+  }
+});
+
 test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
   await page.goto('/mejores/2024');
 
