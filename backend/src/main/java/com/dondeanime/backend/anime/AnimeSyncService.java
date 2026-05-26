@@ -83,6 +83,7 @@ public class AnimeSyncService {
         anime.setFormat(media.format());
         anime.setStatus(media.status());
         anime.setEpisodes(media.episodes());
+        anime.setEpisodeDuration(media.duration());
         anime.setAverageScore(media.averageScore());
         anime.setPopularity(media.popularity());
 
