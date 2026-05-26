@@ -3,11 +3,19 @@ import type { AnimeSummary } from '@/lib/api';
 
 interface Props {
   anime: AnimeSummary;
+  recommendationSourceSlug?: string;
 }
 
-const { anime } = Astro.props;
+const { anime, recommendationSourceSlug } = Astro.props;
 const title = anime.titleEnglish || anime.titleRomaji;
 const score = anime.averageScore;
+const recommendationAttributes = recommendationSourceSlug
+  ? {
+      'data-recommendation-link': 'true',
+      'data-recommendation-source': recommendationSourceSlug,
+      'data-recommendation-target': anime.slug,
+    }
+  : {};
 
 let scoreClass = '';
 if (score !== null) {
@@ -17,7 +25,7 @@ if (score !== null) {
 }
 ---
 <article class="group">
-  <a href={`/anime/${anime.slug}`} class="block">
+  <a href={`/anime/${anime.slug}`} class="block" {...recommendationAttributes}>
     <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
       <img
         src={anime.coverImage}

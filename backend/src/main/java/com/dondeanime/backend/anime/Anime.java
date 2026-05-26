@@ -81,6 +81,9 @@ public class Anime {
 
     private Integer popularity;
 
+    @Column(name = "primary_studio", length = 120)
+    private String primaryStudio;
+
     @Column(name = "synced_at")
     private Instant syncedAt;
 
@@ -100,6 +103,10 @@ public class Anime {
 
     @Column(name = "season_year")
     private Integer seasonYear;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "anime_tag", joinColumns = @JoinColumn(name = "anime_id"))
+    private Set<AnimeTag> tags = new HashSet<>();
 
     public Anime() {
     }
@@ -272,6 +279,14 @@ public class Anime {
         this.popularity = popularity;
     }
 
+    public String getPrimaryStudio() {
+        return primaryStudio;
+    }
+
+    public void setPrimaryStudio(String primaryStudio) {
+        this.primaryStudio = primaryStudio;
+    }
+
     public Instant getSyncedAt() {
         return syncedAt;
     }
@@ -302,6 +317,14 @@ public class Anime {
 
     public void setSeasonYear(Integer seasonYear) {
         this.seasonYear = seasonYear;
+    }
+
+    public Set<AnimeTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<AnimeTag> tags) {
+        this.tags = tags;
     }
 
 }
