@@ -38,6 +38,18 @@ class AnimeSearchServiceTest {
         verify(repository, never()).findBySearchVectorMatching(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    void slugQueryIsNormalizedForFullTextSearch() {
+        Anime anime = anime("attack-on-titan", "Attack on Titan", 999);
+        AnimeRepository repository = mock(AnimeRepository.class);
+        when(repository.findBySearchVectorMatching("attack on titan")).thenReturn(List.of(anime));
+
+        List<?> result = new AnimeSearchService(repository).search("attack-on-titan", 10);
+
+        assertThat(result).hasSize(1);
+        verify(repository).findBySearchVectorMatching("attack on titan");
+    }
+
     private static Anime anime(String slug, String title, int popularity) {
         Anime anime = new Anime();
         anime.setAnilistId((long) popularity);
