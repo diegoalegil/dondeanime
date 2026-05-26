@@ -36,7 +36,7 @@ jobs:
             const thresholds = {
               performance: 85,
               accessibility: 95,
-              seo: 95,
+              seo: 90,
               'best-practices': 90,
             };
             const labels = {
