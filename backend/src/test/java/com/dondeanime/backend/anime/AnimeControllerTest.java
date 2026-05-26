@@ -140,6 +140,25 @@ class AnimeControllerTest {
     }
 
     @Test
+    void getByEpisodeCountReturnsMatchingAnime() throws Exception {
+        Anime a = makeAnime("attack-on-titan", "Attack on Titan");
+        a.setEpisodes(12);
+        when(animeRepository.findByEpisodesLessThanOrEqual(12)).thenReturn(List.of(a));
+
+        mvc.perform(get("/api/anime/episodes/less-than/12"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$[0].episodes").value(12));
+    }
+
+    @Test
+    void getByEpisodeCountRejectsInvalidLimit() throws Exception {
+        mvc.perform(get("/api/anime/episodes/less-than/0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getBySlugReturnsDetailWithProviders() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
         WatchProvider provider = provider();
@@ -184,6 +203,7 @@ class AnimeControllerTest {
         a.setTitleEnglish(titleEnglish);
         a.setFormat("TV");
         a.setStatus("FINISHED");
+        a.setEpisodes(24);
         a.setEpisodeDuration(24);
         return a;
     }
