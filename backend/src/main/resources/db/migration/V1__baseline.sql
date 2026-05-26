@@ -133,7 +133,7 @@ CREATE TABLE public.anime_tag (
 );
 
 
--- 
+--
 -- Name: anime_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 

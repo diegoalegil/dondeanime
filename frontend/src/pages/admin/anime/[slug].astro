@@ -243,10 +243,10 @@ const title = anime.titleEnglish || anime.titleRomaji;
       }`;
     };
 
-    const getToken = () => sessionStorage.getItem(tokenKey);
+    const getToken = () => localStorage.getItem(tokenKey);
     const authHeaders = () => {
       const token = getToken();
-      return token ? { Authorization: `Basic ${token}` } : {};
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const asText = (value) => value ?? '';
@@ -275,7 +275,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
           setLoginStatus('Sesión activa.', 'success');
         } catch (error) {
           if (error.status === 401) {
-            sessionStorage.removeItem(tokenKey);
+            localStorage.removeItem(tokenKey);
             setLoginStatus('Credenciales incorrectas.', 'danger');
           }
         }
@@ -354,13 +354,22 @@ const title = anime.titleEnglish || anime.titleRomaji;
       const data = new FormData(loginForm);
       const username = String(data.get('username') ?? '');
       const password = String(data.get('password') ?? '');
-      const token = btoa(`${username}:${password}`);
-
-      sessionStorage.setItem(tokenKey, token);
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        setLoginStatus('Credenciales incorrectas.', 'danger');
+        return;
+      }
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       try {
         await loadEditor();
       } catch (error) {
-        sessionStorage.removeItem(tokenKey);
+        localStorage.removeItem(tokenKey);
         setLoginStatus('Credenciales incorrectas.', 'danger');
       }
     });

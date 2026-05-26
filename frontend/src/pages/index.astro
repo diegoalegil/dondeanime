@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
@@ -186,6 +187,8 @@ const itemListSchema = buildItemListSchema(
       ))}
     </div>
   </section>
+
+  <NewsletterForm />
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
     <h2 class="mb-5 text-2xl font-semibold">Preguntas frecuentes</h2>

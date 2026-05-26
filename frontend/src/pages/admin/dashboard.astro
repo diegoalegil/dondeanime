@@ -39,12 +39,53 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           <span class="mb-1 block text-xs font-medium text-fg-secondary">Contraseña</span>
           <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
         </label>
+        <label class="hidden" data-totp-field>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Codigo 2FA</span>
+          <input name="totpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
         <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
           Entrar
         </button>
       </div>
       <p class="mt-2 min-h-5 text-sm text-fg-muted" data-status></p>
     </form>
+
+    <article class="mb-6 rounded-lg border border-surface-2 bg-surface-1 p-5" data-twofa-panel>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-base font-semibold text-fg-primary">2FA admin</h2>
+          <p class="mt-1 text-sm text-fg-muted" data-twofa-status>Sin comprobar.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="rounded-md border border-surface-2 px-3 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-violet hover:text-accent-violet" data-twofa-setup>
+            Generar setup
+          </button>
+          <button type="button" class="rounded-md border border-danger px-3 py-2 text-sm font-semibold text-danger transition-opacity hover:opacity-80" data-twofa-disable>
+            Desactivar
+          </button>
+        </div>
+      </div>
+      <form class="mt-4 hidden space-y-3" data-twofa-verify-form>
+        <label class="block">
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Secret</span>
+          <input name="secret" readonly class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary" />
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">QR code data</span>
+          <textarea name="qrCodeData" readonly rows="2" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-xs text-fg-secondary"></textarea>
+        </label>
+        <div class="grid gap-3 sm:grid-cols-[12rem_auto]">
+          <label>
+            <span class="mb-1 block text-xs font-medium text-fg-secondary">Codigo</span>
+            <input name="code" inputmode="numeric" maxlength="6" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+          </label>
+          <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
+            Activar 2FA
+          </button>
+        </div>
+      </form>
+      <p class="mt-3 min-h-5 text-sm text-fg-muted" data-twofa-message></p>
+    </article>
 
     <div class="grid gap-4 md:grid-cols-2">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
@@ -54,6 +95,21 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <p class="text-sm text-fg-muted">Clicks afiliados últimos 30 días</p>
         <p class="mt-2 text-3xl font-semibold text-fg-primary" data-clicks-30>0</p>
+      </article>
+    </div>
+
+    <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(20rem,1fr)]">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Clicks por dia</h2>
+        <div class="mt-4 h-72">
+          <canvas data-clicks-chart></canvas>
+        </div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Conversion por plataforma</h2>
+        <div class="mt-4 h-72">
+          <canvas data-conversion-chart></canvas>
+        </div>
       </article>
     </div>
 
@@ -75,6 +131,17 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         <div class="mt-4 space-y-3 text-sm" data-top-recommendations></div>
       </article>
     </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Paises con mas clicks</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-countries></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Cambios de availability</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-availability></div>
+      </article>
+    </div>
   </section>
 
   <script>
@@ -83,6 +150,15 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const tokenKey = 'dondeanime-admin-token';
     const form = document.querySelector('[data-login-form]');
     const status = document.querySelector('[data-status]');
+    const totpField = document.querySelector('[data-totp-field]');
+    const twofaStatus = document.querySelector('[data-twofa-status]');
+    const twofaMessage = document.querySelector('[data-twofa-message]');
+    const twofaSetup = document.querySelector('[data-twofa-setup]');
+    const twofaDisable = document.querySelector('[data-twofa-disable]');
+    const twofaVerifyForm = document.querySelector('[data-twofa-verify-form]');
+    let chartLoader;
+    let clicksChart;
+    let conversionChart;
 
     const setStatus = (message, tone = 'muted') => {
       if (!status) return;
@@ -92,9 +168,17 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       }`;
     };
 
+    const setTwofaMessage = (message, tone = 'muted') => {
+      if (!twofaMessage) return;
+      twofaMessage.textContent = message;
+      twofaMessage.className = `mt-3 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
     const authHeaders = () => {
-      const token = sessionStorage.getItem(tokenKey);
-      return token ? { Authorization: `Basic ${token}` } : {};
+      const token = localStorage.getItem(tokenKey);
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const escapeHtml = (value) => String(value ?? '')
@@ -111,6 +195,96 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </div>`;
 
     const empty = '<p class="text-sm text-fg-muted">Sin datos todavía.</p>';
+
+    const formatPercent = (value) => `${((Number(value) || 0) * 100).toFixed(2)}%`;
+
+    const loadChart = async () => {
+      if (!chartLoader) {
+        chartLoader = import('chart.js').then(({ Chart, registerables }) => {
+          Chart.register(...registerables);
+          return Chart;
+        });
+      }
+      return chartLoader;
+    };
+
+    async function renderCharts(data) {
+      const Chart = await loadChart();
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            ticks: { color: '#a1a1aa', maxRotation: 0 },
+            grid: { color: 'rgba(161, 161, 170, 0.12)' },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#a1a1aa', precision: 0 },
+            grid: { color: 'rgba(161, 161, 170, 0.12)' },
+          },
+        },
+      };
+
+      const clicksCanvas = document.querySelector('[data-clicks-chart]');
+      if (clicksCanvas) {
+        clicksChart?.destroy();
+        clicksChart = new Chart(clicksCanvas, {
+          type: 'line',
+          data: {
+            labels: (data.clicksByDay ?? []).map((item) => item.date.slice(5)),
+            datasets: [{
+              data: (data.clicksByDay ?? []).map((item) => item.clicks ?? 0),
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.18)',
+              fill: true,
+              tension: 0.32,
+            }],
+          },
+          options: chartOptions,
+        });
+      }
+
+      const conversionCanvas = document.querySelector('[data-conversion-chart]');
+      if (conversionCanvas) {
+        conversionChart?.destroy();
+        conversionChart = new Chart(conversionCanvas, {
+          type: 'bar',
+          data: {
+            labels: (data.platformConversions ?? []).map((item) => item.providerSlug),
+            datasets: [{
+              data: (data.platformConversions ?? []).map((item) => (item.conversionRate ?? 0) * 100),
+              backgroundColor: '#ec4899',
+              borderRadius: 6,
+            }],
+          },
+          options: {
+            ...chartOptions,
+            plugins: {
+              ...chartOptions.plugins,
+              tooltip: {
+                callbacks: {
+                  label: (context) => formatPercent(Number(context.raw) / 100),
+                },
+              },
+            },
+            scales: {
+              ...chartOptions.scales,
+              y: {
+                ...chartOptions.scales.y,
+                ticks: {
+                  ...chartOptions.scales.y.ticks,
+                  callback: (value) => `${value}%`,
+                },
+              },
+            },
+          },
+        });
+      }
+    }
 
     async function loadDashboard() {
       setStatus('Cargando...');
@@ -142,22 +316,127 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
               .map((item) => row(`${item.sourceAnimeSlug} -> ${item.targetAnimeSlug}`, item.clicks))
               .join('')
           : empty;
+      document.querySelector('[data-top-countries]').innerHTML =
+        data.topClickCountries?.length
+          ? data.topClickCountries.map((item) => row(item.countryCode, item.clicks)).join('')
+          : empty;
+      document.querySelector('[data-top-availability]').innerHTML =
+        data.topAvailabilityChanges?.length
+          ? data.topAvailabilityChanges.map((item) => row(item.animeSlug, item.changes)).join('')
+          : empty;
+      await renderCharts(data);
       setStatus('Datos cargados.', 'success');
     }
+
+    async function loadTwofaStatus() {
+      if (!localStorage.getItem(tokenKey)) {
+        if (twofaStatus) twofaStatus.textContent = 'Inicia sesion para gestionar 2FA.';
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/api/admin/2fa`, {
+        headers: authHeaders(),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      if (twofaStatus) twofaStatus.textContent = data.enabled ? '2FA activo.' : '2FA desactivado.';
+      if (twofaDisable) twofaDisable.disabled = !data.enabled;
+    }
+
+    async function loadAdminData() {
+      await loadDashboard();
+      await loadTwofaStatus();
+    }
+
+    twofaSetup?.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/admin/2fa/setup`, {
+          method: 'POST',
+          headers: authHeaders(),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        twofaVerifyForm?.classList.remove('hidden');
+        twofaVerifyForm.querySelector('[name="secret"]').value = data.secret;
+        twofaVerifyForm.querySelector('[name="qrCodeData"]').value = data.qrCodeData;
+        setTwofaMessage('Escanea el QR data o copia el secret y verifica el primer codigo.', 'success');
+      } catch {
+        setTwofaMessage('No se pudo generar el setup 2FA.', 'danger');
+      }
+    });
+
+    twofaVerifyForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(twofaVerifyForm);
+      const response = await fetch(`${apiUrl}/api/admin/2fa/verify`, {
+        method: 'POST',
+        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: String(data.get('secret') ?? ''),
+          code: String(data.get('code') ?? ''),
+        }),
+      });
+      if (!response.ok) {
+        setTwofaMessage('Codigo 2FA incorrecto.', 'danger');
+        return;
+      }
+      twofaVerifyForm.classList.add('hidden');
+      setTwofaMessage('2FA activado.', 'success');
+      await loadTwofaStatus();
+    });
+
+    twofaDisable?.addEventListener('click', async () => {
+      const response = await fetch(`${apiUrl}/api/admin/2fa`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      if (!response.ok) {
+        setTwofaMessage('No se pudo desactivar 2FA.', 'danger');
+        return;
+      }
+      twofaVerifyForm?.classList.add('hidden');
+      setTwofaMessage('2FA desactivado.', 'success');
+      await loadTwofaStatus();
+    });
 
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(form);
-      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
-      loadDashboard().catch(() => {
-        sessionStorage.removeItem(tokenKey);
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: String(data.get('username') ?? ''),
+          password: String(data.get('password') ?? ''),
+          totpCode: String(data.get('totpCode') ?? ''),
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        if (payload?.error === 'totp_required') {
+          totpField?.classList.remove('hidden');
+          form.querySelector('[name="totpCode"]')?.focus();
+          setStatus('Introduce el codigo de Google Authenticator.', 'danger');
+          return;
+        }
+        setStatus('Credenciales incorrectas.', 'danger');
+        return;
+      }
+      const session = payload;
+      localStorage.setItem(tokenKey, session.token);
+      loadAdminData().catch(() => {
+        localStorage.removeItem(tokenKey);
         setStatus('Credenciales incorrectas.', 'danger');
       });
     });
 
-    if (sessionStorage.getItem(tokenKey)) {
-      loadDashboard().catch(() => setStatus('No se pudo cargar el dashboard.', 'danger'));
+    if (localStorage.getItem(tokenKey)) {
+      loadAdminData().catch(() => setStatus('No se pudo cargar el dashboard.', 'danger'));
     } else {
+      loadTwofaStatus().catch(() => {});
       setStatus('Inicia sesión para ver métricas.');
     }
   </script>
