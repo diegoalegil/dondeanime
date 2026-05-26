@@ -3,6 +3,7 @@ package com.dondeanime.backend.anime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
@@ -64,6 +65,41 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
     List<Anime> findBySeasonYearAndSeason(int year, String season);
+
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            JOIN a.genres g
+            WHERE a.id <> :animeId
+            AND g = :primaryGenre
+            AND a.averageScore > :minScore
+            ORDER BY a.averageScore DESC NULLS LAST, a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findSimilarByPrimaryGenre(Long animeId, String primaryGenre, int minScore, Pageable pageable);
+
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.id <> :animeId
+            AND LOWER(a.primaryStudio) = LOWER(:primaryStudio)
+            AND a.averageScore > :minScore
+            ORDER BY a.averageScore DESC NULLS LAST, a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findSimilarByPrimaryStudio(Long animeId, String primaryStudio, int minScore, Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT candidate FROM Anime candidate
+            JOIN candidate.tags candidateTag
+            WHERE candidate.id <> :animeId
+            AND candidate.averageScore > :minScore
+            AND candidateTag.rank > :minTagRank
+            AND candidateTag.name IN (
+                SELECT sourceTag.name FROM Anime source
+                JOIN source.tags sourceTag
+                WHERE source.id = :animeId
+                AND sourceTag.rank > :minTagRank
+            )
+            ORDER BY candidate.averageScore DESC NULLS LAST, candidate.popularity DESC NULLS LAST, candidate.titleEnglish ASC
+            """)
+    List<Anime> findSimilarBySharedHighRankTags(Long animeId, int minScore, int minTagRank, Pageable pageable);
 
     /**
      * Anime con match TMDb pero sin descripción localizada en español.

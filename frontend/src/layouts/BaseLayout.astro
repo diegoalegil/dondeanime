@@ -1,9 +1,13 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '@/styles/global.css';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
+import SkeletonRow from '@/components/ui/SkeletonRow.astro';
+import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
 
 interface Props {
   title: string;
@@ -30,6 +34,11 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/pwa/icons/icon-192.svg" />
+    <meta name="theme-color" content="#0A0A0F" />
+    <ClientRouter />
+    <link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>
       // Anti-FOIT: aplicar tema guardado antes del primer paint
       try {
@@ -38,6 +47,45 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
           document.documentElement.setAttribute('data-theme', stored);
         }
       } catch (e) {}
+    </script>
+    <script is:inline>
+      (() => {
+        if (window.__dondeanimeNavigationSkeletonBound) return;
+        window.__dondeanimeNavigationSkeletonBound = true;
+
+        let hideTimer;
+        let showFrame;
+
+        const skeleton = () => document.querySelector('[data-navigation-skeleton]');
+
+        const showSkeleton = () => {
+          const el = skeleton();
+          if (!el) return;
+          window.clearTimeout(hideTimer);
+          window.cancelAnimationFrame(showFrame);
+          el.hidden = false;
+          el.setAttribute('aria-busy', 'true');
+          showFrame = requestAnimationFrame(() => {
+            el.dataset.visible = 'true';
+          });
+        };
+
+        const hideSkeleton = () => {
+          const el = skeleton();
+          if (!el) return;
+          window.cancelAnimationFrame(showFrame);
+          el.dataset.visible = 'false';
+          el.removeAttribute('aria-busy');
+          hideTimer = window.setTimeout(() => {
+            el.hidden = true;
+          }, 180);
+        };
+
+        document.addEventListener('astro:before-preparation', showSkeleton);
+        document.addEventListener('astro:after-swap', hideSkeleton);
+        document.addEventListener('astro:page-load', hideSkeleton);
+        window.addEventListener('pageshow', hideSkeleton);
+      })();
     </script>
     <SEOHead {...props} />
     {plausibleEnabled && (
@@ -61,10 +109,25 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
   </head>
   <body class="bg-surface-0 text-fg-primary font-sans">
     <Header />
-    <main class="min-h-[calc(100vh-8rem)]">
+    <div
+      data-navigation-skeleton
+      hidden
+      class="fixed inset-x-0 top-[3.75rem] z-40 border-b border-surface-2 bg-surface-0/95 shadow-2xl shadow-black/25 backdrop-blur-md"
+    >
+      <SkeletonRow count={6} />
+    </div>
+    <main class="min-h-[calc(100vh-8rem)]" transition:animate="fade">
       <slot />
     </main>
     <Footer />
+    <InstallPromotion />
     <AffiliateTrackingScript />
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

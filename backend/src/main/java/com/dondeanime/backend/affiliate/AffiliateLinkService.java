@@ -125,7 +125,8 @@ public class AffiliateLinkService {
                 clickEventRepository.countByClickedAtAfter(thirtyDaysAgo),
                 topAnime,
                 topLinks,
-                plausibleStatsClient.topAnimePages30Days());
+                plausibleStatsClient.topAnimePages30Days(),
+                List.of());
     }
 
     static String normalizeProviderSlug(String value) {

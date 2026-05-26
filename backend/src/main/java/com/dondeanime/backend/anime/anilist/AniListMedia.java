@@ -21,5 +21,6 @@ public record AniListMedia(
         String bannerImage,
         List<String> genres,
         String season,
-        Integer seasonYear
+        Integer seasonYear,
+        List<AniListTag> tags
 ) {}
