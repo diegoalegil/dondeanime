@@ -264,6 +264,83 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
 });
 
+test('PWA manifest links icons, screenshots and shortcuts', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.json');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0A0F');
+
+  const manifestResponse = await request.get('/manifest.json');
+  expect(manifestResponse.ok()).toBe(true);
+  expect(manifestResponse.headers()['content-type']).toContain('application/json');
+
+  const manifest = await manifestResponse.json();
+  expect(manifest).toEqual(expect.objectContaining({
+    name: 'DondeAnime',
+    short_name: 'DondeAnime',
+    display: 'standalone',
+    start_url: '/',
+    scope: '/',
+  }));
+  expect(manifest.icons.map((icon: { sizes: string }) => icon.sizes)).toEqual(
+    expect.arrayContaining(['16x16', '32x32', '192x192', '512x512', '1024x1024']),
+  );
+  expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(true);
+  expect(manifest.screenshots).toHaveLength(2);
+  expect(manifest.shortcuts.map((shortcut: { name: string }) => shortcut.name)).toEqual([
+    'Buscar',
+    'Mi pais',
+    'Alertas',
+  ]);
+
+  for (const asset of [...manifest.icons, ...manifest.screenshots]) {
+    const assetResponse = await request.get(asset.src);
+    expect(assetResponse.ok()).toBe(true);
+    expect(assetResponse.headers()['content-type']).toContain('image/svg+xml');
+  }
+});
+
+test('offline page and service worker are generated', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  expect(await home.text()).toContain("navigator.serviceWorker.register('/sw.js')");
+
+  const offline = await request.get('/offline');
+  expect(offline.ok()).toBe(true);
+  expect(await offline.text()).toContain('No hay conexion disponible');
+
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
+  expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
+  expect(serviceWorkerText).toContain("request.mode === 'navigate'");
+});
+
+test('alert background sync is generated in the service worker', async ({ request }) => {
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+
+  expect(serviceWorkerText).toContain("const ALERT_SYNC_TAG = 'dondeanime-alerts-sync'");
+  expect(serviceWorkerText).toContain("const ALERT_DB_NAME = 'dondeanime-alerts'");
+  expect(serviceWorkerText).toContain("self.addEventListener('sync'");
+  expect(serviceWorkerText).toContain("fetch(alert.endpoint");
+  expect(serviceWorkerText).toContain("self.registration.showNotification('Alerta enviada'");
+});
+
+test('install promotion banner is generated with visit gate and tracking', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  const homeText = await home.text();
+
+  expect(homeText).toContain('data-install-promotion');
+  expect(homeText).toContain('Instala DondeAnime como app');
+  expect(homeText).toContain('dondeanime-install-visits');
+  expect(homeText).toContain('dondeanime-install-dismissed');
+  expect(homeText).toContain('install_prompt_shown');
+  expect(homeText).toContain('install_completed');
+});
+
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
   await page.goto('/blog');
 

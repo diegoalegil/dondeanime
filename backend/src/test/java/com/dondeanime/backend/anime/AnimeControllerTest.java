@@ -70,6 +70,9 @@ class AnimeControllerTest {
     @MockitoBean
     private AffiliateLinkService affiliateLinkService;
 
+    @MockitoBean
+    private RecommendationService recommendationService;
+
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
@@ -143,6 +146,35 @@ class AnimeControllerTest {
         when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
 
         mvc.perform(get("/api/anime/inexistente"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getSimilarReturnsRecommendationSummaries() throws Exception {
+        Anime source = makeAnime("attack-on-titan", "Attack on Titan");
+        Anime recommendation = makeAnime("vinland-saga", "Vinland Saga");
+        recommendation.setId(2L);
+        recommendation.setAnilistId(456L);
+        recommendation.setAverageScore(88);
+
+        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(source));
+        when(recommendationService.findSimilar(1L, 10)).thenReturn(List.of(recommendation));
+
+        mvc.perform(get("/api/anime/attack-on-titan/similar"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("vinland-saga"))
+                .andExpect(jsonPath("$[0].averageScore").value(88))
+                .andExpect(jsonPath("$[0].id").doesNotExist())
+                .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
+                .andExpect(jsonPath("$[0].syncedAt").doesNotExist());
+    }
+
+    @Test
+    void getSimilarUnknownSlugReturns404() throws Exception {
+        when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/anime/inexistente/similar"))
                 .andExpect(status().isNotFound());
     }
 

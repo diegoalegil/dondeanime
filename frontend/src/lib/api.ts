@@ -91,6 +91,17 @@ export const getUpcomingAnime = async (days: number) => {
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
 
+export const getSimilarAnime = async (slug: string) => {
+  const res = await fetch(`${API_URL}/api/anime/${slug}/similar`);
+  if (res.status === 404) {
+    return [] as AnimeSummary[];
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/anime/${slug}/similar failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<AnimeSummary[]>;
+};
+
 export const getProviders = () => fetchJson<ProviderSummary[]>('/api/providers');
 
 export const getProvidersByCountry = (countryIso: string) =>
