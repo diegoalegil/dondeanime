@@ -144,3 +144,15 @@ export const getAnimeByDuration = async (minutes: number) => {
   }
   return res.json() as Promise<AnimeSummary[]>;
 };
+
+export const getAnimeByMaxEpisodes = async (maxEpisodes: number) => {
+  const res = await fetch(`${API_URL}/api/anime/episodes/less-than/${maxEpisodes}`);
+  if (res.status === 404) {
+    const allAnime = await getAllAnime();
+    return allAnime.filter((anime) => anime.episodes !== null && anime.episodes <= maxEpisodes);
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/anime/episodes/less-than/${maxEpisodes} failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<AnimeSummary[]>;
+};
