@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { t } from '@/i18n';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
 
@@ -29,8 +30,8 @@ export const GET: APIRoute = async () => {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>DondeAnime Blog</title>
-    <description>Archivo editorial de DondeAnime.</description>
+    <title>${xmlEscape(t('blog.rss.title'))}</title>
+    <description>${xmlEscape(t('blog.rss.description'))}</description>
     <link>${xmlEscape(`${SITE_URL}/blog`)}</link>
 ${items}
   </channel>

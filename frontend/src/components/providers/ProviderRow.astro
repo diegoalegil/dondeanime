@@ -3,6 +3,8 @@ import type { WatchProvider } from '@/lib/api';
 import PlatformBadge from './PlatformBadge.astro';
 import { formatProviderType } from '@/lib/format';
 import { getPlatform } from '@/lib/platforms';
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 interface Props {
   provider: WatchProvider;
@@ -11,7 +13,7 @@ interface Props {
 
 const { provider, animeSlug = '' } = Astro.props;
 const platform = getPlatform(provider.providerSlug);
-const href = provider.affiliateUrl ?? platform?.url ?? `/plataforma/${provider.providerSlug}`;
+const href = provider.affiliateUrl ?? platform?.url ?? localizedPath(`/plataforma/${provider.providerSlug}`);
 const isAffiliate = Boolean(provider.affiliateUrl);
 
 const typeClass =
@@ -37,7 +39,7 @@ const typeClass =
       {formatProviderType(provider.providerType)}
     </span>
     <span class="rounded-md border border-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-secondary">
-      Ver
+      {t('anime.providerRow.watch')}
     </span>
   </span>
 </a>
