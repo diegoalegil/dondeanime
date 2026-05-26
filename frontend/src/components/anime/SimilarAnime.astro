@@ -4,9 +4,10 @@ import AnimeCard from './AnimeCard.astro';
 
 interface Props {
   anime: AnimeSummary[];
+  sourceSlug: string;
 }
 
-const { anime } = Astro.props;
+const { anime, sourceSlug } = Astro.props;
 ---
 {anime.length > 0 && (
   <section class="mx-auto max-w-6xl px-4 py-8">
@@ -17,7 +18,7 @@ const { anime } = Astro.props;
       </div>
     </div>
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5">
-      {anime.slice(0, 10).map((item) => <AnimeCard anime={item} />)}
+      {anime.slice(0, 10).map((item) => <AnimeCard anime={item} recommendationSourceSlug={sourceSlug} />)}
     </div>
   </section>
 )}
