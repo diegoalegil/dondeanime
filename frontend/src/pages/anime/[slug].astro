@@ -67,5 +67,5 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
     translationPending={detail.anime.descriptionTranslationPending}
   />
   <MetaList anime={detail.anime} />
-  <SimilarAnime anime={similarAnime} />
+  <SimilarAnime anime={similarAnime} sourceSlug={slug!} />
 </BaseLayout>

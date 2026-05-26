@@ -22,12 +22,16 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.anime.RecommendationTrackRequest;
+import com.dondeanime.backend.anime.RecommendationTrackingController;
+import com.dondeanime.backend.anime.RecommendationTrackingService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest({
         AffiliateLinkAdminController.class,
         AffiliateTrackingController.class,
-        AffiliateDashboardController.class
+        AffiliateDashboardController.class,
+        RecommendationTrackingController.class
 })
 @Import(SecurityConfig.class)
 @TestPropertySource(properties = {
@@ -42,6 +46,9 @@ class AffiliateLinkAdminControllerTest {
 
     @MockitoBean
     private AffiliateLinkService affiliateLinkService;
+
+    @MockitoBean
+    private RecommendationTrackingService recommendationTrackingService;
 
     @Test
     void adminAffiliateLinksRequireAuth() throws Exception {
@@ -93,6 +100,18 @@ class AffiliateLinkAdminControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(affiliateLinkService).trackClick(any(AffiliateTrackRequest.class));
+    }
+
+    @Test
+    void recommendationTrackingIsPublic() throws Exception {
+        mvc.perform(post("/api/track/recommendation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"sourceAnimeSlug":"attack-on-titan","targetAnimeSlug":"vinland-saga"}
+                                """))
+                .andExpect(status().isNoContent());
+
+        verify(recommendationTrackingService).trackClick(any(RecommendationTrackRequest.class));
     }
 
     @Test
