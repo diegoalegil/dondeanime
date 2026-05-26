@@ -1,46 +1,72 @@
-const FORMAT_LABELS: Record<string, string> = {
-  TV: 'Serie TV',
-  TV_SHORT: 'Serie corta',
-  MOVIE: 'Película',
-  SPECIAL: 'Especial',
-  OVA: 'OVA',
-  ONA: 'ONA',
-  MUSIC: 'Música',
+import { getLocale, t, type I18nKey } from '@/i18n';
+
+const FORMAT_LABEL_KEYS: Record<string, I18nKey> = {
+  TV: 'format.type.TV',
+  TV_SHORT: 'format.type.TV_SHORT',
+  MOVIE: 'format.type.MOVIE',
+  SPECIAL: 'format.type.SPECIAL',
+  OVA: 'format.type.OVA',
+  ONA: 'format.type.ONA',
+  MUSIC: 'format.type.MUSIC',
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  FINISHED: 'Finalizado',
-  RELEASING: 'En emisión',
-  NOT_YET_RELEASED: 'Próximamente',
-  CANCELLED: 'Cancelado',
-  HIATUS: 'En pausa',
+const STATUS_LABEL_KEYS: Record<string, I18nKey> = {
+  FINISHED: 'format.status.FINISHED',
+  RELEASING: 'format.status.RELEASING',
+  NOT_YET_RELEASED: 'format.status.NOT_YET_RELEASED',
+  CANCELLED: 'format.status.CANCELLED',
+  HIATUS: 'format.status.HIATUS',
 };
 
-const SEASON_LABELS: Record<string, string> = {
-  WINTER: 'Invierno',
-  SPRING: 'Primavera',
-  SUMMER: 'Verano',
-  FALL: 'Otoño',
+const SEASON_LABEL_KEYS: Record<string, I18nKey> = {
+  WINTER: 'format.season.WINTER',
+  SPRING: 'format.season.SPRING',
+  SUMMER: 'format.season.SUMMER',
+  FALL: 'format.season.FALL',
 };
 
-const PROVIDER_TYPE_LABELS: Record<string, string> = {
-  FLATRATE: 'Suscripción',
-  FREE: 'Gratis',
-  RENT: 'Alquiler',
-  BUY: 'Compra',
-  ADS: 'Con anuncios',
+const PROVIDER_TYPE_LABEL_KEYS: Record<string, I18nKey> = {
+  FLATRATE: 'format.providerType.FLATRATE',
+  FREE: 'format.providerType.FREE',
+  RENT: 'format.providerType.RENT',
+  BUY: 'format.providerType.BUY',
+  ADS: 'format.providerType.ADS',
 };
 
-const MONTHS_SHORT = [
-  'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-  'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
-];
+const MONTH_KEYS: Record<number, I18nKey> = {
+  1: 'format.month.1',
+  2: 'format.month.2',
+  3: 'format.month.3',
+  4: 'format.month.4',
+  5: 'format.month.5',
+  6: 'format.month.6',
+  7: 'format.month.7',
+  8: 'format.month.8',
+  9: 'format.month.9',
+  10: 'format.month.10',
+  11: 'format.month.11',
+  12: 'format.month.12',
+};
 
-export const formatType = (value: string): string => FORMAT_LABELS[value] ?? value;
-export const formatStatus = (value: string): string => STATUS_LABELS[value] ?? value;
-export const formatSeason = (value: string): string => SEASON_LABELS[value] ?? value;
-export const formatProviderType = (value: string): string =>
-  PROVIDER_TYPE_LABELS[value] ?? value;
+export const formatType = (value: string): string => {
+  const key = FORMAT_LABEL_KEYS[value];
+  return key ? t(key) : value;
+};
+
+export const formatStatus = (value: string): string => {
+  const key = STATUS_LABEL_KEYS[value];
+  return key ? t(key) : value;
+};
+
+export const formatSeason = (value: string): string => {
+  const key = SEASON_LABEL_KEYS[value];
+  return key ? t(key) : value;
+};
+
+export const formatProviderType = (value: string): string => {
+  const key = PROVIDER_TYPE_LABEL_KEYS[value];
+  return key ? t(key) : value;
+};
 
 export const formatDate = (
   year: number | null,
@@ -49,14 +75,15 @@ export const formatDate = (
 ): string => {
   if (year === null) return '—';
   if (month === null) return String(year);
-  const monthLabel = MONTHS_SHORT[month - 1] ?? '';
+  const monthLabel = MONTH_KEYS[month] ? t(MONTH_KEYS[month]) : '';
   if (day === null) return `${monthLabel} ${year}`;
+  if (getLocale() === 'en') return `${monthLabel} ${day}, ${year}`;
   return `${day} ${monthLabel} ${year}`;
 };
 
 export const formatNumber = (value: number | null): string => {
   if (value === null) return '—';
-  return new Intl.NumberFormat('es-ES').format(value);
+  return new Intl.NumberFormat(getLocale() === 'en' ? 'en-US' : 'es-ES').format(value);
 };
 
 export const formatSeasonYear = (

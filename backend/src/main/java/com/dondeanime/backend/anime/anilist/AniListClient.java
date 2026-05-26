@@ -36,6 +36,7 @@ public class AniListClient {
               genres
               season
               seasonYear
+              tags { name rank }
             }
           }
         }

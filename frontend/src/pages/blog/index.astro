@@ -1,48 +1,53 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import { getCollection } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
+import { setLocale, getLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-const formatDate = new Intl.DateTimeFormat('es-ES', {
+const formatDate = new Intl.DateTimeFormat(getLocale() === 'en' ? 'en-US' : 'es-ES', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
 });
 ---
 <BaseLayout
-  title="Blog editorial | DondeAnime"
-  description="Archivo editorial de DondeAnime para guías y piezas futuras sobre anime en streaming."
+  title={t('blog.index.title')}
+  description={t('blog.index.description')}
   canonical={absoluteUrl('/blog')}
 >
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Blog', url: '/blog' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.blog'), url: '/blog' },
     ]}
   />
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
-    <p class="text-xs uppercase tracking-wide text-accent-violet">Editorial</p>
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('breadcrumbs.blog')}</p>
     <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
-      Blog <span class="brand-gradient-text">DondeAnime</span>
+      {t('blog.index.headingPrefix')} <span class="brand-gradient-text">{t('brand.name')}</span>
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      Estructura preparada para publicar guías y análisis cuando Diego añada el contenido.
+      {t('blog.index.subtitle')}
     </p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-4 px-4 pb-20 md:grid-cols-2">
+  <section class="mx-auto grid max-w-6xl gap-4 px-4 pb-12 md:grid-cols-2">
     {posts.map((post) => (
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <p class="text-sm text-fg-muted">
           {formatDate.format(post.data.pubDate)}
         </p>
         <h2 class="mt-3 text-2xl font-semibold tracking-tight">
-          <a href={`/blog/${post.id}`} class="transition-colors hover:text-accent-violet">
+          <a href={localizedPath(`/blog/${post.id}`)} class="transition-colors hover:text-accent-violet">
             {post.data.title}
           </a>
         </h2>
@@ -50,12 +55,14 @@ const formatDate = new Intl.DateTimeFormat('es-ES', {
           {post.data.description}
         </p>
         <a
-          href={`/blog/${post.id}`}
+          href={localizedPath(`/blog/${post.id}`)}
           class="mt-5 inline-flex text-sm font-medium text-accent-violet transition-colors hover:text-accent-pink"
         >
-          Leer artículo
+          {t('blog.index.readArticle')}
         </a>
       </article>
     ))}
   </section>
+
+  <NewsletterForm />
 </BaseLayout>

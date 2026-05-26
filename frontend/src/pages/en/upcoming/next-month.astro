@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import UpcomingAnimeList from '@/components/anime/UpcomingAnimeList.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getUpcomingAnime } from '@/lib/api';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('en');
+
+const anime = await getUpcomingAnime(30);
+
+const pageUrl = absoluteUrl('/estrenos/proximo-mes');
+const itemListSchema = buildItemListSchema(
+  anime.map((item) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  t('premieres.month.schema.name'),
+);
+---
+<BaseLayout
+  title={t('premieres.month.title')}
+  description={t('premieres.month.description')}
+>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.premieres'), url: '/estrenos/proxima-semana' },
+      { name: t('breadcrumbs.nextMonth'), url: '/estrenos/proximo-mes' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('premieres.eyebrow')}</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      {t('premieres.month.headingPrefix')} <span class="brand-gradient-text">{t('premieres.month.headingHighlight')}</span>
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      {t('premieres.month.count', { count: anime.length })}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        {t('premieres.month.empty')}
+      </p>
+    ) : (
+      <UpcomingAnimeList anime={anime} />
+    )}
+  </section>
+</BaseLayout>

@@ -1,4 +1,6 @@
-import type { AnimeDetail, WatchProvider } from './api';
+import { t } from '@/i18n';
+import type { AnimeDetail, AnimeSummary, WatchProvider } from './api';
+import { localizedPath } from './localizedRoutes';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL;
 const DEFAULT_ORGANIZATION_SAME_AS = 'https://github.com/diegoalegil';
@@ -13,30 +15,18 @@ export interface FAQItem {
   answer: string;
 }
 
-export const HOME_FAQS: FAQItem[] = [
-  {
-    question: '¿Dónde puedo ver anime online de forma legal?',
-    answer: 'Puedes revisar plataformas con licencia como Crunchyroll, Netflix, Prime Video, Disney+ y HBO Max. DondeAnime cruza cada anime con las plataformas detectadas por país.',
-  },
-  {
-    question: '¿Dónde ver anime gratis legalmente?',
-    answer: 'Algunas plataformas publican episodios gratis o catálogos con anuncios según el país. Cuando el proveedor aparece como gratuito o incluido en streaming, DondeAnime lo muestra en la ficha.',
-  },
-  {
-    question: '¿Qué plataforma tiene más anime?',
-    answer: 'Depende del país y del catálogo vigente. Crunchyroll suele concentrar mucho anime, pero Netflix, Prime Video y otras plataformas cambian sus licencias con frecuencia.',
-  },
-  {
-    question: '¿Cada cuánto se actualiza el catálogo?',
-    answer: 'El catálogo se actualiza automáticamente con datos de AniList y TMDb. Las páginas públicas se regeneran cuando hay cambios relevantes en anime o disponibilidad.',
-  },
-  {
-    question: '¿Por qué un anime no aparece disponible en mi país?',
-    answer: 'Las licencias de streaming cambian por región. Un anime puede estar disponible en otro país, llegar más tarde o no tener proveedor detectado todavía.',
-  },
+export const getHomeFaqs = (): FAQItem[] => [
+  { question: t('faq.legal.question'), answer: t('faq.legal.answer') },
+  { question: t('faq.free.question'), answer: t('faq.free.answer') },
+  { question: t('faq.platform.question'), answer: t('faq.platform.answer') },
+  { question: t('faq.update.question'), answer: t('faq.update.answer') },
+  { question: t('faq.unavailable.question'), answer: t('faq.unavailable.answer') },
 ];
 
-export const absoluteUrl = (path: string): string => `${SITE_URL}${path}`;
+const isAssetPath = (path: string): boolean => /\.[a-z0-9]+$/i.test(path.split('?')[0] ?? path);
+
+export const absoluteUrl = (path: string): string =>
+  `${SITE_URL}${isAssetPath(path) ? path : localizedPath(path)}`;
 
 const stripHtml = (s: string): string => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
@@ -101,7 +91,7 @@ export const buildAnimeReviewSchema = (
   return {
     '@context': 'https://schema.org',
     '@type': 'Review',
-    name: `Puntuación media de ${name}`,
+    name: t('seo.review.name', { name }),
     itemReviewed: {
       '@type': 'TVSeries',
       name,
@@ -115,10 +105,10 @@ export const buildAnimeReviewSchema = (
     },
     publisher: {
       '@type': 'Organization',
-      name: 'DondeAnime',
+      name: t('brand.name'),
       url: SITE_URL,
     },
-    reviewBody: `Puntuación media de ${name} en AniList, convertida a escala 0-10.`,
+    reviewBody: t('seo.review.body', { name }),
     reviewRating: {
       '@type': 'Rating',
       ratingValue: ratingValue(anime.averageScore),
@@ -142,13 +132,13 @@ export const buildBreadcrumbSchema = (items: BreadcrumbItem[]) => ({
 export const buildWebSiteSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'DondeAnime',
+  name: t('brand.name'),
   url: SITE_URL,
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: `${SITE_URL}/?q={search_term_string}`,
+      urlTemplate: `${SITE_URL}${localizedPath('/')}?q={search_term_string}`,
     },
     'query-input': 'required name=search_term_string',
   },
@@ -157,8 +147,9 @@ export const buildWebSiteSchema = () => ({
 export const buildOrganizationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'DondeAnime',
-  url: SITE_URL,
+  name: t('brand.name'),
+  url: `${SITE_URL}${localizedPath('/')}`,
+  availableLanguage: ['es', 'en'],
   logo: {
     '@type': 'ImageObject',
     url: absoluteUrl('/og-default.png'),
@@ -196,3 +187,36 @@ export const buildItemListSchema = (
     url: item.url,
   })),
 });
+
+export const buildRelatedAnimeSchema = (
+  source: AnimeDetail['anime'],
+  related: AnimeSummary[],
+  pageUrl: string,
+) => {
+  if (related.length === 0) return undefined;
+
+  const sourceName = titleFor(source);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Anime similares a ${sourceName}`,
+    url: pageUrl,
+    about: {
+      '@type': 'TVSeries',
+      name: sourceName,
+      url: pageUrl,
+    },
+    numberOfItems: related.length,
+    itemListElement: related.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'TVSeries',
+        name: item.titleEnglish || item.titleRomaji,
+        url: absoluteUrl(`/anime/${item.slug}`),
+        image: item.coverImage,
+      },
+    })),
+  };
+};

@@ -1,6 +1,9 @@
 ---
 import type { AnimeDetail } from '@/lib/api';
 import { formatType, formatStatus } from '@/lib/format';
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+import AnimePicture from './AnimePicture.astro';
 
 interface Props {
   anime: AnimeDetail['anime'];
@@ -13,11 +16,13 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
 ---
 <section class="relative">
   <div class="absolute inset-0 overflow-hidden">
-    <img
+    <AnimePicture
       src={backdropImage}
-      alt=""
-      aria-hidden="true"
-      class="h-full w-full object-cover opacity-30 blur-2xl scale-110"
+      ariaHidden
+      widths={[640, 960, 1280, 1920]}
+      sizes="100vw"
+      class="block h-full w-full"
+      imgClass="h-full w-full object-cover opacity-30 blur-2xl scale-110"
     />
     <div class="absolute inset-0 bg-gradient-to-b from-surface-0/60 via-surface-0/80 to-surface-0"></div>
   </div>
@@ -25,10 +30,17 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
   <div class="relative mx-auto max-w-6xl px-4 pt-12 pb-8 md:pt-16">
     <div class="flex flex-col gap-6 md:flex-row md:gap-10">
       <div class="mx-auto w-40 shrink-0 md:mx-0 md:w-56">
-        <img
+        <AnimePicture
           src={anime.coverImage}
           alt={title}
-          class="aspect-[2/3] w-full rounded-xl object-cover shadow-2xl shadow-black/50"
+          width={448}
+          height={672}
+          widths={[224, 320, 448, 640]}
+          sizes="(min-width: 768px) 14rem, 10rem"
+          loading="eager"
+          fetchpriority="high"
+          class="block"
+          imgClass="aspect-[2/3] w-full rounded-xl object-cover shadow-2xl shadow-black/50"
         />
       </div>
 
@@ -51,7 +63,7 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
           )}
           {anime.episodes !== null && (
             <span class="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-fg-secondary">
-              {anime.episodes} {anime.episodes === 1 ? 'episodio' : 'episodios'}
+              {anime.episodes} {anime.episodes === 1 ? t('anime.hero.episode.one') : t('anime.hero.episode.other')}
             </span>
           )}
           <span class="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-fg-secondary">
@@ -68,7 +80,7 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
           <div class="mt-4 flex flex-wrap justify-center gap-1.5 md:justify-start">
             {anime.genres.map((g) => (
               <a
-                href={`/genero/${g.toLowerCase().replace(/\s+/g, '-')}`}
+                href={localizedPath(`/genero/${g.toLowerCase().replace(/\s+/g, '-')}`)}
                 class="rounded-full border border-surface-2 px-3 py-1 text-xs text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
               >
                 {g}
