@@ -3,14 +3,28 @@ package com.dondeanime.backend.anime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
 
     Optional<Anime> findByAnilistId(Long anilistId);
 
+    @EntityGraph(attributePaths = "genres")
     Optional<Anime> findBySlug(String slug);
+
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
+            """)
+    List<Anime> findAllWithGenres();
+
+    @EntityGraph(attributePaths = "tags")
+    @Query("SELECT a FROM Anime a WHERE a.id = :id")
+    Optional<Anime> findByIdWithTags(@Param("id") Long id);
 
     /**
      * Anime disponibles en una plataforma concreta en un país concreto.
@@ -22,6 +36,7 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      */
     @Query("""
             SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.id IN (
                 SELECT wp.animeId FROM WatchProvider wp
                 WHERE LOWER(REPLACE(wp.providerName, ' ', '-')) = :providerSlug
@@ -39,6 +54,7 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @Query("""
             SELECT DISTINCT a FROM Anime a
             JOIN a.genres g
+            LEFT JOIN FETCH a.genres
             WHERE LOWER(REPLACE(g, ' ', '-')) = :genreSlug
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
@@ -48,11 +64,62 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      * Anime de una temporada concreta (ej. WINTER 2024).
      */
     @Query("""
-            SELECT a FROM Anime a
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.seasonYear = :year AND a.season = :season
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
     List<Anime> findBySeasonYearAndSeason(int year, String season);
+
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            JOIN a.genres g
+            WHERE a.id <> :animeId
+            AND g = :primaryGenre
+            AND a.averageScore > :minScore
+            ORDER BY a.averageScore DESC NULLS LAST, a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findSimilarByPrimaryGenre(Long animeId, String primaryGenre, int minScore, Pageable pageable);
+
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.id <> :animeId
+            AND LOWER(a.primaryStudio) = LOWER(:primaryStudio)
+            AND a.averageScore > :minScore
+            ORDER BY a.averageScore DESC NULLS LAST, a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findSimilarByPrimaryStudio(Long animeId, String primaryStudio, int minScore, Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT candidate FROM Anime candidate
+            JOIN candidate.tags candidateTag
+            WHERE candidate.id <> :animeId
+            AND candidate.averageScore > :minScore
+            AND candidateTag.rank > :minTagRank
+            AND candidateTag.name IN (
+                SELECT sourceTag.name FROM Anime source
+                JOIN source.tags sourceTag
+                WHERE source.id = :animeId
+                AND sourceTag.rank > :minTagRank
+            )
+            ORDER BY candidate.averageScore DESC NULLS LAST, candidate.popularity DESC NULLS LAST, candidate.titleEnglish ASC
+            """)
+    List<Anime> findSimilarBySharedHighRankTags(Long animeId, int minScore, int minTagRank, Pageable pageable);
+
+    /**
+     * Búsqueda full-text vía columna generada search_vector.
+     * La columna y su índice GIN se crean en V3__anime_search_vector.sql.
+     */
+    @Query(value = """
+            SELECT *
+            FROM anime
+            WHERE search_vector @@ plainto_tsquery('spanish', :query)
+            ORDER BY
+                ts_rank(search_vector, plainto_tsquery('spanish', :query)) DESC,
+                popularity DESC NULLS LAST,
+                title_english ASC
+            """, nativeQuery = true)
+    List<Anime> findBySearchVectorMatching(@Param("query") String query);
 
     /**
      * Anime con match TMDb pero sin descripción localizada en español.

@@ -10,6 +10,10 @@ public interface EmailService {
             String countryName,
             String confirmUrl);
 
+    void sendNewsletterConfirmationEmail(
+            String email,
+            String confirmUrl);
+
     void sendAlertEmail(
             String email,
             String animeTitle,

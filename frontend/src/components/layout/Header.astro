@@ -1,20 +1,26 @@
 ---
 import ThemeToggle from '@/components/ui/ThemeToggle.astro';
 import SearchBox from '@/components/ui/SearchBox.astro';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher.astro';
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
+const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
 ---
 <header class="sticky top-0 z-50 border-b border-surface-2 bg-surface-1/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-    <a href="/" class="text-xl font-semibold brand-gradient-text">
-      DondeAnime
+    <a href={localizedPath('/')} class="text-xl font-semibold brand-gradient-text">
+      {t('brand.name')}
     </a>
     <nav class="hidden items-center gap-5 text-sm text-fg-secondary md:flex">
-      <a href="/" class="transition-colors hover:text-fg-primary">Catálogo</a>
-      <a href="/pais/espana" class="transition-colors hover:text-fg-primary">Países</a>
-      <a href="/plataforma/crunchyroll" class="transition-colors hover:text-fg-primary">Plataformas</a>
+      <a href={localizedPath('/')} class="transition-colors hover:text-fg-primary">{t('nav.catalog')}</a>
+      <a href={localizedPath('/pais/espana')} class="transition-colors hover:text-fg-primary">{t('nav.countries')}</a>
+      <a href={localizedPath('/plataforma/crunchyroll')} class="transition-colors hover:text-fg-primary">{t('nav.platforms')}</a>
       <a href="/premium" class="transition-colors hover:text-fg-primary">Premium</a>
     </nav>
     <div class="flex items-center gap-3">
       <SearchBox />
+      {showLanguageSwitcher && <LanguageSwitcher />}
       <ThemeToggle />
     </div>
   </div>

@@ -1,0 +1,81 @@
+---
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<section class="mx-auto max-w-6xl px-4 pb-12" data-newsletter-form data-api-url={apiUrl}>
+  <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+    <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] md:items-center">
+      <div>
+        <h2 class="text-xl font-semibold text-fg-primary">Newsletter DondeAnime</h2>
+        <p class="mt-2 text-sm leading-6 text-fg-secondary">
+          Recibe avisos editoriales cuando haya nuevas guias y mejoras importantes del catalogo.
+        </p>
+      </div>
+      <form class="space-y-3" data-newsletter-panel>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-fg-secondary">Email</span>
+          <input
+            name="email"
+            type="email"
+            required
+            autocomplete="email"
+            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
+          />
+        </label>
+        <label class="flex gap-2 text-sm text-fg-muted">
+          <input name="privacyAccepted" type="checkbox" required class="mt-1" />
+          <span>
+            Acepto la <a href="/legal/privacidad" class="text-accent-violet hover:underline">politica de privacidad</a>.
+          </span>
+        </label>
+        <button
+          type="submit"
+          class="rounded-md bg-accent-pink px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
+        >
+          Suscribirme
+        </button>
+        <p class="min-h-5 text-sm text-fg-muted" data-newsletter-status></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('[data-newsletter-form]').forEach((root) => {
+      const apiUrl = root.getAttribute('data-api-url') ?? '';
+      const form = root.querySelector('[data-newsletter-panel]');
+      const status = root.querySelector('[data-newsletter-status]');
+
+      const setStatus = (message, tone = 'muted') => {
+        if (!status) return;
+        status.textContent = message;
+        status.className = `min-h-5 text-sm ${
+          tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+        }`;
+      };
+
+      form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const email = String(data.get('email') ?? '').trim();
+        const privacyAccepted = data.get('privacyAccepted') === 'on';
+
+        setStatus('Enviando confirmacion...');
+        try {
+          const response = await fetch(`${apiUrl}/api/newsletter/subscribe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, privacyAccepted }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          form.reset();
+          setStatus('Te hemos enviado un correo de confirmacion.', 'success');
+        } catch {
+          setStatus('No se pudo crear la suscripcion. Intentalo de nuevo.', 'danger');
+        }
+      });
+    });
+  </script>
+</section>

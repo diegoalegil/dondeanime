@@ -1,6 +1,7 @@
 ---
 import type { AnimeDetail } from '@/lib/api';
 import { formatType, formatStatus, formatDate, formatSeasonYear, formatNumber } from '@/lib/format';
+import { t } from '@/i18n';
 
 interface Props {
   anime: AnimeDetail['anime'];
@@ -9,18 +10,18 @@ interface Props {
 const { anime } = Astro.props;
 
 const rows: Array<{ label: string; value: string; mono?: boolean }> = [
-  { label: 'Formato', value: formatType(anime.format) },
-  { label: 'Estado', value: formatStatus(anime.status) },
-  { label: 'Episodios', value: anime.episodes !== null ? String(anime.episodes) : '—', mono: true },
-  { label: 'Estreno', value: formatDate(anime.startYear, anime.startMonth, anime.startDay), mono: true },
-  { label: 'Fin', value: formatDate(anime.endYear, anime.endMonth, anime.endDay), mono: true },
-  { label: 'Temporada', value: formatSeasonYear(anime.season, anime.seasonYear) },
-  { label: 'Puntuación', value: anime.averageScore !== null ? `${anime.averageScore} / 100` : '—', mono: true },
-  { label: 'Popularidad', value: formatNumber(anime.popularity), mono: true },
+  { label: t('anime.meta.format'), value: formatType(anime.format) },
+  { label: t('anime.meta.status'), value: formatStatus(anime.status) },
+  { label: t('anime.meta.episodes'), value: anime.episodes !== null ? String(anime.episodes) : '—', mono: true },
+  { label: t('anime.meta.start'), value: formatDate(anime.startYear, anime.startMonth, anime.startDay), mono: true },
+  { label: t('anime.meta.end'), value: formatDate(anime.endYear, anime.endMonth, anime.endDay), mono: true },
+  { label: t('anime.meta.season'), value: formatSeasonYear(anime.season, anime.seasonYear) },
+  { label: t('anime.meta.score'), value: anime.averageScore !== null ? `${anime.averageScore} / 100` : '—', mono: true },
+  { label: t('anime.meta.popularity'), value: formatNumber(anime.popularity), mono: true },
 ];
 ---
 <section class="mx-auto max-w-6xl px-4 py-8">
-  <h2 class="mb-4 text-lg font-semibold text-fg-primary">Detalles</h2>
+  <h2 class="mb-4 text-lg font-semibold text-fg-primary">{t('anime.meta.title')}</h2>
   <dl class="grid grid-cols-2 gap-4 rounded-lg border border-surface-2 bg-surface-1 p-6 sm:grid-cols-3 md:grid-cols-4">
     {rows.map((row) => (
       <div>
