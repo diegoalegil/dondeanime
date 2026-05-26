@@ -171,6 +171,9 @@ test('genre and platform combination pages filter anime and are indexed', async 
   const animeCards = page.locator('article a[href^="/anime/"]');
   const resultCount = await animeCards.count();
   expect(resultCount).toBeGreaterThan(0);
+  const autoText = page.locator('[data-auto-text]');
+  await expect(autoText).toBeVisible();
+  expect((await autoText.innerText()).split(/\s+/).length).toBeGreaterThanOrEqual(150);
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
   const itemList = jsonLdBlocks
