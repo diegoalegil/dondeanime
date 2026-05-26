@@ -12,6 +12,9 @@ import AlternateLangs from '@/components/seo/AlternateLangs.astro';
 import { getAllAnime, getAnimeBySlug, getSimilarAnime } from '@/lib/api';
 import { buildAnimeReviewSchema, buildRelatedAnimeSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const all = await getAllAnime();
@@ -30,7 +33,7 @@ const uniqueProviders = filterVisibleProviders(
 
 const seoDescription = detail.anime.description
   ? detail.anime.description.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').slice(0, 160).trim()
-  : `Descubre dónde ver ${title} en streaming en España, México, Argentina, Colombia y Chile.`;
+  : t('anime.seo.description', { title });
 
 const pageUrl = absoluteUrl(`/anime/${slug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
@@ -38,7 +41,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUrl);
 ---
 <BaseLayout
-  title={`${title} — Dónde verlo en streaming | DondeAnime`}
+  title={t('anime.seo.title', { title })}
   description={seoDescription}
   image={detail.anime.bannerImage ?? detail.anime.coverImage}
   type="article"
@@ -54,8 +57,8 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Anime', url: '/' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.anime'), url: '/' },
       { name: title, url: `/anime/${slug}` },
     ]}
   />

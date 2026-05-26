@@ -2,6 +2,12 @@
   import { onDestroy, onMount } from 'svelte';
 
   export let apiUrl = '';
+  export let actionPath = '/buscar';
+  export let animePathPrefix = '/anime';
+  export let label = 'Buscar anime';
+  export let placeholder = 'Buscar anime...';
+  export let loadingLabel = 'Buscando...';
+  export let noResultsLabel = 'Sin resultados';
 
   interface SearchResult {
     slug: string;
@@ -26,6 +32,7 @@
 
   const searchUrl = (value: string) =>
     `${apiUrl}/api/search?q=${encodeURIComponent(value)}&limit=5`;
+  const animeHref = (slug: string) => `${animePathPrefix.replace(/\/$/, '')}/${slug}`;
 
   const isEditable = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
@@ -113,8 +120,8 @@
   }
 </script>
 
-<form bind:this={root} class="relative" role="search" action="/buscar" method="get">
-  <label class="sr-only" for={inputId}>Buscar anime</label>
+<form bind:this={root} class="relative" role="search" action={actionPath} method="get">
+  <label class="sr-only" for={inputId}>{label}</label>
   <div class="flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-3 py-1.5">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +143,7 @@
       id={inputId}
       name="q"
       type="search"
-      placeholder="Buscar anime..."
+      placeholder={placeholder}
       autocomplete="off"
       class="w-32 bg-transparent text-sm text-fg-primary placeholder:text-fg-muted focus:outline-none md:w-48"
       aria-autocomplete="list"
@@ -155,13 +162,13 @@
       role="listbox"
     >
       {#if loading}
-        <p class="px-4 py-3 text-sm text-fg-muted">Buscando...</p>
+        <p class="px-4 py-3 text-sm text-fg-muted">{loadingLabel}</p>
       {:else if results.length === 0}
-        <p class="px-4 py-3 text-sm text-fg-muted">Sin resultados</p>
+        <p class="px-4 py-3 text-sm text-fg-muted">{noResultsLabel}</p>
       {:else}
         {#each results as anime}
           <a
-            href={`/anime/${anime.slug}`}
+            href={animeHref(anime.slug)}
             class="flex items-center gap-3 border-b border-surface-2/50 px-3 py-2 last:border-b-0 transition-colors hover:bg-surface-2 focus:bg-surface-2 focus:outline-none"
             role="option"
           >

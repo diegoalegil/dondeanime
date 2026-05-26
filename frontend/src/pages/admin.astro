@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getAllAnime } from '@/lib/api';
+import { t } from '@/i18n';
 
 const anime = await getAllAnime();
 const apiUrl = import.meta.env.PUBLIC_API_URL;
 ---
 <BaseLayout
-  title="Admin — DondeAnime"
-  description="Panel admin de DondeAnime."
+  title={t('admin.home.title')}
+  description={t('admin.home.description')}
 >
   <meta slot="head" name="robots" content="noindex, nofollow" />
 
@@ -16,25 +17,30 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     data-admin-home
     data-api-url={apiUrl}
     data-first-slug={anime[0]?.slug ?? ''}
+    data-status-session-active={t('admin.status.sessionActive')}
+    data-status-no-anime={t('admin.status.noAnimeCredentials')}
+    data-status-verifying={t('admin.status.verifying')}
+    data-status-wrong-credentials={t('admin.status.wrongCredentials')}
+    data-status-session-closed={t('admin.status.sessionClosed')}
   >
     <aside class="rounded-lg border border-surface-2 bg-surface-1 p-5">
       <div class="mb-5">
-        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
-        <h1 class="mt-1 text-2xl font-semibold text-fg-primary">Panel editorial</h1>
+        <p class="text-xs font-semibold uppercase text-accent-violet">{t('admin.eyebrow')}</p>
+        <h1 class="mt-1 text-2xl font-semibold text-fg-primary">{t('admin.panel')}</h1>
       </div>
 
       <nav class="mb-5 grid gap-2 text-sm">
         <a href="/admin/dashboard" class="rounded-md border border-surface-2 px-3 py-2 text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary">
-          Dashboard
+          {t('admin.dashboard')}
         </a>
         <a href="/admin/affiliate-links" class="rounded-md border border-surface-2 px-3 py-2 text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary">
-          Enlaces afiliados
+          {t('admin.affiliateLinks')}
         </a>
       </nav>
 
       <form class="space-y-4" data-login-form>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-fg-secondary">Usuario</span>
+          <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('admin.username')}</span>
           <input
             name="username"
             autocomplete="username"
@@ -43,7 +49,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           />
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-fg-secondary">Contraseña</span>
+          <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('admin.password')}</span>
           <input
             name="password"
             type="password"
@@ -56,14 +62,14 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
             type="submit"
             class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
           >
-            Entrar
+            {t('admin.login')}
           </button>
           <button
             type="button"
             class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
             data-logout-button
           >
-            Salir
+            {t('admin.logout')}
           </button>
         </div>
         <p class="min-h-5 text-sm text-fg-muted" data-login-status></p>
@@ -73,14 +79,14 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     <section>
       <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase text-accent-pink">Catálogo</p>
-          <h2 class="mt-1 text-2xl font-semibold text-fg-primary">Editar fichas</h2>
+          <p class="text-xs font-semibold uppercase text-accent-pink">{t('admin.catalog')}</p>
+          <h2 class="mt-1 text-2xl font-semibold text-fg-primary">{t('admin.editEntries')}</h2>
         </div>
         <label class="w-full md:max-w-xs">
-          <span class="sr-only">Buscar anime</span>
+          <span class="sr-only">{t('search.label')}</span>
           <input
             type="search"
-            placeholder="Buscar anime"
+            placeholder={t('search.placeholder')}
             class="w-full rounded-md border border-surface-2 bg-surface-1 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
             data-search
           />
@@ -109,7 +115,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
                 {item.titleRomaji && item.titleRomaji !== item.titleEnglish && (
                   <p class="mt-1 truncate text-xs text-fg-muted">{item.titleRomaji}</p>
                 )}
-                <p class="mt-2 text-xs text-fg-muted">{item.startYear ?? 'Sin año'}</p>
+                <p class="mt-2 text-xs text-fg-muted">{item.startYear ?? t('admin.noYear')}</p>
               </div>
             </a>
           );
@@ -122,6 +128,13 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const root = document.querySelector('[data-admin-home]');
     const apiUrl = root?.getAttribute('data-api-url') ?? '';
     const firstSlug = root?.getAttribute('data-first-slug') ?? '';
+    const messages = {
+      sessionActive: root?.getAttribute('data-status-session-active') ?? '',
+      noAnime: root?.getAttribute('data-status-no-anime') ?? '',
+      verifying: root?.getAttribute('data-status-verifying') ?? '',
+      wrongCredentials: root?.getAttribute('data-status-wrong-credentials') ?? '',
+      sessionClosed: root?.getAttribute('data-status-session-closed') ?? '',
+    };
     const form = document.querySelector('[data-login-form]');
     const status = document.querySelector('[data-login-status]');
     const logoutButton = document.querySelector('[data-logout-button]');
@@ -138,7 +151,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const hasToken = () => Boolean(localStorage.getItem(tokenKey));
 
     if (hasToken()) {
-      setStatus('Sesión activa.', 'success');
+      setStatus(messages.sessionActive, 'success');
     }
 
     form?.addEventListener('submit', async (event) => {
@@ -148,7 +161,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       const password = String(data.get('password') ?? '');
       const loginPayload = { username, password };
 
-      setStatus('Verificando...');
+      setStatus(messages.verifying);
       const response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,18 +169,18 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       });
 
       if (!response.ok) {
-        setStatus('Credenciales incorrectas.', 'danger');
+        setStatus(messages.wrongCredentials, 'danger');
         return;
       }
 
       const session = await response.json();
       localStorage.setItem(tokenKey, session.token);
-      setStatus('Sesión activa.', 'success');
+      setStatus(messages.sessionActive, 'success');
     });
 
     logoutButton?.addEventListener('click', () => {
       localStorage.removeItem(tokenKey);
-      setStatus('Sesión cerrada.');
+      setStatus(messages.sessionClosed);
     });
 
     search?.addEventListener('input', () => {

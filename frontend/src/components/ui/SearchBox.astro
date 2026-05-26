@@ -1,6 +1,17 @@
 ---
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 import SearchBoxIsland from './SearchBox.svelte';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
-<SearchBoxIsland apiUrl={apiUrl} client:load />
+<SearchBoxIsland
+  apiUrl={apiUrl}
+  actionPath={localizedPath('/buscar')}
+  animePathPrefix={localizedPath('/anime')}
+  label={t('search.label')}
+  placeholder={t('search.placeholder')}
+  loadingLabel={t('search.loading')}
+  noResultsLabel={t('search.noResults')}
+  client:load
+/>

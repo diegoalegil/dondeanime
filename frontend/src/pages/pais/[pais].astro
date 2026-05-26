@@ -10,14 +10,20 @@ import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+import { canonicalCountrySlug, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   return COUNTRY_SLUGS.map((s) => ({ params: { pais: s } }));
 }
 
 const { pais } = Astro.params;
-const countrySlug = pais as CountrySlug;
+const countrySlug = canonicalCountrySlug(pais);
+if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
 const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
 
 const rawProviders = await getProvidersByCountry(country.iso);
 const providers = rawProviders.filter((p) => !isHiddenVariant(p.slug));
@@ -37,8 +43,11 @@ const anime = [...animeBySlug.values()].sort((a, b) => {
   return (a.titleEnglish || a.titleRomaji).localeCompare(b.titleEnglish || b.titleRomaji, 'es');
 });
 
-const seoTitle = `Anime en streaming en ${country.name} — Plataformas disponibles | DondeAnime`;
-const seoDescription = `Descubre todas las plataformas de streaming con anime en ${country.name}: ${providers.slice(0, 5).map((p) => p.providerName).join(', ')} y más.`;
+const seoTitle = t('countryPage.seo.title', { country: countryName });
+const seoDescription = t('countryPage.seo.description', {
+  country: countryName,
+  platforms: providers.slice(0, 5).map((p) => p.providerName).join(', '),
+});
 
 const pageUrl = absoluteUrl(`/pais/${countrySlug}`);
 const itemListSchema = buildItemListSchema(
@@ -47,7 +56,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/plataforma/${p.slug}/${countrySlug}`),
   })),
   pageUrl,
-  `Plataformas de anime en ${country.name}`,
+  t('countryPage.schema.name', { country: countryName }),
 );
 ---
 <BaseLayout
@@ -60,8 +69,8 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: country.name, url: `/pais/${countrySlug}` },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: countryName, url: `/pais/${countrySlug}` },
     ]}
   />
 
@@ -69,23 +78,27 @@ const itemListSchema = buildItemListSchema(
     <div class="flex items-center gap-4">
       <CountryFlag country={country} class="h-8 min-w-11 text-sm" />
       <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
-        Anime en streaming en {country.name}
+        {t('countryPage.heading', { country: countryName })}
       </h1>
     </div>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      {providers.length} plataforma{providers.length === 1 ? '' : 's'} con catálogo de anime detectada{providers.length === 1 ? '' : 's'} en {country.name}.
+      {t('countryPage.providerCount', {
+        count: providers.length,
+        plural: providers.length === 1 ? '' : 's',
+        country: countryName,
+      })}
     </p>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
-    <h2 class="mb-6 text-2xl font-semibold">Plataformas</h2>
+    <h2 class="mb-6 text-2xl font-semibold">{t('countryPage.platforms')}</h2>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {providers.map((p) => {
         const platform = getPlatform(p.slug);
         const displayName = platform?.name ?? p.providerName;
         return (
           <a
-            href={`/plataforma/${p.slug}/${countrySlug}`}
+            href={localizedPath(`/plataforma/${p.slug}/${countrySlug}`)}
             class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
           >
             <div class="flex items-center gap-4">
@@ -98,7 +111,7 @@ const itemListSchema = buildItemListSchema(
               <div>
                 <h3 class="text-base font-semibold text-fg-primary">{displayName}</h3>
                 <p class="mt-1 text-sm text-fg-muted">
-                  {p.animeCount} anime{p.animeCount === 1 ? '' : 's'}
+                  {t('countryPage.animeCount', { count: p.animeCount })}
                 </p>
               </div>
             </div>
