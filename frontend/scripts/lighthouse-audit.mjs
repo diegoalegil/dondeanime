@@ -18,6 +18,8 @@ const thresholds = {
   'best-practices': Number(process.env.LIGHTHOUSE_MIN_BEST_PRACTICES_SCORE ?? 80),
   seo: Number(process.env.LIGHTHOUSE_MIN_SEO_SCORE ?? 80),
 };
+const lighthouseConcurrency = Number(process.env.LIGHTHOUSE_CONCURRENCY ?? 2);
+const lighthouseTimeoutMs = Number(process.env.LIGHTHOUSE_TIMEOUT_MS ?? 120_000);
 const chromeFlags = [
   '--headless=new',
   '--no-sandbox',
@@ -114,9 +116,22 @@ const runCommand = (command, args, options = {}) => new Promise((resolve, reject
     shell: false,
     stdio: options.stdio ?? 'inherit',
   });
+  let timedOut = false;
+  const timeoutId = options.timeoutMs
+    ? setTimeout(() => {
+        timedOut = true;
+        child.kill('SIGKILL');
+      }, options.timeoutMs)
+    : null;
 
   child.on('error', reject);
   child.on('exit', (code) => {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (timedOut) {
+      reject(new Error(`${command} ${args.join(' ')} timed out after ${options.timeoutMs}ms`));
+      return;
+    }
+
     if (code === 0 || options.allowFailure) {
       resolve(code);
       return;
@@ -125,6 +140,22 @@ const runCommand = (command, args, options = {}) => new Promise((resolve, reject
     reject(new Error(`${command} ${args.join(' ')} failed with exit code ${code}`));
   });
 });
+
+const runWithConcurrency = async (items, concurrency, worker) => {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workerCount = Math.max(1, Math.min(concurrency, items.length));
+
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await worker(items[index]);
+    }
+  }));
+
+  return results;
+};
 
 const startPreview = () => {
   const args = ['run', 'preview', '--', '--host', '127.0.0.1', '--port', String(port)];
@@ -172,8 +203,10 @@ const runLighthouse = async ({ template, route, url }) => {
     `--only-categories=${categories.join(',')}`,
     '--output=json',
     `--output-path=${outputPath}`,
+    '--throttling-method=provided',
+    '--max-wait-for-load=45000',
     `--chrome-flags=${chromeFlags}`,
-  ], { allowFailure: true, stdio: 'pipe' });
+  ], { allowFailure: true, stdio: 'pipe', timeoutMs: lighthouseTimeoutMs });
 
   const raw = JSON.parse(readFileSync(outputPath, 'utf8'));
   const scores = Object.fromEntries(
@@ -211,12 +244,10 @@ const preview = startPreview();
 
 try {
   await waitForServer(baseUrl);
-  const audits = [];
-
-  for (const target of targets) {
+  const audits = await runWithConcurrency(targets, lighthouseConcurrency, async (target) => {
     console.log(`Lighthouse ${target.template}: ${target.route}`);
-    audits.push(await runLighthouse(target));
-  }
+    return runLighthouse(target);
+  });
 
   const report = {
     generatedAt: new Date().toISOString(),
