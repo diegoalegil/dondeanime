@@ -81,6 +81,9 @@ public class Anime {
 
     private Integer popularity;
 
+    @Column(name = "primary_studio", length = 120)
+    private String primaryStudio;
+
     @Column(name = "synced_at")
     private Instant syncedAt;
 
@@ -270,6 +273,14 @@ public class Anime {
 
     public void setPopularity(Integer popularity) {
         this.popularity = popularity;
+    }
+
+    public String getPrimaryStudio() {
+        return primaryStudio;
+    }
+
+    public void setPrimaryStudio(String primaryStudio) {
+        this.primaryStudio = primaryStudio;
     }
 
     public Instant getSyncedAt() {
