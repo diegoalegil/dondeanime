@@ -15,6 +15,8 @@ import com.dondeanime.backend.anime.anilist.AniListCoverImage;
 import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
 import com.dondeanime.backend.anime.anilist.AniListTag;
+import com.dondeanime.backend.anime.anilist.AniListStudio;
+import com.dondeanime.backend.anime.anilist.AniListStudioConnection;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
 
 /**
@@ -84,6 +86,7 @@ public class AnimeSyncService {
         anime.setStatus(media.status());
         anime.setEpisodes(media.episodes());
         anime.setEpisodeDuration(media.duration());
+        anime.setStudio(mainStudioName(media.studios()));
         anime.setAverageScore(media.averageScore());
         anime.setPopularity(media.popularity());
 
@@ -174,5 +177,17 @@ public class AnimeSyncService {
 
     private static boolean isBlank(String s) {
         return s == null || s.isBlank();
+    }
+
+    private static String mainStudioName(AniListStudioConnection studios) {
+        if (studios == null || studios.nodes() == null) {
+            return null;
+        }
+
+        return studios.nodes().stream()
+                .map(AniListStudio::name)
+                .filter(name -> !isBlank(name))
+                .findFirst()
+                .orElse(null);
     }
 }
