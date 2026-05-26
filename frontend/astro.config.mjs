@@ -13,7 +13,7 @@ export default defineConfig({
     format: 'file',
   },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
   integrations: [
     mdx(),

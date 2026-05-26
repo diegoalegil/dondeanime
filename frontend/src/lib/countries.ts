@@ -1,16 +1,15 @@
 export interface CountryInfo {
   iso: string;
   name: string;
-  flagCode: string;
   hreflang: string;
 }
 
 export const COUNTRIES = {
-  espana: { iso: 'ES', name: 'España', flagCode: 'es', hreflang: 'es-ES' },
-  mexico: { iso: 'MX', name: 'México', flagCode: 'mx', hreflang: 'es-MX' },
-  argentina: { iso: 'AR', name: 'Argentina', flagCode: 'ar', hreflang: 'es-AR' },
-  colombia: { iso: 'CO', name: 'Colombia', flagCode: 'co', hreflang: 'es-CO' },
-  chile: { iso: 'CL', name: 'Chile', flagCode: 'cl', hreflang: 'es-CL' },
+  espana: { iso: 'ES', name: 'España', hreflang: 'es-ES' },
+  mexico: { iso: 'MX', name: 'México', hreflang: 'es-MX' },
+  argentina: { iso: 'AR', name: 'Argentina', hreflang: 'es-AR' },
+  colombia: { iso: 'CO', name: 'Colombia', hreflang: 'es-CO' },
+  chile: { iso: 'CL', name: 'Chile', hreflang: 'es-CL' },
 } as const satisfies Record<string, CountryInfo>;
 
 export type CountrySlug = keyof typeof COUNTRIES;

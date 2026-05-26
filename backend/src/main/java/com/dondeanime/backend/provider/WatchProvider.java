@@ -27,7 +27,8 @@ import jakarta.persistence.UniqueConstraint;
         ),
         indexes = {
                 @Index(name = "idx_watch_provider_anime", columnList = "anime_id"),
-                @Index(name = "idx_watch_provider_country", columnList = "country_code")
+                @Index(name = "idx_watch_provider_country", columnList = "country_code"),
+                @Index(name = "idx_watch_provider_anime_country", columnList = "anime_id, country_code")
         }
 )
 public class WatchProvider {
