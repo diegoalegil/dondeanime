@@ -4,6 +4,7 @@ import {
   getProviders,
   getProvidersByCountry,
   getSeasons,
+  getStudios,
 } from './api';
 import { BEST_ANIME_YEARS } from './bestYears';
 import { COUNTRIES, COUNTRY_SLUGS } from './countries';
@@ -11,9 +12,11 @@ import { isHiddenVariant } from './platforms';
 import {
   DURATION_MINUTES,
   EPISODE_LIMITS,
+  TOP_STUDIO_LIMIT,
   beginnerGenrePath,
   durationPath,
   episodeLimitPath,
+  studioPath,
 } from './programmaticSeo';
 
 export const SITEMAP_ENTRIES = [
@@ -147,6 +150,14 @@ export const combinationSitemapPaths = async (): Promise<string[]> => {
   const durationPaths = DURATION_MINUTES.map((minutes) => durationPath(minutes));
   const episodeLimitPaths = EPISODE_LIMITS.map((maxEpisodes) => episodeLimitPath(maxEpisodes));
   const beginnerGenrePaths = genres.map((genre) => beginnerGenrePath(genre.slug));
+  const studioPaths = (await getStudios()).slice(0, TOP_STUDIO_LIMIT)
+    .map((studio) => studioPath(studio.slug));
 
-  return [...genreProviderPaths, ...durationPaths, ...episodeLimitPaths, ...beginnerGenrePaths];
+  return [
+    ...genreProviderPaths,
+    ...durationPaths,
+    ...episodeLimitPaths,
+    ...beginnerGenrePaths,
+    ...studioPaths,
+  ];
 };

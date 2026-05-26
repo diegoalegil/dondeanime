@@ -27,6 +27,7 @@ public class AniListClient {
               endDate { year month day }
               episodes
               duration
+              studios(isMain: true) { nodes { name } }
               format
               status
               averageScore

@@ -13,6 +13,7 @@ public record AniListMedia(
         AniListFuzzyDate endDate,
         Integer episodes,
         Integer duration,
+        AniListStudioConnection studios,
         String format,
         String status,
         Integer averageScore,

@@ -116,6 +116,18 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             """)
     List<SeasonAggregation> aggregateSeasons();
 
+    /**
+     * Estudios agregados con count de anime distintos.
+     */
+    @Query("""
+            SELECT a.studio AS studio, COUNT(a) AS animeCount
+            FROM Anime a
+            WHERE a.studio IS NOT NULL AND TRIM(a.studio) <> ''
+            GROUP BY a.studio
+            ORDER BY COUNT(a) DESC, a.studio ASC
+            """)
+    List<StudioAggregation> aggregateStudios();
+
     interface GenreAggregation {
         String getGenre();
         Long getAnimeCount();
@@ -124,6 +136,11 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     interface SeasonAggregation {
         Integer getYear();
         String getSeason();
+        Long getAnimeCount();
+    }
+
+    interface StudioAggregation {
+        String getStudio();
         Long getAnimeCount();
     }
 }

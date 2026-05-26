@@ -1,0 +1,127 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeSummary, StudioSummary } from '@/lib/api';
+import { getBestAnimeByStudio, getStudios } from '@/lib/api';
+import { TOP_STUDIO_LIMIT, studioPath } from '@/lib/programmaticSeo';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+
+interface Props {
+  studio: StudioSummary;
+}
+
+export async function getStaticPaths() {
+  const studios = await getStudios();
+  return studios.slice(0, TOP_STUDIO_LIMIT).map((studio) => ({
+    params: { slug: studio.slug },
+    props: { studio },
+  }));
+}
+
+const { studio } = Astro.props as Props;
+const topAnime = (await getBestAnimeByStudio(studio.slug)).slice(0, 30);
+const pagePath = studioPath(studio.slug);
+const pageUrl = absoluteUrl(pagePath);
+const topTitles = topAnime.slice(0, 4).map((anime: AnimeSummary) => anime.titleEnglish || anime.titleRomaji);
+
+const seoTitle = `Mejor anime de ${studio.name} | DondeAnime`;
+const seoDescription = topTitles.length > 0
+  ? `Ranking de anime de ${studio.name}: ${topTitles.join(', ')} y mas titulos del estudio.`
+  : `Ranking preparado para listar el mejor anime de ${studio.name} en DondeAnime.`;
+
+const intro = topAnime.length > 0
+  ? `${studio.name} aparece en el catalogo con ${studio.animeCount} anime. Esta pagina ordena sus titulos por popularidad para encontrar rapido por donde empezar, desde series muy conocidas hasta obras que siguen apareciendo en plataformas de streaming.`
+  : `Esta pagina queda preparada para listar el mejor anime de ${studio.name} cuando el catalogo sincronizado incluya datos de estudio en produccion.`;
+
+const itemListSchema = buildItemListSchema(
+  topAnime.map((anime: AnimeSummary) => ({
+    name: anime.titleEnglish || anime.titleRomaji,
+    url: absoluteUrl(`/anime/${anime.slug}`),
+  })),
+  pageUrl,
+  `Mejor anime de ${studio.name}`,
+);
+
+const creativeWorkSeriesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWorkSeries',
+  name: `Mejor anime de ${studio.name}`,
+  url: pageUrl,
+  creator: {
+    '@type': 'Organization',
+    name: studio.name,
+  },
+  hasPart: topAnime.slice(0, 10).map((anime: AnimeSummary) => ({
+    '@type': 'TVSeries',
+    name: anime.titleEnglish || anime.titleRomaji,
+    url: absoluteUrl(`/anime/${anime.slug}`),
+    image: anime.coverImage,
+  })),
+};
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
+  <JsonLd slot="head" data={itemListSchema} />
+  <JsonLd slot="head" data={creativeWorkSeriesSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Estudios', url: pagePath },
+      { name: studio.name, url: pagePath },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase text-accent-violet">Ranking por estudio</p>
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">
+      Mejor anime de <span class="brand-gradient-text">{studio.name}</span>
+    </h1>
+    <p class="mt-4 max-w-3xl text-lg text-fg-secondary">
+      {intro}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {topAnime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No hay anime con estudio sincronizado para este ranking todavia.
+      </p>
+    ) : (
+      <ol class="grid gap-4">
+        {topAnime.map((anime: AnimeSummary, index: number) => {
+          const title = anime.titleEnglish || anime.titleRomaji;
+          return (
+            <li
+              class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[4rem_6rem_1fr] sm:items-start"
+              data-studio-result
+            >
+              <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet sm:h-12 sm:w-16">
+                #{index + 1}
+              </div>
+              <a href={`/anime/${anime.slug}`} class="block w-24 sm:w-full">
+                <img
+                  src={anime.coverImage}
+                  alt={title}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  class="aspect-[2/3] w-full rounded-lg object-cover ring-1 ring-surface-2"
+                />
+              </a>
+              <div class="min-w-0">
+                <a
+                  href={`/anime/${anime.slug}`}
+                  class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
+                >
+                  {title}
+                </a>
+                <p class="mt-2 text-sm text-fg-muted">
+                  {anime.format} - Popularidad {anime.popularity ?? 'sin dato'} - Nota {anime.averageScore ?? 'sin dato'}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    )}
+  </section>
+</BaseLayout>

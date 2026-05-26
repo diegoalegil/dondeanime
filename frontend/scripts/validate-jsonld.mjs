@@ -8,6 +8,7 @@ const schemaContext = new Set(['https://schema.org', 'http://schema.org']);
 const knownTypes = new Set([
   'BlogPosting',
   'BreadcrumbList',
+  'CreativeWorkSeries',
   'FAQPage',
   'ItemList',
   'Organization',
@@ -149,6 +150,11 @@ function validateNode(node, file) {
         errors.push(`${rel(file)}: Organization.logo.url debe existir`);
       }
       requireArray(node, 'sameAs', file, type);
+    }
+    if (type === 'CreativeWorkSeries') {
+      requireString(node, 'name', file, type);
+      requireString(node, 'url', file, type);
+      if (!isRecord(node.creator)) errors.push(`${rel(file)}: CreativeWorkSeries.creator debe existir`);
     }
   }
 }

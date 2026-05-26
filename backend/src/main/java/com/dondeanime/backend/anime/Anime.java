@@ -55,6 +55,9 @@ public class Anime {
     @Column(name = "episode_duration")
     private Integer episodeDuration;
 
+    @Column(length = 120)
+    private String studio;
+
     @Column(name = "start_year")
     private Integer startYear;
 
@@ -201,6 +204,14 @@ public class Anime {
 
     public void setEpisodeDuration(Integer episodeDuration) {
         this.episodeDuration = episodeDuration;
+    }
+
+    public String getStudio() {
+        return studio;
+    }
+
+    public void setStudio(String studio) {
+        this.studio = studio;
     }
 
     public Integer getStartYear() {

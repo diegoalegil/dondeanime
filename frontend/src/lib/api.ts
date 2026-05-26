@@ -1,3 +1,5 @@
+import { FALLBACK_TOP_STUDIOS, studioSlug } from './programmaticSeo';
+
 const API_URL = import.meta.env.PUBLIC_API_URL;
 
 export interface AnimeSummary {
@@ -9,6 +11,7 @@ export interface AnimeSummary {
   status: string;
   episodes: number | null;
   episodeDuration: number | null;
+  studio: string | null;
   year: number | null;
   averageScore: number | null;
   popularity: number | null;
@@ -117,6 +120,12 @@ export interface SeasonSummary {
   animeCount: number;
 }
 
+export interface StudioSummary {
+  name: string;
+  slug: string;
+  animeCount: number;
+}
+
 export const getGenres = () => fetchJson<GenreSummary[]>('/api/genres');
 
 export const getAnimeByGenre = (genreSlug: string) =>
@@ -162,6 +171,57 @@ export const getAnimeByMaxEpisodes = async (maxEpisodes: number) => {
   }
   if (!res.ok) {
     throw new Error(`API /api/anime/episodes/less-than/${maxEpisodes} failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<AnimeSummary[]>;
+};
+
+const summarizeStudiosFromAnime = (anime: AnimeSummary[]): StudioSummary[] => {
+  const counts = new Map<string, { name: string; animeCount: number }>();
+
+  anime.forEach((item) => {
+    if (!item.studio) return;
+    const slug = studioSlug(item.studio);
+    if (!slug) return;
+    const current = counts.get(slug);
+    counts.set(slug, {
+      name: current?.name ?? item.studio,
+      animeCount: (current?.animeCount ?? 0) + 1,
+    });
+  });
+
+  const summaries = Array.from(counts.entries())
+    .map(([slug, value]) => ({ slug, ...value }))
+    .sort((a, b) => b.animeCount - a.animeCount || a.name.localeCompare(b.name, 'es'));
+
+  if (summaries.length > 0) return summaries;
+
+  return FALLBACK_TOP_STUDIOS.map((studio) => ({
+    ...studio,
+    animeCount: 0,
+  }));
+};
+
+export const getStudios = async () => {
+  const res = await fetch(`${API_URL}/api/studios`);
+  if (res.status === 404) {
+    return summarizeStudiosFromAnime(await getAllAnime());
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/studios failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<StudioSummary[]>;
+};
+
+export const getBestAnimeByStudio = async (slug: string) => {
+  const res = await fetch(`${API_URL}/api/studios/${slug}/best`);
+  if (res.status === 404) {
+    const allAnime = await getAllAnime();
+    return allAnime
+      .filter((anime) => anime.studio && studioSlug(anime.studio) === slug)
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/studios/${slug}/best failed: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<AnimeSummary[]>;
 };
