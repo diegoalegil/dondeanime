@@ -1,5 +1,6 @@
 ---
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 interface Props {
   animeSlug: string;
@@ -24,12 +25,12 @@ const { animeSlug, activeCountry } = Astro.props;
           <Fragment>
             {isActive ? (
               <span class={`${baseClass} ${stateClass}`} aria-current="page">
-                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                <CountryFlag country={country} />
                 {country.name}
               </span>
             ) : (
               <a href={`/anime/${animeSlug}/${slug}`} class={`${baseClass} ${stateClass}`}>
-                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                <CountryFlag country={country} />
                 {country.name}
               </a>
             )}

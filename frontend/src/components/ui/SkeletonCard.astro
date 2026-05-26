@@ -1,0 +1,16 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+<article class="group" aria-hidden="true">
+  <div
+    class={`skeleton-shimmer rounded-lg bg-surface-2 ${compact ? 'aspect-[5/2]' : 'aspect-[2/3]'}`}
+  ></div>
+  <div class="mt-3 space-y-2">
+    <div class="skeleton-shimmer h-4 w-4/5 rounded bg-surface-2"></div>
+    <div class="skeleton-shimmer h-3 w-1/2 rounded bg-surface-2"></div>
+  </div>
+</article>
