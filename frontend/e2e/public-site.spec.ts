@@ -89,7 +89,7 @@ test('home renders the static catalog and links to an anime detail page', async 
 
   await animeCards.first().click();
 
-  expect(new URL(page.url()).pathname).toBe(firstHref);
+  await expect(page).toHaveURL(new RegExp(`${escapeRegExp(firstHref!)}$`));
   await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
   await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -413,3 +413,24 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(Number(review.reviewRating.ratingValue)).toBeGreaterThan(0);
   expect(review.author.name).toBe('AniList');
 });
+
+test('search index is loaded lazily when the user searches', async ({ page }) => {
+  const searchIndexRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/search-index.json') {
+      searchIndexRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/');
+  expect(searchIndexRequests).toHaveLength(0);
+
+  await page.getByPlaceholder('Buscar anime...').fill('naruto');
+
+  await expect(page.locator('[data-search-results] a[href^="/anime/"]').first()).toBeVisible();
+  expect(searchIndexRequests).toHaveLength(1);
+});
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
