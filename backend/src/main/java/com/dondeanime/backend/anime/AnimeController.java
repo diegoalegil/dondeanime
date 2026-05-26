@@ -105,6 +105,18 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/duration/{minutes}")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeDuration(@PathVariable int minutes) {
+        if (minutes < 1 || minutes > 240) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodeDuration(minutes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
     /**
      * Detalle de un anime + sus watch providers agrupados por país.
      * 404 si el slug no existe.
