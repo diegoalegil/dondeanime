@@ -150,6 +150,7 @@
   {#if open}
     <div
       id={listId}
+      data-search-results
       class="absolute right-0 top-full z-50 mt-2 max-h-[60vh] w-80 overflow-y-auto rounded-lg border border-surface-2 bg-surface-1 shadow-2xl shadow-black/40"
       role="listbox"
     >
