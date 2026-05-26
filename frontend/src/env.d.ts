@@ -1,5 +1,3 @@
-/// <reference types="vite-plugin-pwa/client" />
-
 interface ImportMetaEnv {
   readonly PUBLIC_API_URL: string;
   readonly PUBLIC_DATA_API_URL?: string;

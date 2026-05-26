@@ -5,9 +5,9 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
-import { pwaInfo } from 'virtual:pwa-info';
 import SkeletonRow from '@/components/ui/SkeletonRow.astro';
 import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
 
 interface Props {
   title: string;
@@ -34,9 +34,9 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
-    <meta name="theme-color" content="#A78BFA" />
-    {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/pwa/icons/icon-192.svg" />
+    <meta name="theme-color" content="#0A0A0F" />
     <ClientRouter />
     <link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>
@@ -105,7 +105,6 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
         crossorigin="anonymous"
       ></script>
     )}
-    <script src="/src/pwa.ts"></script>
     <slot name="head" />
   </head>
   <body class="bg-surface-0 text-fg-primary font-sans">
@@ -121,6 +120,14 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
       <slot />
     </main>
     <Footer />
+    <InstallPromotion />
     <AffiliateTrackingScript />
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
