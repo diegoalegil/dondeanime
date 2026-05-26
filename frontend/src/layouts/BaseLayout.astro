@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
+import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
 
 interface Props {
   title: string;
@@ -68,6 +69,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
       <slot />
     </main>
     <Footer />
+    <InstallPromotion />
     <AffiliateTrackingScript />
     <script is:inline>
       if ('serviceWorker' in navigator) {
