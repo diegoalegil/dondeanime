@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
 
@@ -20,6 +21,10 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             LEFT JOIN FETCH a.genres
             """)
     List<Anime> findAllWithGenres();
+
+    @EntityGraph(attributePaths = "tags")
+    @Query("SELECT a FROM Anime a WHERE a.id = :id")
+    Optional<Anime> findByIdWithTags(@Param("id") Long id);
 
     /**
      * Anime disponibles en una plataforma concreta en un país concreto.
