@@ -1,45 +1,71 @@
 package com.dondeanime.backend.api;
 
-import java.net.URI;
+import java.io.IOException;
+import java.util.Set;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-@RestController
-public class LegacyApiRedirectController {
+@Component
+public class LegacyApiRedirectController extends OncePerRequestFilter {
 
     public static final String SUNSET_DATE = "Wed, 25 Nov 2026 00:00:00 GMT";
 
-    @GetMapping({
-            "/api/anime",
-            "/api/anime/upcoming",
-            "/api/anime/{slug}",
-            "/api/providers",
-            "/api/providers/{slug}/{country}",
-            "/api/genres",
-            "/api/genres/{slug}",
-            "/api/seasons",
-            "/api/seasons/{year}/{season}",
-            "/api/sitemap"
-    })
-    public ResponseEntity<Void> redirectToVersionedApi(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        String versionedPath = "/api/v1" + requestUri.substring("/api".length());
-        URI location = ServletUriComponentsBuilder.fromRequest(request)
-                .replacePath(versionedPath)
-                .build(true)
-                .toUri();
+    private static final Set<String> ANIME_ACTION_PATHS = Set.of(
+            "sync",
+            "match",
+            "sync-providers");
 
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .location(location)
-                .header("Deprecation", "true")
-                .header("Sunset", SUNSET_DATE)
-                .header("Link", "</docs/api-versioning.md>; rel=\"deprecation\"; type=\"text/markdown\"")
-                .build();
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        if (isDeprecatedPublicRoute(request.getRequestURI())) {
+            response.setHeader("Deprecation", "true");
+            response.setHeader("Sunset", SUNSET_DATE);
+            response.setHeader(
+                    "Link",
+                    "</docs/api-versioning.md>; rel=\"deprecation\"; type=\"text/markdown\"");
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private static boolean isDeprecatedPublicRoute(String path) {
+        if (path.equals("/api/anime")
+                || path.equals("/api/anime/upcoming")
+                || path.equals("/api/providers")
+                || path.equals("/api/genres")
+                || path.equals("/api/seasons")
+                || path.equals("/api/sitemap")) {
+            return true;
+        }
+
+        if (path.startsWith("/api/anime/")) {
+            String[] segments = path.substring("/api/anime/".length()).split("/");
+            return (segments.length == 1 && !ANIME_ACTION_PATHS.contains(segments[0]))
+                    || segments.length == 2 && "similar".equals(segments[1]);
+        }
+
+        return hasSegments(path, "/api/providers/", 2)
+                || hasSegments(path, "/api/genres/", 1)
+                || hasSegments(path, "/api/seasons/", 2);
+    }
+
+    private static boolean hasSegments(String path, String prefix, int expectedSegments) {
+        if (!path.startsWith(prefix)) {
+            return false;
+        }
+        String rest = path.substring(prefix.length());
+        if (rest.isBlank()) {
+            return false;
+        }
+        return rest.split("/").length == expectedSegments;
     }
 }

@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/v1/genres")
+@RequestMapping({"/api/genres", "/api/v1/genres"})
 @Tag(name = "Genres", description = "Generos de anime disponibles en el catalogo")
 public class GenreController {
 

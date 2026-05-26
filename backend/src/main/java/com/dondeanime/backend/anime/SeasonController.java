@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/v1/seasons")
+@RequestMapping({"/api/seasons", "/api/v1/seasons"})
 @Tag(name = "Seasons", description = "Temporadas de estreno cubiertas por el catalogo")
 public class SeasonController {
 

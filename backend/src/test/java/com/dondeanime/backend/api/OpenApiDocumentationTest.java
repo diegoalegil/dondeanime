@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
@@ -27,6 +28,7 @@ import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.AnimeController;
 import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.GenreController;
+import com.dondeanime.backend.anime.RecommendationService;
 import com.dondeanime.backend.anime.SeasonController;
 import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.ProviderController;
@@ -50,7 +52,7 @@ import org.springdoc.webmvc.ui.SwaggerConfig;
         SitemapController.class,
         OpenApiDocsController.class
 })
-@Import({SecurityConfig.class, OpenApiConfig.class})
+@Import({SecurityConfig.class, OpenApiConfig.class, AdminJwtService.class})
 @ImportAutoConfiguration({
         SpringDocConfiguration.class,
         SpringDocConfigProperties.class,
@@ -64,6 +66,7 @@ import org.springdoc.webmvc.ui.SwaggerConfig;
         "admin.username=admin",
         "admin.password=secret",
         "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret",
         "springdoc.api-docs.enabled=true",
         "springdoc.swagger-ui.enabled=true"
 })
@@ -95,6 +98,9 @@ class OpenApiDocumentationTest {
 
     @MockitoBean
     private AffiliateLinkService affiliateLinkService;
+
+    @MockitoBean
+    private RecommendationService recommendationService;
 
     @Test
     void openApiYamlGeneratesPublicV1Spec() throws Exception {

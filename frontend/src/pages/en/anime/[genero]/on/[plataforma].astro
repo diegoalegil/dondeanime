@@ -1,0 +1,115 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeSummary, ProviderSummary } from '@/lib/api';
+import { getAnimeByProvider, getGenres, getProviders } from '@/lib/api';
+import { COUNTRIES } from '@/lib/countries';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { getPlatform, isHiddenVariant } from '@/lib/platforms';
+import { setLocale, t } from '@/i18n';
+
+setLocale('en');
+
+interface Props {
+  genreName: string;
+  provider: ProviderSummary;
+}
+
+const slugifyGenre = (genre: string): string => genre.toLowerCase().replace(/\s+/g, '-');
+
+export async function getStaticPaths() {
+  const topGenreLimit = 7;
+  const topProviderLimit = 5;
+  const [genres, providers] = await Promise.all([
+    getGenres(),
+    getProviders(),
+  ]);
+
+  const topGenres = genres.slice(0, topGenreLimit);
+  const topProviders = providers
+    .filter((provider) => !isHiddenVariant(provider.slug))
+    .slice(0, topProviderLimit);
+
+  return topGenres.flatMap((genre) =>
+    topProviders.map((provider) => ({
+      params: {
+        genero: genre.slug,
+        plataforma: provider.slug,
+      },
+      props: {
+        genreName: genre.name,
+        provider,
+      },
+    }))
+  );
+}
+
+const { genero, plataforma } = Astro.params;
+const { genreName, provider } = Astro.props as Props;
+const platformName = getPlatform(provider.slug)?.name ?? provider.providerName;
+
+const animeByCountry = await Promise.all(
+  Object.values(COUNTRIES).map((country) => getAnimeByProvider(plataforma!, country.iso)),
+);
+
+const providerAnime = Array.from(
+  new Map(animeByCountry.flat().map((anime) => [anime.slug, anime])).values(),
+);
+
+const anime = providerAnime
+  .filter((item) => item.genres.some((genre) => slugifyGenre(genre) === genero))
+  .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+
+const seoTitle = t('combo.seo.title', { genre: genreName, platform: platformName });
+const seoDescription = anime.length > 0
+  ? t('combo.seo.description.populated', {
+      genre: genreName,
+      platform: platformName,
+      titles: anime.slice(0, 5).map((item) => item.titleEnglish || item.titleRomaji).join(', '),
+    })
+  : t('combo.seo.description.empty', { genre: genreName, platform: platformName });
+
+const pageUrl = absoluteUrl(`/anime/${genero}/en/${plataforma}`);
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((item: AnimeSummary) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  t('combo.schema.name', { genre: genreName, platform: platformName }),
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.genres'), url: `/genero/${genero}` },
+      { name: platformName, url: `/plataforma/${plataforma}` },
+      { name: t('combo.schema.name', { genre: genreName, platform: platformName }), url: `/anime/${genero}/en/${plataforma}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('combo.eyebrow')}</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      {t('combo.headingPrefix')} <span class="brand-gradient-text">{genreName}</span> {t('combo.headingMiddle')} {platformName}
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      {t('combo.summary', { count: anime.length })}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        {t('combo.empty')}
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

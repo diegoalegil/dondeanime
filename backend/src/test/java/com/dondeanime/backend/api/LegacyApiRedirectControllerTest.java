@@ -1,51 +1,52 @@
 package com.dondeanime.backend.api;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.mock.web.MockFilterChain;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.dondeanime.backend.config.SecurityConfig;
-
-@WebMvcTest(LegacyApiRedirectController.class)
-@Import(SecurityConfig.class)
-@TestPropertySource(properties = {
-        "admin.username=admin",
-        "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
-})
 class LegacyApiRedirectControllerTest {
 
-    @Autowired
-    private MockMvc mvc;
+    private final LegacyApiRedirectController filter = new LegacyApiRedirectController();
 
     @Test
-    void redirectsLegacyAnimeListWithDeprecationHeaders() throws Exception {
-        mvc.perform(get("/api/anime"))
-                .andExpect(status().isMovedPermanently())
-                .andExpect(header().string("Location", "http://localhost/api/v1/anime"))
-                .andExpect(header().string("Deprecation", "true"))
-                .andExpect(header().string("Sunset", LegacyApiRedirectController.SUNSET_DATE));
+    void addsDeprecationHeadersToLegacyAnimeList() throws Exception {
+        MockHttpServletResponse response = doFilter("/api/anime");
+
+        assertThat(response.getHeader("Deprecation")).isEqualTo("true");
+        assertThat(response.getHeader("Sunset")).isEqualTo(LegacyApiRedirectController.SUNSET_DATE);
+        assertThat(response.getHeader("Link"))
+                .isEqualTo("</docs/api-versioning.md>; rel=\"deprecation\"; type=\"text/markdown\"");
     }
 
     @Test
-    void redirectsLegacyRouteAndPreservesQueryString() throws Exception {
-        mvc.perform(get("/api/providers?country=ES"))
-                .andExpect(status().isMovedPermanently())
-                .andExpect(header().string("Location", "http://localhost/api/v1/providers?country=ES"))
-                .andExpect(header().string("Link", "</docs/api-versioning.md>; rel=\"deprecation\"; type=\"text/markdown\""));
+    void addsDeprecationHeadersToLegacyProviderRoute() throws Exception {
+        MockHttpServletResponse response = doFilter("/api/providers/crunchyroll/ES");
+
+        assertThat(response.getHeader("Deprecation")).isEqualTo("true");
     }
 
     @Test
-    void redirectsLegacySitemap() throws Exception {
-        mvc.perform(get("/api/sitemap"))
-                .andExpect(status().isMovedPermanently())
-                .andExpect(header().string("Location", "http://localhost/api/v1/sitemap"));
+    void skipsMaintenanceRoutes() throws Exception {
+        MockHttpServletResponse response = doFilter("/api/anime/sync");
+
+        assertThat(response.getHeader("Deprecation")).isNull();
+    }
+
+    @Test
+    void skipsVersionedApi() throws Exception {
+        MockHttpServletResponse response = doFilter("/api/v1/anime");
+
+        assertThat(response.getHeader("Deprecation")).isNull();
+    }
+
+    private MockHttpServletResponse doFilter(String path) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", path);
+        request.setRequestURI(path);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        filter.doFilter(request, response, new MockFilterChain());
+        return response;
     }
 }

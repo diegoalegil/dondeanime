@@ -1,36 +1,27 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 ---
 <BaseLayout
-  title="Enlaces de afiliado — DondeAnime"
-  description="Información sobre enlaces de afiliado en DondeAnime."
+  title={t('legal.affiliates.title')}
+  description={t('legal.affiliates.description')}
 >
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Afiliados', url: '/legal/afiliados' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.affiliates'), url: '/legal/afiliados' },
     ]}
   />
 
   <section class="mx-auto max-w-3xl px-4 py-10">
-    <h1 class="text-3xl font-semibold text-fg-primary">Enlaces de afiliado</h1>
+    <h1 class="text-3xl font-semibold text-fg-primary">{t('legal.affiliates.heading')}</h1>
     <div class="mt-6 space-y-5 text-sm leading-7 text-fg-secondary">
-      <p>
-        DondeAnime puede incluir enlaces de afiliado hacia plataformas de streaming
-        o tiendas asociadas. Si te registras o compras a través de esos enlaces,
-        podemos recibir una comisión sin coste adicional para ti.
-      </p>
-      <p>
-        Los enlaces de afiliado no cambian el orden de los providers. La
-        disponibilidad se basa en los datos de TMDb y las plataformas visibles
-        se filtran con las mismas reglas para todos los usuarios.
-      </p>
-      <p>
-        Cuando exista enlace de afiliado para una plataforma y país, lo usaremos
-        en el botón externo. Si no existe, el botón apunta al enlace genérico de
-        la plataforma.
-      </p>
+      <p>{t('legal.affiliates.paragraph1')}</p>
+      <p>{t('legal.affiliates.paragraph2')}</p>
+      <p>{t('legal.affiliates.paragraph3')}</p>
     </div>
   </section>
 </BaseLayout>

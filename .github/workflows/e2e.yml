@@ -1,0 +1,173 @@
+name: E2E
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/e2e.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: dondeanime
+          POSTGRES_USER: dondeanime_user
+          POSTGRES_PASSWORD: cambiar_en_local
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U dondeanime_user -d dondeanime"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      TMDB_API_KEY: ci_dummy_token
+      PUBLIC_API_URL: http://127.0.0.1:8080
+      PUBLIC_DATA_API_URL: https://api.dondeanime.com
+      PUBLIC_SITE_URL: https://dondeanime.com
+      RESEND_ENABLED: 'false'
+      SPRING_FLYWAY_ENABLED: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Start backend
+        working-directory: backend
+        run: |
+          ./mvnw spring-boot:run > ../backend-e2e.log 2>&1 &
+          echo $! > ../backend-e2e.pid
+          for i in {1..90}; do
+            if curl -fsS http://127.0.0.1:8080/api/anime >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat ../backend-e2e.log
+          exit 1
+
+      - name: Seed backend anime from public API
+        run: |
+          curl -fsSL https://api.dondeanime.com/api/anime -o /tmp/anime.json
+          node <<'NODE' > /tmp/seed-anime.sql
+          const fs = require('node:fs');
+          const anime = JSON.parse(fs.readFileSync('/tmp/anime.json', 'utf8'));
+
+          const sqlString = (value) => {
+            if (value === null || value === undefined || value === '') return 'NULL';
+            return `'${String(value).replaceAll("'", "''")}'`;
+          };
+          const sqlNumber = (value) => Number.isFinite(Number(value)) ? String(Number(value)) : 'NULL';
+
+          const rows = anime
+            .filter((entry) => entry.anilistId && entry.slug)
+            .map((entry) => `(
+              ${sqlNumber(entry.anilistId)},
+              ${sqlString(entry.slug)},
+              ${sqlString(entry.titleEnglish)},
+              ${sqlString(entry.titleRomaji)},
+              ${sqlString(entry.format ?? 'TV')},
+              ${sqlString(entry.status ?? 'UNKNOWN')},
+              ${sqlNumber(entry.episodes)},
+              ${sqlNumber(entry.year)},
+              ${sqlNumber(entry.averageScore)},
+              ${sqlNumber(entry.popularity)},
+              ${sqlString(entry.coverImage)}
+            )`);
+
+          if (rows.length === 0) {
+            throw new Error('Public API returned no anime to seed.');
+          }
+
+          console.log(`
+          INSERT INTO anime (
+            anilist_id,
+            slug,
+            title_english,
+            title_romaji,
+            format,
+            status,
+            episodes,
+            start_year,
+            average_score,
+            popularity,
+            cover_image
+          )
+          VALUES ${rows.join(',\n')}
+          ON CONFLICT (anilist_id) DO UPDATE SET
+            slug = EXCLUDED.slug,
+            title_english = EXCLUDED.title_english,
+            title_romaji = EXCLUDED.title_romaji,
+            format = EXCLUDED.format,
+            status = EXCLUDED.status,
+            episodes = EXCLUDED.episodes,
+            start_year = EXCLUDED.start_year,
+            average_score = EXCLUDED.average_score,
+            popularity = EXCLUDED.popularity,
+            cover_image = EXCLUDED.cover_image;
+          `);
+          NODE
+          PGPASSWORD=cambiar_en_local psql \
+            -h 127.0.0.1 \
+            -p 5433 \
+            -U dondeanime_user \
+            -d dondeanime \
+            -v ON_ERROR_STOP=1 \
+            -f /tmp/seed-anime.sql
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        working-directory: frontend
+        run: npm run test:e2e -- --workers=2
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          if-no-files-found: ignore
+
+      - name: Upload backend log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-e2e-log
+          path: backend-e2e.log
+          if-no-files-found: ignore

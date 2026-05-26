@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { getAllAnime } from '@/lib/api';
+import { t } from '@/i18n';
 
 export async function getStaticPaths() {
   const all = await getAllAnime();
@@ -14,17 +15,38 @@ export async function getStaticPaths() {
 const { anime } = Astro.props;
 const apiUrl = import.meta.env.PUBLIC_API_URL;
 const title = anime.titleEnglish || anime.titleRomaji;
+
+const fieldPanels = [
+  {
+    name: 'title_english',
+    title: t('admin.editor.englishTitle'),
+    helper: t('admin.editor.publicValue'),
+    input: 'input',
+  },
+  {
+    name: 'title_romaji',
+    title: t('admin.editor.romajiTitle'),
+    helper: t('admin.editor.publicValue'),
+    input: 'input',
+  },
+  {
+    name: 'description',
+    title: t('admin.editor.descriptionField'),
+    helper: t('admin.editor.publicDescriptionValue'),
+    input: 'textarea',
+  },
+];
 ---
 <BaseLayout
-  title={`Editar ${title} — DondeAnime`}
-  description={`Panel admin para editar ${title}.`}
+  title={t('admin.editor.title', { title })}
+  description={t('admin.editor.description', { title })}
 >
   <meta slot="head" name="robots" content="noindex, nofollow" />
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Admin', url: '/admin' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.admin'), url: '/admin' },
       { name: title, url: `/admin/anime/${anime.slug}` },
     ]}
   />
@@ -34,6 +56,19 @@ const title = anime.titleEnglish || anime.titleRomaji;
     data-admin-editor
     data-api-url={apiUrl}
     data-slug={anime.slug}
+    data-status-loading={t('admin.status.editorLoading')}
+    data-status-session-active={t('admin.status.sessionActive')}
+    data-status-wrong-credentials={t('admin.status.wrongCredentials')}
+    data-status-loaded={t('admin.status.loaded')}
+    data-status-no-value={t('admin.status.noValue')}
+    data-status-login-required-save={t('admin.status.loginRequiredSave')}
+    data-status-empty-override={t('admin.status.emptyOverride')}
+    data-status-saving={t('admin.status.saving')}
+    data-status-saved={t('admin.status.saved')}
+    data-status-login-required-reset={t('admin.status.loginRequiredReset')}
+    data-status-resetting={t('admin.status.resetting')}
+    data-status-reset-done={t('admin.status.resetDone')}
+    data-status-load-error={t('admin.status.editorLoadError')}
   >
     <header class="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div class="flex gap-4">
@@ -43,7 +78,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
           class="h-28 w-20 shrink-0 rounded-lg object-cover shadow-xl shadow-black/30"
         />
         <div>
-          <p class="text-xs font-semibold uppercase text-accent-violet">Editor</p>
+          <p class="text-xs font-semibold uppercase text-accent-violet">{t('admin.editor.eyebrow')}</p>
           <h1 class="mt-1 text-3xl font-semibold text-fg-primary">{title}</h1>
           {anime.titleRomaji && anime.titleRomaji !== anime.titleEnglish && (
             <p class="mt-1 text-sm text-fg-muted">{anime.titleRomaji}</p>
@@ -52,7 +87,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
             href={`/anime/${anime.slug}`}
             class="mt-3 inline-flex text-sm text-fg-muted transition-colors hover:text-accent-violet"
           >
-            Ver ficha pública
+            {t('admin.editor.publicPage')}
           </a>
         </div>
       </div>
@@ -60,7 +95,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
       <form class="rounded-lg border border-surface-2 bg-surface-1 p-4" data-login-form>
         <div class="grid gap-3 sm:grid-cols-[9rem_12rem_auto]">
           <label>
-            <span class="mb-1 block text-xs font-medium text-fg-secondary">Usuario</span>
+            <span class="mb-1 block text-xs font-medium text-fg-secondary">{t('admin.username')}</span>
             <input
               name="username"
               autocomplete="username"
@@ -69,7 +104,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
             />
           </label>
           <label>
-            <span class="mb-1 block text-xs font-medium text-fg-secondary">Contraseña</span>
+            <span class="mb-1 block text-xs font-medium text-fg-secondary">{t('admin.password')}</span>
             <input
               name="password"
               type="password"
@@ -81,7 +116,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
             type="submit"
             class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
           >
-            Entrar
+            {t('admin.login')}
           </button>
         </div>
         <p class="mt-2 min-h-5 text-sm text-fg-muted" data-login-status></p>
@@ -89,125 +124,66 @@ const title = anime.titleEnglish || anime.titleRomaji;
     </header>
 
     <div class="mb-5 rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 text-sm text-fg-secondary" data-global-status>
-      Cargando datos...
+      {t('admin.status.editorLoading')}
     </div>
 
     <div class="grid gap-5">
-      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel="title_english">
-        <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-          <h2 class="text-lg font-semibold text-fg-primary">Título inglés</h2>
-          <p class="text-sm text-fg-muted">Valor público: <span data-effective></span></p>
-        </div>
-        <label class="block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Original AniList</span>
-          <input
-            readonly
-            data-original
-            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-muted"
-          />
-        </label>
-        <label class="mt-4 block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Override español</span>
-          <input
-            data-input
-            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet"
-          />
-        </label>
-        <div class="mt-4 flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
-            data-save
-          >
-            Guardar
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
-            data-reset
-          >
-            Resetear al original
-          </button>
-        </div>
-      </article>
-
-      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel="title_romaji">
-        <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-          <h2 class="text-lg font-semibold text-fg-primary">Título romaji</h2>
-          <p class="text-sm text-fg-muted">Valor público: <span data-effective></span></p>
-        </div>
-        <label class="block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Original AniList</span>
-          <input
-            readonly
-            data-original
-            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-muted"
-          />
-        </label>
-        <label class="mt-4 block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Override español</span>
-          <input
-            data-input
-            class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet"
-          />
-        </label>
-        <div class="mt-4 flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
-            data-save
-          >
-            Guardar
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
-            data-reset
-          >
-            Resetear al original
-          </button>
-        </div>
-      </article>
-
-      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel="description">
-        <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-          <h2 class="text-lg font-semibold text-fg-primary">Descripción</h2>
-          <p class="text-sm text-fg-muted">Valor público actualizado en la ficha</p>
-        </div>
-        <label class="block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Original AniList</span>
-          <textarea
-            readonly
-            data-original
-            rows="6"
-            class="w-full resize-y rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm leading-relaxed text-fg-muted"
-          ></textarea>
-        </label>
-        <label class="mt-4 block">
-          <span class="mb-2 block text-sm font-medium text-fg-secondary">Override español</span>
-          <textarea
-            data-input
-            rows="10"
-            class="w-full resize-y rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm leading-relaxed text-fg-primary outline-none focus:border-accent-violet"
-          ></textarea>
-        </label>
-        <div class="mt-4 flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
-            data-save
-          >
-            Guardar
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
-            data-reset
-          >
-            Resetear al original
-          </button>
-        </div>
-      </article>
+      {fieldPanels.map((field) => (
+        <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel={field.name}>
+          <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+            <h2 class="text-lg font-semibold text-fg-primary">{field.title}</h2>
+            <p class="text-sm text-fg-muted">{field.helper} <span data-effective></span></p>
+          </div>
+          <label class="block">
+            <span class="mb-2 block text-sm font-medium text-fg-secondary">{t('admin.editor.originalAniList')}</span>
+            {field.input === 'textarea' ? (
+              <textarea
+                readonly
+                data-original
+                rows="6"
+                class="w-full resize-y rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm leading-relaxed text-fg-muted"
+              ></textarea>
+            ) : (
+              <input
+                readonly
+                data-original
+                class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-muted"
+              />
+            )}
+          </label>
+          <label class="mt-4 block">
+            <span class="mb-2 block text-sm font-medium text-fg-secondary">{t('admin.editor.spanishOverride')}</span>
+            {field.input === 'textarea' ? (
+              <textarea
+                data-input
+                rows="10"
+                class="w-full resize-y rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm leading-relaxed text-fg-primary outline-none focus:border-accent-violet"
+              ></textarea>
+            ) : (
+              <input
+                data-input
+                class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet"
+              />
+            )}
+          </label>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
+              data-save
+            >
+              {t('admin.editor.save')}
+            </button>
+            <button
+              type="button"
+              class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
+              data-reset
+            >
+              {t('admin.editor.reset')}
+            </button>
+          </div>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -215,6 +191,21 @@ const title = anime.titleEnglish || anime.titleRomaji;
     const root = document.querySelector('[data-admin-editor]');
     const apiUrl = root?.getAttribute('data-api-url') ?? '';
     const slug = root?.getAttribute('data-slug') ?? '';
+    const messages = {
+      loading: root?.getAttribute('data-status-loading') ?? '',
+      sessionActive: root?.getAttribute('data-status-session-active') ?? '',
+      wrongCredentials: root?.getAttribute('data-status-wrong-credentials') ?? '',
+      loaded: root?.getAttribute('data-status-loaded') ?? '',
+      noValue: root?.getAttribute('data-status-no-value') ?? '',
+      loginRequiredSave: root?.getAttribute('data-status-login-required-save') ?? '',
+      emptyOverride: root?.getAttribute('data-status-empty-override') ?? '',
+      saving: root?.getAttribute('data-status-saving') ?? '',
+      saved: root?.getAttribute('data-status-saved') ?? '',
+      loginRequiredReset: root?.getAttribute('data-status-login-required-reset') ?? '',
+      resetting: root?.getAttribute('data-status-resetting') ?? '',
+      resetDone: root?.getAttribute('data-status-reset-done') ?? '',
+      loadError: root?.getAttribute('data-status-load-error') ?? '',
+    };
     const tokenKey = 'dondeanime-admin-token';
     const globalStatus = document.querySelector('[data-global-status]');
     const loginForm = document.querySelector('[data-login-form]');
@@ -243,10 +234,10 @@ const title = anime.titleEnglish || anime.titleRomaji;
       }`;
     };
 
-    const getToken = () => sessionStorage.getItem(tokenKey);
+    const getToken = () => localStorage.getItem(tokenKey);
     const authHeaders = () => {
       const token = getToken();
-      return token ? { Authorization: `Basic ${token}` } : {};
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const asText = (value) => value ?? '';
@@ -263,7 +254,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
     }
 
     async function loadEditor() {
-      setGlobalStatus('Cargando datos...');
+      setGlobalStatus(messages.loading);
       const detail = await fetchJson(`/api/anime/${slug}`);
       let overrides = [];
 
@@ -272,11 +263,11 @@ const title = anime.titleEnglish || anime.titleRomaji;
           overrides = await fetchJson(`/api/admin/anime/${slug}/overrides`, {
             headers: authHeaders(),
           });
-          setLoginStatus('Sesión activa.', 'success');
+          setLoginStatus(messages.sessionActive, 'success');
         } catch (error) {
           if (error.status === 401) {
-            sessionStorage.removeItem(tokenKey);
-            setLoginStatus('Credenciales incorrectas.', 'danger');
+            localStorage.removeItem(tokenKey);
+            setLoginStatus(messages.wrongCredentials, 'danger');
           }
         }
       }
@@ -298,11 +289,11 @@ const title = anime.titleEnglish || anime.titleRomaji;
 
         const effective = panel.querySelector('[data-effective]');
         if (effective) {
-          effective.textContent = displayEffective || 'Sin valor';
+          effective.textContent = displayEffective || messages.noValue;
         }
       });
 
-      setGlobalStatus('Datos cargados.', 'success');
+      setGlobalStatus(messages.loaded, 'success');
     }
 
     async function saveField(panel) {
@@ -310,16 +301,16 @@ const title = anime.titleEnglish || anime.titleRomaji;
       const fieldValue = panel.querySelector('[data-input]').value.trim();
 
       if (!getToken()) {
-        setGlobalStatus('Inicia sesión antes de guardar.', 'danger');
+        setGlobalStatus(messages.loginRequiredSave, 'danger');
         return;
       }
 
       if (!fieldValue) {
-        setGlobalStatus('El override no puede estar vacío. Usa resetear para volver al original.', 'danger');
+        setGlobalStatus(messages.emptyOverride, 'danger');
         return;
       }
 
-      setGlobalStatus('Guardando...');
+      setGlobalStatus(messages.saving);
       await fetchJson(`/api/admin/anime/${slug}/override`, {
         method: 'POST',
         headers: {
@@ -329,24 +320,24 @@ const title = anime.titleEnglish || anime.titleRomaji;
         body: JSON.stringify({ fieldName, fieldValue, locale: 'es' }),
       });
       await loadEditor();
-      setGlobalStatus('Guardado.', 'success');
+      setGlobalStatus(messages.saved, 'success');
     }
 
     async function resetField(panel) {
       const fieldName = panel.getAttribute('data-field-panel');
 
       if (!getToken()) {
-        setGlobalStatus('Inicia sesión antes de resetear.', 'danger');
+        setGlobalStatus(messages.loginRequiredReset, 'danger');
         return;
       }
 
-      setGlobalStatus('Reseteando...');
+      setGlobalStatus(messages.resetting);
       await fetchJson(`/api/admin/anime/${slug}/override?field=${encodeURIComponent(fieldName)}&locale=es`, {
         method: 'DELETE',
         headers: authHeaders(),
       });
       await loadEditor();
-      setGlobalStatus('Reseteado al original.', 'success');
+      setGlobalStatus(messages.resetDone, 'success');
     }
 
     loginForm?.addEventListener('submit', async (event) => {
@@ -354,14 +345,23 @@ const title = anime.titleEnglish || anime.titleRomaji;
       const data = new FormData(loginForm);
       const username = String(data.get('username') ?? '');
       const password = String(data.get('password') ?? '');
-      const token = btoa(`${username}:${password}`);
-
-      sessionStorage.setItem(tokenKey, token);
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        setLoginStatus(messages.wrongCredentials, 'danger');
+        return;
+      }
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       try {
         await loadEditor();
       } catch (error) {
-        sessionStorage.removeItem(tokenKey);
-        setLoginStatus('Credenciales incorrectas.', 'danger');
+        localStorage.removeItem(tokenKey);
+        setLoginStatus(messages.wrongCredentials, 'danger');
       }
     });
 
@@ -371,7 +371,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
     });
 
     loadEditor().catch(() => {
-      setGlobalStatus('No se pudo cargar la ficha.', 'danger');
+      setGlobalStatus(messages.loadError, 'danger');
     });
   </script>
 </BaseLayout>

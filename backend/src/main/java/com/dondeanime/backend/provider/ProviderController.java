@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/v1/providers")
+@RequestMapping({"/api/providers", "/api/v1/providers"})
 @Tag(name = "Providers", description = "Plataformas de streaming por pais")
 public class ProviderController {
 
