@@ -30,7 +30,7 @@ public class SitemapController {
      * Una sola request te da todo: slugs de anime, pares
      * (proveedor, país), slugs de géneros y temporadas.
      */
-    @GetMapping("/api/v1/sitemap")
+    @GetMapping({"/api/sitemap", "/api/v1/sitemap"})
     @Operation(summary = "Lista identificadores para sitemap", description = "Devuelve slugs y pares necesarios para generar sitemap.xml.")
     public SitemapDto sitemap() {
         List<String> animeSlugs = animeRepository.findAllSlugs();

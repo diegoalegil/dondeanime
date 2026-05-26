@@ -6,7 +6,7 @@ La API publica de DondeAnime vive bajo `/api/v1/*`.
 
 - `v1` es la version estable actual.
 - La documentacion y los ejemplos nuevos deben usar siempre `/api/v1`.
-- Las rutas historicas `/api/anime`, `/api/providers`, `/api/genres`, `/api/seasons` y `/api/sitemap` redirigen con `301` a su equivalente versionado.
+- Las rutas historicas `/api/anime`, `/api/providers`, `/api/genres`, `/api/seasons` y `/api/sitemap` siguen respondiendo durante la ventana de compatibilidad y envian headers de deprecacion.
 
 ## Compatibilidad hacia atras
 
@@ -31,7 +31,7 @@ Cambios que requieren una nueva version mayor:
 
 Una ruta publica obsoleta debe mantener compatibilidad durante 6 meses.
 
-Durante ese periodo devuelve:
+Durante ese periodo las rutas antiguas devuelven la misma respuesta que antes y anaden:
 
 - `Deprecation: true`
 - `Sunset: <fecha RFC 1123>`

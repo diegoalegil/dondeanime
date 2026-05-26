@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/v1/anime")
+@RequestMapping({"/api/anime", "/api/v1/anime"})
 @Tag(name = "Anime", description = "Catalogo publico de anime")
 public class AnimeController {
 
@@ -32,22 +32,25 @@ public class AnimeController {
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
+    private final RecommendationService recommendationService;
 
     public AnimeController(
             AnimeRepository repository,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
-            AffiliateLinkService affiliateLinkService) {
+            AffiliateLinkService affiliateLinkService,
+            RecommendationService recommendationService) {
         this.repository = repository;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping
     @Operation(summary = "Lista todos los anime", description = "Devuelve la vista resumida del catalogo ordenada como esta almacenada.")
     public List<AnimeSummaryDto> getAll() {
-        return repository.findAll().stream()
+        return repository.findAllWithGenres().stream()
                 .map(AnimeSummaryDto::from)
                 .toList();
     }
@@ -76,6 +79,16 @@ public class AnimeController {
                 .toList();
 
         return ResponseEntity.ok(upcoming);
+    }
+
+    @GetMapping("/{slug}/similar")
+    public ResponseEntity<List<AnimeSummaryDto>> getSimilar(@PathVariable String slug) {
+        return repository.findBySlug(slug)
+                .map(anime -> ResponseEntity.ok(
+                        recommendationService.findSimilar(anime.getId(), 10).stream()
+                                .map(AnimeSummaryDto::from)
+                                .toList()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{slug}")

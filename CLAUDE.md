@@ -296,9 +296,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 
 ### Variables de entorno producción
 Están en `/opt/dondeanime/.env.prod` (NO en repo). Plantilla en `.env.prod.example`.
-Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte.
-Web Push usa `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` y `PUBLIC_VAPID_PUBLIC_KEY`; por defecto vacías para mantener push apagado hasta generar claves reales. Generar con `npx web-push generate-vapid-keys --json` y copiar la public key también a `PUBLIC_VAPID_PUBLIC_KEY`.
-Premium con Stripe usa `STRIPE_SECRET_KEY`, `PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL` y `STRIPE_PORTAL_RETURN_URL`. Durante implementación se usan claves test (`sk_test_...` y `pk_test_...`); Diego cambia a live cuando active pagos reales.
+Claves: `POSTGRES_PASSWORD` (autogenerada), `TMDB_API_KEY` (la misma que en .env local), `VERCEL_DEPLOY_HOOK` (URL del Deploy Hook configurado en Vercel), `SCHEDULING_ENABLED=true`, `ADMIN_USERNAME=admin`, `ADMIN_PASSWORD` fuerte. Backups usan `R2_*`; la verificación semanal usa `BACKUP_VERIFY_DIR`, `BACKUP_VERIFY_MIN_RATIO_PERCENT` y, si está activado, `TELEGRAM_ENABLED` + `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`.
 
 ### Más detalle operativo
 Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VPS nuevo, backups manuales.

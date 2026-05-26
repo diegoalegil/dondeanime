@@ -1,0 +1,24 @@
+name: VPS Scripts
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**/*.sh'
+      - '.github/workflows/vps-scripts.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/**/*.sh'
+      - '.github/workflows/vps-scripts.yml'
+
+jobs:
+  bash-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate shell scripts parse
+        run: |
+          find scripts/vps -name '*.sh' -print0 | xargs -0 -n1 bash -n

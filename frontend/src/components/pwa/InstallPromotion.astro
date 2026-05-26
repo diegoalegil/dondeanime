@@ -1,0 +1,107 @@
+<aside
+  class="fixed inset-x-3 bottom-3 z-50 hidden rounded-lg border border-surface-2 bg-surface-0/95 p-4 shadow-2xl backdrop-blur md:inset-x-auto md:right-5 md:max-w-md"
+  data-install-promotion
+  aria-label="Instalar DondeAnime"
+>
+  <div class="flex items-start gap-3">
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-semibold text-fg-primary">Instala DondeAnime como app</p>
+      <p class="mt-1 text-sm leading-relaxed text-fg-muted">
+        Acceso rapido al catalogo y paginas guardadas sin conexion.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="grid size-8 shrink-0 place-items-center rounded-md border border-surface-2 text-lg leading-none text-fg-muted transition hover:text-fg-primary"
+      data-install-dismiss
+      aria-label="Cerrar"
+    >
+      &times;
+    </button>
+  </div>
+  <button
+    type="button"
+    class="mt-4 w-full rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition hover:bg-accent-pink"
+    data-install-action
+  >
+    Instalar
+  </button>
+</aside>
+
+<script>
+  const VISIT_COOKIE = 'dondeanime-install-visits';
+  const DISMISSED_COOKIE = 'dondeanime-install-dismissed';
+  const VISIT_SESSION_KEY = 'dondeanime-install-visit-counted';
+  const SHOWN_SESSION_KEY = 'dondeanime-install-shown';
+
+  const readCookie = (name) => document.cookie
+    .split('; ')
+    .find((item) => item.startsWith(`${name}=`))
+    ?.split('=')[1];
+
+  const writeCookie = (name, value, maxAgeDays) => {
+    document.cookie = `${name}=${value}; Max-Age=${maxAgeDays * 24 * 60 * 60}; Path=/; SameSite=Lax`;
+  };
+
+  const isStandalone = () =>
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  const trackInstallEvent = (name) => {
+    if (typeof window.plausible === 'function') {
+      window.plausible(name);
+    }
+  };
+
+  const visits = () => {
+    const current = Number(readCookie(VISIT_COOKIE) ?? '0');
+    if (sessionStorage.getItem(VISIT_SESSION_KEY) === 'true') return current;
+
+    const next = Math.min(current + 1, 3);
+    writeCookie(VISIT_COOKIE, String(next), 365);
+    sessionStorage.setItem(VISIT_SESSION_KEY, 'true');
+    return next;
+  };
+
+  const promotion = document.querySelector('[data-install-promotion]');
+  const installButton = document.querySelector('[data-install-action]');
+  const dismissButton = document.querySelector('[data-install-dismiss]');
+  let deferredInstallPrompt = null;
+
+  const showPromotion = () => {
+    if (!promotion || !deferredInstallPrompt) return;
+    if (isStandalone() || readCookie(DISMISSED_COOKIE) === 'true' || visits() < 3) return;
+
+    promotion.classList.remove('hidden');
+    if (sessionStorage.getItem(SHOWN_SESSION_KEY) !== 'true') {
+      trackInstallEvent('install_prompt_shown');
+      sessionStorage.setItem(SHOWN_SESSION_KEY, 'true');
+    }
+  };
+
+  dismissButton?.addEventListener('click', () => {
+    writeCookie(DISMISSED_COOKIE, 'true', 30);
+    promotion?.classList.add('hidden');
+  });
+
+  installButton?.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+
+    promotion?.classList.add('hidden');
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(() => undefined);
+    deferredInstallPrompt = null;
+  });
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showPromotion();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    writeCookie(DISMISSED_COOKIE, 'true', 365);
+    trackInstallEvent('install_completed');
+    promotion?.classList.add('hidden');
+  });
+</script>

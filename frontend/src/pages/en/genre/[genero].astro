@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getGenres, getAnimeByGenre } from '@/lib/api';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('en');
+
+export async function getStaticPaths() {
+  const genres = await getGenres();
+  return genres.map((g) => ({
+    params: { genero: g.slug },
+    props: { genreName: g.name, total: g.animeCount },
+  }));
+}
+
+const { genero } = Astro.params;
+const { genreName, total } = Astro.props;
+
+const anime = await getAnimeByGenre(genero!);
+const previewTitles = anime.slice(0, 5).map((a) => a.titleEnglish || a.titleRomaji).join(', ');
+
+const seoTitle = t('genre.seo.title', { genre: genreName, total });
+const seoDescription = t('genre.seo.description', {
+  genre: genreName,
+  titles: previewTitles,
+  remaining: Math.max(0, total - 5),
+});
+
+const pageUrl = absoluteUrl(`/genero/${genero}`);
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((a) => ({
+    name: a.titleEnglish || a.titleRomaji,
+    url: absoluteUrl(`/anime/${a.slug}`),
+  })),
+  pageUrl,
+  t('genre.schema.name', { genre: genreName }),
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.genres'), url: '/' },
+      { name: genreName, url: `/genero/${genero}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('genre.eyebrow')}</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
+      {t('genre.headingPrefix')} <span class="brand-gradient-text">{genreName}</span>
+    </h1>
+    <p class="mt-4 text-lg text-fg-secondary">
+      {t('genre.count', { count: anime.length, plural: anime.length === 1 ? '' : 's' })}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        {t('genre.empty')}
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

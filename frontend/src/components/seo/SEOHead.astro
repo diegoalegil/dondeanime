@@ -8,13 +8,16 @@ interface Props {
   locale?: string;
 }
 
+import { localeFromPath, setLocale, t } from '@/i18n';
+import { localeAlternates } from '@/lib/localizedRoutes';
+
 const {
   title,
   description,
   canonical,
   image,
   type = 'website',
-  locale = 'es_ES',
+  locale,
 } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL;
@@ -23,6 +26,11 @@ const cleanPathname = Astro.url.pathname
   .replace(/\.html$/, '');
 const canonicalUrl = canonical ?? new URL(cleanPathname || '/', siteUrl).toString();
 const ogImage = image ?? `${siteUrl}/og-default.png`;
+const activeLocale = localeFromPath(Astro.url.pathname);
+setLocale(activeLocale);
+const ogLocale = activeLocale === 'en' ? 'en_US' : locale ?? 'es_ES';
+const ogLocaleAlternates = activeLocale === 'en' ? ['es_ES'] : ['en_US'];
+const alternates = localeAlternates(cleanPathname || '/');
 ---
 <title>{title}</title>
 <meta name="description" content={description} />
@@ -33,8 +41,15 @@ const ogImage = image ?? `${siteUrl}/og-default.png`;
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonicalUrl} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:site_name" content="DondeAnime" />
-<meta property="og:locale" content={locale} />
+<meta property="og:site_name" content={t('brand.name')} />
+<meta property="og:locale" content={ogLocale} />
+{ogLocaleAlternates.map((alternateLocale) => (
+  <meta property="og:locale:alternate" content={alternateLocale} />
+))}
+
+{alternates.map((alternate) => (
+  <link rel="alternate" hreflang={alternate.hreflang} href={new URL(alternate.path, siteUrl).toString()} />
+))}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />

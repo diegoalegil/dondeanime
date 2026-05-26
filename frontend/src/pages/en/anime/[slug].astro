@@ -1,0 +1,69 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeHero from '@/components/anime/AnimeHero.astro';
+import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
+import MetaList from '@/components/anime/MetaList.astro';
+import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
+import AdSlot from '@/components/ads/AdSlot.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import AlternateLangs from '@/components/seo/AlternateLangs.astro';
+import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { filterVisibleProviders } from '@/lib/platforms';
+import { setLocale, t } from '@/i18n';
+
+setLocale('en');
+
+export async function getStaticPaths() {
+  const all = await getAllAnime();
+  return all.map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const detail = await getAnimeBySlug(slug!);
+const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
+
+const allProviders = Object.values(detail.watchProvidersByCountry).flat();
+const uniqueProviders = filterVisibleProviders(
+  Array.from(new Map(allProviders.map((p) => [p.providerSlug, p])).values())
+);
+
+const seoDescription = detail.anime.description
+  ? detail.anime.description.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').slice(0, 160).trim()
+  : t('anime.seo.description', { title });
+
+const pageUrl = absoluteUrl(`/anime/${slug}`);
+const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
+const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
+---
+<BaseLayout
+  title={t('anime.seo.title', { title })}
+  description={seoDescription}
+  image={detail.anime.bannerImage ?? detail.anime.coverImage}
+  type="article"
+>
+  <JsonLd slot="head" data={tvSchema} />
+  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
+  <AlternateLangs
+    slot="head"
+    basePathWithSlug={`/anime/${slug}`}
+    defaultPath={`/anime/${slug}`}
+  />
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.anime'), url: '/' },
+      { name: title, url: `/anime/${slug}` },
+    ]}
+  />
+  <AnimeHero anime={detail.anime} />
+  <ProvidersByCountry providersByCountry={detail.watchProvidersByCountry} animeSlug={slug!} />
+  <AdSlot position="inline" />
+  <AnimeSynopsis
+    description={detail.anime.description}
+    translationPending={detail.anime.descriptionTranslationPending}
+  />
+  <MetaList anime={detail.anime} />
+</BaseLayout>

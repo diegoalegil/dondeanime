@@ -5,6 +5,9 @@ import UpcomingAnimeList from '@/components/anime/UpcomingAnimeList.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getUpcomingAnime } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
 
 const anime = await getUpcomingAnime(30);
 
@@ -15,37 +18,37 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${item.slug}`),
   })),
   pageUrl,
-  'Estrenos de anime del próximo mes',
+  t('premieres.month.schema.name'),
 );
 ---
 <BaseLayout
-  title="Estrenos de anime del próximo mes | DondeAnime"
-  description="Anime que estrenan en los próximos 30 días, ordenados por fecha de estreno."
+  title={t('premieres.month.title')}
+  description={t('premieres.month.description')}
 >
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Estrenos', url: '/estrenos/proxima-semana' },
-      { name: 'Próximo mes', url: '/estrenos/proximo-mes' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.premieres'), url: '/estrenos/proxima-semana' },
+      { name: t('breadcrumbs.nextMonth'), url: '/estrenos/proximo-mes' },
     ]}
   />
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
-    <p class="text-xs uppercase tracking-wide text-accent-violet">Estrenos</p>
+    <p class="text-xs uppercase tracking-wide text-accent-violet">{t('premieres.eyebrow')}</p>
     <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
-      Estrenos de anime del <span class="brand-gradient-text">próximo mes</span>
+      {t('premieres.month.headingPrefix')} <span class="brand-gradient-text">{t('premieres.month.headingHighlight')}</span>
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
-      {anime.length} anime con fecha completa en los próximos 30 días.
+      {t('premieres.month.count', { count: anime.length })}
     </p>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
     {anime.length === 0 ? (
       <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
-        No tenemos estrenos con fecha completa para los próximos 30 días.
+        {t('premieres.month.empty')}
       </p>
     ) : (
       <UpcomingAnimeList anime={anime} />

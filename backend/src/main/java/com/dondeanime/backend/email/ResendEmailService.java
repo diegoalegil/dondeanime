@@ -59,6 +59,29 @@ public class ResendEmailService implements EmailService {
     }
 
     @Override
+    public void sendNewsletterConfirmationEmail(
+            String email,
+            String confirmUrl) {
+        String safeConfirmUrl = escapeHtml(confirmUrl);
+
+        String subject = "Confirma tu newsletter de DondeAnime";
+        String html = """
+                <p>Hola.</p>
+                <p>Confirma tu suscripcion a la newsletter de DondeAnime.</p>
+                <p><a href="%s">Confirmar newsletter</a></p>
+                <p>El enlace caduca en 15 minutos.</p>
+                """.formatted(safeConfirmUrl);
+        String text = """
+                Confirma tu suscripcion a la newsletter de DondeAnime:
+                %s
+
+                El enlace caduca en 15 minutos.
+                """.formatted(confirmUrl).trim();
+
+        send(email, subject, html, text);
+    }
+
+    @Override
     public void sendAlertEmail(
             String email,
             String animeTitle,

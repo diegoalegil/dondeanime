@@ -1,0 +1,13 @@
+<script is:inline>
+  (() => {
+    const params = new URLSearchParams(window.location.search);
+    const active = ['genero', 'year', 'score'].filter((key) => params.get(key)).length;
+    if (active < 2) return;
+
+    const meta = document.createElement('meta');
+    meta.setAttribute('name', 'robots');
+    meta.setAttribute('content', 'noindex');
+    meta.setAttribute('data-filter-robots', 'true');
+    document.head.append(meta);
+  })();
+</script>
