@@ -1,5 +1,7 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
+import { formatType } from '@/lib/format';
+import { localizedPath } from '@/lib/localizedRoutes';
 import AnimePicture from './AnimePicture.astro';
 
 interface Props {
@@ -27,7 +29,7 @@ if (score !== null) {
 }
 ---
 <article class="group">
-  <a href={`/anime/${anime.slug}`} class="block" {...recommendationAttributes}>
+  <a href={localizedPath(`/anime/${anime.slug}`)} class="block" {...recommendationAttributes}>
     <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
       <AnimePicture
         src={anime.coverImage}
@@ -50,7 +52,7 @@ if (score !== null) {
         {title}
       </h3>
       <p class="mt-1 text-xs text-fg-muted">
-        {anime.year ?? '—'} · {anime.format}
+        {anime.year ?? '---'} &middot; {formatType(anime.format)}
       </p>
     </div>
   </a>

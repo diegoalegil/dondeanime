@@ -6,8 +6,10 @@ import Footer from '@/components/layout/Footer.astro';
 import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
 import SkeletonRow from '@/components/ui/SkeletonRow.astro';
-import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
+import { localeFromPath, setLocale } from '@/i18n';
+import { localizedPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
+import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -19,6 +21,14 @@ interface Props {
 }
 
 const props = Astro.props;
+const activeLocale = localeFromPath(Astro.url.pathname);
+setLocale(activeLocale);
+const publicLanguageRoute = !Astro.url.pathname.startsWith('/admin') && !Astro.url.pathname.startsWith('/api');
+const spanishPath = spanishPathFromLocalized(Astro.url.pathname);
+const languageRoutes = {
+  es: spanishPath,
+  en: localizedPath(spanishPath, 'en'),
+};
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === 'true';
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? 'dondeanime.com';
 const plausibleScriptUrl = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_URL ?? 'https://plausible.io/js/script.js';
@@ -28,7 +38,7 @@ const adsenseEnabled =
 const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
 ---
 <!doctype html>
-<html lang="es" data-theme="dark">
+<html lang={activeLocale} data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,7 +50,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <ClientRouter />
     <link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>
-      // Anti-FOIT: aplicar tema guardado antes del primer paint
+      // Anti-FOIT: apply saved theme before first paint.
       try {
         const stored = localStorage.getItem('dondeanime-theme');
         if (stored === 'light' || stored === 'dark') {
@@ -48,6 +58,30 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
         }
       } catch (e) {}
     </script>
+    {publicLanguageRoute && (
+      <script is:inline define:vars={{ languageRoutes }}>
+        try {
+          const normalizePath = (path) => path.replace(/\/+$/, '') || '/';
+          const withLocationSuffix = (path) => `${path}${window.location.search}${window.location.hash}`;
+          const cookieMatch = document.cookie.match(/(?:^|;\s*)dondeanime-locale=(es|en)(?:;|$)/);
+          const preferredLocale = cookieMatch?.[1];
+          const currentPath = normalizePath(window.location.pathname);
+          const targetForPreference = preferredLocale ? normalizePath(languageRoutes[preferredLocale]) : null;
+
+          if (preferredLocale && targetForPreference && currentPath !== targetForPreference) {
+            window.location.replace(withLocationSuffix(languageRoutes[preferredLocale]));
+          } else if (!preferredLocale && !localStorage.getItem('dondeanime-locale-auto-checked')) {
+            localStorage.setItem('dondeanime-locale-auto-checked', '1');
+            const browserLocale = navigator.language || navigator.languages?.[0] || '';
+            const shouldUseEnglish = browserLocale.toLowerCase().startsWith('en');
+
+            if (shouldUseEnglish && !currentPath.startsWith('/en')) {
+              window.location.replace(withLocationSuffix(languageRoutes.en));
+            }
+          }
+        } catch (e) {}
+      </script>
+    )}
     <script is:inline>
       (() => {
         if (window.__dondeanimeNavigationSkeletonBound) return;

@@ -1,4 +1,7 @@
 ---
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
 interface Props {
   animeSlug: string;
   animeTitle: string;
@@ -16,13 +19,18 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
   data-alert-api-url={alertApiUrl}
   data-anime-slug={animeSlug}
   data-country={countryIso}
+  data-status-creating={t('alert.creating')}
+  data-status-success={t('alert.success')}
+  data-status-error={t('alert.error')}
+  data-status-queued={t('alert.queued')}
+  data-status-offline-error={t('alert.offlineError')}
 >
   <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h2 class="text-lg font-semibold text-fg-primary">Aviso de disponibilidad</h2>
+        <h2 class="text-lg font-semibold text-fg-primary">{t('alert.title')}</h2>
         <p class="mt-1 text-sm text-fg-muted">
-          Recibe un correo cuando {animeTitle} aparezca en plataformas de {countryName}.
+          {t('alert.description', { title: animeTitle, country: countryName })}
         </p>
       </div>
       <button
@@ -30,13 +38,13 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
         class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
         data-open-alert
       >
-        Avisarme
+        {t('alert.open')}
       </button>
     </div>
 
     <form class="mt-5 hidden grid gap-4 md:grid-cols-[1fr_auto]" data-alert-panel>
       <label class="block">
-        <span class="mb-1 block text-sm font-medium text-fg-secondary">Email</span>
+        <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('alert.email')}</span>
         <input
           name="email"
           type="email"
@@ -49,12 +57,12 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
         type="submit"
         class="self-end rounded-md bg-accent-pink px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
       >
-        Crear alerta
+        {t('alert.submit')}
       </button>
       <label class="flex gap-2 text-sm text-fg-muted md:col-span-2">
         <input type="checkbox" required class="mt-1" />
         <span>
-          Acepto la <a href="/legal/privacidad" class="text-accent-violet hover:underline">política de privacidad</a>.
+          {t('alert.privacyPrefix')} <a href={localizedPath('/legal/privacidad')} class="text-accent-violet hover:underline">{t('alert.privacyLink')}</a>.
         </span>
       </label>
       <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
@@ -123,6 +131,11 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
       const alertApiUrl = root.getAttribute('data-alert-api-url') ?? '';
       const animeSlug = root.getAttribute('data-anime-slug') ?? '';
       const country = root.getAttribute('data-country') ?? '';
+      const creatingMessage = root.getAttribute('data-status-creating') ?? '';
+      const successMessage = root.getAttribute('data-status-success') ?? '';
+      const errorMessage = root.getAttribute('data-status-error') ?? '';
+      const queuedMessage = root.getAttribute('data-status-queued') ?? '';
+      const offlineErrorMessage = root.getAttribute('data-status-offline-error') ?? '';
       const openButton = root.querySelector('[data-open-alert]');
       const panel = root.querySelector('[data-alert-panel]');
       const status = root.querySelector('[data-alert-status]');
@@ -146,7 +159,7 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
         const email = String(data.get('email') ?? '').trim();
         const payload = { email, animeSlug, country };
 
-        setStatus('Creando alerta...');
+        setStatus(creatingMessage);
         try {
           const response = await fetch(alertApiUrl, {
             method: 'POST',
@@ -159,7 +172,7 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
           }
 
           form.reset();
-          setStatus('Te hemos enviado un correo de confirmación.', 'success');
+          setStatus(successMessage, 'success');
         } catch (error) {
           const canQueue = !navigator.onLine || error instanceof TypeError;
           if (canQueue) {
@@ -168,14 +181,14 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
               await scheduleAlertSync();
               requestQueuedAlertNotification();
               form.reset();
-              setStatus('Guardamos la alerta y la enviaremos cuando vuelva la conexion.', 'success');
+              setStatus(queuedMessage, 'success');
               return;
             } catch {
-              setStatus('No se pudo guardar la alerta offline. Intentalo de nuevo.', 'danger');
+              setStatus(offlineErrorMessage, 'danger');
               return;
             }
           }
-          setStatus('No se pudo crear la alerta. Inténtalo de nuevo.', 'danger');
+          setStatus(errorMessage, 'danger');
         }
       });
     });

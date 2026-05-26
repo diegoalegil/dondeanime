@@ -1,5 +1,7 @@
 ---
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import { t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 interface Props {
@@ -11,7 +13,7 @@ const { animeSlug, activeCountry } = Astro.props;
 ---
 <nav class="mx-auto max-w-6xl px-4 pt-2 pb-6">
   <div class="flex items-center gap-2 overflow-x-auto">
-    <span class="shrink-0 text-xs uppercase tracking-wide text-fg-muted">Ver en</span>
+    <span class="shrink-0 text-xs uppercase tracking-wide text-fg-muted">{t('countrySwitcher.viewIn')}</span>
     <div class="flex gap-1.5">
       {COUNTRY_SLUGS.map((slug) => {
         const country = COUNTRIES[slug];
@@ -20,18 +22,17 @@ const { animeSlug, activeCountry } = Astro.props;
         const stateClass = isActive
           ? "bg-accent-violet/15 text-accent-violet"
           : "border border-surface-2 text-fg-secondary hover:border-accent-violet/40 hover:text-fg-primary";
-        const tag = isActive ? 'span' : 'a';
         return (
           <Fragment>
             {isActive ? (
               <span class={`${baseClass} ${stateClass}`} aria-current="page">
                 <CountryFlag country={country} />
-                {country.name}
+                {localizedCountryName(slug)}
               </span>
             ) : (
-              <a href={`/anime/${animeSlug}/${slug}`} class={`${baseClass} ${stateClass}`}>
+              <a href={localizedPath(`/anime/${animeSlug}/${slug}`)} class={`${baseClass} ${stateClass}`}>
                 <CountryFlag country={country} />
-                {country.name}
+                {localizedCountryName(slug)}
               </a>
             )}
           </Fragment>

@@ -7,6 +7,10 @@ import { getProvidersByCountry, type ProviderSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('es');
 
 export async function getStaticPaths() {
   const lists = await Promise.all(
@@ -28,7 +32,7 @@ const availability = await Promise.all(
     const country = COUNTRIES[slug];
     const providers = await getProvidersByCountry(country.iso);
     const provider = providers.find((p) => p.slug === plataforma);
-    return { slug, country, provider };
+    return { slug: slug as CountrySlug, country, provider };
   }),
 );
 
@@ -40,18 +44,25 @@ const firstProvider = availableEntries[0]?.provider;
 const displayName = platform?.name ?? firstProvider?.providerName ?? plataforma!;
 const logoUrl = firstProvider?.logoUrl;
 const totalAnime = availableEntries.reduce((sum, a) => sum + a.provider.animeCount, 0);
+const countryCountLabel = t(
+  availableEntries.length === 1 ? 'platform.countryCount.one' : 'platform.countryCount.other',
+  { count: availableEntries.length },
+);
 
-const seoTitle = `Anime en ${displayName} — Disponibilidad por país | DondeAnime`;
-const seoDescription = `${displayName} ofrece anime en ${availableEntries.length} país${availableEntries.length === 1 ? '' : 'es'} hispanoamericano${availableEntries.length === 1 ? '' : 's'}. Elige tu país para ver el catálogo completo.`;
+const seoTitle = t('platform.seo.title', { platform: displayName });
+const seoDescription = t('platform.seo.description', {
+  platform: displayName,
+  countryCount: countryCountLabel,
+});
 
 const pageUrl = absoluteUrl(`/plataforma/${plataforma}`);
 const itemListSchema = buildItemListSchema(
   availableEntries.map((a) => ({
-    name: `${displayName} en ${a.country.name}`,
+    name: `${displayName} ${localizedCountryName(a.slug)}`,
     url: absoluteUrl(`/plataforma/${plataforma}/${a.slug}`),
   })),
   pageUrl,
-  `${displayName} por país`,
+  t('platform.schema.name', { platform: displayName }),
 );
 ---
 <BaseLayout title={seoTitle} description={seoDescription}>
@@ -59,8 +70,8 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: 'Inicio', url: '/' },
-      { name: 'Plataformas', url: '/' },
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.platforms'), url: '/' },
       { name: displayName, url: `/plataforma/${plataforma}` },
     ]}
   />
@@ -76,40 +87,40 @@ const itemListSchema = buildItemListSchema(
       )}
       <div>
         <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
-          Anime en {displayName}
+          {t('platform.headingPrefix')} {displayName}
         </h1>
         <p class="mt-2 text-sm text-fg-muted">
-          {totalAnime} entradas totales en {availableEntries.length} país{availableEntries.length === 1 ? '' : 'es'}
+          {t('platform.total', { animeCount: totalAnime, countryCount: countryCountLabel })}
         </p>
       </div>
     </div>
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
-    <h2 class="mb-6 text-2xl font-semibold">Disponibilidad por país</h2>
+    <h2 class="mb-6 text-2xl font-semibold">{t('platform.availabilityByCountry')}</h2>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {availability.map(({ slug, country, provider }) => (
         provider ? (
           <a
-            href={`/plataforma/${plataforma}/${slug}`}
+            href={localizedPath(`/plataforma/${plataforma}/${slug}`)}
             class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
           >
             <div class="flex items-center gap-3">
               <CountryFlag country={country} />
               <div>
-                <h3 class="text-base font-semibold text-fg-primary">{country.name}</h3>
-                <p class="mt-0.5 text-sm text-fg-muted">{provider.animeCount} anime</p>
+                <h3 class="text-base font-semibold text-fg-primary">{localizedCountryName(slug)}</h3>
+                <p class="mt-0.5 text-sm text-fg-muted">{t('platform.animeCount', { count: provider.animeCount })}</p>
               </div>
             </div>
-            <span class="text-fg-muted">→</span>
+            <span class="text-fg-muted">-></span>
           </a>
         ) : (
           <div class="flex items-center justify-between rounded-xl border border-surface-2/50 bg-surface-1/50 p-5 opacity-60">
             <div class="flex items-center gap-3">
               <CountryFlag country={country} muted />
               <div>
-                <h3 class="text-base font-semibold text-fg-secondary">{country.name}</h3>
-                <p class="mt-0.5 text-sm text-fg-muted">No disponible</p>
+                <h3 class="text-base font-semibold text-fg-secondary">{localizedCountryName(slug)}</h3>
+                <p class="mt-0.5 text-sm text-fg-muted">{t('platform.notAvailable')}</p>
               </div>
             </div>
           </div>
