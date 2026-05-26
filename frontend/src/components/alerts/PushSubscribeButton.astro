@@ -1,0 +1,117 @@
+---
+interface Props {
+  countryIso: string;
+}
+
+const { countryIso } = Astro.props;
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
+---
+<div
+  class="mt-5 border-t border-surface-2 pt-4"
+  data-push-subscribe
+  data-api-url={apiUrl}
+  data-country={countryIso}
+  data-vapid-key={vapidPublicKey}
+>
+  <div class="grid gap-3 md:grid-cols-[1fr_auto]">
+    <label class="block">
+      <span class="mb-1 block text-sm font-medium text-fg-secondary">Email para push</span>
+      <input
+        data-push-email
+        type="email"
+        autocomplete="email"
+        class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-accent-violet"
+      />
+    </label>
+    <button
+      type="button"
+      class="self-end rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-primary transition-colors hover:border-accent-violet hover:text-accent-violet disabled:cursor-not-allowed disabled:opacity-50"
+      data-push-button
+    >
+      Activar push
+    </button>
+  </div>
+  <p class="mt-2 min-h-5 text-sm text-fg-muted" data-push-status></p>
+</div>
+
+<script>
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = `${base64String}${padding}`.replaceAll('-', '+').replaceAll('_', '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+  };
+
+  document.querySelectorAll('[data-push-subscribe]').forEach((root) => {
+    const apiUrl = root.getAttribute('data-api-url') ?? '';
+    const countryIso = root.getAttribute('data-country') ?? '';
+    const vapidKey = root.getAttribute('data-vapid-key') ?? '';
+    const emailInput = root.querySelector('[data-push-email]');
+    const button = root.querySelector('[data-push-button]');
+    const status = root.querySelector('[data-push-status]');
+
+    const setStatus = (message, tone = 'muted') => {
+      if (!status) return;
+      status.textContent = message;
+      status.className = `mt-2 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
+    if (!button) return;
+    if (!vapidKey) {
+      button.setAttribute('disabled', 'true');
+      setStatus('Las notificaciones push todavia no estan configuradas.');
+      return;
+    }
+
+    button.addEventListener('click', async () => {
+      const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : '';
+      if (!email) {
+        setStatus('Introduce un email antes de activar push.', 'danger');
+        return;
+      }
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+        setStatus('Este navegador no soporta notificaciones push.', 'danger');
+        return;
+      }
+
+      setStatus('Solicitando permiso...');
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          setStatus('Permiso de notificaciones rechazado.', 'danger');
+          return;
+        }
+
+        const registration = await navigator.serviceWorker.register('/push-worker.js');
+        const existing = await registration.pushManager.getSubscription();
+        const subscription = existing ?? await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        });
+        const json = subscription.toJSON();
+
+        const response = await fetch(`${apiUrl}/api/push/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: email,
+            endpoint: json.endpoint,
+            countryIso,
+            keys: json.keys,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        setStatus('Notificaciones push activadas.', 'success');
+      } catch {
+        setStatus('No se pudo activar push. Intentalo de nuevo.', 'danger');
+      }
+    });
+  });
+</script>

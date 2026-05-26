@@ -1,4 +1,5 @@
 ---
+import PushSubscribeButton from './PushSubscribeButton.astro';
 import { t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 
@@ -67,6 +68,8 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
       </label>
       <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
     </form>
+
+    <PushSubscribeButton countryIso={countryIso} />
   </div>
 
   <script>

@@ -93,6 +93,8 @@ nano .env.prod
 #   POSTGRES_PASSWORD: openssl rand -base64 32
 #   TMDB_API_KEY: el de tu .env local
 #   ADMIN_PASSWORD: openssl rand -base64 32
+#   VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY: npx web-push generate-vapid-keys --json
+#   PUBLIC_VAPID_PUBLIC_KEY: mismo valor que VAPID_PUBLIC_KEY
 #   PLAUSIBLE_API_KEY: opcional, solo si quieres top páginas en dashboard
 #   VERCEL_DEPLOY_HOOK: vacío por ahora, se rellena en paso 6
 

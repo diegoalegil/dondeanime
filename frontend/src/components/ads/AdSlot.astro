@@ -18,17 +18,35 @@ const adSlot = slot ?? slotByPosition[position];
 const shouldRender = enabled && clientId && adSlot;
 ---
 {shouldRender && (
-  <aside class="mx-auto max-w-6xl px-4 py-6" data-ad-position={position}>
-    <ins
-      class="adsbygoogle"
-      style="display:block"
-      data-ad-client={clientId}
-      data-ad-slot={adSlot}
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    ></ins>
+  <aside
+    class="mx-auto max-w-6xl px-4 py-6"
+    data-ad-position={position}
+    data-ad-client={clientId}
+    data-ad-slot={adSlot}
+  >
     <script is:inline>
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      (() => {
+        const script = document.currentScript;
+        const container = script?.closest('[data-ad-position]');
+        if (!container) return;
+
+        try {
+          if (localStorage.getItem('dondeanime-premium') === 'true') {
+            container.remove();
+            return;
+          }
+        } catch (error) {}
+
+        const ad = document.createElement('ins');
+        ad.className = 'adsbygoogle';
+        ad.style.display = 'block';
+        ad.setAttribute('data-ad-client', container.getAttribute('data-ad-client') || '');
+        ad.setAttribute('data-ad-slot', container.getAttribute('data-ad-slot') || '');
+        ad.setAttribute('data-ad-format', 'auto');
+        ad.setAttribute('data-full-width-responsive', 'true');
+        container.insertBefore(ad, script);
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      })();
     </script>
   </aside>
 )}
