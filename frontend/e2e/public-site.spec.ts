@@ -328,6 +328,19 @@ test('alert background sync is generated in the service worker', async ({ reques
   expect(serviceWorkerText).toContain("self.registration.showNotification('Alerta enviada'");
 });
 
+test('install promotion banner is generated with visit gate and tracking', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  const homeText = await home.text();
+
+  expect(homeText).toContain('data-install-promotion');
+  expect(homeText).toContain('Instala DondeAnime como app');
+  expect(homeText).toContain('dondeanime-install-visits');
+  expect(homeText).toContain('dondeanime-install-dismissed');
+  expect(homeText).toContain('install_prompt_shown');
+  expect(homeText).toContain('install_completed');
+});
+
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
   await page.goto('/blog');
 
