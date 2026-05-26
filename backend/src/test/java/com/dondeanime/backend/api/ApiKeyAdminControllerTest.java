@@ -2,7 +2,6 @@ package com.dondeanime.backend.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,14 +19,19 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest(ApiKeyAdminController.class)
-@Import(SecurityConfig.class)
+@Import({
+        SecurityConfig.class,
+        AdminJwtService.class
+})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class ApiKeyAdminControllerTest {
 
@@ -36,6 +40,9 @@ class ApiKeyAdminControllerTest {
 
     @MockitoBean
     private ApiKeyService apiKeyService;
+
+    @Autowired
+    private AdminJwtService adminJwtService;
 
     @Test
     void createsApiKeyWithBasicAuth() throws Exception {
@@ -51,7 +58,7 @@ class ApiKeyAdminControllerTest {
                         0));
 
         mvc.perform(post("/api/admin/api-keys")
-                        .with(httpBasic("admin", "secret"))
+                        .header("Authorization", bearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"ownerEmail":"diego@example.com","tier":"FREE"}
@@ -87,10 +94,14 @@ class ApiKeyAdminControllerTest {
                 List.of(new ApiEndpointUsageDto("/api/v1/anime", 12))));
 
         mvc.perform(get("/api/admin/api-keys/stats")
-                        .with(httpBasic("admin", "secret")))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.keys[0].keyPreview").value("da_free_abcd...wxyz"))
                 .andExpect(jsonPath("$.keys[0].monthlyUsage").value(12))
                 .andExpect(jsonPath("$.topEndpoints[0].endpoint").value("/api/v1/anime"));
+    }
+
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 }
