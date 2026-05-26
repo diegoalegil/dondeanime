@@ -92,6 +92,7 @@ class AnimeControllerTest {
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
                 .andExpect(jsonPath("$[0].episodeDuration").value(24))
+                .andExpect(jsonPath("$[0].studio").value("WIT Studio"))
                 // El DTO no debe exponer id interno ni tmdbId ni syncedAt.
                 .andExpect(jsonPath("$[0].id").doesNotExist())
                 .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
@@ -245,6 +246,7 @@ class AnimeControllerTest {
         a.setStatus("FINISHED");
         a.setEpisodes(24);
         a.setEpisodeDuration(24);
+        a.setStudio("WIT Studio");
         return a;
     }
 

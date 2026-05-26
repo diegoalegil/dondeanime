@@ -285,6 +285,33 @@ test('beginner genre pages render curated recommendations and are indexed', asyn
   expect(allSitemapText).toContain('https://dondeanime.com/empezar/action');
 });
 
+test('studio ranking pages render schema and are indexed', async ({ page, request }) => {
+  await page.goto('/estudio/madhouse/mejores');
+
+  await expect(page.getByRole('heading', { name: /Mejor anime de Madhouse/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/estudio/madhouse/mejores',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const schemas = jsonLdBlocks.map((block) => JSON.parse(block));
+  const creativeWorkSeries = schemas.find((schema) => schema['@type'] === 'CreativeWorkSeries');
+  const itemList = schemas.find((schema) => schema['@type'] === 'ItemList');
+
+  expect(creativeWorkSeries).toEqual(expect.objectContaining({
+    name: 'Mejor anime de Madhouse',
+    creator: expect.objectContaining({ name: 'Madhouse' }),
+  }));
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Mejor anime de Madhouse',
+    itemListElement: expect.any(Array),
+  }));
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  expect(allSitemapText).toContain('https://dondeanime.com/estudio/madhouse/mejores');
+});
+
 test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
   await page.goto('/mejores/2024');
 
