@@ -358,6 +358,118 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```
 
+Verificación semanal de backups:
+
+```bash
+# Ejecutar manualmente
+cd /opt/dondeanime
+scripts/vps/verify-backup.sh
+
+# Instalar cron semanal, domingos a las 04:00 UTC
+sudo bash scripts/vps/verify-backup.sh --install-cron
+```
+
+El verificador descarga el último backup de R2, lo restaura en un Postgres
+temporal (`dondeanime_backup_verify`) ligado a `127.0.0.1:5444` y compara filas
+en `anime`, `watch_provider` y `affiliate_link`. La restauración nunca se hace
+sobre `dondeanime_postgres_prod`; producción solo se lee con `count(*)`.
+
+Variables opcionales:
+
+```env
+BACKUP_VERIFY_DIR=/opt/dondeanime/backup-verification
+BACKUP_VERIFY_MIN_RATIO_PERCENT=95
+```
+
+Si `TELEGRAM_ENABLED=true`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` están
+configurados, un fallo en la verificación manda alerta al mismo bot operativo.
+
+### Hardening SSH y fail2ban
+
+El hardening queda preparado en repo, pero se aplica manualmente desde el VPS
+despuÃ©s de revisar el PR. No lo ejecuta CI y no se ejecuta desde una sesiÃ³n
+local.
+
+Aplica:
+
+```bash
+ssh deploy@IP_VPS
+cd /opt/dondeanime
+git pull
+sudo bash scripts/vps/setup-hardening.sh
+```
+
+El script hace tres cambios:
+
+- Instala y activa `fail2ban` con jail `sshd`, `maxretry=3`, `findtime=10m` y `bantime=1h`.
+- Ajusta `/etc/ssh/sshd_config`: `PasswordAuthentication no`, `PermitRootLogin no`, `MaxAuthTries 3`, `PubkeyAuthentication yes`.
+- Activa `unattended-upgrades` para parches automÃ¡ticos de seguridad.
+
+Antes de cerrar la sesiÃ³n SSH actual, abre otra terminal y verifica que el
+login como `deploy` sigue funcionando:
+
+```bash
+ssh deploy@IP_VPS
+```
+
+Verifica el estado:
+
+```bash
+cd /opt/dondeanime
+sudo bash scripts/vps/setup-hardening.sh --check
+sudo fail2ban-client status sshd
+sudo sshd -T | grep -E '^(passwordauthentication|permitrootlogin|maxauthtries)'
+systemctl status unattended-upgrades --no-pager
+```
+
+Si `sshd -t` falla, el script no reinicia SSH. Deja backup automÃ¡tico en
+`/etc/ssh/sshd_config.dondeanime.<timestamp>.bak`.
+
+### Monitoreo externo UptimeRobot
+
+Sprint 11 usa UptimeRobot en free tier para vigilar desde fuera del VPS. Los
+monitores esperados son:
+
+| Nombre | URL | Intervalo |
+|---|---|---|
+| DondeAnime frontend | `https://dondeanime.com` | 5 min |
+| DondeAnime API anime | `https://api.dondeanime.com/api/anime` | 5 min |
+| DondeAnime API health | `https://api.dondeanime.com/actuator/health` | 5 min |
+
+La alerta Telegram se configura en UptimeRobot como alert contact. Para
+localizar el ID:
+
+```bash
+cd /opt/dondeanime
+UPTIMEROBOT_API_KEY=... bash scripts/vps/setup-uptimerobot-monitors.sh --list-contacts
+```
+
+Crear los monitores:
+
+```bash
+cd /opt/dondeanime
+UPTIMEROBOT_API_KEY=... \
+UPTIMEROBOT_ALERT_CONTACT_IDS=123456 \
+bash scripts/vps/setup-uptimerobot-monitors.sh
+```
+
+Antes de ejecutar contra la API real:
+
+```bash
+UPTIMEROBOT_API_KEY=dummy \
+UPTIMEROBOT_ALERT_CONTACT_IDS=123456 \
+bash scripts/vps/setup-uptimerobot-monitors.sh --dry-run
+```
+
+Notas:
+
+- UptimeRobot `type=1` es monitor HTTP(S).
+- `interval=300` equivale a check cada 5 minutos.
+- `alert_contacts` usa el formato `contactId_0_0`; en free tier el threshold
+  y la recurrencia se mantienen en `0`.
+- Si Diego prefiere hacerlo por UI, debe crear los mismos 3 monitores HTTP(S),
+  intervalo 5 min, y asignar el contacto Telegram monitor por monitor.
+
 ### Disparar sync manual
 
 ```bash

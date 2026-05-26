@@ -2,6 +2,7 @@
 import type { WatchProvider } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import ProviderRow from './ProviderRow.astro';
 
 interface Props {
@@ -34,7 +35,7 @@ const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
       <div class="rounded-xl border border-surface-2 bg-surface-1 p-5">
         <header class="mb-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+            <CountryFlag country={country} />
             <h3 class="text-base font-semibold text-fg-primary">{country.name}</h3>
           </div>
           <a

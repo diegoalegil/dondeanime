@@ -6,8 +6,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     if (window.__dondeAnimeAffiliateTracking) return;
     window.__dondeAnimeAffiliateTracking = true;
 
-    const sendTracking = (payload) => {
-      const url = `${apiUrl}/api/track/affiliate`;
+    const sendTracking = (path, payload) => {
+      const url = `${apiUrl}${path}`;
       const body = JSON.stringify(payload);
 
       if (navigator.sendBeacon) {
@@ -26,18 +26,33 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
 
     document.addEventListener('click', (event) => {
       const link = event.target?.closest?.('[data-affiliate-link="true"]');
-      if (!link) return;
+      if (link) {
+        const providerSlug = link.getAttribute('data-affiliate-provider') ?? '';
+        const country = link.getAttribute('data-affiliate-country') ?? '';
+        const animeSlug = link.getAttribute('data-affiliate-anime') ?? '';
+        if (providerSlug && country && animeSlug) {
+          sendTracking('/api/track/affiliate', { providerSlug, country, animeSlug });
 
-      const providerSlug = link.getAttribute('data-affiliate-provider') ?? '';
-      const country = link.getAttribute('data-affiliate-country') ?? '';
-      const animeSlug = link.getAttribute('data-affiliate-anime') ?? '';
-      if (!providerSlug || !country || !animeSlug) return;
+          if (typeof window.plausible === 'function') {
+            window.plausible('Affiliate Click', {
+              props: { provider: providerSlug, country },
+            });
+          }
+        }
+      }
 
-      sendTracking({ providerSlug, country, animeSlug });
+      const recommendationLink = event.target?.closest?.('[data-recommendation-link="true"]');
+      if (!recommendationLink) return;
+
+      const sourceAnimeSlug = recommendationLink.getAttribute('data-recommendation-source') ?? '';
+      const targetAnimeSlug = recommendationLink.getAttribute('data-recommendation-target') ?? '';
+      if (!sourceAnimeSlug || !targetAnimeSlug) return;
+
+      sendTracking('/api/track/recommendation', { sourceAnimeSlug, targetAnimeSlug });
 
       if (typeof window.plausible === 'function') {
-        window.plausible('Affiliate Click', {
-          props: { provider: providerSlug, country },
+        window.plausible('Recommendation Click', {
+          props: { source: sourceAnimeSlug, target: targetAnimeSlug },
         });
       }
     });
