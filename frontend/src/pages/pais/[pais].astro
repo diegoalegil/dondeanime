@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { getProvidersByCountry } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -47,7 +48,7 @@ const itemListSchema = buildItemListSchema(
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
     <div class="flex items-center gap-4">
-      <span class={`fi fi-${country.flagCode} rounded text-3xl`} aria-hidden="true"></span>
+      <CountryFlag country={country} class="h-8 min-w-11 text-sm" />
       <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
         Anime en streaming en {country.name}
       </h1>
