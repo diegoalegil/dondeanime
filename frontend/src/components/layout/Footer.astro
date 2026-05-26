@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { buildOrganizationSchema } from '@/lib/seo';
 import { t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 const year = new Date().getFullYear();
 const organizationSchema = buildOrganizationSchema();
@@ -41,7 +42,7 @@ const featuredGenres = [
             return (
               <li>
                 <a href={localizedPath(`/pais/${slug}`)} class="flex items-center gap-2 text-fg-muted transition-colors hover:text-fg-primary">
-                  <span class={`fi fi-${c.flagCode} rounded`} aria-hidden="true"></span>
+                  <CountryFlag country={c} />
                   {localizedCountryName(slug)}
                 </a>
               </li>

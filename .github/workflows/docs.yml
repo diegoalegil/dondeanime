@@ -1,0 +1,33 @@
+name: Docs
+
+on:
+  pull_request:
+    paths:
+      - 'DISASTER-RECOVERY.md'
+      - 'SECRETS-ROTATION.md'
+      - 'scripts/vps/validate-*.sh'
+      - '.github/workflows/docs.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'DISASTER-RECOVERY.md'
+      - 'SECRETS-ROTATION.md'
+      - 'scripts/vps/validate-*.sh'
+      - '.github/workflows/docs.yml'
+
+jobs:
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate disaster recovery doc
+        run: bash scripts/vps/validate-disaster-recovery-doc.sh
+
+      - name: Validate secrets rotation doc
+        run: |
+          if [ -f SECRETS-ROTATION.md ]; then
+            bash scripts/vps/validate-secrets-rotation-doc.sh
+          fi

@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
@@ -35,11 +37,15 @@ import com.dondeanime.backend.provider.WatchProviderRepository;
  * sustituidos por Mockito.
  */
 @WebMvcTest(AnimeController.class)
-@Import(SecurityConfig.class)
+@Import({
+        SecurityConfig.class,
+        AdminJwtService.class
+})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class AnimeControllerTest {
 
@@ -70,13 +76,18 @@ class AnimeControllerTest {
     @MockitoBean
     private AffiliateLinkService affiliateLinkService;
 
+    @MockitoBean
+    private RecommendationService recommendationService;
+
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
         Anime a = makeAnime("attack-on-titan", "Attack on Titan");
-        when(animeRepository.findAll()).thenReturn(List.of(a));
+        when(animeRepository.findAllWithGenres()).thenReturn(List.of(a));
 
-        mvc.perform(get("/api/anime"))
+        mvc.perform(get("/api/anime")
+                        .header("X-Request-Id", "req-test"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("X-Request-Id", "req-test"))
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
@@ -143,6 +154,35 @@ class AnimeControllerTest {
         when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
 
         mvc.perform(get("/api/anime/inexistente"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getSimilarReturnsRecommendationSummaries() throws Exception {
+        Anime source = makeAnime("attack-on-titan", "Attack on Titan");
+        Anime recommendation = makeAnime("vinland-saga", "Vinland Saga");
+        recommendation.setId(2L);
+        recommendation.setAnilistId(456L);
+        recommendation.setAverageScore(88);
+
+        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(source));
+        when(recommendationService.findSimilar(1L, 10)).thenReturn(List.of(recommendation));
+
+        mvc.perform(get("/api/anime/attack-on-titan/similar"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("vinland-saga"))
+                .andExpect(jsonPath("$[0].averageScore").value(88))
+                .andExpect(jsonPath("$[0].id").doesNotExist())
+                .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
+                .andExpect(jsonPath("$[0].syncedAt").doesNotExist());
+    }
+
+    @Test
+    void getSimilarUnknownSlugReturns404() throws Exception {
+        when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/anime/inexistente/similar"))
                 .andExpect(status().isNotFound());
     }
 

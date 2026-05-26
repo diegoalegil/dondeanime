@@ -50,6 +50,7 @@ public class ProviderSyncService {
     private final AnimeRepository animeRepository;
     private final WatchProviderRepository providerRepository;
     private final AlertService alertService;
+    private final AvailabilityChangeService availabilityChangeService;
     private final TransactionTemplate transactionTemplate;
 
     public ProviderSyncService(
@@ -57,11 +58,13 @@ public class ProviderSyncService {
             AnimeRepository animeRepository,
             WatchProviderRepository providerRepository,
             AlertService alertService,
+            AvailabilityChangeService availabilityChangeService,
             PlatformTransactionManager transactionManager) {
         this.client = client;
         this.animeRepository = animeRepository;
         this.providerRepository = providerRepository;
         this.alertService = alertService;
+        this.availabilityChangeService = availabilityChangeService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -118,6 +121,7 @@ public class ProviderSyncService {
                         Collectors.toList()));
 
         transactionTemplate.executeWithoutResult(status -> {
+            availabilityChangeService.recordChanges(anime, existing, current, now);
             providerRepository.deleteByAnimeId(anime.getId());
             current.forEach(providerRepository::save);
         });

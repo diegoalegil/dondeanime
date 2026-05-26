@@ -2,6 +2,7 @@
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 interface Props {
   animeSlug: string;
@@ -25,12 +26,12 @@ const { animeSlug, activeCountry } = Astro.props;
           <Fragment>
             {isActive ? (
               <span class={`${baseClass} ${stateClass}`} aria-current="page">
-                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                <CountryFlag country={country} />
                 {localizedCountryName(slug)}
               </span>
             ) : (
               <a href={localizedPath(`/anime/${animeSlug}/${slug}`)} class={`${baseClass} ${stateClass}`}>
-                <span class={`fi fi-${country.flagCode} rounded`} aria-hidden="true"></span>
+                <CountryFlag country={country} />
                 {localizedCountryName(slug)}
               </a>
             )}

@@ -1,4 +1,7 @@
 ---
+import { t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+
 interface Props {
   animeSlug: string;
   animeTitle: string;
@@ -6,20 +9,21 @@ interface Props {
   countryName: string;
 }
 
-import { t } from '@/i18n';
-
 const { animeSlug, animeTitle, countryIso, countryName } = Astro.props;
 const apiUrl = import.meta.env.PUBLIC_API_URL;
+const alertApiUrl = `${apiUrl}/api/alerts`;
 ---
 <section
   class="mx-auto max-w-6xl px-4 pb-8"
   data-alert-form
-  data-api-url={apiUrl}
+  data-alert-api-url={alertApiUrl}
   data-anime-slug={animeSlug}
   data-country={countryIso}
   data-status-creating={t('alert.creating')}
   data-status-success={t('alert.success')}
   data-status-error={t('alert.error')}
+  data-status-queued={t('alert.queued')}
+  data-status-offline-error={t('alert.offlineError')}
 >
   <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -58,7 +62,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <label class="flex gap-2 text-sm text-fg-muted md:col-span-2">
         <input type="checkbox" required class="mt-1" />
         <span>
-          {t('alert.privacyPrefix')} <a href="/legal/privacidad" class="text-accent-violet hover:underline">{t('alert.privacyLink')}</a>.
+          {t('alert.privacyPrefix')} <a href={localizedPath('/legal/privacidad')} class="text-accent-violet hover:underline">{t('alert.privacyLink')}</a>.
         </span>
       </label>
       <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
@@ -66,13 +70,72 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
   </div>
 
   <script>
+    const ALERT_SYNC_TAG = 'dondeanime-alerts-sync';
+    const ALERT_DB_NAME = 'dondeanime-alerts';
+    const ALERT_STORE = 'alerts';
+
+    const openAlertDb = () => new Promise((resolve, reject) => {
+      const request = indexedDB.open(ALERT_DB_NAME, 1);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(ALERT_STORE)) {
+          db.createObjectStore(ALERT_STORE, { keyPath: 'id' });
+        }
+      };
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    const queueAlert = async (endpoint, payload) => {
+      const db = await openAlertDb();
+      const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(ALERT_STORE, 'readwrite');
+        tx.objectStore(ALERT_STORE).put({
+          id,
+          endpoint,
+          payload,
+          createdAt: new Date().toISOString(),
+        });
+        tx.oncomplete = () => resolve(undefined);
+        tx.onerror = () => reject(tx.error);
+      });
+
+      db.close();
+    };
+
+    const scheduleAlertSync = async () => {
+      if (!('serviceWorker' in navigator)) return;
+
+      const registration = await navigator.serviceWorker.ready;
+      const syncRegistration = registration.sync;
+      if (syncRegistration) {
+        await syncRegistration.register(ALERT_SYNC_TAG);
+      }
+      registration.active?.postMessage({ type: 'SYNC_ALERTS' });
+    };
+
+    const requestQueuedAlertNotification = () => {
+      if (!('Notification' in window) || Notification.permission !== 'default') return;
+      Notification.requestPermission().catch(() => {});
+    };
+
+    window.addEventListener('online', () => {
+      scheduleAlertSync().catch(() => {});
+    });
+
     document.querySelectorAll('[data-alert-form]').forEach((root) => {
-      const apiUrl = root.getAttribute('data-api-url') ?? '';
+      const alertApiUrl = root.getAttribute('data-alert-api-url') ?? '';
       const animeSlug = root.getAttribute('data-anime-slug') ?? '';
       const country = root.getAttribute('data-country') ?? '';
       const creatingMessage = root.getAttribute('data-status-creating') ?? '';
       const successMessage = root.getAttribute('data-status-success') ?? '';
       const errorMessage = root.getAttribute('data-status-error') ?? '';
+      const queuedMessage = root.getAttribute('data-status-queued') ?? '';
+      const offlineErrorMessage = root.getAttribute('data-status-offline-error') ?? '';
       const openButton = root.querySelector('[data-open-alert]');
       const panel = root.querySelector('[data-alert-panel]');
       const status = root.querySelector('[data-alert-status]');
@@ -94,13 +157,14 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         const form = event.currentTarget;
         const data = new FormData(form);
         const email = String(data.get('email') ?? '').trim();
+        const payload = { email, animeSlug, country };
 
         setStatus(creatingMessage);
         try {
-          const response = await fetch(`${apiUrl}/api/subscriptions`, {
+          const response = await fetch(alertApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, animeSlug, country }),
+            body: JSON.stringify(payload),
           });
 
           if (!response.ok) {
@@ -109,7 +173,21 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
 
           form.reset();
           setStatus(successMessage, 'success');
-        } catch {
+        } catch (error) {
+          const canQueue = !navigator.onLine || error instanceof TypeError;
+          if (canQueue) {
+            try {
+              await queueAlert(alertApiUrl, payload);
+              await scheduleAlertSync();
+              requestQueuedAlertNotification();
+              form.reset();
+              setStatus(queuedMessage, 'success');
+              return;
+            } catch {
+              setStatus(offlineErrorMessage, 'danger');
+              return;
+            }
+          }
           setStatus(errorMessage, 'danger');
         }
       });

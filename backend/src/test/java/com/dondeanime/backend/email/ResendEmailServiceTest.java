@@ -48,4 +48,31 @@ class ResendEmailServiceTest {
 
         server.verify();
     }
+
+    @Test
+    void sendsNewsletterConfirmationEmailThroughResendRestApi() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        ResendEmailService service = new ResendEmailService(
+                builder,
+                "https://api.resend.com",
+                "re_test",
+                "alertas@dondeanime.com",
+                true);
+
+        server.expect(once(), requestTo("https://api.resend.com/emails"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("Authorization", "Bearer re_test"))
+                .andExpect(jsonPath("$.to[0]").value("diego@example.com"))
+                .andExpect(jsonPath("$.subject").value("Confirma tu newsletter de DondeAnime"))
+                .andRespond(withSuccess("""
+                        {"id":"email_456"}
+                        """, MediaType.APPLICATION_JSON));
+
+        service.sendNewsletterConfirmationEmail(
+                "diego@example.com",
+                "https://api/newsletter/confirm?token=raw.jwt");
+
+        server.verify();
+    }
 }

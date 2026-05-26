@@ -7,8 +7,8 @@ export interface CountryInfo {
 }
 
 export const COUNTRIES = {
-  espana: { iso: 'ES', name: 'España', nameEn: 'Spain', flagCode: 'es', hreflang: 'es-ES' },
-  mexico: { iso: 'MX', name: 'México', nameEn: 'Mexico', flagCode: 'mx', hreflang: 'es-MX' },
+  espana: { iso: 'ES', name: 'Espa\u00f1a', nameEn: 'Spain', flagCode: 'es', hreflang: 'es-ES' },
+  mexico: { iso: 'MX', name: 'M\u00e9xico', nameEn: 'Mexico', flagCode: 'mx', hreflang: 'es-MX' },
   argentina: { iso: 'AR', name: 'Argentina', nameEn: 'Argentina', flagCode: 'ar', hreflang: 'es-AR' },
   colombia: { iso: 'CO', name: 'Colombia', nameEn: 'Colombia', flagCode: 'co', hreflang: 'es-CO' },
   chile: { iso: 'CL', name: 'Chile', nameEn: 'Chile', flagCode: 'cl', hreflang: 'es-CL' },

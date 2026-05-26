@@ -84,6 +84,36 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           </button>
           <p class="min-h-5 text-sm text-fg-muted" data-status></p>
         </form>
+
+        <form class="mt-6 space-y-4 border-t border-surface-2 pt-5" data-bulk-form>
+          <div>
+            <p class="text-sm font-semibold text-fg-primary">Import CSV</p>
+            <p class="mt-1 text-xs text-fg-muted">provider_slug,country_code,url,active</p>
+          </div>
+          <label class="flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-surface-2 bg-surface-0 px-4 py-5 text-center text-sm text-fg-muted transition-colors hover:border-accent-violet hover:text-accent-violet" data-csv-drop>
+            <span>Arrastra un CSV o selecciónalo</span>
+            <input name="csv" type="file" accept=".csv,text/csv" class="sr-only" data-csv-input />
+          </label>
+          <div class="max-h-48 overflow-auto rounded-md border border-surface-2 bg-surface-0">
+            <table class="w-full min-w-[32rem] text-left text-xs">
+              <thead class="text-fg-muted">
+                <tr>
+                  <th class="border-b border-surface-2 px-3 py-2">Provider</th>
+                  <th class="border-b border-surface-2 px-3 py-2">Pais</th>
+                  <th class="border-b border-surface-2 px-3 py-2">URL</th>
+                  <th class="border-b border-surface-2 px-3 py-2">Activo</th>
+                </tr>
+              </thead>
+              <tbody data-bulk-preview>
+                <tr><td colspan="4" class="px-3 py-4 text-fg-muted">Sin CSV cargado.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button type="submit" disabled class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 opacity-50 transition-opacity enabled:hover:opacity-90" data-bulk-submit>
+            Confirmar import
+          </button>
+          <p class="min-h-5 text-sm text-fg-muted" data-bulk-status></p>
+        </form>
       </aside>
 
       <section class="rounded-lg border border-surface-2 bg-surface-1 p-5">
@@ -128,6 +158,13 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const linkForm = document.querySelector('[data-link-form]');
     const status = document.querySelector('[data-status]');
     const body = document.querySelector('[data-links-body]');
+    const bulkForm = document.querySelector('[data-bulk-form]');
+    const csvDrop = document.querySelector('[data-csv-drop]');
+    const csvInput = document.querySelector('[data-csv-input]');
+    const bulkPreview = document.querySelector('[data-bulk-preview]');
+    const bulkSubmit = document.querySelector('[data-bulk-submit]');
+    const bulkStatus = document.querySelector('[data-bulk-status]');
+    let pendingCsv = '';
 
     const setStatus = (message, tone = 'muted') => {
       if (!status) return;
@@ -137,9 +174,17 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       }`;
     };
 
+    const setBulkStatus = (message, tone = 'muted') => {
+      if (!bulkStatus) return;
+      bulkStatus.textContent = message;
+      bulkStatus.className = `min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
     const authHeaders = () => {
-      const token = sessionStorage.getItem(tokenKey);
-      return token ? { Authorization: `Basic ${token}` } : {};
+      const token = localStorage.getItem(tokenKey);
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const escapeHtml = (value) => String(value ?? '')
@@ -148,6 +193,64 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       .replaceAll('>', '&gt;')
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#39;');
+
+    const splitCsvLine = (line) => {
+      const columns = [];
+      let current = '';
+      let inQuotes = false;
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+        if (char === '"') {
+          if (inQuotes && line[index + 1] === '"') {
+            current += '"';
+            index += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          columns.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      columns.push(current.trim());
+      return columns;
+    };
+
+    const previewCsv = (csv) => {
+      pendingCsv = csv;
+      const rows = csv
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .filter((line, index) => !(index === 0 && line.toLowerCase().startsWith('provider_slug,')))
+        .map(splitCsvLine);
+
+      if (!rows.length) {
+        bulkPreview.innerHTML = '<tr><td colspan="4" class="px-3 py-4 text-fg-muted">Sin filas válidas.</td></tr>';
+        bulkSubmit.disabled = true;
+        setBulkStatus('CSV vacío.', 'danger');
+        return;
+      }
+
+      bulkPreview.innerHTML = rows.slice(0, 20).map((row) => `
+        <tr>
+          <td class="border-b border-surface-2 px-3 py-2 text-fg-primary">${escapeHtml(row[0])}</td>
+          <td class="border-b border-surface-2 px-3 py-2 text-fg-secondary">${escapeHtml(row[1])}</td>
+          <td class="border-b border-surface-2 px-3 py-2 text-fg-secondary">${escapeHtml(row[2])}</td>
+          <td class="border-b border-surface-2 px-3 py-2 text-fg-secondary">${escapeHtml(row[3])}</td>
+        </tr>
+      `).join('');
+      bulkSubmit.disabled = false;
+      setBulkStatus(`${rows.length} filas listas para confirmar.`, 'success');
+    };
+
+    const readCsvFile = (file) => {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => previewCsv(String(reader.result ?? '')));
+      reader.readAsText(file);
+    };
 
     async function request(path, options = {}) {
       const response = await fetch(`${apiUrl}${path}`, {
@@ -187,16 +290,30 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     loginForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(loginForm);
-      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: String(data.get('username') ?? ''),
+          password: String(data.get('password') ?? ''),
+        }),
+      });
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        setStatus(messages.wrongCredentials, 'danger');
+        return;
+      }
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       loadLinks().catch(() => {
-        sessionStorage.removeItem(tokenKey);
+        localStorage.removeItem(tokenKey);
         setStatus(messages.wrongCredentials, 'danger');
       });
     });
 
     linkForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!sessionStorage.getItem(tokenKey)) {
+      if (!localStorage.getItem(tokenKey)) {
         setStatus(messages.loginRequiredSave, 'danger');
         return;
       }
@@ -227,7 +344,56 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       setStatus(messages.linkDeleted, 'success');
     });
 
-    if (sessionStorage.getItem(tokenKey)) {
+    csvInput?.addEventListener('change', () => {
+      const file = csvInput.files?.[0];
+      if (file) readCsvFile(file);
+    });
+
+    csvDrop?.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      csvDrop.classList.add('border-accent-violet', 'text-accent-violet');
+    });
+
+    csvDrop?.addEventListener('dragleave', () => {
+      csvDrop.classList.remove('border-accent-violet', 'text-accent-violet');
+    });
+
+    csvDrop?.addEventListener('drop', (event) => {
+      event.preventDefault();
+      csvDrop.classList.remove('border-accent-violet', 'text-accent-violet');
+      const file = event.dataTransfer?.files?.[0];
+      if (file) readCsvFile(file);
+    });
+
+    bulkForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!localStorage.getItem(tokenKey)) {
+        setBulkStatus('Inicia sesión antes de importar.', 'danger');
+        return;
+      }
+      if (!pendingCsv.trim()) {
+        setBulkStatus('Carga un CSV antes de confirmar.', 'danger');
+        return;
+      }
+
+      try {
+        const result = await request('/api/admin/affiliate-links/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/csv' },
+          body: pendingCsv,
+        });
+        pendingCsv = '';
+        csvInput.value = '';
+        bulkSubmit.disabled = true;
+        bulkPreview.innerHTML = '<tr><td colspan="4" class="px-3 py-4 text-fg-muted">Sin CSV cargado.</td></tr>';
+        await loadLinks();
+        setBulkStatus(`${result.imported} links importados.`, 'success');
+      } catch (error) {
+        setBulkStatus('CSV rechazado por validación.', 'danger');
+      }
+    });
+
+    if (localStorage.getItem(tokenKey)) {
       loadLinks().catch(() => setStatus(messages.linksLoadError, 'danger'));
     } else {
       setStatus(messages.loginRequiredManage);

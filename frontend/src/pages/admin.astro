@@ -148,7 +148,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     };
 
     const tokenKey = 'dondeanime-admin-token';
-    const hasToken = () => Boolean(sessionStorage.getItem(tokenKey));
+    const hasToken = () => Boolean(localStorage.getItem(tokenKey));
 
     if (hasToken()) {
       setStatus(messages.sessionActive, 'success');
@@ -159,16 +159,13 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       const data = new FormData(form);
       const username = String(data.get('username') ?? '');
       const password = String(data.get('password') ?? '');
-      const token = btoa(`${username}:${password}`);
-
-      if (!firstSlug) {
-        setStatus(messages.noAnime, 'danger');
-        return;
-      }
+      const loginPayload = { username, password };
 
       setStatus(messages.verifying);
-      const response = await fetch(`${apiUrl}/api/admin/anime/${firstSlug}/overrides`, {
-        headers: { Authorization: `Basic ${token}` },
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginPayload),
       });
 
       if (!response.ok) {
@@ -176,12 +173,13 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         return;
       }
 
-      sessionStorage.setItem(tokenKey, token);
+      const session = await response.json();
+      localStorage.setItem(tokenKey, session.token);
       setStatus(messages.sessionActive, 'success');
     });
 
     logoutButton?.addEventListener('click', () => {
-      sessionStorage.removeItem(tokenKey);
+      localStorage.removeItem(tokenKey);
       setStatus(messages.sessionClosed);
     });
 
