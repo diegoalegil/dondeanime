@@ -36,7 +36,10 @@ public class AnimeSearchService {
         if (query == null || query.isBlank()) {
             return null;
         }
-        return query.trim();
+        return query.trim()
+                .replace('-', ' ')
+                .replace('_', ' ')
+                .replaceAll("\\s+", " ");
     }
 
     private static int safeLimit(Integer limit) {
