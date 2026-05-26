@@ -17,17 +17,19 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
 import com.dondeanime.backend.config.RateLimitFilter;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest(SearchController.class)
-@Import({SecurityConfig.class, RateLimitFilter.class})
+@Import({SecurityConfig.class, AdminJwtService.class, RateLimitFilter.class})
 @TestPropertySource(properties = {
         "admin.username=admin",
         "admin.password=secret",
-        "admin.cors.allowed-origins=http://localhost:4321"
+        "admin.cors.allowed-origins=http://localhost:4321",
+        "alerts.jwt-secret=test-jwt-secret"
 })
 class SearchControllerTest {
 
