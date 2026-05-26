@@ -8,7 +8,13 @@ import {
 import { BEST_ANIME_YEARS } from './bestYears';
 import { COUNTRIES, COUNTRY_SLUGS } from './countries';
 import { isHiddenVariant } from './platforms';
-import { DURATION_MINUTES, EPISODE_LIMITS, durationPath, episodeLimitPath } from './programmaticSeo';
+import {
+  DURATION_MINUTES,
+  EPISODE_LIMITS,
+  beginnerGenrePath,
+  durationPath,
+  episodeLimitPath,
+} from './programmaticSeo';
 
 export const SITEMAP_ENTRIES = [
   { name: 'Anime', path: '/sitemap-anime.xml' },
@@ -140,6 +146,7 @@ export const combinationSitemapPaths = async (): Promise<string[]> => {
   );
   const durationPaths = DURATION_MINUTES.map((minutes) => durationPath(minutes));
   const episodeLimitPaths = EPISODE_LIMITS.map((maxEpisodes) => episodeLimitPath(maxEpisodes));
+  const beginnerGenrePaths = genres.map((genre) => beginnerGenrePath(genre.slug));
 
-  return [...genreProviderPaths, ...durationPaths, ...episodeLimitPaths];
+  return [...genreProviderPaths, ...durationPaths, ...episodeLimitPaths, ...beginnerGenrePaths];
 };

@@ -18,6 +18,11 @@ export interface AnimeSummary {
   seasonYear: number | null;
 }
 
+export interface BeginnerAnime {
+  anime: AnimeSummary;
+  beginnerRecommendation: string | null;
+}
+
 export interface UpcomingAnime extends AnimeSummary {
   startYear: number;
   startMonth: number;
@@ -116,6 +121,21 @@ export const getGenres = () => fetchJson<GenreSummary[]>('/api/genres');
 
 export const getAnimeByGenre = (genreSlug: string) =>
   fetchJson<AnimeSummary[]>(`/api/genres/${genreSlug}`);
+
+export const getBeginnerAnimeByGenre = async (genreSlug: string) => {
+  const res = await fetch(`${API_URL}/api/genres/${genreSlug}/beginner`);
+  if (res.status === 404) {
+    const anime = await getAnimeByGenre(genreSlug);
+    return anime.slice(0, 10).map((item) => ({
+      anime: item,
+      beginnerRecommendation: null,
+    })) satisfies BeginnerAnime[];
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/genres/${genreSlug}/beginner failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<BeginnerAnime[]>;
+};
 
 export const getSeasons = () => fetchJson<SeasonSummary[]>('/api/seasons');
 
