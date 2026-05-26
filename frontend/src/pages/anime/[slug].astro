@@ -3,13 +3,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeHero from '@/components/anime/AnimeHero.astro';
 import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
 import MetaList from '@/components/anime/MetaList.astro';
+import SimilarAnime from '@/components/anime/SimilarAnime.astro';
 import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
 import AdSlot from '@/components/ads/AdSlot.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import AlternateLangs from '@/components/seo/AlternateLangs.astro';
-import { getAllAnime, getAnimeBySlug } from '@/lib/api';
-import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { getAllAnime, getAnimeBySlug, getSimilarAnime } from '@/lib/api';
+import { buildAnimeReviewSchema, buildRelatedAnimeSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
 
 export async function getStaticPaths() {
@@ -19,6 +20,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const detail = await getAnimeBySlug(slug!);
+const similarAnime = await getSimilarAnime(slug!);
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
 
 const allProviders = Object.values(detail.watchProvidersByCountry).flat();
@@ -33,6 +35,7 @@ const seoDescription = detail.anime.description
 const pageUrl = absoluteUrl(`/anime/${slug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
 const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
+const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUrl);
 ---
 <BaseLayout
   title={`${title} — Dónde verlo en streaming | DondeAnime`}
@@ -42,6 +45,7 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 >
   <JsonLd slot="head" data={tvSchema} />
   {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
+  {relatedSchema && <JsonLd slot="head" data={relatedSchema} />}
   <AlternateLangs
     slot="head"
     basePathWithSlug={`/anime/${slug}`}
@@ -63,4 +67,5 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
     translationPending={detail.anime.descriptionTranslationPending}
   />
   <MetaList anime={detail.anime} />
+  <SimilarAnime anime={similarAnime} />
 </BaseLayout>
