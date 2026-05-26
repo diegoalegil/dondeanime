@@ -104,7 +104,7 @@ public class Anime {
     @Column(name = "season_year")
     private Integer seasonYear;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "anime_tag", joinColumns = @JoinColumn(name = "anime_id"))
     private Set<AnimeTag> tags = new HashSet<>();
 

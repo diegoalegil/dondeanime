@@ -50,7 +50,7 @@ public class RecommendationService {
     }
 
     private List<Anime> findSimilarUncached(RecommendationKey key) {
-        Optional<Anime> source = animeRepository.findById(key.animeId());
+        Optional<Anime> source = animeRepository.findByIdWithTags(key.animeId());
         if (source.isEmpty()) {
             return List.of();
         }
