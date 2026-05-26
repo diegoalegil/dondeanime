@@ -208,6 +208,39 @@ const title = anime.titleEnglish || anime.titleRomaji;
           </button>
         </div>
       </article>
+
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-field-panel="beginner_recommendation">
+        <div class="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+          <h2 class="text-lg font-semibold text-fg-primary">Recomendacion para principiantes</h2>
+          <p class="text-sm text-fg-muted">Visible en las paginas /empezar/</p>
+        </div>
+        <label class="block">
+          <span class="mb-2 block text-sm font-medium text-fg-secondary">Texto editorial</span>
+          <textarea
+            data-input
+            rows="5"
+            class="w-full resize-y rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm leading-relaxed text-fg-primary outline-none focus:border-accent-violet"
+          ></textarea>
+        </label>
+        <input type="hidden" data-original value="" />
+        <p class="mt-2 text-sm text-fg-muted">Valor actual: <span data-effective></span></p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            class="rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
+            data-save
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            class="rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-secondary transition-colors hover:border-danger hover:text-danger"
+            data-reset
+          >
+            Quitar texto
+          </button>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -225,6 +258,7 @@ const title = anime.titleEnglish || anime.titleRomaji;
       title_english: 'titleEnglish',
       title_romaji: 'titleRomaji',
       description: 'description',
+      beginner_recommendation: null,
     };
 
     const setGlobalStatus = (message, tone = 'muted') => {
@@ -287,8 +321,8 @@ const title = anime.titleEnglish || anime.titleRomaji;
         const fieldName = panel.getAttribute('data-field-panel');
         const apiField = apiFieldByOverride[fieldName];
         const override = overrideByField.get(fieldName);
-        const originalValue = override?.originalValue ?? detail.anime[apiField];
-        const effectiveValue = override?.fieldValue ?? detail.anime[apiField];
+        const originalValue = override?.originalValue ?? (apiField ? detail.anime[apiField] : '');
+        const effectiveValue = override?.fieldValue ?? (apiField ? detail.anime[apiField] : '');
         const displayEffective = fieldName === 'description' ? stripHtml(effectiveValue) : asText(effectiveValue);
 
         panel.querySelector('[data-original]').value = fieldName === 'description'

@@ -243,6 +243,35 @@ test('episode count pages render and are indexed', async ({ page, request }) => 
   }
 });
 
+test('beginner genre pages render curated recommendations and are indexed', async ({ page, request }) => {
+  await page.goto('/empezar/action');
+
+  await expect(page.getByRole('heading', { name: /Anime para principiantes en Action/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/empezar/action',
+  );
+
+  const resultCount = await page.locator('[data-beginner-result]').count();
+  expect(resultCount).toBeGreaterThan(0);
+  expect(resultCount).toBeLessThanOrEqual(10);
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Anime para principiantes en Action',
+    numberOfItems: resultCount,
+    itemListElement: expect.any(Array),
+  }));
+  expect(itemList.itemListElement).toHaveLength(resultCount);
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  expect(allSitemapText).toContain('https://dondeanime.com/empezar/action');
+});
+
 test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
   await page.goto('/mejores/2024');
 

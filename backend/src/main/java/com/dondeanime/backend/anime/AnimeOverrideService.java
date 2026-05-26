@@ -17,7 +17,8 @@ public class AnimeOverrideService {
     private static final Set<String> OVERRIDEABLE_FIELDS = Set.of(
             "description",
             "title_english",
-            "title_romaji");
+            "title_romaji",
+            "beginner_recommendation");
 
     private final AnimeOverrideRepository repository;
 
@@ -74,6 +75,7 @@ public class AnimeOverrideService {
             case "description" -> anime.getDescription();
             case "title_english" -> anime.getTitleEnglish();
             case "title_romaji" -> anime.getTitleRomaji();
+            case "beginner_recommendation" -> null;
             default -> throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Campo no editable: " + rawFieldName);
@@ -88,6 +90,7 @@ public class AnimeOverrideService {
         String fieldName = rawFieldName.trim()
                 .replace("titleEnglish", "title_english")
                 .replace("titleRomaji", "title_romaji")
+                .replace("beginnerRecommendation", "beginner_recommendation")
                 .toLowerCase(Locale.ROOT);
 
         if (!OVERRIDEABLE_FIELDS.contains(fieldName)) {

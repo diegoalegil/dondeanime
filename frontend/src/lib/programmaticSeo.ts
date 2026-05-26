@@ -3,3 +3,4 @@ export const EPISODE_LIMITS = [12, 24, 50, 100, 200] as const;
 
 export const durationPath = (minutes: number): string => `/anime/duracion/${minutes}`;
 export const episodeLimitPath = (maxEpisodes: number): string => `/anime/episodios/menos-de-${maxEpisodes}`;
+export const beginnerGenrePath = (genreSlug: string): string => `/empezar/${genreSlug}`;
