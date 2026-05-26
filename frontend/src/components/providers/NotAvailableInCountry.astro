@@ -1,5 +1,6 @@
 ---
 import { COUNTRIES, type CountrySlug } from '@/lib/countries';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 interface Props {
   animeSlug: string;
@@ -32,7 +33,7 @@ const country = COUNTRIES[countrySlug];
                 href={`/anime/${animeSlug}/${slug}`}
                 class="flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-3 py-2 text-sm transition-colors hover:border-accent-violet hover:text-fg-primary"
               >
-                <span class={`fi fi-${c.flagCode} rounded`} aria-hidden="true"></span>
+                <CountryFlag country={c} />
                 {c.name}
               </a>
             );

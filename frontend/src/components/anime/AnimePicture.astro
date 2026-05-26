@@ -1,0 +1,70 @@
+---
+import {
+  DEFAULT_ANIME_IMAGE_QUALITY,
+  DEFAULT_ANIME_IMAGE_SIZES,
+  DEFAULT_ANIME_IMAGE_WIDTHS,
+  buildAnimeImageSrcset,
+  buildAnimeImageUrl,
+  canOptimizeAnimeImage,
+  normalizeImageWidths,
+} from '@/lib/images';
+
+interface Props {
+  src: string;
+  alt?: string;
+  class?: string;
+  imgClass?: string;
+  widths?: number[];
+  sizes?: string;
+  width?: number;
+  height?: number;
+  loading?: 'eager' | 'lazy';
+  decoding?: 'async' | 'auto' | 'sync';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  quality?: number;
+  ariaHidden?: boolean;
+}
+
+const {
+  src,
+  alt = '',
+  class: className = 'block',
+  imgClass = '',
+  widths = DEFAULT_ANIME_IMAGE_WIDTHS,
+  sizes = DEFAULT_ANIME_IMAGE_SIZES,
+  width,
+  height,
+  loading = 'lazy',
+  decoding = 'async',
+  fetchpriority,
+  quality = DEFAULT_ANIME_IMAGE_QUALITY,
+  ariaHidden = false,
+} = Astro.props;
+
+const canUseVercelOptimizer = canOptimizeAnimeImage(src);
+const normalizedWidths = normalizeImageWidths(widths);
+const fallbackWidth = normalizedWidths[Math.min(1, normalizedWidths.length - 1)] ?? width ?? 320;
+const imageAlt = ariaHidden ? '' : alt;
+const optimizedSrc = buildAnimeImageUrl(src, fallbackWidth, quality);
+const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
+---
+<picture class={className} aria-hidden={ariaHidden ? 'true' : undefined}>
+  {canUseVercelOptimizer && (
+    <>
+      <source type="image/avif" srcset={optimizedSrcset} sizes={sizes} />
+      <source type="image/webp" srcset={optimizedSrcset} sizes={sizes} />
+    </>
+  )}
+  <img
+    src={optimizedSrc}
+    srcset={optimizedSrcset}
+    sizes={canUseVercelOptimizer ? sizes : undefined}
+    alt={imageAlt}
+    width={width}
+    height={height}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+    class={imgClass}
+  />
+</picture>

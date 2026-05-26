@@ -73,7 +73,11 @@ public class SecurityConfig {
                 HttpMethod.POST.name(),
                 HttpMethod.DELETE.name(),
                 HttpMethod.OPTIONS.name()));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                RequestMdcFilter.REQUEST_ID_HEADER));
+        configuration.setExposedHeaders(List.of("WWW-Authenticate", RequestMdcFilter.REQUEST_ID_HEADER));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

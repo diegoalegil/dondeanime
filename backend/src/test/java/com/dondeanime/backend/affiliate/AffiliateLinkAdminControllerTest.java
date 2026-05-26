@@ -23,12 +23,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.admin.auth.AdminJwtService;
+import com.dondeanime.backend.anime.RecommendationClickDto;
+import com.dondeanime.backend.anime.RecommendationTrackRequest;
+import com.dondeanime.backend.anime.RecommendationTrackingController;
+import com.dondeanime.backend.anime.RecommendationTrackingService;
 import com.dondeanime.backend.config.SecurityConfig;
 
 @WebMvcTest({
         AffiliateLinkAdminController.class,
         AffiliateTrackingController.class,
-        AffiliateDashboardController.class
+        AffiliateDashboardController.class,
+        RecommendationTrackingController.class
 })
 @Import({
         SecurityConfig.class,
@@ -50,6 +55,9 @@ class AffiliateLinkAdminControllerTest {
 
     @Autowired
     private AdminJwtService adminJwtService;
+
+    @MockitoBean
+    private RecommendationTrackingService recommendationTrackingService;
 
     @Test
     void adminAffiliateLinksRequireAuth() throws Exception {
@@ -138,6 +146,18 @@ class AffiliateLinkAdminControllerTest {
     }
 
     @Test
+    void recommendationTrackingIsPublic() throws Exception {
+        mvc.perform(post("/api/track/recommendation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"sourceAnimeSlug":"attack-on-titan","targetAnimeSlug":"vinland-saga"}
+                                """))
+                .andExpect(status().isNoContent());
+
+        verify(recommendationTrackingService).trackClick(any(RecommendationTrackRequest.class));
+    }
+
+    @Test
     void dashboardRequiresAuth() throws Exception {
         mvc.perform(get("/api/admin/dashboard"))
                 .andExpect(status().isUnauthorized());
@@ -154,7 +174,8 @@ class AffiliateLinkAdminControllerTest {
                 List.of(new AffiliateDailyClicksDto(LocalDate.of(2026, 5, 25), 2L)),
                 List.of(new AffiliatePlatformConversionDto("crunchyroll", 4L, 100L, 0.04)),
                 List.of(new AffiliateCountryClicksDto("ES", 5L)),
-                List.of(new AvailabilityAnimeChangesDto("frieren", 2L))));
+                List.of(new AvailabilityAnimeChangesDto("frieren", 2L)),
+                List.of(new RecommendationClickDto("frieren", "violet-evergarden", 3L))));
 
         mvc.perform(get("/api/admin/dashboard")
                         .header("Authorization", bearerToken()))
@@ -162,7 +183,8 @@ class AffiliateLinkAdminControllerTest {
                 .andExpect(jsonPath("$.clicksByDay[0].clicks").value(2))
                 .andExpect(jsonPath("$.platformConversions[0].conversionRate").value(0.04))
                 .andExpect(jsonPath("$.topClickCountries[0].countryCode").value("ES"))
-                .andExpect(jsonPath("$.topAvailabilityChanges[0].changes").value(2));
+                .andExpect(jsonPath("$.topAvailabilityChanges[0].changes").value(2))
+                .andExpect(jsonPath("$.topRecommendationClicks[0].targetAnimeSlug").value("violet-evergarden"));
     }
 
     private static AffiliateLinkDto dto() {
