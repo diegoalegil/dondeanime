@@ -16,6 +16,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -27,7 +28,13 @@ import jakarta.persistence.UniqueConstraint;
 import com.dondeanime.backend.studio.Studio;
 
 @Entity
-@Table(name = "anime")
+@Table(
+        name = "anime",
+        indexes = {
+                @Index(name = "idx_anime_season_year", columnList = "season, season_year"),
+                @Index(name = "idx_anime_popularity_desc", columnList = "popularity DESC")
+        }
+)
 public class Anime {
 
     @Id
@@ -95,6 +102,9 @@ public class Anime {
 
     private Integer popularity;
 
+    @Column(name = "primary_studio", length = 120)
+    private String primaryStudio;
+
     @Column(name = "synced_at")
     private Instant syncedAt;
 
@@ -104,7 +114,11 @@ public class Anime {
      * EAGER para que cuando devolvamos JSON estén ya cargados.
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "anime_genre", joinColumns = @JoinColumn(name = "anime_id"))
+    @CollectionTable(
+            name = "anime_genre",
+            joinColumns = @JoinColumn(name = "anime_id"),
+            indexes = @Index(name = "idx_anime_genre_genre", columnList = "genre")
+    )
     @Column(name = "genre", length = 50, nullable = false)
     private Set<String> genres = new HashSet<>();
 
@@ -128,6 +142,10 @@ public class Anime {
 
     @OneToMany(mappedBy = "anime", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AnimeCharacterRole> characterRoles = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "anime_tag", joinColumns = @JoinColumn(name = "anime_id"))
+    private Set<AnimeTag> tags = new HashSet<>();
 
     public Anime() {
     }
@@ -308,6 +326,14 @@ public class Anime {
         this.popularity = popularity;
     }
 
+    public String getPrimaryStudio() {
+        return primaryStudio;
+    }
+
+    public void setPrimaryStudio(String primaryStudio) {
+        this.primaryStudio = primaryStudio;
+    }
+
     public Instant getSyncedAt() {
         return syncedAt;
     }
@@ -362,6 +388,14 @@ public class Anime {
             role.setAnime(this);
             this.characterRoles.add(role);
         });
+    }
+
+    public Set<AnimeTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<AnimeTag> tags) {
+        this.tags = tags;
     }
 
 }

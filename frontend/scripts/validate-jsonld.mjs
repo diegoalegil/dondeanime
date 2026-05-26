@@ -145,6 +145,12 @@ function validateNode(node, file) {
     if (type === 'Organization') {
       requireString(node, 'name', file, type);
       requireString(node, 'url', file, type);
+      requireArray(node, 'availableLanguage', file, type);
+      for (const locale of ['es', 'en']) {
+        if (!node.availableLanguage?.includes(locale)) {
+          errors.push(`${rel(file)}: Organization.availableLanguage debe incluir ${locale}`);
+        }
+      }
       if (!isRecord(node.logo) || typeof node.logo.url !== 'string') {
         errors.push(`${rel(file)}: Organization.logo.url debe existir`);
       }

@@ -70,4 +70,39 @@ public class PlausibleStatsClient {
             return List.of();
         }
     }
+
+    public Long animeDetailPageviews30Days() {
+        if (!enabled || apiKey == null || apiKey.isBlank()) {
+            return 0L;
+        }
+
+        Map<String, Object> request = Map.of(
+                "site_id", siteId,
+                "metrics", List.of("pageviews"),
+                "date_range", "30d",
+                "filters", List.of(List.of("contains", "event:page", List.of("/anime/"))),
+                "pagination", Map.of("limit", 1));
+
+        try {
+            PlausibleQueryResponse response = restClient.post()
+                    .uri("/api/v2/query")
+                    .header("Authorization", "Bearer " + apiKey)
+                    .body(request)
+                    .retrieve()
+                    .body(PlausibleQueryResponse.class);
+
+            if (response == null || response.results() == null || response.results().isEmpty()) {
+                return 0L;
+            }
+
+            List<Number> metrics = response.results().getFirst().metrics();
+            if (metrics == null || metrics.isEmpty()) {
+                return 0L;
+            }
+            return metrics.getFirst().longValue();
+        } catch (RestClientException e) {
+            log.warn("No se pudo consultar Plausible Stats API: {}", e.getMessage());
+            return 0L;
+        }
+    }
 }

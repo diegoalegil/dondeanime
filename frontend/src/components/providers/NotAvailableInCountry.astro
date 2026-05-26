@@ -1,5 +1,8 @@
 ---
 import { COUNTRIES, type CountrySlug } from '@/lib/countries';
+import { t } from '@/i18n';
+import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 interface Props {
   animeSlug: string;
@@ -10,30 +13,31 @@ interface Props {
 
 const { animeSlug, animeTitle, countrySlug, availableInCountries } = Astro.props;
 const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
 ---
 <section class="mx-auto max-w-6xl px-4 py-8">
-  <h2 class="mb-6 text-lg font-semibold text-fg-primary">Dónde verlo en {country.name}</h2>
+  <h2 class="mb-6 text-lg font-semibold text-fg-primary">{t('notAvailable.title', { country: countryName })}</h2>
 
   <div class="rounded-xl border border-warning/30 bg-warning/5 p-6">
     <p class="text-base text-fg-primary">
-      <strong>{animeTitle}</strong> no está disponible en plataformas de {country.name} actualmente.
+      {t('notAvailable.message', { title: animeTitle, country: countryName })}
     </p>
 
     {availableInCountries.length > 0 ? (
       <div class="mt-4">
         <p class="text-sm text-fg-secondary">
-          Sí está disponible en estos países hispanoamericanos:
+          {t('notAvailable.availableIn')}
         </p>
         <div class="mt-3 flex flex-wrap gap-2">
           {availableInCountries.map((slug) => {
             const c = COUNTRIES[slug];
             return (
               <a
-                href={`/anime/${animeSlug}/${slug}`}
+                href={localizedPath(`/anime/${animeSlug}/${slug}`)}
                 class="flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-3 py-2 text-sm transition-colors hover:border-accent-violet hover:text-fg-primary"
               >
-                <span class={`fi fi-${c.flagCode} rounded`} aria-hidden="true"></span>
-                {c.name}
+                <CountryFlag country={c} />
+                {localizedCountryName(slug)}
               </a>
             );
           })}
@@ -41,7 +45,7 @@ const country = COUNTRIES[countrySlug];
       </div>
     ) : (
       <p class="mt-3 text-sm text-fg-secondary">
-        Tampoco hemos detectado plataformas en otros países hispanoamericanos. Volveremos a sincronizar pronto.
+        {t('notAvailable.none')}
       </p>
     )}
   </div>

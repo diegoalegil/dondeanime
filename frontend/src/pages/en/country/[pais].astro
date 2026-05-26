@@ -1,0 +1,104 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getProvidersByCountry } from '@/lib/api';
+import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
+import { isHiddenVariant, getPlatform } from '@/lib/platforms';
+import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+import { canonicalCountrySlug, countryParamForLocale, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+
+setLocale('en');
+
+export async function getStaticPaths() {
+  return COUNTRY_SLUGS.map((s) => ({ params: { pais: countryParamForLocale(s, 'en') } }));
+}
+
+const { pais } = Astro.params;
+const countrySlug = canonicalCountrySlug(pais);
+if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
+const country = COUNTRIES[countrySlug];
+const countryName = localizedCountryName(countrySlug);
+
+const rawProviders = await getProvidersByCountry(country.iso);
+const providers = rawProviders.filter((p) => !isHiddenVariant(p.slug));
+
+const seoTitle = t('countryPage.seo.title', { country: countryName });
+const seoDescription = t('countryPage.seo.description', {
+  country: countryName,
+  platforms: providers.slice(0, 5).map((p) => p.providerName).join(', '),
+});
+
+const pageUrl = absoluteUrl(`/pais/${countrySlug}`);
+const itemListSchema = buildItemListSchema(
+  providers.map((p) => ({
+    name: p.providerName,
+    url: absoluteUrl(`/plataforma/${p.slug}/${countrySlug}`),
+  })),
+  pageUrl,
+  t('countryPage.schema.name', { country: countryName }),
+);
+---
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  locale={country.hreflang.replace('-', '_')}
+>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: countryName, url: `/pais/${countrySlug}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <div class="flex items-center gap-4">
+      <span class={`fi fi-${country.flagCode} rounded text-3xl`} aria-hidden="true"></span>
+      <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">
+        {t('countryPage.heading', { country: countryName })}
+      </h1>
+    </div>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      {t('countryPage.providerCount', {
+        count: providers.length,
+        plural: providers.length === 1 ? '' : 's',
+        country: countryName,
+      })}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <h2 class="mb-6 text-2xl font-semibold">{t('countryPage.platforms')}</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {providers.map((p) => {
+        const platform = getPlatform(p.slug);
+        const displayName = platform?.name ?? p.providerName;
+        return (
+          <a
+            href={localizedPath(`/plataforma/${p.slug}/${countrySlug}`)}
+            class="flex items-center justify-between rounded-xl border border-surface-2 bg-surface-1 p-5 transition-colors hover:border-accent-violet/40"
+          >
+            <div class="flex items-center gap-4">
+              <img
+                src={p.logoUrl}
+                alt={displayName}
+                loading="lazy"
+                class="h-14 w-14 rounded-lg object-cover ring-1 ring-surface-2"
+              />
+              <div>
+                <h3 class="text-base font-semibold text-fg-primary">{displayName}</h3>
+                <p class="mt-1 text-sm text-fg-muted">
+                  {t('countryPage.animeCount', { count: p.animeCount })}
+                </p>
+              </div>
+            </div>
+            <span class="text-fg-muted">→</span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>

@@ -10,6 +10,16 @@ const expectedPartitionSitemaps = [
   '/sitemap-combinatoria.xml',
 ];
 
+const expectedLanguageSitemaps = [
+  '/sitemap-es.xml',
+  '/sitemap-en.xml',
+];
+
+const expectedSitemapIndexPaths = [
+  ...expectedLanguageSitemaps,
+  ...expectedPartitionSitemaps,
+];
+
 const seasonOrder: Record<string, number> = { winter: 0, spring: 1, summer: 2, fall: 3 };
 const seasonLabelPattern: Record<string, string> = {
   winter: 'Invierno',
@@ -49,7 +59,7 @@ const sitemapPathsFromIndex = async (request: APIRequestContext, path = '/sitema
   const sitemapIndexText = await sitemapIndex.text();
 
   expect(sitemapIndexText).toContain('<sitemapindex');
-  expect(expectedPartitionSitemaps.every((sitemapPath) =>
+  expect(expectedSitemapIndexPaths.every((sitemapPath) =>
     sitemapIndexText.includes(`https://dondeanime.com${sitemapPath}`),
   )).toBe(true);
 
@@ -89,7 +99,7 @@ test('home renders the static catalog and links to an anime detail page', async 
 
   await animeCards.first().click();
 
-  expect(new URL(page.url()).pathname).toBe(firstHref);
+  await expect(page).toHaveURL(new RegExp(`${escapeRegExp(firstHref!)}$`));
   await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
   await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -238,14 +248,33 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
 
   const robots = await request.get('/robots.txt');
   expect(robots.ok()).toBe(true);
-  expect(await robots.text()).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
+  const robotsText = await robots.text();
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-es.xml');
+  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-en.xml');
 
   const sitemapPaths = await sitemapPathsFromIndex(request);
-  expect(sitemapPaths).toEqual(expectedPartitionSitemaps);
+  expect(sitemapPaths).toEqual(expectedSitemapIndexPaths);
 
   const sitemapAlias = await request.get('/sitemap.xml');
   expect(sitemapAlias.ok()).toBe(true);
   expect(await sitemapAlias.text()).toContain('<sitemapindex');
+
+  const spanishSitemap = await request.get('/sitemap-es.xml');
+  const spanishSitemapText = await spanishSitemap.text();
+  expect(spanishSitemap.ok()).toBe(true);
+  expect(spanishSitemapText).toContain('https://dondeanime.com/');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/blog/placeholder-guia-editorial');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/privacidad');
+
+  const englishSitemap = await request.get('/sitemap-en.xml');
+  const englishSitemapText = await englishSitemap.text();
+  expect(englishSitemap.ok()).toBe(true);
+  expect(englishSitemapText).toContain('https://dondeanime.com/en');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/country/spain');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/upcoming/next-week');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/blog/placeholder-guia-editorial');
+  expect(englishSitemapText).not.toContain('https://dondeanime.com/en/pais/espana');
 
   const animeSitemap = await request.get('/sitemap-anime.xml');
   const animeUrls = [...(await animeSitemap.text()).matchAll(/<url>/g)];
@@ -262,6 +291,83 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
 
   const seasonSitemap = await request.get('/sitemap-temporadas.xml');
   expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
+});
+
+test('PWA manifest links icons, screenshots and shortcuts', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.json');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0A0F');
+
+  const manifestResponse = await request.get('/manifest.json');
+  expect(manifestResponse.ok()).toBe(true);
+  expect(manifestResponse.headers()['content-type']).toContain('application/json');
+
+  const manifest = await manifestResponse.json();
+  expect(manifest).toEqual(expect.objectContaining({
+    name: 'DondeAnime',
+    short_name: 'DondeAnime',
+    display: 'standalone',
+    start_url: '/',
+    scope: '/',
+  }));
+  expect(manifest.icons.map((icon: { sizes: string }) => icon.sizes)).toEqual(
+    expect.arrayContaining(['16x16', '32x32', '192x192', '512x512', '1024x1024']),
+  );
+  expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(true);
+  expect(manifest.screenshots).toHaveLength(2);
+  expect(manifest.shortcuts.map((shortcut: { name: string }) => shortcut.name)).toEqual([
+    'Buscar',
+    'Mi pais',
+    'Alertas',
+  ]);
+
+  for (const asset of [...manifest.icons, ...manifest.screenshots]) {
+    const assetResponse = await request.get(asset.src);
+    expect(assetResponse.ok()).toBe(true);
+    expect(assetResponse.headers()['content-type']).toContain('image/svg+xml');
+  }
+});
+
+test('offline page and service worker are generated', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  expect(await home.text()).toContain("navigator.serviceWorker.register('/sw.js')");
+
+  const offline = await request.get('/offline');
+  expect(offline.ok()).toBe(true);
+  expect(await offline.text()).toContain('No hay conexion disponible');
+
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
+  expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
+  expect(serviceWorkerText).toContain("request.mode === 'navigate'");
+});
+
+test('alert background sync is generated in the service worker', async ({ request }) => {
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+
+  expect(serviceWorkerText).toContain("const ALERT_SYNC_TAG = 'dondeanime-alerts-sync'");
+  expect(serviceWorkerText).toContain("const ALERT_DB_NAME = 'dondeanime-alerts'");
+  expect(serviceWorkerText).toContain("self.addEventListener('sync'");
+  expect(serviceWorkerText).toContain("fetch(alert.endpoint");
+  expect(serviceWorkerText).toContain("self.registration.showNotification('Alerta enviada'");
+});
+
+test('install promotion banner is generated with visit gate and tracking', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  const homeText = await home.text();
+
+  expect(homeText).toContain('data-install-promotion');
+  expect(homeText).toContain('Instala DondeAnime como app');
+  expect(homeText).toContain('dondeanime-install-visits');
+  expect(homeText).toContain('dondeanime-install-dismissed');
+  expect(homeText).toContain('install_prompt_shown');
+  expect(homeText).toContain('install_completed');
 });
 
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
@@ -316,11 +422,14 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   const homeTypes = homeJson.map((schema) => schema['@type']);
   expect(homeTypes).toContain('FAQPage');
   expect(homeTypes).toContain('Organization');
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'es_ES');
+  await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute('content', 'en_US');
 
   const faq = homeJson.find((schema) => schema['@type'] === 'FAQPage');
   expect(faq.mainEntity).toHaveLength(5);
 
   const organization = homeJson.find((schema) => schema['@type'] === 'Organization');
+  expect(organization.availableLanguage).toEqual(['es', 'en']);
   expect(organization.logo.url).toBe('https://dondeanime.com/og-default.png');
   expect(organization.sameAs.length).toBeGreaterThan(0);
 
@@ -336,3 +445,24 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(Number(review.reviewRating.ratingValue)).toBeGreaterThan(0);
   expect(review.author.name).toBe('AniList');
 });
+
+test('search index is loaded lazily when the user searches', async ({ page }) => {
+  const searchIndexRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/search-index.json') {
+      searchIndexRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/');
+  expect(searchIndexRequests).toHaveLength(0);
+
+  await page.getByPlaceholder('Buscar anime...').fill('naruto');
+
+  await expect(page.locator('[data-search-results] a[href^="/anime/"]').first()).toBeVisible();
+  expect(searchIndexRequests).toHaveLength(1);
+});
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

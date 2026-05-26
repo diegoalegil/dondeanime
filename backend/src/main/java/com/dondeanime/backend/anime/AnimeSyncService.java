@@ -23,6 +23,7 @@ import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
 import com.dondeanime.backend.anime.anilist.AniListStudio;
 import com.dondeanime.backend.anime.anilist.AniListStudioConnection;
+import com.dondeanime.backend.anime.anilist.AniListTag;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
 import com.dondeanime.backend.character.AnimeCharacter;
 import com.dondeanime.backend.character.AnimeCharacterRepository;
@@ -145,6 +146,18 @@ public class AnimeSyncService {
         }
 
         anime.setStudios(mapStudios(media.studios()));
+
+        if (media.tags() != null) {
+            HashSet<AnimeTag> tags = new HashSet<>();
+            for (AniListTag tag : media.tags()) {
+                if (tag.name() != null && !tag.name().isBlank()) {
+                    tags.add(new AnimeTag(tag.name(), tag.rank()));
+                }
+            }
+            anime.setTags(tags);
+        } else {
+            anime.setTags(new HashSet<>());
+        }
 
         anime.setSyncedAt(Instant.now());
         anime.replaceCharacterRoles(mapCharacters(media.characters()));
