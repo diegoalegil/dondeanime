@@ -37,6 +37,7 @@ jobs:
       PUBLIC_DATA_API_URL: https://api.dondeanime.com
       PUBLIC_SITE_URL: https://dondeanime.com
       RESEND_ENABLED: 'false'
+      SPRING_FLYWAY_ENABLED: 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
