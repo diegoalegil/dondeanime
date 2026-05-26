@@ -14,6 +14,7 @@ import com.dondeanime.backend.anime.anilist.AniListClient;
 import com.dondeanime.backend.anime.anilist.AniListCoverImage;
 import com.dondeanime.backend.anime.anilist.AniListFuzzyDate;
 import com.dondeanime.backend.anime.anilist.AniListMedia;
+import com.dondeanime.backend.anime.anilist.AniListTag;
 import com.dondeanime.backend.anime.anilist.AniListTitle;
 
 /**
@@ -114,6 +115,18 @@ public class AnimeSyncService {
             anime.setGenres(new HashSet<>(media.genres()));
         } else {
             anime.setGenres(new HashSet<>());
+        }
+
+        if (media.tags() != null) {
+            HashSet<AnimeTag> tags = new HashSet<>();
+            for (AniListTag tag : media.tags()) {
+                if (tag.name() != null && !tag.name().isBlank()) {
+                    tags.add(new AnimeTag(tag.name(), tag.rank()));
+                }
+            }
+            anime.setTags(tags);
+        } else {
+            anime.setTags(new HashSet<>());
         }
 
         anime.setSyncedAt(Instant.now());
