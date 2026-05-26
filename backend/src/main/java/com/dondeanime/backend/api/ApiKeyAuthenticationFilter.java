@@ -66,7 +66,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            usage = apiKeyService.recordUsage(rawKey);
+            usage = apiKeyService.recordUsage(rawKey, request.getRequestURI());
         } catch (ApiKeyNotFoundException e) {
             writeError(response, HttpStatus.UNAUTHORIZED, "invalid_api_key");
             return;

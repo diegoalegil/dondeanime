@@ -9,6 +9,8 @@ import java.util.Base64;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +25,22 @@ public class ApiKeyService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final ApiKeyRepository repository;
+    private final ApiKeyEndpointUsageRepository endpointUsageRepository;
     private final Clock clock;
 
     @Autowired
-    public ApiKeyService(ApiKeyRepository repository) {
-        this(repository, Clock.systemUTC());
+    public ApiKeyService(
+            ApiKeyRepository repository,
+            ApiKeyEndpointUsageRepository endpointUsageRepository) {
+        this(repository, endpointUsageRepository, Clock.systemUTC());
     }
 
-    ApiKeyService(ApiKeyRepository repository, Clock clock) {
+    ApiKeyService(
+            ApiKeyRepository repository,
+            ApiKeyEndpointUsageRepository endpointUsageRepository,
+            Clock clock) {
         this.repository = repository;
+        this.endpointUsageRepository = endpointUsageRepository;
         this.clock = clock;
     }
 
@@ -58,17 +67,34 @@ public class ApiKeyService {
 
     @Transactional
     public ApiKeyUsage recordUsage(String rawKey) {
+        return recordUsage(rawKey, null);
+    }
+
+    @Transactional
+    public ApiKeyUsage recordUsage(String rawKey, String endpoint) {
         ApiKey apiKey = repository.findByKey(normalizeKey(rawKey))
                 .orElseThrow(ApiKeyNotFoundException::new);
         Instant now = Instant.now(clock);
-        resetMonthlyUsageIfNeeded(apiKey, now);
+        boolean reset = resetMonthlyUsageIfNeeded(apiKey, now);
         if (apiKey.getMonthlyUsage() >= apiKey.getMonthlyQuota()) {
             throw new ApiQuotaExceededException();
         }
         apiKey.setMonthlyUsage(apiKey.getMonthlyUsage() + 1);
         apiKey.setLastUsedAt(now);
+        recordEndpointUsage(apiKey, endpoint, now, reset);
         long remaining = Math.max(0, apiKey.getMonthlyQuota() - apiKey.getMonthlyUsage());
         return new ApiKeyUsage(apiKey.getTier(), apiKey.getMonthlyQuota(), apiKey.getMonthlyUsage(), remaining);
+    }
+
+    @Transactional(readOnly = true)
+    public ApiKeyStatsDto stats() {
+        var keys = repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+                .map(ApiKeyStatsRowDto::from)
+                .toList();
+        var topEndpoints = endpointUsageRepository.findTopEndpoints(PageRequest.of(0, 10)).stream()
+                .map(ApiEndpointUsageDto::from)
+                .toList();
+        return new ApiKeyStatsDto(keys, topEndpoints);
     }
 
     static String normalizeTier(String tier) {
@@ -102,14 +128,49 @@ public class ApiKeyService {
         return key;
     }
 
-    private void resetMonthlyUsageIfNeeded(ApiKey apiKey, Instant now) {
-        if (apiKey.getLastUsedAt() == null) {
+    private void recordEndpointUsage(ApiKey apiKey, String endpoint, Instant now, boolean reset) {
+        String normalizedEndpoint = normalizeEndpoint(endpoint);
+        if (normalizedEndpoint.isBlank()) {
             return;
+        }
+        if (reset && apiKey.getId() != null) {
+            endpointUsageRepository.resetMonthlyUsageByApiKeyId(apiKey.getId());
+        }
+        ApiKeyEndpointUsage usage = endpointUsageRepository
+                .findByApiKey_IdAndEndpoint(apiKey.getId(), normalizedEndpoint)
+                .orElseGet(() -> {
+                    ApiKeyEndpointUsage newUsage = new ApiKeyEndpointUsage();
+                    newUsage.setApiKey(apiKey);
+                    newUsage.setEndpoint(normalizedEndpoint);
+                    newUsage.setMonthlyUsage(0);
+                    return newUsage;
+                });
+        usage.setMonthlyUsage(usage.getMonthlyUsage() + 1);
+        usage.setLastUsedAt(now);
+        endpointUsageRepository.save(usage);
+    }
+
+    private static String normalizeEndpoint(String endpoint) {
+        if (endpoint == null) {
+            return "";
+        }
+        String normalized = endpoint.trim();
+        if (normalized.length() > 255) {
+            return normalized.substring(0, 255);
+        }
+        return normalized;
+    }
+
+    private boolean resetMonthlyUsageIfNeeded(ApiKey apiKey, Instant now) {
+        if (apiKey.getLastUsedAt() == null) {
+            return false;
         }
         YearMonth currentMonth = YearMonth.from(now.atZone(ZoneOffset.UTC));
         YearMonth lastUsedMonth = YearMonth.from(apiKey.getLastUsedAt().atZone(ZoneOffset.UTC));
         if (!currentMonth.equals(lastUsedMonth)) {
             apiKey.setMonthlyUsage(0);
+            return true;
         }
+        return false;
     }
 }

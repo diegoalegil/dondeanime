@@ -45,7 +45,7 @@ class ApiKeyAuthenticationFilterTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         when(apiKeyService.findUsage("da_free_test"))
                 .thenReturn(new ApiKeyUsage("FREE", 1_000, 0, 1_000));
-        when(apiKeyService.recordUsage("da_free_test"))
+        when(apiKeyService.recordUsage("da_free_test", "/api/v1/anime"))
                 .thenReturn(new ApiKeyUsage("FREE", 1_000, 1, 999));
 
         filter.doFilter(request, response, new MockFilterChain());
@@ -53,6 +53,6 @@ class ApiKeyAuthenticationFilterTest {
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.getHeader(ApiKeyAuthenticationFilter.RATE_LIMIT_LIMIT_HEADER)).isEqualTo("1000");
         assertThat(response.getHeader(ApiKeyAuthenticationFilter.RATE_LIMIT_REMAINING_HEADER)).isEqualTo("999");
-        verify(apiKeyService).recordUsage("da_free_test");
+        verify(apiKeyService).recordUsage("da_free_test", "/api/v1/anime");
     }
 }
