@@ -65,6 +65,16 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findByEpisodeDuration(int minutes);
 
     /**
+     * Anime con numero de episodios conocido igual o inferior al limite.
+     */
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.episodes IS NOT NULL AND a.episodes <= :maxEpisodes
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByEpisodesLessThanOrEqual(int maxEpisodes);
+
+    /**
      * Anime con match TMDb pero sin descripción localizada en español.
      */
     @Query("""

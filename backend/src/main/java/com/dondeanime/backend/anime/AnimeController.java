@@ -104,6 +104,18 @@ public class AnimeController {
         return ResponseEntity.ok(anime);
     }
 
+    @GetMapping("/episodes/less-than/{maxEpisodes}")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeCount(@PathVariable int maxEpisodes) {
+        if (maxEpisodes < 1 || maxEpisodes > 10_000) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodesLessThanOrEqual(maxEpisodes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
     /**
      * Detalle de un anime + sus watch providers agrupados por país.
      * 404 si el slug no existe.
