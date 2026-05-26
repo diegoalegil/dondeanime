@@ -264,6 +264,41 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
 });
 
+test('PWA manifest links icons, screenshots and shortcuts', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.json');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0A0F');
+
+  const manifestResponse = await request.get('/manifest.json');
+  expect(manifestResponse.ok()).toBe(true);
+  expect(manifestResponse.headers()['content-type']).toContain('application/json');
+
+  const manifest = await manifestResponse.json();
+  expect(manifest).toEqual(expect.objectContaining({
+    name: 'DondeAnime',
+    short_name: 'DondeAnime',
+    display: 'standalone',
+    start_url: '/',
+    scope: '/',
+  }));
+  expect(manifest.icons.map((icon: { sizes: string }) => icon.sizes)).toEqual(
+    expect.arrayContaining(['16x16', '32x32', '192x192', '512x512', '1024x1024']),
+  );
+  expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(true);
+  expect(manifest.screenshots).toHaveLength(2);
+  expect(manifest.shortcuts.map((shortcut: { name: string }) => shortcut.name)).toEqual([
+    'Buscar',
+    'Mi pais',
+    'Alertas',
+  ]);
+
+  for (const asset of [...manifest.icons, ...manifest.screenshots]) {
+    const assetResponse = await request.get(asset.src);
+    expect(assetResponse.ok()).toBe(true);
+    expect(assetResponse.headers()['content-type']).toContain('image/svg+xml');
+  }
+});
+
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
   await page.goto('/blog');
 
