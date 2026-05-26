@@ -84,12 +84,13 @@ class FlywayMigrationTest {
                 "idx_watch_provider_anime_country",
                 "idx_anime_season_year",
                 "idx_anime_popularity_desc",
-                "idx_anime_genre_genre");
+                "idx_anime_genre_genre",
+                "idx_anime_search_vector");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(2);
+        assertThat(successfulMigrations).isEqualTo(3);
     }
 }
