@@ -299,6 +299,23 @@ test('PWA manifest links icons, screenshots and shortcuts', async ({ page, reque
   }
 });
 
+test('offline page and service worker are generated', async ({ request }) => {
+  const home = await request.get('/');
+  expect(home.ok()).toBe(true);
+  expect(await home.text()).toContain("navigator.serviceWorker.register('/sw.js')");
+
+  const offline = await request.get('/offline');
+  expect(offline.ok()).toBe(true);
+  expect(await offline.text()).toContain('No hay conexion disponible');
+
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
+  expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
+  expect(serviceWorkerText).toContain("request.mode === 'navigate'");
+});
+
 test('blog index, article schema and RSS are generated', async ({ page, request }) => {
   await page.goto('/blog');
 

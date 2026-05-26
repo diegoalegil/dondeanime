@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Sin conexion | DondeAnime"
+  description="Pagina offline de DondeAnime cuando no hay red ni copia local disponible."
+  canonical="https://dondeanime.com/offline"
+>
+  <section class="mx-auto grid max-w-3xl gap-6 px-4 py-20">
+    <p class="text-sm font-semibold uppercase tracking-[0.18em] text-accent-pink">Offline</p>
+    <h1 class="text-4xl font-bold text-fg-primary">No hay conexion disponible</h1>
+    <p class="text-lg leading-relaxed text-fg-secondary">
+      Esta pagina aparece cuando DondeAnime no puede conectar y la URL que pediste
+      todavia no esta guardada en este dispositivo.
+    </p>
+    <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+      <p class="text-sm leading-relaxed text-fg-secondary">
+        Vuelve a una pagina que hayas visitado antes o intenta recargar cuando
+        recuperes conexion. Las paginas vistas se guardan automaticamente para
+        poder consultarlas sin red.
+      </p>
+    </div>
+    <a
+      href="/"
+      class="inline-flex w-fit items-center rounded-lg bg-accent-violet px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-pink"
+    >
+      Volver al catalogo
+    </a>
+  </section>
+</BaseLayout>
