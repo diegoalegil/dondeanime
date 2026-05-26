@@ -16,8 +16,10 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class RecommendationService {
 
     private static final int MIN_SCORE = 70;
+    private static final int MIN_TAG_RANK = 70;
     private static final int GENRE_LIMIT = 10;
     private static final int STUDIO_LIMIT = 5;
+    private static final int TAG_LIMIT = 10;
 
     private final AnimeRepository animeRepository;
     private final Cache<RecommendationKey, List<Anime>> cache;
@@ -74,12 +76,24 @@ public class RecommendationService {
                             PageRequest.of(0, STUDIO_LIMIT)));
         }
 
+        addCandidates(
+                recommendations,
+                animeRepository.findSimilarBySharedHighRankTags(
+                        anime.getId(),
+                        MIN_SCORE,
+                        MIN_TAG_RANK,
+                        PageRequest.of(0, TAG_LIMIT)));
+
         return recommendations.values().stream()
                 .limit(key.limit())
                 .toList();
     }
 
     private static void addCandidates(LinkedHashMap<Long, Anime> recommendations, List<Anime> candidates) {
+        if (candidates == null) {
+            return;
+        }
+
         for (Anime candidate : candidates) {
             if (candidate.getId() != null) {
                 recommendations.putIfAbsent(candidate.getId(), candidate);

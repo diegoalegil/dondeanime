@@ -36,10 +36,32 @@ class RecommendationServiceTest {
                 .thenReturn(List.of(genreMatch, sharedMatch));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(sharedMatch, studioMatch));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
 
         List<Anime> similar = recommendationService.findSimilar(1L, 10);
 
         assertThat(similar).containsExactly(genreMatch, sharedMatch, studioMatch);
+    }
+
+    @Test
+    void appendsSharedTagMatchesAfterGenreAndStudio() {
+        Anime source = anime(1L, "source", 85, "Madhouse", "Action");
+        Anime genreMatch = anime(2L, "genre", 91, "Bones", "Action");
+        Anime studioMatch = anime(3L, "studio", 88, "Madhouse", "Comedy");
+        Anime tagMatch = anime(4L, "tag", 84, "Trigger", "Sci-Fi");
+
+        when(animeRepository.findById(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(genreMatch));
+        when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(studioMatch));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(tagMatch));
+
+        List<Anime> similar = recommendationService.findSimilar(1L, 10);
+
+        assertThat(similar).containsExactly(genreMatch, studioMatch, tagMatch);
     }
 
     @Test
@@ -53,6 +75,8 @@ class RecommendationServiceTest {
                 .thenReturn(List.of(first, second));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(second));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
 
         List<Anime> similar = recommendationService.findSimilar(1L, 1);
 
@@ -67,6 +91,8 @@ class RecommendationServiceTest {
         when(animeRepository.findById(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(first));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
 
         recommendationService.findSimilar(1L, 10);
         recommendationService.findSimilar(1L, 10);

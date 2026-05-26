@@ -104,6 +104,10 @@ public class Anime {
     @Column(name = "season_year")
     private Integer seasonYear;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "anime_tag", joinColumns = @JoinColumn(name = "anime_id"))
+    private Set<AnimeTag> tags = new HashSet<>();
+
     public Anime() {
     }
 
@@ -313,6 +317,14 @@ public class Anime {
 
     public void setSeasonYear(Integer seasonYear) {
         this.seasonYear = seasonYear;
+    }
+
+    public Set<AnimeTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<AnimeTag> tags) {
+        this.tags = tags;
     }
 
 }
