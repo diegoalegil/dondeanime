@@ -16,10 +16,13 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.6",
+    "@astrojs/svelte": "^8.1.1",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.7",
+    "flag-icons": "^7.5.0",
+    "svelte": "^5.55.9",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {

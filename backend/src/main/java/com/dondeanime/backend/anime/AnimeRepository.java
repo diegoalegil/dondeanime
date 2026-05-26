@@ -107,6 +107,21 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findSimilarBySharedHighRankTags(Long animeId, int minScore, int minTagRank, Pageable pageable);
 
     /**
+     * Búsqueda full-text vía columna generada search_vector.
+     * La columna y su índice GIN se crean en V3__anime_search_vector.sql.
+     */
+    @Query(value = """
+            SELECT *
+            FROM anime
+            WHERE search_vector @@ plainto_tsquery('spanish', :query)
+            ORDER BY
+                ts_rank(search_vector, plainto_tsquery('spanish', :query)) DESC,
+                popularity DESC NULLS LAST,
+                title_english ASC
+            """, nativeQuery = true)
+    List<Anime> findBySearchVectorMatching(@Param("query") String query);
+
+    /**
      * Anime con match TMDb pero sin descripción localizada en español.
      */
     @Query("""
