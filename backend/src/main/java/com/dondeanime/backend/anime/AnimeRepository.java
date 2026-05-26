@@ -74,6 +74,22 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             """)
     List<Anime> findSimilarByPrimaryStudio(Long animeId, String primaryStudio, int minScore, Pageable pageable);
 
+    @Query("""
+            SELECT DISTINCT candidate FROM Anime candidate
+            JOIN candidate.tags candidateTag
+            WHERE candidate.id <> :animeId
+            AND candidate.averageScore > :minScore
+            AND candidateTag.rank > :minTagRank
+            AND candidateTag.name IN (
+                SELECT sourceTag.name FROM Anime source
+                JOIN source.tags sourceTag
+                WHERE source.id = :animeId
+                AND sourceTag.rank > :minTagRank
+            )
+            ORDER BY candidate.averageScore DESC NULLS LAST, candidate.popularity DESC NULLS LAST, candidate.titleEnglish ASC
+            """)
+    List<Anime> findSimilarBySharedHighRankTags(Long animeId, int minScore, int minTagRank, Pageable pageable);
+
     /**
      * Anime con match TMDb pero sin descripción localizada en español.
      */
