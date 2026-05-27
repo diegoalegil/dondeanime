@@ -1,5 +1,6 @@
 import {
   getAllAnime,
+  getCuratedLists,
   getGenres,
   getProviders,
   getProvidersByCountry,
@@ -35,6 +36,7 @@ export const PARTITION_SITEMAP_ENTRIES = [
   { name: t('sitemap.seasons'), path: '/sitemap-temporadas.xml' },
   { name: t('sitemap.best'), path: '/sitemap-mejores.xml' },
   { name: t('sitemap.combinations'), path: '/sitemap-combinatoria.xml' },
+  { name: 'Listas', path: '/sitemap-listas.xml' },
 ] as const;
 
 export const SITEMAP_ENTRIES = [
@@ -156,6 +158,11 @@ export const seasonSitemapPaths = async (): Promise<string[]> => {
 export const bestYearSitemapPaths = (): string[] =>
   BEST_ANIME_YEARS.map((year) => `/mejores/${year}`);
 
+export const curatedListSitemapPaths = async (): Promise<string[]> => {
+  const lists = await getCuratedLists();
+  return ['/listas', ...lists.map((list) => `/listas/${list.slug}`)];
+};
+
 export const combinationSitemapPaths = async (): Promise<string[]> => {
   const topGenreLimit = 7;
   const topProviderLimit = 5;
@@ -195,6 +202,7 @@ export const spanishSitemapPaths = async (): Promise<string[]> => {
     platformPaths,
     genrePaths,
     seasonPaths,
+    curatedListPaths,
     combinationPaths,
   ] = await Promise.all([
     staticSitemapPaths(),
@@ -203,6 +211,7 @@ export const spanishSitemapPaths = async (): Promise<string[]> => {
     platformSitemapPaths(),
     genreSitemapPaths(),
     seasonSitemapPaths(),
+    curatedListSitemapPaths(),
     combinationSitemapPaths(),
   ]);
 
@@ -214,6 +223,7 @@ export const spanishSitemapPaths = async (): Promise<string[]> => {
     ...genrePaths,
     ...seasonPaths,
     ...bestYearSitemapPaths(),
+    ...curatedListPaths,
     ...combinationPaths,
   ];
 };

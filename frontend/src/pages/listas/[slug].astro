@@ -1,0 +1,124 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import AnimePicture from '@/components/anime/AnimePicture.astro';
+import { getCuratedListBySlug, getCuratedLists } from '@/lib/api';
+import { formatType } from '@/lib/format';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+import { setLocale } from '@/i18n';
+
+setLocale('es');
+
+export async function getStaticPaths() {
+  const lists = await getCuratedLists();
+  return lists.map((list) => ({ params: { slug: list.slug } }));
+}
+
+const { slug } = Astro.params;
+const list = await getCuratedListBySlug(slug!);
+const items = list.items.toSorted((a, b) => a.position - b.position);
+const titles = items
+  .map((item) => item.anime?.titleEnglish || item.anime?.titleRomaji || item.animeSlug)
+  .slice(0, 4);
+const seoTitle = `${list.title} | Listas curadas | DondeAnime`;
+const seoDescription = list.description
+  ?? `Lista curada con ${titles.join(', ')} y más anime para descubrir qué ver.`;
+const schema = list.schema ?? buildItemListSchema(
+  items.map((item) => ({
+    name: item.anime?.titleEnglish || item.anime?.titleRomaji || item.animeSlug,
+    url: absoluteUrl(`/anime/${item.animeSlug}`),
+  })),
+  absoluteUrl(`/listas/${list.slug}`),
+  list.title,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <JsonLd slot="head" data={schema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Listas', url: '/listas' },
+      { name: list.title, url: `/listas/${list.slug}` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Lista curada</p>
+    <h1 class="mt-2 max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">
+      {list.title}
+    </h1>
+    {list.description && (
+      <p class="mt-4 max-w-2xl text-lg text-fg-secondary">{list.description}</p>
+    )}
+    <div class="mt-5 flex flex-wrap gap-2 text-sm text-fg-muted">
+      <span class="rounded-md bg-surface-1 px-3 py-2">{items.length} {items.length === 1 ? 'anime' : 'anime'}</span>
+      {list.owner && <span class="rounded-md bg-surface-1 px-3 py-2">Curador: {list.owner}</span>}
+      <span class="rounded-md bg-surface-1 px-3 py-2">{list.status}</span>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {items.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        Esta lista aún no tiene anime publicados.
+      </p>
+    ) : (
+      <ol class="grid gap-4">
+        {items.map((item) => {
+          const anime = item.anime;
+          const title = anime?.titleEnglish || anime?.titleRomaji || item.animeSlug;
+
+          return (
+            <li class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[3.5rem_6rem_1fr] sm:items-start">
+              <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet">
+                #{item.position}
+              </div>
+              {anime ? (
+                <a href={`/anime/${anime.slug}`} class="block w-24 sm:w-full">
+                  <AnimePicture
+                    src={anime.coverImage}
+                    alt={title}
+                    width={240}
+                    height={360}
+                    loading={item.position <= 3 ? 'eager' : 'lazy'}
+                    class="block aspect-[2/3] w-full overflow-hidden rounded-lg bg-surface-2 ring-1 ring-surface-2"
+                    imgClass="h-full w-full object-cover"
+                  />
+                </a>
+              ) : (
+                <div class="aspect-[2/3] w-24 rounded-lg bg-surface-2 sm:w-full" />
+              )}
+              <div class="min-w-0">
+                <a
+                  href={`/anime/${item.animeSlug}`}
+                  class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet"
+                >
+                  {title}
+                </a>
+                {anime && (
+                  <p class="mt-2 text-sm text-fg-muted">
+                    {anime.year ?? '---'} &middot; {formatType(anime.format)} &middot; {anime.averageScore ?? 'sin nota'}
+                  </p>
+                )}
+                {item.note && (
+                  <p class="mt-3 text-sm text-fg-secondary">{item.note}</p>
+                )}
+                {anime?.genres?.length ? (
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    {anime.genres.slice(0, 4).map((genre) => (
+                      <span class="rounded-md bg-surface-2 px-2 py-1 text-xs text-fg-secondary">
+                        {genre}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    )}
+  </section>
+</BaseLayout>

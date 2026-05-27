@@ -100,6 +100,28 @@ export interface ProviderSummary {
   animeCount: number;
 }
 
+export interface CuratedListSummary {
+  slug: string;
+  title: string;
+  description: string | null;
+  owner: string | null;
+  visibility: string;
+  status: string;
+  itemCount: number;
+}
+
+export interface CuratedListItem {
+  animeSlug: string;
+  position: number;
+  note: string | null;
+  anime: AnimeSummary | null;
+}
+
+export interface CuratedListDetail extends CuratedListSummary {
+  items: CuratedListItem[];
+  schema: unknown;
+}
+
 async function fetchWithRetry(path: string): Promise<Response> {
   let lastError: unknown;
 
@@ -177,6 +199,13 @@ export const getProvidersByCountry = (countryIso: string) =>
 
 export const getAnimeByProvider = (providerSlug: string, countryIso: string) =>
   fetchJson<AnimeSummary[]>(`/api/providers/${providerSlug}/${countryIso}`);
+
+export const getCuratedLists = async () => {
+  return fetchJsonAllowing404('/api/lists', () => [] as CuratedListSummary[]);
+};
+
+export const getCuratedListBySlug = (slug: string) =>
+  fetchJson<CuratedListDetail>(`/api/lists/${slug}`);
 
 export interface GenreSummary {
   name: string;
