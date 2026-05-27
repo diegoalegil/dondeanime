@@ -13,9 +13,10 @@ import org.springframework.web.client.RestClient;
  * como Bearer en cada request. Se inyecta vía @Value desde la
  * property tmdb.api-key (que a su vez lee TMDB_API_KEY del .env).
  *
- * Dos métodos públicos:
+ * Métodos públicos:
  *  - searchTv(query): busca series por título.
  *  - getWatchProviders(tmdbId): devuelve las plataformas por país.
+ *  - getTrailers(tmdbId, language): devuelve vídeos localizados.
  */
 @Component
 public class TmdbClient {
@@ -70,9 +71,34 @@ public class TmdbClient {
                 .body(TmdbProvidersResponse.class);
     }
 
+    /**
+     * Devuelve los vídeos de una serie en el idioma pedido.
+     * Si se pasa "es", TMDb recibe "es-ES".
+     */
+    public TmdbVideosResponse getTrailers(Long tmdbId, String language) {
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/tv/{id}/videos")
+                        .queryParam("language", normalizeLanguage(language))
+                        .build(tmdbId))
+                .retrieve()
+                .body(TmdbVideosResponse.class);
+    }
+
     /** Convierte un logo_path relativo de TMDb a URL absoluta. */
     public static String fullLogoUrl(String logoPath) {
         if (logoPath == null || logoPath.isBlank()) return null;
         return IMAGE_BASE + logoPath;
+    }
+
+    private static String normalizeLanguage(String language) {
+        if (language == null || language.isBlank()) {
+            return "es-ES";
+        }
+        String trimmed = language.trim();
+        if (trimmed.contains("-")) {
+            return trimmed;
+        }
+        return "es".equalsIgnoreCase(trimmed) ? "es-ES" : trimmed;
     }
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
@@ -32,6 +34,7 @@ public class AnimeController {
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
     private final AnimeDescriptionEnricher descriptionEnricher;
+    private final TrailerSyncService trailerSyncService;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -43,6 +46,7 @@ public class AnimeController {
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
             AnimeDescriptionEnricher descriptionEnricher,
+            TrailerSyncService trailerSyncService,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService,
@@ -52,6 +56,7 @@ public class AnimeController {
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
         this.descriptionEnricher = descriptionEnricher;
+        this.trailerSyncService = trailerSyncService;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -65,11 +70,6 @@ public class AnimeController {
                 .toList();
     }
 
-    /**
-     * Próximos estrenos con fecha completa, ordenados por startDate asc.
-     * Solo incluye anime con año, mes y día: si AniList devuelve fecha
-     * parcial no podemos prometer "próxima semana" con precisión.
-     */
     @GetMapping("/upcoming")
     public ResponseEntity<List<UpcomingAnimeDto>> upcoming(@RequestParam(defaultValue = "7") int days) {
         if (days < 1 || days > 365) {
@@ -111,7 +111,7 @@ public class AnimeController {
      */
     @GetMapping("/{slug}")
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
-        return repository.findBySlug(slug)
+        return repository.findBySlugWithCharacters(slug)
                 .map(anime -> {
                     Map<String, List<ProviderDto>> byCountry = providerRepository
                             .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
@@ -127,22 +127,17 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Dispara el sync de AniList. Manual durante desarrollo; en semana 4
-     * lo automatizaremos con @Scheduled cada 12h.
-     *
-     * Ejemplo: POST /api/anime/sync?count=100
-     */
     @PostMapping("/sync")
     public Map<String, Integer> sync(@RequestParam(defaultValue = "100") int count) {
+        if (count < 1 || count > AnimeSyncService.MAX_POPULAR_SYNC_COUNT) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "count debe estar entre 1 y " + AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
+        }
         int synced = syncService.syncPopular(count);
         return Map.of("synced", synced);
     }
 
-    /**
-     * Cruza cada anime con su id de TMDb. Skip si ya está matcheado.
-     * Tarda ~30s para 100 anime (300ms de sleep entre requests).
-     */
     @PostMapping("/match")
     public Map<String, Integer> match() {
         int matched = matchingService.matchAll();
@@ -150,13 +145,15 @@ public class AnimeController {
         return Map.of("matched", matched, "descriptionsEnriched", descriptionsEnriched);
     }
 
-    /**
-     * Sincroniza watch providers desde TMDb para cada anime con tmdbId.
-     * Tarda ~30s para 100 anime.
-     */
     @PostMapping("/sync-providers")
     public Map<String, Integer> syncProviders() {
         int processed = providerSyncService.syncAll();
+        return Map.of("processed", processed);
+    }
+
+    @PostMapping("/sync-trailers")
+    public Map<String, Integer> syncTrailers() {
+        int processed = trailerSyncService.syncAll();
         return Map.of("processed", processed);
     }
 

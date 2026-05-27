@@ -34,8 +34,19 @@ public class AniListClient {
               coverImage { large }
               bannerImage
               genres
+              studios { nodes { id name isAnimationStudio } }
               season
               seasonYear
+              characters(perPage: 6, role: MAIN) {
+                edges {
+                  role
+                  node {
+                    id
+                    name { full native }
+                    image { large medium }
+                  }
+                }
+              }
               tags { name rank }
             }
           }

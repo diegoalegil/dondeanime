@@ -180,9 +180,10 @@ Primera ingesta de datos:
 curl -X POST http://localhost:8080/api/anime/sync?count=100
 curl -X POST http://localhost:8080/api/anime/match
 curl -X POST http://localhost:8080/api/anime/sync-providers
+curl -X POST http://localhost:8080/api/anime/sync-trailers
 ```
 
-Tarda unos 3 minutos en total. Al terminar tienes 100 anime con providers reales en BD.
+Tarda unos 4 minutos en total. Al terminar tienes 100 anime con providers reales y trailers cuando TMDb los expone.
 
 ### Tests
 
@@ -199,6 +200,7 @@ cd backend
 |---|---|---|
 | GET | `/api/anime` | Lista catálogo completo |
 | GET | `/api/anime/{slug}` | Detalle de anime con providers por país |
+| POST | `/api/anime/sync-trailers` | Sincroniza trailers de YouTube desde TMDb |
 | GET | `/api/providers` | Lista plataformas (filtro por `?country=ES`) |
 | GET | `/api/providers/{slug}/{country}` | Anime disponibles en plataforma+país |
 | GET | `/api/genres` y `/api/genres/{slug}` | Géneros con listado |
