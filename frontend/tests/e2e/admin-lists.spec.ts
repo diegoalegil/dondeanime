@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('admin creates, adds anime and publishes a curated list', async ({ page }) => {
-  const apiBase = 'https://api.dondeanime.com';
+  const apiBase = (process.env.PUBLIC_API_URL ?? 'https://api.dondeanime.com').replace(/\/$/, '');
   let lists: any[] = [];
 
   await page.route(`${apiBase}/api/admin/login`, async (route) => {
