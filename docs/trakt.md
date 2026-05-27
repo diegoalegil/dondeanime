@@ -26,6 +26,7 @@ TRAKT_REDIRECT_URI=https://api.dondeanime.com/api/trakt/oauth/callback
 
 - `GET /api/trakt/oauth/start`: redirige a Trakt con `response_type=code`, `client_id`, `redirect_uri` y `state` firmado.
 - `GET /api/trakt/oauth/callback`: valida `state`, intercambia `code` por tokens y devuelve una respuesta segura.
+- `GET /api/trakt/watched?externalUserId=...`: devuelve slugs vistos para filtros frontend.
 - `POST /api/trakt/sync`: importa vistos y ratings para una cuenta externa existente usando un access token temporal en el body.
 
 La respuesta del callback no expone tokens:

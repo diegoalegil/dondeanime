@@ -25,6 +25,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new RateLimitRule("/api/search", false, 30),
             new RateLimitRule("/api/track/affiliate", false, 60),
             new RateLimitRule("/api/trakt/sync", false, 10),
+            new RateLimitRule("/api/trakt/watched", false, 60),
             new RateLimitRule("/api/trakt/oauth/", true, 20),
             new RateLimitRule("/api/admin/", true, 10));
 
