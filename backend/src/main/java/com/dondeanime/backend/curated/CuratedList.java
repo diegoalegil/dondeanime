@@ -71,6 +71,9 @@ public class CuratedList {
     @Column(nullable = false, length = 30)
     private CuratedListStatus status = CuratedListStatus.DRAFT;
 
+    @Column(name = "premium_only", nullable = false)
+    private boolean premiumOnly = false;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -161,6 +164,14 @@ public class CuratedList {
 
     public void setStatus(CuratedListStatus status) {
         this.status = status;
+    }
+
+    public boolean isPremiumOnly() {
+        return premiumOnly;
+    }
+
+    public void setPremiumOnly(boolean premiumOnly) {
+        this.premiumOnly = premiumOnly;
     }
 
     public Instant getCreatedAt() {

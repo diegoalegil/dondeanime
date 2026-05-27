@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
+import com.dondeanime.backend.premium.SubscriberService;
 
 @Service
 public class CuratedListService {
@@ -23,14 +24,17 @@ public class CuratedListService {
 
     private final CuratedListRepository listRepository;
     private final AnimeRepository animeRepository;
+    private final SubscriberService subscriberService;
     private final String siteUrl;
 
     public CuratedListService(
             CuratedListRepository listRepository,
             AnimeRepository animeRepository,
+            SubscriberService subscriberService,
             @Value("${dondeanime.site-url:https://dondeanime.com}") String siteUrl) {
         this.listRepository = listRepository;
         this.animeRepository = animeRepository;
+        this.subscriberService = subscriberService;
         this.siteUrl = siteUrl;
     }
 
@@ -46,9 +50,14 @@ public class CuratedListService {
 
     @Transactional(readOnly = true)
     public Optional<CuratedListDetailDto> publishedList(String slug) {
+        return publishedList(slug, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<CuratedListDetailDto> publishedList(String slug, String viewerEmail) {
         return listRepository.findBySlugWithItems(slug)
                 .filter(this::isPublishedPublic)
-                .map(this::toDetailDto);
+                .map(list -> toDetailDto(list, subscriberService.isPremium(viewerEmail)));
     }
 
     @Transactional(readOnly = true)
@@ -69,6 +78,7 @@ public class CuratedListService {
         list.setOwner(request.owner().trim());
         list.setVisibility(Optional.ofNullable(request.visibility()).orElse(CuratedListVisibility.PRIVATE));
         list.setStatus(Optional.ofNullable(request.status()).orElse(CuratedListStatus.DRAFT));
+        list.setPremiumOnly(Boolean.TRUE.equals(request.premiumOnly()));
 
         return toAdminDto(listRepository.save(list));
     }
@@ -125,9 +135,18 @@ public class CuratedListService {
                 && list.getVisibility() == CuratedListVisibility.PUBLIC;
     }
 
-    private CuratedListDetailDto toDetailDto(CuratedList list) {
+    private CuratedListDetailDto toDetailDto(CuratedList list, boolean premiumViewer) {
         List<CuratedListItemDto> items = hydrateItems(list);
-        return CuratedListDetailDto.from(list, items, siteUrl);
+        boolean premiumPreview = list.isPremiumOnly() && !premiumViewer;
+        List<CuratedListItemDto> visibleItems = premiumPreview
+                ? items.stream().limit(3).toList()
+                : items;
+        return CuratedListDetailDto.from(
+                list,
+                visibleItems,
+                siteUrl,
+                premiumPreview,
+                premiumPreview ? siteUrl.replaceAll("/+$", "") + "/premium" : null);
     }
 
     private CuratedListAdminDto toAdminDto(CuratedList list) {

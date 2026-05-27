@@ -9,6 +9,10 @@ public record CuratedListDetailDto(
         String owner,
         String visibility,
         String status,
+        boolean premiumOnly,
+        boolean premiumPreview,
+        String premiumCtaUrl,
+        int itemCount,
         List<CuratedListItemDto> items,
         CuratedListItemListSchemaDto schema
 ) {
@@ -16,13 +20,15 @@ public record CuratedListDetailDto(
         List<CuratedListItemDto> items = list.orderedItems().stream()
                 .map(CuratedListItemDto::from)
                 .toList();
-        return from(list, items, "https://dondeanime.com");
+        return from(list, items, "https://dondeanime.com", false, null);
     }
 
     public static CuratedListDetailDto from(
             CuratedList list,
             List<CuratedListItemDto> items,
-            String siteUrl) {
+            String siteUrl,
+            boolean premiumPreview,
+            String premiumCtaUrl) {
         return new CuratedListDetailDto(
                 list.getSlug(),
                 list.getTitle(),
@@ -30,6 +36,10 @@ public record CuratedListDetailDto(
                 CuratedListSummaryDto.publicOwner(list.getOwner()),
                 list.getVisibility().name(),
                 list.getStatus().name(),
+                list.isPremiumOnly(),
+                premiumPreview,
+                premiumCtaUrl,
+                list.getItems().size(),
                 items,
                 CuratedListItemListSchemaDto.from(list, items, siteUrl));
     }

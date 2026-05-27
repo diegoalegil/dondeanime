@@ -7,6 +7,7 @@ public record CuratedListSummaryDto(
         String owner,
         String visibility,
         String status,
+        boolean premiumOnly,
         int itemCount
 ) {
     public static CuratedListSummaryDto from(CuratedList list) {
@@ -17,6 +18,7 @@ public record CuratedListSummaryDto(
                 publicOwner(list.getOwner()),
                 list.getVisibility().name(),
                 list.getStatus().name(),
+                list.isPremiumOnly(),
                 list.getItems().size());
     }
 

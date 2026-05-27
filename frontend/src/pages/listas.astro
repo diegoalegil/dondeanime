@@ -184,9 +184,10 @@ const itemListSchema = buildItemListSchema(
 
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
-                  <span>{item.list.itemCount} {item.list.itemCount === 1 ? 'anime' : 'anime'}</span>
+                  <span>{item.list.itemCount ?? item.list.items.length} anime</span>
                   {item.durationOptions[0] && <span>&middot; {item.durationOptions[0].label}</span>}
                   {platformLabel && <span>&middot; {platformLabel}</span>}
+                  {item.list.premiumOnly && <span class="rounded bg-accent-violet/15 px-2 py-0.5 text-accent-violet">Premium</span>}
                 </div>
                 <h2 class="mt-2 text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet">
                   {item.list.title}

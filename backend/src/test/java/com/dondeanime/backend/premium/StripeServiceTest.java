@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dondeanime.backend.curated.CuratedListTrackingService;
 import com.dondeanime.backend.email.EmailService;
 import com.stripe.exception.SignatureVerificationException;
 
@@ -23,10 +24,12 @@ class StripeServiceTest {
 
     private final StripeGateway stripeGateway = mock(StripeGateway.class);
     private final SubscriberService subscriberService = mock(SubscriberService.class);
+    private final CuratedListTrackingService curatedListTrackingService = mock(CuratedListTrackingService.class);
     private final EmailService emailService = mock(EmailService.class);
     private final StripeService service = new StripeService(
             stripeGateway,
             subscriberService,
+            curatedListTrackingService,
             emailService,
             "sk_test_123",
             "price_test_123",
@@ -54,6 +57,7 @@ class StripeServiceTest {
         StripeService unconfigured = new StripeService(
                 stripeGateway,
                 subscriberService,
+                curatedListTrackingService,
                 emailService,
                 "",
                 "price_test_123",
@@ -65,6 +69,18 @@ class StripeServiceTest {
         assertThatThrownBy(() -> unconfigured.createCheckoutSession("diego@example.com"))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e ->
                         assertThat(e.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE));
+    }
+
+    @Test
+    void createCheckoutSessionIncludesSourceListSlug() throws Exception {
+        when(stripeGateway.createCheckoutSession(any(StripeCheckoutCommand.class)))
+                .thenReturn("https://checkout.stripe.test/session");
+
+        service.createCheckoutSession("diego@example.com", " Anime-Para-Empezar ");
+
+        ArgumentCaptor<StripeCheckoutCommand> captor = ArgumentCaptor.forClass(StripeCheckoutCommand.class);
+        verify(stripeGateway).createCheckoutSession(captor.capture());
+        assertThat(captor.getValue().sourceListSlug()).isEqualTo("anime-para-empezar");
     }
 
     @Test
@@ -100,6 +116,7 @@ class StripeServiceTest {
                         "customer.subscription.created",
                         "diego@example.com",
                         "cus_test_123",
+                        "anime-para-empezar",
                         NOW,
                         NOW.plusSeconds(2_592_000)));
 
@@ -117,6 +134,7 @@ class StripeServiceTest {
                 "diego@example.com",
                 "PREMIUM",
                 "https://dondeanime.com/premium");
+        verify(curatedListTrackingService).trackConversion("anime-para-empezar");
     }
 
     @Test
@@ -126,6 +144,7 @@ class StripeServiceTest {
                         "invoice.payment_succeeded",
                         "diego@example.com",
                         "cus_test_123",
+                        null,
                         NOW,
                         null));
 
@@ -147,6 +166,7 @@ class StripeServiceTest {
                         "customer.subscription.deleted",
                         null,
                         "cus_test_123",
+                        null,
                         NOW,
                         null));
 

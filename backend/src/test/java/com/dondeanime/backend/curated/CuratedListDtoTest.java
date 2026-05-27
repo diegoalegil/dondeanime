@@ -16,6 +16,8 @@ class CuratedListDtoTest {
 
         assertThat(dto.slug()).isEqualTo("anime-para-empezar");
         assertThat(dto.owner()).isNull();
+        assertThat(dto.premiumOnly()).isFalse();
+        assertThat(dto.premiumPreview()).isFalse();
         assertThat(dto.items())
                 .extracting(CuratedListItemDto::animeSlug)
                 .containsExactly("frieren-beyond-journeys-end", "naruto");
@@ -40,6 +42,7 @@ class CuratedListDtoTest {
         assertThat(dto.owner()).isEqualTo("Diego");
         assertThat(dto.status()).isEqualTo("PUBLISHED");
         assertThat(dto.visibility()).isEqualTo("PUBLIC");
+        assertThat(dto.premiumOnly()).isFalse();
         assertThat(dto.itemCount()).isEqualTo(2);
     }
 

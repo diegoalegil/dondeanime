@@ -78,6 +78,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
               </select>
             </label>
           </div>
+          <label class="flex items-center gap-2 rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-secondary">
+            <input name="premiumOnly" type="checkbox" class="h-4 w-4 accent-accent-violet" />
+            Solo Premium
+          </label>
           <button type="submit" class="rounded-md bg-accent-pink px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
             Guardar lista
           </button>
@@ -207,7 +211,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
             list.slug === activeSlug ? 'border-accent-violet bg-surface-0 text-fg-primary' : 'border-surface-2 text-fg-secondary hover:border-accent-violet'
           }" data-list-select="${escapeHtml(list.slug)}">
             <span class="block font-semibold">${escapeHtml(list.title)}</span>
-            <span class="mt-1 block text-xs text-fg-muted">${escapeHtml(list.status)} · ${list.items?.length ?? 0} anime</span>
+            <span class="mt-1 block text-xs text-fg-muted">${escapeHtml(list.status)} · ${list.items?.length ?? 0} anime${list.premiumOnly ? ' · Premium' : ''}</span>
           </button>
         `).join('');
       }
@@ -223,6 +227,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         setFieldValue('owner', list.owner ?? 'Diego');
         setFieldValue('status', list.status ?? 'DRAFT');
         setFieldValue('visibility', list.visibility ?? 'PRIVATE');
+        const premiumField = listForm?.querySelector('[name="premiumOnly"]');
+        if (premiumField) premiumField.checked = Boolean(list.premiumOnly);
       }
 
       const items = list?.items ?? [];
@@ -279,6 +285,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       slugInput.value = '';
       listForm.reset();
       setFieldValue('owner', 'Diego');
+      const premiumField = listForm?.querySelector('[name="premiumOnly"]');
+      if (premiumField) premiumField.checked = false;
       detailTitle.textContent = 'Nueva lista';
       detailStatus.textContent = 'Borrador';
       itemsBody.innerHTML = '<li class="text-sm text-fg-muted">Guarda la lista antes de añadir anime.</li>';
@@ -305,6 +313,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           owner: String(data.get('owner') ?? ''),
           status: String(data.get('status') ?? 'DRAFT'),
           visibility: String(data.get('visibility') ?? 'PRIVATE'),
+          premiumOnly: data.get('premiumOnly') === 'on',
         }),
       });
       if (!response.ok) {

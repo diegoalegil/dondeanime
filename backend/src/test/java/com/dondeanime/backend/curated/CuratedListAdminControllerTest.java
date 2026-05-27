@@ -127,6 +127,7 @@ class CuratedListAdminControllerTest {
                 "Diego",
                 status.equals("PUBLISHED") ? "PUBLIC" : "PRIVATE",
                 status,
+                false,
                 List.of());
     }
 

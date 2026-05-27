@@ -47,6 +47,7 @@ class CuratedListControllerTest {
                 "Diego",
                 "PUBLIC",
                 "PUBLISHED",
+                false,
                 2)));
 
         mvc.perform(get("/api/lists"))
@@ -59,7 +60,7 @@ class CuratedListControllerTest {
     @Test
     void detailReturnsOrderedAnimeAndItemListSchema() throws Exception {
         CuratedListDetailDto detail = detailDto();
-        when(service.publishedList("anime-para-empezar")).thenReturn(Optional.of(detail));
+        when(service.publishedList("anime-para-empezar", null)).thenReturn(Optional.of(detail));
 
         mvc.perform(get("/api/lists/anime-para-empezar"))
                 .andExpect(status().isOk())
@@ -74,8 +75,19 @@ class CuratedListControllerTest {
     }
 
     @Test
+    void detailPassesPremiumViewerHeaderToService() throws Exception {
+        CuratedListDetailDto detail = detailDto();
+        when(service.publishedList("anime-para-empezar", "premium@example.com")).thenReturn(Optional.of(detail));
+
+        mvc.perform(get("/api/lists/anime-para-empezar")
+                        .header("X-User-Email", "premium@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.premiumPreview").value(false));
+    }
+
+    @Test
     void detailReturns404WhenListIsNotPublished() throws Exception {
-        when(service.publishedList("draft-list")).thenReturn(Optional.empty());
+        when(service.publishedList("draft-list", null)).thenReturn(Optional.empty());
 
         mvc.perform(get("/api/lists/draft-list"))
                 .andExpect(status().isNotFound());
@@ -111,6 +123,6 @@ class CuratedListControllerTest {
         list.setOwner("Diego");
         list.setVisibility(CuratedListVisibility.PUBLIC);
         list.setStatus(CuratedListStatus.PUBLISHED);
-        return CuratedListDetailDto.from(list, items, "https://dondeanime.com");
+        return CuratedListDetailDto.from(list, items, "https://dondeanime.com", false, null);
     }
 }

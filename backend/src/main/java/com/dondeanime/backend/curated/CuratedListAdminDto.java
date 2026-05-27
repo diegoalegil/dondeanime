@@ -9,6 +9,7 @@ public record CuratedListAdminDto(
         String owner,
         String visibility,
         String status,
+        boolean premiumOnly,
         List<CuratedListItemDto> items
 ) {
     public static CuratedListAdminDto from(CuratedList list, List<CuratedListItemDto> items) {
@@ -19,6 +20,7 @@ public record CuratedListAdminDto(
                 list.getOwner(),
                 list.getVisibility().name(),
                 list.getStatus().name(),
+                list.isPremiumOnly(),
                 items);
     }
 }

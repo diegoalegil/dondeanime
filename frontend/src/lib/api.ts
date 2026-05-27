@@ -107,6 +107,7 @@ export interface CuratedListSummary {
   owner: string | null;
   visibility: string;
   status: string;
+  premiumOnly: boolean;
   itemCount: number;
 }
 
@@ -118,6 +119,8 @@ export interface CuratedListItem {
 }
 
 export interface CuratedListDetail extends CuratedListSummary {
+  premiumPreview: boolean;
+  premiumCtaUrl: string | null;
   items: CuratedListItem[];
   schema: unknown;
 }

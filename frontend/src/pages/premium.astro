@@ -152,6 +152,7 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
       try {
         localStorage.setItem('dondeanime-premium', 'true');
         localStorage.setItem('dondeanime-premium-tier', 'Premium');
+        localStorage.removeItem('dondeanime-premium-source-list');
       } catch (error) {}
       setStatus('Premium activo en este navegador.', 'success');
     } else if (params.get('canceled') === '1') {
@@ -168,11 +169,22 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
       return String(data.get('email') ?? '').trim();
     };
 
+    const sourceListSlug = () => {
+      try {
+        return localStorage.getItem('dondeanime-premium-source-list') || '';
+      } catch (error) {
+        return '';
+      }
+    };
+
     const redirectToPremiumUrl = async (path, email) => {
+      const payload = path.endsWith('/checkout')
+        ? { email, sourceListSlug: sourceListSlug() }
+        : { email };
       const response = await fetch(`${apiUrl}${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) return false;

@@ -79,6 +79,7 @@ class FlywayMigrationTest {
                 "curator_profile",
                 "curated_list",
                 "curated_list_item",
+                "curated_list_metric_event",
                 "email_token",
                 "newsletter_subscriber",
                 "newsletter_token",
@@ -116,12 +117,14 @@ class FlywayMigrationTest {
                 "idx_curated_list_owner",
                 "idx_curated_list_item_list_position",
                 "idx_curated_list_item_anime_slug",
-                "idx_curator_profile_approved");
+                "idx_curator_profile_approved",
+                "idx_curated_list_metric_event_type_time",
+                "idx_curated_list_metric_event_list_time");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(14);
+        assertThat(successfulMigrations).isEqualTo(15);
     }
 }

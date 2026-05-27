@@ -9,6 +9,7 @@ public record CuratedListSaveRequest(
         @NotBlank @Size(max = 2_000) String description,
         @NotBlank @Size(max = 120) String owner,
         CuratedListVisibility visibility,
-        CuratedListStatus status
+        CuratedListStatus status,
+        Boolean premiumOnly
 ) {
 }

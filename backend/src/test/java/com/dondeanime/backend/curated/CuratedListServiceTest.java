@@ -13,14 +13,17 @@ import org.junit.jupiter.api.Test;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
+import com.dondeanime.backend.premium.SubscriberService;
 
 class CuratedListServiceTest {
 
     private final CuratedListRepository listRepository = mock(CuratedListRepository.class);
     private final AnimeRepository animeRepository = mock(AnimeRepository.class);
+    private final SubscriberService subscriberService = mock(SubscriberService.class);
     private final CuratedListService service = new CuratedListService(
             listRepository,
             animeRepository,
+            subscriberService,
             "https://dondeanime.com/");
 
     @Test
@@ -70,6 +73,57 @@ class CuratedListServiceTest {
 
         assertThat(service.publishedList("anime-para-empezar")).isEmpty();
         verify(listRepository).findBySlugWithItems("anime-para-empezar");
+    }
+
+    @Test
+    void premiumOnlyListReturnsPreviewForFreeViewer() {
+        CuratedList list = list(CuratedListStatus.PUBLISHED, CuratedListVisibility.PUBLIC);
+        list.setPremiumOnly(true);
+        list.addItem(item("one", 1));
+        list.addItem(item("two", 2));
+        list.addItem(item("three", 3));
+        list.addItem(item("four", 4));
+        when(listRepository.findBySlugWithItems("anime-para-empezar")).thenReturn(Optional.of(list));
+        when(animeRepository.findBySlugIn(Set.of("one", "two", "three", "four")))
+                .thenReturn(List.of(
+                        anime("one", "One"),
+                        anime("two", "Two"),
+                        anime("three", "Three"),
+                        anime("four", "Four")));
+        when(subscriberService.isPremium("free@example.com")).thenReturn(false);
+
+        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar", "free@example.com");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().premiumOnly()).isTrue();
+        assertThat(result.get().premiumPreview()).isTrue();
+        assertThat(result.get().premiumCtaUrl()).isEqualTo("https://dondeanime.com/premium");
+        assertThat(result.get().items()).hasSize(3);
+    }
+
+    @Test
+    void premiumOnlyListReturnsFullListForPremiumViewer() {
+        CuratedList list = list(CuratedListStatus.PUBLISHED, CuratedListVisibility.PUBLIC);
+        list.setPremiumOnly(true);
+        list.addItem(item("one", 1));
+        list.addItem(item("two", 2));
+        list.addItem(item("three", 3));
+        list.addItem(item("four", 4));
+        when(listRepository.findBySlugWithItems("anime-para-empezar")).thenReturn(Optional.of(list));
+        when(animeRepository.findBySlugIn(Set.of("one", "two", "three", "four")))
+                .thenReturn(List.of(
+                        anime("one", "One"),
+                        anime("two", "Two"),
+                        anime("three", "Three"),
+                        anime("four", "Four")));
+        when(subscriberService.isPremium("premium@example.com")).thenReturn(true);
+
+        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar", "premium@example.com");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().premiumPreview()).isFalse();
+        assertThat(result.get().premiumCtaUrl()).isNull();
+        assertThat(result.get().items()).hasSize(4);
     }
 
     private static CuratedList list(CuratedListStatus status, CuratedListVisibility visibility) {
