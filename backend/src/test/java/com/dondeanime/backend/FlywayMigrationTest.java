@@ -66,8 +66,11 @@ class FlywayMigrationTest {
                 "affiliate_link",
                 "admin_user",
                 "anime",
+                "anime_character",
+                "anime_character_role",
                 "anime_tag",
                 "anime_genre",
+                "anime_studio",
                 "anime_override",
                 "app_user",
                 "availability_change_event",
@@ -76,6 +79,7 @@ class FlywayMigrationTest {
                 "newsletter_token",
                 "push_subscription",
                 "recommendation_event",
+                "studio",
                 "subscriber",
                 "subscription",
                 "watch_provider");
@@ -102,6 +106,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(7);
+        assertThat(successfulMigrations).isEqualTo(9);
     }
 }
