@@ -25,6 +25,10 @@ export interface AnimeSummary {
   seasonYear: number | null;
 }
 
+export interface TraktWatchedResponse {
+  slugs: string[];
+}
+
 export interface BeginnerAnime {
   anime: AnimeSummary;
   beginnerRecommendation: string | null;
