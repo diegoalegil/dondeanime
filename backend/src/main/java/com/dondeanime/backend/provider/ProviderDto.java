@@ -1,5 +1,7 @@
 package com.dondeanime.backend.provider;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Vista pública de un WatchProvider. Sin id interno, sin animeId,
  * sin updatedAt, sin tmdbProviderId.
@@ -8,6 +10,7 @@ package com.dondeanime.backend.provider;
  * frontend pueda enlazar a /plataforma/{slug} sin duplicar la regla
  * de slugificación.
  */
+@Schema(description = "Provider de streaming visible para una ficha de anime")
 public record ProviderDto(
         String countryCode,
         String providerSlug,

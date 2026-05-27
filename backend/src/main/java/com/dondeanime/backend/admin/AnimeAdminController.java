@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dondeanime.backend.anime.AnimeDetailDto;
+import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.AnimeRepository;
 
@@ -27,12 +28,15 @@ public class AnimeAdminController {
 
     private final AnimeRepository animeRepository;
     private final AnimeOverrideService overrideService;
+    private final AnimeMatchingService matchingService;
 
     public AnimeAdminController(
             AnimeRepository animeRepository,
-            AnimeOverrideService overrideService) {
+            AnimeOverrideService overrideService,
+            AnimeMatchingService matchingService) {
         this.animeRepository = animeRepository;
         this.overrideService = overrideService;
+        this.matchingService = matchingService;
     }
 
     @PostMapping("/{slug}/override")
@@ -40,7 +44,7 @@ public class AnimeAdminController {
             @PathVariable String slug,
             @Valid @RequestBody AnimeOverrideRequest request,
             Principal principal) {
-        return animeRepository.findBySlug(slug)
+        return animeRepository.findBySlugWithCharacters(slug)
                 .map(anime -> {
                     overrideService.saveOverride(
                             anime,
@@ -60,7 +64,7 @@ public class AnimeAdminController {
             @PathVariable String slug,
             @RequestParam(name = "field") String fieldName,
             @RequestParam(defaultValue = AnimeOverrideService.DEFAULT_LOCALE) String locale) {
-        return animeRepository.findBySlug(slug)
+        return animeRepository.findBySlugWithCharacters(slug)
                 .map(anime -> {
                     overrideService.deleteOverride(anime, fieldName, locale);
                     return ResponseEntity.ok(AnimeDetailDto.from(
@@ -81,6 +85,14 @@ public class AnimeAdminController {
                             .toList();
                     return ResponseEntity.ok(overrides);
                 })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{slug}/rematch")
+    public ResponseEntity<AnimeRematchResponse> rematch(@PathVariable String slug) {
+        return matchingService.rematch(slug)
+                .map(AnimeRematchResponse::from)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
