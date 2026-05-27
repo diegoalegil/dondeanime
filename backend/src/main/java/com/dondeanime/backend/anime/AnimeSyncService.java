@@ -111,6 +111,8 @@ public class AnimeSyncService {
         anime.setFormat(media.format());
         anime.setStatus(media.status());
         anime.setEpisodes(media.episodes());
+        anime.setEpisodeDuration(media.duration());
+        anime.setStudio(mainStudioName(media.studios()));
         anime.setAverageScore(media.averageScore());
         anime.setPopularity(media.popularity());
 
@@ -290,5 +292,17 @@ public class AnimeSyncService {
 
     private static boolean isBlank(String s) {
         return s == null || s.isBlank();
+    }
+
+    private static String mainStudioName(AniListStudioConnection studios) {
+        if (studios == null || studios.nodes() == null) {
+            return null;
+        }
+
+        return studios.nodes().stream()
+                .map(AniListStudio::name)
+                .filter(name -> !isBlank(name))
+                .findFirst()
+                .orElse(null);
     }
 }

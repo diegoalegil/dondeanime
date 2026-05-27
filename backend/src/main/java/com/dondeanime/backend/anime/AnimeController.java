@@ -112,6 +112,32 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/duration/{minutes}")
+    @Operation(summary = "Lista anime por duracion", description = "Devuelve anime cuya duracion media por episodio coincide con los minutos indicados.")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeDuration(@PathVariable int minutes) {
+        if (minutes < 1 || minutes > 240) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodeDuration(minutes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
+    @GetMapping("/episodes/less-than/{maxEpisodes}")
+    @Operation(summary = "Lista anime por numero maximo de episodios", description = "Devuelve anime con numero de episodios conocido igual o inferior al limite.")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeCount(@PathVariable int maxEpisodes) {
+        if (maxEpisodes < 1 || maxEpisodes > 10_000) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodesLessThanOrEqual(maxEpisodes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
     @GetMapping("/{slug}")
     @Operation(summary = "Obtiene el detalle de un anime", description = "Devuelve la ficha publica y providers agrupados por pais.")
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {

@@ -87,6 +87,9 @@ class AnimeControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
+                .andExpect(jsonPath("$[0].episodeDuration").value(24))
+                .andExpect(jsonPath("$[0].studio").value("WIT Studio"))
+                // El DTO no debe exponer id interno ni tmdbId ni syncedAt.
                 .andExpect(jsonPath("$[0].id").doesNotExist())
                 .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
                 .andExpect(jsonPath("$[0].syncedAt").doesNotExist());
@@ -123,6 +126,43 @@ class AnimeControllerTest {
     @Test
     void upcomingRejectsInvalidDays() throws Exception {
         mvc.perform(get("/api/v1/anime/upcoming?days=0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getByDurationReturnsMatchingAnime() throws Exception {
+        Anime a = makeAnime("attack-on-titan", "Attack on Titan");
+        when(animeRepository.findByEpisodeDuration(24)).thenReturn(List.of(a));
+
+        mvc.perform(get("/api/anime/duration/24"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$[0].episodeDuration").value(24));
+    }
+
+    @Test
+    void getByDurationRejectsInvalidMinutes() throws Exception {
+        mvc.perform(get("/api/anime/duration/0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getByEpisodeCountReturnsMatchingAnime() throws Exception {
+        Anime a = makeAnime("attack-on-titan", "Attack on Titan");
+        a.setEpisodes(12);
+        when(animeRepository.findByEpisodesLessThanOrEqual(12)).thenReturn(List.of(a));
+
+        mvc.perform(get("/api/anime/episodes/less-than/12"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$[0].episodes").value(12));
+    }
+
+    @Test
+    void getByEpisodeCountRejectsInvalidLimit() throws Exception {
+        mvc.perform(get("/api/anime/episodes/less-than/0"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -230,6 +270,9 @@ class AnimeControllerTest {
         a.setTitleEnglish(titleEnglish);
         a.setFormat("TV");
         a.setStatus("FINISHED");
+        a.setEpisodes(24);
+        a.setEpisodeDuration(24);
+        a.setStudio("WIT Studio");
         return a;
     }
 

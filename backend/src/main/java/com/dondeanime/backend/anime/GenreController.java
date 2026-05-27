@@ -16,9 +16,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class GenreController {
 
     private final AnimeRepository animeRepository;
+    private final AnimeOverrideService overrideService;
 
-    public GenreController(AnimeRepository animeRepository) {
+    public GenreController(
+            AnimeRepository animeRepository,
+            AnimeOverrideService overrideService) {
         this.animeRepository = animeRepository;
+        this.overrideService = overrideService;
     }
 
     /**
@@ -42,6 +46,14 @@ public class GenreController {
     public List<AnimeSummaryDto> animesByGenre(@PathVariable String slug) {
         return animeRepository.findByGenreSlug(slug.toLowerCase()).stream()
                 .map(AnimeSummaryDto::from)
+                .toList();
+    }
+
+    @GetMapping("/{slug}/beginner")
+    public List<BeginnerAnimeDto> beginnerAnimesByGenre(@PathVariable String slug) {
+        return animeRepository.findByGenreSlug(slug.toLowerCase()).stream()
+                .limit(10)
+                .map(anime -> BeginnerAnimeDto.from(anime, overrideService.findSpanishOverrides(anime)))
                 .toList();
     }
 }

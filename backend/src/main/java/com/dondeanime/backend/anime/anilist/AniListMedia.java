@@ -12,6 +12,7 @@ public record AniListMedia(
         AniListFuzzyDate startDate,
         AniListFuzzyDate endDate,
         Integer episodes,
+        Integer duration,
         String format,
         String status,
         Integer averageScore,

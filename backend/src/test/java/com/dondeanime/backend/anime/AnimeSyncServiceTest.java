@@ -93,6 +93,7 @@ class AnimeSyncServiceTest {
 
         ArgumentCaptor<Anime> animeCaptor = ArgumentCaptor.forClass(Anime.class);
         verify(animeRepository).save(animeCaptor.capture());
+        assertThat(animeCaptor.getValue().getStudio()).isEqualTo("WIT Studio");
         assertThat(animeCaptor.getValue().getStudios())
                 .extracting(Studio::getName)
                 .containsExactly("WIT Studio");
@@ -196,6 +197,7 @@ class AnimeSyncServiceTest {
                 new AniListFuzzyDate(2013, 4, 7),
                 null,
                 25,
+                24,
                 "TV",
                 "FINISHED",
                 85,
