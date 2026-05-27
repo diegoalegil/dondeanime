@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,8 +24,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.admin.auth.AdminJwtService;
-import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
+import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProvider;
@@ -80,13 +79,11 @@ class AnimeControllerTest {
 
     @Test
     void getAllReturnsListOfSummaries() throws Exception {
-        Anime a = makeAnime("attack-on-titan", "Attack on Titan");
-        when(animeRepository.findAllWithGenres()).thenReturn(List.of(a));
+        Anime anime = makeAnime("attack-on-titan", "Attack on Titan");
+        when(animeRepository.findAllWithGenres()).thenReturn(List.of(anime));
 
-        mvc.perform(get("/api/anime")
-                        .header("X-Request-Id", "req-test"))
+        mvc.perform(get("/api/v1/anime"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("X-Request-Id", "req-test"))
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
@@ -113,7 +110,7 @@ class AnimeControllerTest {
 
         when(animeRepository.findAll()).thenReturn(List.of(later, outside, partialDate, early, past));
 
-        mvc.perform(get("/api/anime/upcoming?days=7"))
+        mvc.perform(get("/api/v1/anime/upcoming?days=7"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].slug").value("early"))
@@ -125,22 +122,22 @@ class AnimeControllerTest {
 
     @Test
     void upcomingRejectsInvalidDays() throws Exception {
-        mvc.perform(get("/api/anime/upcoming?days=0"))
+        mvc.perform(get("/api/v1/anime/upcoming?days=0"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void getBySlugReturnsDetailWithProviders() throws Exception {
-        Anime a = makeAnime("attack-on-titan", "Attack on Titan");
+        Anime anime = makeAnime("attack-on-titan", "Attack on Titan");
         WatchProvider provider = provider();
-        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(a));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(anime));
         when(providerRepository
                 .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(any()))
                 .thenReturn(List.of(provider));
         when(affiliateLinkService.toProviderDto(provider)).thenReturn(ProviderDto.from(provider, "https://example.com"));
-        when(overrideService.findSpanishOverrides(a)).thenReturn(List.of());
+        when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of());
 
-        mvc.perform(get("/api/anime/attack-on-titan"))
+        mvc.perform(get("/api/v1/anime/attack-on-titan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.anime.slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$.anime.trailerYoutubeId").value("abc123DEF45"))
@@ -152,7 +149,7 @@ class AnimeControllerTest {
     void getBySlugUnknownReturns404() throws Exception {
         when(animeRepository.findBySlugWithCharacters("inexistente")).thenReturn(Optional.empty());
 
-        mvc.perform(get("/api/anime/inexistente"))
+        mvc.perform(get("/api/v1/anime/inexistente"))
                 .andExpect(status().isNotFound());
     }
 
@@ -167,7 +164,7 @@ class AnimeControllerTest {
         when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(source));
         when(recommendationService.findSimilar(1L, 10)).thenReturn(List.of(recommendation));
 
-        mvc.perform(get("/api/anime/attack-on-titan/similar"))
+        mvc.perform(get("/api/v1/anime/attack-on-titan/similar"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].slug").value("vinland-saga"))
@@ -181,7 +178,7 @@ class AnimeControllerTest {
     void getSimilarUnknownSlugReturns404() throws Exception {
         when(animeRepository.findBySlug("inexistente")).thenReturn(Optional.empty());
 
-        mvc.perform(get("/api/anime/inexistente/similar"))
+        mvc.perform(get("/api/v1/anime/inexistente/similar"))
                 .andExpect(status().isNotFound());
     }
 

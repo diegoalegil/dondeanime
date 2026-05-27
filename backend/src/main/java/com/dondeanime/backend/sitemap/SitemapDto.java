@@ -2,6 +2,8 @@ package com.dondeanime.backend.sitemap;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Lista plana de identificadores que el frontend usa para generar
  * sitemap.xml. El backend NO conoce las URLs del frontend; solo
@@ -13,6 +15,7 @@ import java.util.List;
  *   genreSlugs  → /genero/{slug}
  *   seasons     → /temporada/{year}/{season}
  */
+@Schema(description = "Identificadores publicos usados para generar sitemap.xml")
 public record SitemapDto(
         List<String> animeSlugs,
         List<ProviderCountryEntry> providers,

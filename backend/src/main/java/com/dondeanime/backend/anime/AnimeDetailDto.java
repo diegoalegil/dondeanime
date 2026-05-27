@@ -8,12 +8,15 @@ import java.util.stream.Collectors;
 import com.dondeanime.backend.character.CharacterDto;
 import com.dondeanime.backend.studio.StudioDto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Vista completa de un anime para la pagina de detalle.
  *
  * Incluye todo lo de AnimeSummaryDto mas descripcion larga, fechas
  * detalladas y banner. Sigue ocultando id interno, syncedAt y tmdbId.
  */
+@Schema(description = "Vista completa de una ficha publica de anime")
 public record AnimeDetailDto(
         Long anilistId,
         String slug,
