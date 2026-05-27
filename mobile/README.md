@@ -8,11 +8,18 @@ Wrapper movil de DondeAnime con Capacitor.
 cd mobile
 npm ci
 npm run lint
+npm test
 npm run build
 ```
 
 `npm run build` valida el scaffold. No genera binarios nativos ni requiere SDK de
 Android/iOS en este PR.
+
+## Offline
+
+`OFFLINE.md` documenta la cache de ultimas fichas visitadas. La politica evita
+guardar rutas admin, llamadas API y tokens; solo persiste datos publicos
+sanitizados de fichas de anime.
 
 ## Flujo futuro
 
