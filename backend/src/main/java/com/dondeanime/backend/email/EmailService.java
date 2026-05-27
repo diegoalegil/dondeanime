@@ -21,4 +21,20 @@ public interface EmailService {
             List<String> providerNames,
             String unsubscribeUrl,
             String eraseUrl);
+
+    void sendPremiumWelcomeEmail(
+            String email,
+            String planTier,
+            String manageUrl);
+
+    void sendPremiumReceiptEmail(
+            String email,
+            String planTier,
+            String paidAt,
+            String manageUrl);
+
+    void sendPremiumCancellationEmail(
+            String email,
+            String planTier,
+            String premiumUrl);
 }

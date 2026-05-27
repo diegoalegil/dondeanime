@@ -70,6 +70,15 @@ class AlertServiceTest {
         verify(emailService, never()).sendAlertEmail(any(), any(), any(), any(), any(), any());
     }
 
+    @Test
+    void detectsPendingAlertsWithNormalizedCountry() {
+        when(subscriptionRepository.countPendingAlerts(1L, "ES")).thenReturn(1L);
+
+        boolean hasPendingAlerts = alertService.hasPendingAlerts(1L, "es");
+
+        assertThat(hasPendingAlerts).isTrue();
+    }
+
     private static Anime anime() {
         Anime anime = new Anime();
         anime.setId(1L);

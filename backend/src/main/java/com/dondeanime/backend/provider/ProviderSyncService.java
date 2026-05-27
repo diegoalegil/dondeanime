@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -50,6 +51,7 @@ public class ProviderSyncService {
     private final AnimeRepository animeRepository;
     private final WatchProviderRepository providerRepository;
     private final AlertService alertService;
+    private final ApplicationEventPublisher eventPublisher;
     private final AvailabilityChangeService availabilityChangeService;
     private final TransactionTemplate transactionTemplate;
 
@@ -58,12 +60,14 @@ public class ProviderSyncService {
             AnimeRepository animeRepository,
             WatchProviderRepository providerRepository,
             AlertService alertService,
+            ApplicationEventPublisher eventPublisher,
             AvailabilityChangeService availabilityChangeService,
             PlatformTransactionManager transactionManager) {
         this.client = client;
         this.animeRepository = animeRepository;
         this.providerRepository = providerRepository;
         this.alertService = alertService;
+        this.eventPublisher = eventPublisher;
         this.availabilityChangeService = availabilityChangeService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
@@ -83,10 +87,7 @@ public class ProviderSyncService {
             }
             try {
                 Map<String, List<WatchProvider>> newProviders = syncOne(a);
-                int alerts = alertService.notifyNewProviders(a, newProviders);
-                if (alerts > 0) {
-                    log.info("Alertas enviadas slug={}: {}", a.getSlug(), alerts);
-                }
+                publishProviderAddedEvents(a, newProviders);
                 processed++;
             } catch (Exception e) {
                 log.error("Error sync providers slug={}: {}", a.getSlug(), e.getMessage());
@@ -98,6 +99,20 @@ public class ProviderSyncService {
         log.info("Sync providers completado: {} procesados, {} sin tmdbId, {} fallos",
                 processed, skipped, failed);
         return processed;
+    }
+
+    private void publishProviderAddedEvents(Anime anime, Map<String, List<WatchProvider>> providersByCountry) {
+        if (providersByCountry == null || providersByCountry.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, List<WatchProvider>> entry : providersByCountry.entrySet()) {
+            String countryCode = entry.getKey();
+            List<WatchProvider> providers = entry.getValue();
+            if (providers.isEmpty() || !alertService.hasPendingAlerts(anime.getId(), countryCode)) {
+                continue;
+            }
+            eventPublisher.publishEvent(new ProviderAddedEvent(anime, countryCode, providers));
+        }
     }
 
     private Map<String, List<WatchProvider>> syncOne(Anime anime) {
