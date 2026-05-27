@@ -75,7 +75,6 @@ class ResendEmailServiceTest {
                 "PREMIUM",
                 "2026-05-25T10:00:00Z",
                 "https://dondeanime.com/premium");
-
         server.verify();
     }
 

@@ -66,16 +66,22 @@ class FlywayMigrationTest {
                 "affiliate_link",
                 "admin_user",
                 "anime",
+                "anime_character",
+                "anime_character_role",
                 "anime_tag",
                 "anime_genre",
+                "anime_studio",
                 "anime_override",
                 "app_user",
+                "api_key",
+                "api_key_endpoint_usage",
                 "availability_change_event",
                 "email_token",
                 "newsletter_subscriber",
                 "newsletter_token",
                 "push_subscription",
                 "recommendation_event",
+                "studio",
                 "subscriber",
                 "subscription",
                 "watch_provider");
@@ -93,15 +99,21 @@ class FlywayMigrationTest {
                 "idx_anime_season_year",
                 "idx_anime_popularity_desc",
                 "idx_anime_genre_genre",
+                "idx_anime_episode_duration",
+                "idx_anime_studio_slug",
                 "idx_anime_search_vector",
                 "idx_push_subscription_country",
                 "idx_push_subscription_email",
-                "idx_subscriber_expires_at");
+                "idx_subscriber_expires_at",
+                "idx_api_key_owner_email",
+                "idx_api_key_tier",
+                "idx_api_key_endpoint_usage_api_key",
+                "idx_api_key_endpoint_usage_endpoint");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(7);
+        assertThat(successfulMigrations).isEqualTo(12);
     }
 }

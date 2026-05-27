@@ -1,0 +1,232 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+<BaseLayout
+  title="API keys admin - DondeAnime"
+  description="Panel admin de API keys de DondeAnime."
+>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Admin', url: '/admin' },
+      { name: 'API keys', url: '/admin/api-keys' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 py-8" data-api-keys-admin data-api-url={apiUrl}>
+    <header class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase text-accent-violet">Admin</p>
+        <h1 class="mt-1 text-3xl font-semibold text-fg-primary">API keys</h1>
+      </div>
+      <nav class="flex flex-wrap gap-4 text-sm">
+        <a href="/admin/dashboard" class="text-fg-muted transition-colors hover:text-accent-violet">
+          Dashboard
+        </a>
+        <a href="/admin" class="text-fg-muted transition-colors hover:text-accent-violet">
+          Panel editorial
+        </a>
+      </nav>
+    </header>
+
+    <form class="mb-6 rounded-lg border border-surface-2 bg-surface-1 p-4" data-login-form>
+      <div class="grid gap-3 sm:grid-cols-[9rem_12rem_auto]">
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Usuario</span>
+          <input name="username" autocomplete="username" value="admin" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <label>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Password</span>
+          <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
+        <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
+          Entrar
+        </button>
+      </div>
+      <p class="mt-2 min-h-5 text-sm text-fg-muted" data-status></p>
+    </form>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Keys activas</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-total-keys>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Requests este mes</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-total-usage>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Endpoints usados</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-total-endpoints>0</p>
+      </article>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem]">
+      <section class="rounded-lg border border-surface-2 bg-surface-1">
+        <div class="border-b border-surface-2 px-5 py-4">
+          <h2 class="text-base font-semibold text-fg-primary">Consumo por key</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-surface-2 text-left text-sm">
+            <thead class="text-xs uppercase text-fg-muted">
+              <tr>
+                <th class="px-5 py-3 font-semibold">Owner</th>
+                <th class="px-5 py-3 font-semibold">Tier</th>
+                <th class="px-5 py-3 font-semibold">Key</th>
+                <th class="px-5 py-3 font-semibold">Uso</th>
+                <th class="px-5 py-3 font-semibold">Restante</th>
+                <th class="px-5 py-3 font-semibold">Ultimo uso</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-2" data-key-rows>
+              <tr>
+                <td colspan="6" class="px-5 py-6 text-center text-fg-muted">Sin datos cargados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Top endpoints</h2>
+        <div class="mt-4 space-y-3" data-top-endpoints>
+          <p class="text-sm text-fg-muted">Sin datos cargados.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <script>
+    const root = document.querySelector('[data-api-keys-admin]');
+    const apiUrl = root?.getAttribute('data-api-url') ?? '';
+    const tokenKey = 'dondeanime-admin-token';
+    const form = document.querySelector('[data-login-form]');
+    const status = document.querySelector('[data-status]');
+    const keyRows = document.querySelector('[data-key-rows]');
+    const topEndpoints = document.querySelector('[data-top-endpoints]');
+    const totalKeys = document.querySelector('[data-total-keys]');
+    const totalUsage = document.querySelector('[data-total-usage]');
+    const totalEndpoints = document.querySelector('[data-total-endpoints]');
+
+    const numberFormatter = new Intl.NumberFormat('es-ES');
+    const dateFormatter = new Intl.DateTimeFormat('es-ES', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+
+    const setStatus = (message, tone = 'muted') => {
+      if (!status) return;
+      status.textContent = message;
+      status.className = `mt-2 min-h-5 text-sm ${
+        tone === 'danger' ? 'text-danger' : tone === 'success' ? 'text-success' : 'text-fg-muted'
+      }`;
+    };
+
+    const authHeaders = () => {
+      const token = sessionStorage.getItem(tokenKey);
+      return token ? { Authorization: `Basic ${token}` } : {};
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+
+    const formatNumber = (value) => numberFormatter.format(Number(value ?? 0));
+    const formatDate = (value) => value ? dateFormatter.format(new Date(value)) : 'Nunca';
+
+    const renderKeys = (keys) => {
+      if (!keyRows) return;
+      if (!keys?.length) {
+        keyRows.innerHTML = '<tr><td colspan="6" class="px-5 py-6 text-center text-fg-muted">Sin keys creadas.</td></tr>';
+        return;
+      }
+      keyRows.innerHTML = keys.map((key) => {
+        const usage = Number(key.monthlyUsage ?? 0);
+        const quota = Math.max(1, Number(key.monthlyQuota ?? 1));
+        const percent = Math.min(100, Math.round((usage / quota) * 100));
+        return `
+          <tr class="align-top">
+            <td class="px-5 py-4 text-fg-primary">${escapeHtml(key.ownerEmail)}</td>
+            <td class="px-5 py-4">
+              <span class="rounded-md border border-surface-2 px-2 py-1 text-xs font-semibold text-fg-secondary">
+                ${escapeHtml(key.tier)}
+              </span>
+            </td>
+            <td class="px-5 py-4 font-mono text-xs text-fg-secondary">${escapeHtml(key.keyPreview)}</td>
+            <td class="px-5 py-4">
+              <div class="min-w-32">
+                <div class="flex justify-between gap-3 text-xs text-fg-muted">
+                  <span>${formatNumber(usage)}</span>
+                  <span>${formatNumber(quota)}</span>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-surface-2">
+                  <div class="h-2 rounded-full bg-accent-violet" style="width: ${percent}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-5 py-4 text-fg-secondary">${formatNumber(key.remaining)}</td>
+            <td class="px-5 py-4 text-fg-muted">${escapeHtml(formatDate(key.lastUsedAt))}</td>
+          </tr>`;
+      }).join('');
+    };
+
+    const renderEndpoints = (endpoints) => {
+      if (!topEndpoints) return;
+      if (!endpoints?.length) {
+        topEndpoints.innerHTML = '<p class="text-sm text-fg-muted">Sin consumo todavia.</p>';
+        return;
+      }
+      topEndpoints.innerHTML = endpoints.map((endpoint) => `
+        <div class="flex items-center justify-between gap-3 border-b border-surface-2 pb-3 last:border-b-0">
+          <code class="truncate text-xs text-fg-secondary">${escapeHtml(endpoint.endpoint)}</code>
+          <span class="text-sm font-semibold text-fg-primary">${formatNumber(endpoint.monthlyUsage)}</span>
+        </div>
+      `).join('');
+    };
+
+    async function loadStats() {
+      setStatus('Cargando...');
+      const response = await fetch(`${apiUrl}/api/admin/api-keys/stats`, {
+        headers: authHeaders(),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      const keys = data.keys ?? [];
+      const endpoints = data.topEndpoints ?? [];
+      const usage = keys.reduce((sum, key) => sum + Number(key.monthlyUsage ?? 0), 0);
+
+      if (totalKeys) totalKeys.textContent = formatNumber(keys.length);
+      if (totalUsage) totalUsage.textContent = formatNumber(usage);
+      if (totalEndpoints) totalEndpoints.textContent = formatNumber(endpoints.length);
+      renderKeys(keys);
+      renderEndpoints(endpoints);
+      setStatus('Datos cargados.', 'success');
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
+      loadStats().catch(() => {
+        sessionStorage.removeItem(tokenKey);
+        setStatus('Credenciales incorrectas.', 'danger');
+      });
+    });
+
+    if (sessionStorage.getItem(tokenKey)) {
+      loadStats().catch(() => setStatus('No se pudo cargar API keys.', 'danger'));
+    } else {
+      setStatus('Inicia sesion para ver consumo.');
+    }
+  </script>
+</BaseLayout>

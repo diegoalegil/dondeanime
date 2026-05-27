@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping("/api/seasons")
+@RequestMapping({"/api/seasons", "/api/v1/seasons"})
+@Tag(name = "Seasons", description = "Temporadas de estreno cubiertas por el catalogo")
 public class SeasonController {
 
     /** Seasons válidas en AniList. Anti-fat-fingers en el path param. */
@@ -27,6 +31,7 @@ public class SeasonController {
      * reciente a más antigua.
      */
     @GetMapping
+    @Operation(summary = "Lista temporadas", description = "Devuelve temporadas agregadas de mas reciente a mas antigua.")
     public List<SeasonSummaryDto> list() {
         return animeRepository.aggregateSeasons().stream()
                 .map(r -> new SeasonSummaryDto(r.getYear(), r.getSeason(), r.getAnimeCount()))
@@ -39,6 +44,7 @@ public class SeasonController {
      * 400 si season no es válida.
      */
     @GetMapping("/{year}/{season}")
+    @Operation(summary = "Lista anime por temporada", description = "Devuelve anime de una temporada concreta de AniList.")
     public ResponseEntity<List<AnimeSummaryDto>> animesBySeason(
             @PathVariable int year,
             @PathVariable String season) {

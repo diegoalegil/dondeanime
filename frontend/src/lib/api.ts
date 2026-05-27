@@ -32,6 +32,16 @@ export interface UpcomingAnime extends AnimeSummary {
   startDay: number;
 }
 
+export interface Studio {
+  slug: string;
+  name: string;
+  animationStudio: boolean;
+}
+
+export interface StudioSummary extends Studio {
+  animeCount: number;
+}
+
 export interface WatchProvider {
   countryCode: string;
   providerSlug: string;
@@ -41,12 +51,20 @@ export interface WatchProvider {
   affiliateUrl: string | null;
 }
 
+export interface AnimeCharacter {
+  anilistId: number;
+  name: string;
+  image: string | null;
+  role: string;
+}
+
 export interface AnimeDetail {
   anime: {
     anilistId: number;
     slug: string;
     titleEnglish: string;
     titleRomaji: string;
+    trailerYoutubeId?: string | null;
     description: string | null;
     descriptionTranslationPending: boolean;
     format: string;
@@ -63,8 +81,10 @@ export interface AnimeDetail {
     endMonth: number | null;
     endDay: number | null;
     genres: string[];
+    studios?: Studio[];
     season: string | null;
     seasonYear: number | null;
+    characters?: AnimeCharacter[];
   };
   watchProvidersByCountry: Record<string, WatchProvider[]>;
 }
@@ -128,12 +148,6 @@ export interface GenreSummary {
 export interface SeasonSummary {
   year: number;
   season: string;
-  animeCount: number;
-}
-
-export interface StudioSummary {
-  name: string;
-  slug: string;
   animeCount: number;
 }
 
@@ -201,18 +215,19 @@ const summarizeStudiosFromAnime = (anime: AnimeSummary[]): StudioSummary[] => {
   });
 
   const summaries = Array.from(counts.entries())
-    .map(([slug, value]) => ({ slug, ...value }))
+    .map(([slug, value]) => ({ slug, animationStudio: false, ...value }))
     .sort((a, b) => b.animeCount - a.animeCount || a.name.localeCompare(b.name, 'es'));
 
   if (summaries.length > 0) return summaries;
 
   return FALLBACK_TOP_STUDIOS.map((studio) => ({
     ...studio,
+    animationStudio: false,
     animeCount: 0,
   }));
 };
 
-export const getStudios = async () => {
+export const getStudios = async (): Promise<StudioSummary[]> => {
   const res = await fetch(`${API_URL}/api/studios`);
   if (res.status === 404) {
     return summarizeStudiosFromAnime(await getAllAnime());
@@ -221,6 +236,20 @@ export const getStudios = async () => {
     throw new Error(`API /api/studios failed: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<StudioSummary[]>;
+};
+
+export const getAnimeByStudio = async (slug: string) => {
+  const res = await fetch(`${API_URL}/api/studios/${slug}`);
+  if (res.status === 404) {
+    const allAnime = await getAllAnime();
+    return allAnime
+      .filter((anime) => anime.studio && studioSlug(anime.studio) === slug)
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+  }
+  if (!res.ok) {
+    throw new Error(`API /api/studios/${slug} failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<AnimeSummary[]>;
 };
 
 export const getBestAnimeByStudio = async (slug: string) => {

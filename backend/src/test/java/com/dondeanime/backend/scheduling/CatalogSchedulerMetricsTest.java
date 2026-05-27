@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClient;
 import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
+import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -78,6 +79,7 @@ class CatalogSchedulerMetricsTest {
                 matchingService,
                 mock(AnimeDescriptionEnricher.class),
                 providerSyncService,
+                mock(TrailerSyncService.class),
                 RestClient.builder(),
                 registry,
                 mock(ApplicationEventPublisher.class),
@@ -95,6 +97,7 @@ class CatalogSchedulerMetricsTest {
                 matchingService,
                 mock(AnimeDescriptionEnricher.class),
                 providerSyncService,
+                mock(TrailerSyncService.class),
                 RestClient.builder(),
                 registry,
                 eventPublisher,

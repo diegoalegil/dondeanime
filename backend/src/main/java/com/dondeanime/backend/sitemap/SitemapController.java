@@ -10,7 +10,11 @@ import com.dondeanime.backend.anime.GenreSummaryDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@Tag(name = "Sitemap", description = "Datos para generar sitemap estatico del frontend")
 public class SitemapController {
 
     private final AnimeRepository animeRepository;
@@ -26,7 +30,8 @@ public class SitemapController {
      * Una sola request te da todo: slugs de anime, pares
      * (proveedor, país), slugs de géneros y temporadas.
      */
-    @GetMapping("/api/sitemap")
+    @GetMapping({"/api/sitemap", "/api/v1/sitemap"})
+    @Operation(summary = "Lista identificadores para sitemap", description = "Devuelve slugs y pares necesarios para generar sitemap.xml.")
     public SitemapDto sitemap() {
         List<String> animeSlugs = animeRepository.findAllSlugs();
 

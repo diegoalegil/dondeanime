@@ -16,7 +16,8 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
       <a href={localizedPath('/')} class="transition-colors hover:text-fg-primary">{t('nav.catalog')}</a>
       <a href={localizedPath('/pais/espana')} class="transition-colors hover:text-fg-primary">{t('nav.countries')}</a>
       <a href={localizedPath('/plataforma/crunchyroll')} class="transition-colors hover:text-fg-primary">{t('nav.platforms')}</a>
-      <a href="/premium" class="transition-colors hover:text-fg-primary">Premium</a>
+      <a href="/api" class="transition-colors hover:text-fg-primary">{t('nav.api')}</a>
+      <a href="/premium" class="transition-colors hover:text-fg-primary">{t('nav.premium')}</a>
     </nav>
     <div class="flex items-center gap-3">
       <SearchBox />
