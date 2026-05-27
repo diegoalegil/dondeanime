@@ -35,4 +35,11 @@ public class StudioController {
                 .map(AnimeSummaryDto::from)
                 .toList();
     }
+
+    @GetMapping("/{slug}/best")
+    public List<AnimeSummaryDto> bestByStudio(@PathVariable String slug) {
+        return animeRepository.findByStudioSlug(slug.toLowerCase()).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+    }
 }

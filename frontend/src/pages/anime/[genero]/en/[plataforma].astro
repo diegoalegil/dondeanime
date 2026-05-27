@@ -5,6 +5,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import type { AnimeSummary, ProviderSummary } from '@/lib/api';
 import { getAnimeByProvider, getGenres, getProviders } from '@/lib/api';
+import { AutoTextGenerator } from '@/lib/autoTextGenerator.mjs';
 import { COUNTRIES } from '@/lib/countries';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
@@ -61,6 +62,13 @@ const providerAnime = Array.from(
 const anime = providerAnime
   .filter((item) => item.genres.some((genre) => slugifyGenre(genre) === genero))
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+const autoText = new AutoTextGenerator().generateGenrePlatform({
+  animeCount: anime.length,
+  countries: Object.values(COUNTRIES).map((country) => country.name).join(', '),
+  genreName,
+  platformName,
+  topTitles: anime.slice(0, 4).map((item) => item.titleEnglish || item.titleRomaji),
+});
 
 const seoTitle = t('combo.seo.title', { genre: genreName, platform: platformName });
 const seoDescription = anime.length > 0
@@ -101,6 +109,14 @@ const itemListSchema = buildItemListSchema(
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
       {t('combo.summary', { count: anime.length })}
     </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-10">
+    <div
+      class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-5"
+      data-auto-text
+      set:html={autoText.html}
+    />
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">

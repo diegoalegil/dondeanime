@@ -1,0 +1,76 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeSummary } from '@/lib/api';
+import { getAnimeByMaxEpisodes } from '@/lib/api';
+import { EPISODE_LIMITS, episodeLimitPath } from '@/lib/programmaticSeo';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+
+interface Props {
+  maxEpisodes: number;
+}
+
+export function getStaticPaths() {
+  return EPISODE_LIMITS.map((maxEpisodes) => ({
+    params: { range: `menos-de-${maxEpisodes}` },
+    props: { maxEpisodes },
+  }));
+}
+
+const { maxEpisodes } = Astro.props as Props;
+const anime = await getAnimeByMaxEpisodes(maxEpisodes);
+const topTitles = anime.slice(0, 4).map((item) => item.titleEnglish || item.titleRomaji);
+const pagePath = episodeLimitPath(maxEpisodes);
+const pageUrl = absoluteUrl(pagePath);
+
+const seoTitle = `Anime con ${maxEpisodes} episodios o menos | DondeAnime`;
+const seoDescription = topTitles.length > 0
+  ? `Anime cortos de ${maxEpisodes} episodios o menos: ${topTitles.join(', ')}.`
+  : `Lista de anime con ${maxEpisodes} episodios o menos.`;
+
+const intro = topTitles.length > 0
+  ? `Esta lista agrupa anime con ${maxEpisodes} episodios o menos para encontrar series que se pueden terminar sin entrar en sagas largas. El ranking prioriza popularidad y se actualiza con los datos del catalogo sincronizado.`
+  : `Todavia no tenemos anime catalogados dentro del limite de ${maxEpisodes} episodios, pero la pagina queda preparada para completarse con el siguiente refresco del catalogo.`;
+
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((item: AnimeSummary) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  `Anime con ${maxEpisodes} episodios o menos`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Anime por episodios', url: pagePath },
+      { name: `${maxEpisodes} o menos`, url: pagePath },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase text-accent-violet">Numero de episodios</p>
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">
+      Anime con <span class="brand-gradient-text">{maxEpisodes} episodios</span> o menos
+    </h1>
+    <p class="mt-4 max-w-3xl text-lg text-fg-secondary">
+      {intro}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No hay resultados para este limite en el catalogo actual.
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

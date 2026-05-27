@@ -67,6 +67,18 @@ class StudioControllerTest {
                 .andExpect(jsonPath("$[0].tmdbId").doesNotExist());
     }
 
+    @Test
+    void bestByStudioReturnsSummaries() throws Exception {
+        Anime anime = anime();
+        when(animeRepository.findByStudioSlug("wit-studio")).thenReturn(List.of(anime));
+
+        mvc.perform(get("/api/studios/wit-studio/best"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$[0].id").doesNotExist())
+                .andExpect(jsonPath("$[0].tmdbId").doesNotExist());
+    }
+
     private static Studio studio() {
         Studio studio = new Studio();
         studio.setId(1L);

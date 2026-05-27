@@ -1,0 +1,76 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeSummary } from '@/lib/api';
+import { getAnimeByDuration } from '@/lib/api';
+import { DURATION_MINUTES, durationPath } from '@/lib/programmaticSeo';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+
+interface Props {
+  minutes: number;
+}
+
+export function getStaticPaths() {
+  return DURATION_MINUTES.map((minutes) => ({
+    params: { mins: String(minutes) },
+    props: { minutes },
+  }));
+}
+
+const { minutes } = Astro.props as Props;
+const anime = await getAnimeByDuration(minutes);
+const topTitles = anime.slice(0, 4).map((item) => item.titleEnglish || item.titleRomaji);
+const pagePath = durationPath(minutes);
+const pageUrl = absoluteUrl(pagePath);
+
+const seoTitle = `Anime de ${minutes} minutos por capitulo | DondeAnime`;
+const seoDescription = topTitles.length > 0
+  ? `Anime con episodios de ${minutes} minutos: ${topTitles.join(', ')}.`
+  : `Lista de anime con episodios de ${minutes} minutos por capitulo.`;
+
+const intro = topTitles.length > 0
+  ? `Esta seleccion reune anime con episodios de ${minutes} minutos, una duracion util cuando quieres medir bien el tiempo antes de empezar una serie. Priorizamos los titulos mas populares del catalogo y mantenemos el listado actualizado con los datos sincronizados desde AniList.`
+  : `Todavia no tenemos anime catalogados con episodios de ${minutes} minutos, pero dejamos la pagina lista para que se rellene cuando el catalogo sincronizado traiga esa duracion.`;
+
+const itemListSchema = buildItemListSchema(
+  anime.slice(0, 30).map((item: AnimeSummary) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  `Anime de ${minutes} minutos por capitulo`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Anime por duracion', url: pagePath },
+      { name: `${minutes} minutos`, url: pagePath },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase text-accent-violet">Duracion por episodio</p>
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">
+      Anime de <span class="brand-gradient-text">{minutes} minutos</span> por capitulo
+    </h1>
+    <p class="mt-4 max-w-3xl text-lg text-fg-secondary">
+      {intro}
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    {anime.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No hay resultados para esta duracion en el catalogo actual.
+      </p>
+    ) : (
+      <AnimeGrid anime={anime} />
+    )}
+  </section>
+</BaseLayout>

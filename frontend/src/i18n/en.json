@@ -327,5 +327,7 @@
   "admin.editor.originalAniList": "Original AniList",
   "admin.editor.spanishOverride": "Spanish override",
   "admin.editor.save": "Save",
-  "admin.editor.reset": "Reset to original"
+  "admin.editor.reset": "Reset to original",
+  "admin.editor.beginnerRecommendationField": "Beginner recommendation",
+  "admin.editor.beginnerRecommendationHelper": "Visible on /empezar/ pages"
 }

@@ -145,6 +145,26 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findBySearchVectorMatching(@Param("query") String query);
 
     /**
+     * Anime con una duracion media concreta por episodio, en minutos.
+     */
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.episodeDuration = :minutes
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByEpisodeDuration(int minutes);
+
+    /**
+     * Anime con numero de episodios conocido igual o inferior al limite.
+     */
+    @Query("""
+            SELECT a FROM Anime a
+            WHERE a.episodes IS NOT NULL AND a.episodes <= :maxEpisodes
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByEpisodesLessThanOrEqual(int maxEpisodes);
+
+    /**
      * Anime con match TMDb pero sin descripción localizada en español.
      */
     @Query("""
@@ -186,6 +206,18 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             """)
     List<SeasonAggregation> aggregateSeasons();
 
+    /**
+     * Estudios agregados con count de anime distintos.
+     */
+    @Query("""
+            SELECT a.studio AS studio, COUNT(a) AS animeCount
+            FROM Anime a
+            WHERE a.studio IS NOT NULL AND TRIM(a.studio) <> ''
+            GROUP BY a.studio
+            ORDER BY COUNT(a) DESC, a.studio ASC
+            """)
+    List<StudioAggregation> aggregateStudios();
+
     interface GenreAggregation {
         String getGenre();
         Long getAnimeCount();
@@ -194,6 +226,11 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     interface SeasonAggregation {
         Integer getYear();
         String getSeason();
+        Long getAnimeCount();
+    }
+
+    interface StudioAggregation {
+        String getStudio();
         Long getAnimeCount();
     }
 }

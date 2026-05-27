@@ -327,5 +327,7 @@
   "admin.editor.originalAniList": "Original AniList",
   "admin.editor.spanishOverride": "Override español",
   "admin.editor.save": "Guardar",
-  "admin.editor.reset": "Resetear al original"
+  "admin.editor.reset": "Resetear al original",
+  "admin.editor.beginnerRecommendationField": "Recomendacion para principiantes",
+  "admin.editor.beginnerRecommendationHelper": "Visible en las paginas /empezar/"
 }

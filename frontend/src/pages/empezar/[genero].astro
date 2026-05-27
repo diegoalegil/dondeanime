@@ -1,0 +1,102 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import type { AnimeSummary, BeginnerAnime } from '@/lib/api';
+import { getBeginnerAnimeByGenre, getGenres } from '@/lib/api';
+import { beginnerGenrePath } from '@/lib/programmaticSeo';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+
+interface Props {
+  genreName: string;
+}
+
+export async function getStaticPaths() {
+  const genres = await getGenres();
+  return genres.map((genre) => ({
+    params: { genero: genre.slug },
+    props: { genreName: genre.name },
+  }));
+}
+
+const { genero } = Astro.params;
+const { genreName } = Astro.props as Props;
+const recommendations = await getBeginnerAnimeByGenre(genero!);
+const anime = recommendations.map((item: BeginnerAnime) => item.anime);
+const topTitles = anime.slice(0, 4).map((item: AnimeSummary) => item.titleEnglish || item.titleRomaji);
+const pagePath = beginnerGenrePath(genero!);
+const pageUrl = absoluteUrl(pagePath);
+
+const seoTitle = `Anime para principiantes en ${genreName} | DondeAnime`;
+const seoDescription = topTitles.length > 0
+  ? `Empieza con anime de ${genreName}: ${topTitles.join(', ')} y mas recomendaciones populares.`
+  : `Guia para empezar con anime de ${genreName}.`;
+
+const intro = topTitles.length > 0
+  ? `Si quieres empezar con anime de ${genreName}, esta seleccion prioriza titulos populares y faciles de ubicar en el catalogo. El objetivo es evitar listas enormes: diez opciones claras para probar el genero sin perderse entre sagas, spin-offs o estrenos demasiado concretos.`
+  : `Todavia no tenemos anime suficientes para preparar una lista de inicio en ${genreName}, pero la pagina queda lista para completarse con el catalogo sincronizado.`;
+
+const itemListSchema = buildItemListSchema(
+  anime.map((item: AnimeSummary) => ({
+    name: item.titleEnglish || item.titleRomaji,
+    url: absoluteUrl(`/anime/${item.slug}`),
+  })),
+  pageUrl,
+  `Anime para principiantes en ${genreName}`,
+);
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
+  <JsonLd slot="head" data={itemListSchema} />
+
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Empezar', url: pagePath },
+      { name: genreName, url: pagePath },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
+    <p class="text-xs uppercase text-accent-violet">Guia de entrada</p>
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">
+      Anime para principiantes en <span class="brand-gradient-text">{genreName}</span>
+    </h1>
+    <p class="mt-4 max-w-3xl text-lg text-fg-secondary">
+      {intro}
+    </p>
+  </section>
+
+  <section class="mx-auto grid max-w-6xl gap-5 px-4 pb-20">
+    {recommendations.length === 0 ? (
+      <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+        No hay recomendaciones disponibles para este genero en el catalogo actual.
+      </p>
+    ) : (
+      recommendations.map((item: BeginnerAnime, index: number) => (
+        <article class="rounded-lg border border-surface-2 bg-surface-1 p-5" data-beginner-result>
+          <div class="flex flex-col gap-4 md:flex-row">
+            <a href={`/anime/${item.anime.slug}`} class="shrink-0">
+              <img
+                src={item.anime.coverImage}
+                alt={item.anime.titleEnglish || item.anime.titleRomaji}
+                class="h-36 w-24 rounded-md object-cover"
+                loading={index < 2 ? 'eager' : 'lazy'}
+              />
+            </a>
+            <div>
+              <p class="text-xs font-semibold uppercase text-accent-violet">#{index + 1}</p>
+              <h2 class="mt-1 text-xl font-semibold text-fg-primary">
+                <a href={`/anime/${item.anime.slug}`} class="transition-colors hover:text-accent-violet">
+                  {item.anime.titleEnglish || item.anime.titleRomaji}
+                </a>
+              </h2>
+              <p class="mt-2 max-w-3xl text-sm leading-relaxed text-fg-secondary">
+                {item.beginnerRecommendation ?? `Buena puerta de entrada al ${genreName}: es uno de los titulos mas populares del genero en el catalogo y permite orientarte rapido antes de pasar a listas mas largas.`}
+              </p>
+            </div>
+          </div>
+        </article>
+      ))
+    )}
+  </section>
+</BaseLayout>

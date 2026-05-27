@@ -1,4 +1,10 @@
+import { FALLBACK_TOP_STUDIOS, studioSlug } from './programmaticSeo';
+
 const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
+const JSON_CACHE = new Map<string, Promise<unknown>>();
+const FETCH_ATTEMPTS = 3;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface AnimeSummary {
   anilistId: number;
@@ -8,6 +14,8 @@ export interface AnimeSummary {
   format: string;
   status: string;
   episodes: number | null;
+  episodeDuration: number | null;
+  studio: string | null;
   year: number | null;
   averageScore: number | null;
   popularity: number | null;
@@ -15,6 +23,11 @@ export interface AnimeSummary {
   genres: string[];
   season: string | null;
   seasonYear: number | null;
+}
+
+export interface BeginnerAnime {
+  anime: AnimeSummary;
+  beginnerRecommendation: string | null;
 }
 
 export interface UpcomingAnime extends AnimeSummary {
@@ -87,8 +100,57 @@ export interface ProviderSummary {
   animeCount: number;
 }
 
+async function fetchWithRetry(path: string): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    try {
+      const res = await fetch(`${API_URL}${path}`);
+      if (res.status < 500 || attempt === FETCH_ATTEMPTS) {
+        return res;
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt === FETCH_ATTEMPTS) {
+        throw error;
+      }
+    }
+
+    await sleep(400 * attempt);
+  }
+
+  throw lastError;
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`);
+  const cached = JSON_CACHE.get(path);
+  if (cached) {
+    return cached as Promise<T>;
+  }
+
+  const request = (async () => {
+    const res = await fetchWithRetry(path);
+    if (!res.ok) {
+      throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json() as Promise<T>;
+  })();
+
+  JSON_CACHE.set(path, request);
+
+  try {
+    return await request;
+  } catch (error) {
+    JSON_CACHE.delete(path);
+    throw error;
+  }
+}
+
+async function fetchJsonAllowing404<T>(path: string, fallback: () => Promise<T> | T): Promise<T> {
+  const res = await fetchWithRetry(path);
+  if (res.status === 404) {
+    return fallback();
+  }
   if (!res.ok) {
     throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
   }
@@ -98,28 +160,14 @@ async function fetchJson<T>(path: string): Promise<T> {
 export const getAllAnime = () => fetchJson<AnimeSummary[]>('/api/anime');
 
 export const getUpcomingAnime = async (days: number) => {
-  const res = await fetch(`${API_URL}/api/anime/upcoming?days=${days}`);
-  if (res.status === 404) {
-    return [] as UpcomingAnime[];
-  }
-  if (!res.ok) {
-    throw new Error(`API /api/anime/upcoming failed: ${res.status} ${res.statusText}`);
-  }
-  return res.json() as Promise<UpcomingAnime[]>;
+  return fetchJsonAllowing404(`/api/anime/upcoming?days=${days}`, () => [] as UpcomingAnime[]);
 };
 
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
 
 export const getSimilarAnime = async (slug: string) => {
-  const res = await fetch(`${API_URL}/api/anime/${slug}/similar`);
-  if (res.status === 404) {
-    return [] as AnimeSummary[];
-  }
-  if (!res.ok) {
-    throw new Error(`API /api/anime/${slug}/similar failed: ${res.status} ${res.statusText}`);
-  }
-  return res.json() as Promise<AnimeSummary[]>;
+  return fetchJsonAllowing404(`/api/anime/${slug}/similar`, () => [] as AnimeSummary[]);
 };
 
 export const getProviders = () => fetchJson<ProviderSummary[]>('/api/providers');
@@ -147,21 +195,82 @@ export const getGenres = () => fetchJson<GenreSummary[]>('/api/genres');
 export const getAnimeByGenre = (genreSlug: string) =>
   fetchJson<AnimeSummary[]>(`/api/genres/${genreSlug}`);
 
+export const getBeginnerAnimeByGenre = async (genreSlug: string) => {
+  return fetchJsonAllowing404(`/api/genres/${genreSlug}/beginner`, async () => {
+    const anime = await getAnimeByGenre(genreSlug);
+    return anime.slice(0, 10).map((item) => ({
+      anime: item,
+      beginnerRecommendation: null,
+    })) satisfies BeginnerAnime[];
+  });
+};
+
 export const getSeasons = () => fetchJson<SeasonSummary[]>('/api/seasons');
 
 export const getAnimeBySeason = (year: number, season: string) =>
   fetchJson<AnimeSummary[]>(`/api/seasons/${year}/${season}`);
 
-export async function getStudios(): Promise<StudioSummary[]> {
-  const res = await fetch(`${API_URL}/api/studios`);
-  if (res.status === 404) {
-    return [];
-  }
-  if (!res.ok) {
-    throw new Error(`API /api/studios failed: ${res.status} ${res.statusText}`);
-  }
-  return res.json() as Promise<StudioSummary[]>;
-}
+export const getAnimeByDuration = async (minutes: number) => {
+  return fetchJsonAllowing404(`/api/anime/duration/${minutes}`, async () => {
+    const allAnime = await getAllAnime();
+    return allAnime.filter((anime) => anime.episodeDuration === minutes);
+  });
+};
 
-export const getAnimeByStudio = (studioSlug: string) =>
-  fetchJson<AnimeSummary[]>(`/api/studios/${studioSlug}`);
+export const getAnimeByMaxEpisodes = async (maxEpisodes: number) => {
+  return fetchJsonAllowing404(`/api/anime/episodes/less-than/${maxEpisodes}`, async () => {
+    const allAnime = await getAllAnime();
+    return allAnime.filter((anime) => anime.episodes !== null && anime.episodes <= maxEpisodes);
+  });
+};
+
+const summarizeStudiosFromAnime = (anime: AnimeSummary[]): StudioSummary[] => {
+  const counts = new Map<string, { name: string; animeCount: number }>();
+
+  anime.forEach((item) => {
+    if (!item.studio) return;
+    const slug = studioSlug(item.studio);
+    if (!slug) return;
+    const current = counts.get(slug);
+    counts.set(slug, {
+      name: current?.name ?? item.studio,
+      animeCount: (current?.animeCount ?? 0) + 1,
+    });
+  });
+
+  const summaries = Array.from(counts.entries())
+    .map(([slug, value]) => ({ slug, animationStudio: false, ...value }))
+    .sort((a, b) => b.animeCount - a.animeCount || a.name.localeCompare(b.name, 'es'));
+
+  if (summaries.length > 0) return summaries;
+
+  return FALLBACK_TOP_STUDIOS.map((studio) => ({
+    ...studio,
+    animationStudio: false,
+    animeCount: 0,
+  }));
+};
+
+export const getStudios = async (): Promise<StudioSummary[]> => {
+  return fetchJsonAllowing404('/api/studios', async () => {
+    return summarizeStudiosFromAnime(await getAllAnime());
+  });
+};
+
+export const getAnimeByStudio = async (slug: string) => {
+  return fetchJsonAllowing404(`/api/studios/${slug}`, async () => {
+    const allAnime = await getAllAnime();
+    return allAnime
+      .filter((anime) => anime.studio && studioSlug(anime.studio) === slug)
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+  });
+};
+
+export const getBestAnimeByStudio = async (slug: string) => {
+  return fetchJsonAllowing404(`/api/studios/${slug}/best`, async () => {
+    const allAnime = await getAllAnime();
+    return allAnime
+      .filter((anime) => anime.studio && studioSlug(anime.studio) === slug)
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+  });
+};
