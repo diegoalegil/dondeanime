@@ -131,4 +131,34 @@ class ExternalAccountServiceTest {
         assertThat(watched.getWatchedAt()).isEqualTo("2026-05-21T19:00:00Z");
         assertThat(watched.getCreatedAt()).isEqualTo("2026-05-20T19:00:00Z");
     }
+
+    @Test
+    void markRatingStoresRatingOnExistingWatchedAnime() {
+        ExternalAccount account = new ExternalAccount();
+        UserWatchedAnime existing = new UserWatchedAnime();
+        existing.setExternalAccount(account);
+        existing.setAnimeSlug("attack-on-titan");
+        existing.setSource("TRAKT");
+        existing.setWatchedAt(Instant.parse("2026-05-20T19:00:00Z"));
+        existing.setCreatedAt(Instant.parse("2026-05-20T19:00:00Z"));
+
+        when(watchedAnimeRepository.findByExternalAccountAndAnimeSlugAndSource(
+                account,
+                "attack-on-titan",
+                "TRAKT"))
+                .thenReturn(Optional.of(existing));
+        when(watchedAnimeRepository.save(any(UserWatchedAnime.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserWatchedAnime watched = service.markRating(
+                account,
+                "attack-on-titan",
+                9,
+                Instant.parse("2026-05-22T19:00:00Z"),
+                "trakt");
+
+        assertThat(watched.getRating()).isEqualTo(9);
+        assertThat(watched.getRatedAt()).isEqualTo("2026-05-22T19:00:00Z");
+        assertThat(watched.getWatchedAt()).isEqualTo("2026-05-20T19:00:00Z");
+    }
 }

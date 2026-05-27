@@ -78,6 +78,39 @@ public class ExternalAccountService {
         return watchedAnimeRepository.save(watched);
     }
 
+    @Transactional
+    public UserWatchedAnime markRating(
+            ExternalAccount account,
+            String animeSlug,
+            Integer rating,
+            Instant ratedAt,
+            String source) {
+        Objects.requireNonNull(account, "account");
+        Objects.requireNonNull(ratedAt, "ratedAt");
+        if (rating == null || rating < 1 || rating > 10) {
+            throw new IllegalArgumentException("rating debe estar entre 1 y 10");
+        }
+
+        String normalizedSlug = requireTrimmed(animeSlug, "animeSlug").toLowerCase(Locale.ROOT);
+        String normalizedSource = requireTrimmed(source, "source").toUpperCase(Locale.ROOT);
+
+        UserWatchedAnime watched = watchedAnimeRepository
+                .findByExternalAccountAndAnimeSlugAndSource(account, normalizedSlug, normalizedSource)
+                .orElseGet(() -> {
+                    UserWatchedAnime created = new UserWatchedAnime();
+                    created.setExternalAccount(account);
+                    created.setAnimeSlug(normalizedSlug);
+                    created.setSource(normalizedSource);
+                    created.setWatchedAt(ratedAt);
+                    created.setCreatedAt(Instant.now(clock));
+                    return created;
+                });
+
+        watched.setRating(rating);
+        watched.setRatedAt(ratedAt);
+        return watchedAnimeRepository.save(watched);
+    }
+
     static String normalizeProvider(String provider) {
         return requireTrimmed(provider, "provider").toLowerCase(Locale.ROOT);
     }

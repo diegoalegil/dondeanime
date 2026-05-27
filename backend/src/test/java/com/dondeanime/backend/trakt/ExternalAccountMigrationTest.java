@@ -27,4 +27,19 @@ class ExternalAccountMigrationTest {
         assertThat(sql).contains("CONSTRAINT uk_user_watched_anime_account_slug_source UNIQUE (external_account_id, anime_slug, source)");
         assertThat(sql).contains("ON DELETE CASCADE");
     }
+
+    @Test
+    void ratingMigrationAddsRatingColumns() throws Exception {
+        String sql = Files.readString(Path.of(
+                "src",
+                "main",
+                "resources",
+                "db",
+                "migration",
+                "V15__user_watched_anime_ratings.sql"));
+
+        assertThat(sql).contains("ADD COLUMN IF NOT EXISTS rating integer");
+        assertThat(sql).contains("ADD COLUMN IF NOT EXISTS rated_at timestamp(6) with time zone");
+        assertThat(sql).contains("idx_user_watched_anime_rated_at");
+    }
 }

@@ -113,12 +113,13 @@ class FlywayMigrationTest {
                 "idx_api_key_endpoint_usage_endpoint",
                 "idx_external_account_email",
                 "idx_user_watched_anime_account",
-                "idx_user_watched_anime_slug");
+                "idx_user_watched_anime_slug",
+                "idx_user_watched_anime_rated_at");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(13);
+        assertThat(successfulMigrations).isEqualTo(14);
     }
 }

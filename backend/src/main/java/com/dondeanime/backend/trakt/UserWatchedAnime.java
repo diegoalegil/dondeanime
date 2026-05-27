@@ -44,6 +44,12 @@ public class UserWatchedAnime {
     @Column(name = "source", nullable = false, length = 32)
     private String source;
 
+    @Column(name = "rating")
+    private Integer rating;
+
+    @Column(name = "rated_at")
+    private Instant ratedAt;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -88,6 +94,22 @@ public class UserWatchedAnime {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public Instant getRatedAt() {
+        return ratedAt;
+    }
+
+    public void setRatedAt(Instant ratedAt) {
+        this.ratedAt = ratedAt;
     }
 
     public Instant getCreatedAt() {

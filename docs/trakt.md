@@ -26,6 +26,7 @@ TRAKT_REDIRECT_URI=https://api.dondeanime.com/api/trakt/oauth/callback
 
 - `GET /api/trakt/oauth/start`: redirige a Trakt con `response_type=code`, `client_id`, `redirect_uri` y `state` firmado.
 - `GET /api/trakt/oauth/callback`: valida `state`, intercambia `code` por tokens y devuelve una respuesta segura.
+- `POST /api/trakt/sync`: importa vistos y ratings para una cuenta externa existente usando un access token temporal en el body.
 
 La respuesta del callback no expone tokens:
 
@@ -53,3 +54,23 @@ PR 22.2 agrega:
 - `user_watched_anime`: anime visto por cuenta externa, deduplicado por `external_account_id + anime_slug + source`.
 
 Los campos de token estan nombrados como `ciphertext` a proposito. No se debe guardar un token plano en esas columnas. El servicio de cuenta externa normaliza provider, email, scopes, slug y source antes de persistir.
+
+## Sync
+
+PR 22.3 importa:
+
+- `GET /sync/watched/shows`
+- `GET /sync/ratings/shows`
+
+El match contra catalogo local es deliberadamente simple y auditable: titulo normalizado + anio. No toca `AnimeMatchingService`, porque ese servicio es solo para AniList/TMDb.
+
+Ejemplo de request:
+
+```json
+{
+  "externalUserId": "123456",
+  "accessToken": "trakt_access_token_temporal"
+}
+```
+
+La respuesta solo devuelve contadores y hasta 20 no matcheados. No devuelve tokens.
