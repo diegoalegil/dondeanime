@@ -43,13 +43,22 @@ public class EmbeddingDocumentBuilder {
     }
 
     public List<AnimeSearchDocument> buildDocuments() {
+        return buildDocumentRecords().stream()
+                .map(EmbeddingDocumentRecord::document)
+                .toList();
+    }
+
+    public List<EmbeddingDocumentRecord> buildDocumentRecords() {
         List<Anime> anime = animeRepository.findAllWithGenres().stream()
+                .filter(item -> item.getId() != null)
                 .sorted(ANIME_ORDER)
                 .toList();
         Map<Long, List<WatchProvider>> providersByAnimeId = providersByAnimeId(anime);
 
         return anime.stream()
-                .map(item -> buildDocument(item, providersByAnimeId.getOrDefault(item.getId(), List.of())))
+                .map(item -> new EmbeddingDocumentRecord(
+                        item.getId(),
+                        buildDocument(item, providersByAnimeId.getOrDefault(item.getId(), List.of()))))
                 .toList();
     }
 

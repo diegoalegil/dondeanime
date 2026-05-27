@@ -11,14 +11,14 @@ import io.swagger.v3.oas.annotations.Hidden;
 @RequestMapping("/api/admin/embeddings")
 public class EmbeddingAdminController {
 
-    private final EmbeddingDocumentBuilder documentBuilder;
+    private final EmbeddingRebuildService rebuildService;
 
-    public EmbeddingAdminController(EmbeddingDocumentBuilder documentBuilder) {
-        this.documentBuilder = documentBuilder;
+    public EmbeddingAdminController(EmbeddingRebuildService rebuildService) {
+        this.rebuildService = rebuildService;
     }
 
     @PostMapping("/rebuild")
     public EmbeddingRebuildResponse rebuild() {
-        return new EmbeddingRebuildResponse(documentBuilder.buildDocuments().size());
+        return rebuildService.rebuild();
     }
 }

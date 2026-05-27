@@ -5,8 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -35,7 +33,7 @@ class EmbeddingAdminControllerTest {
     private MockMvc mvc;
 
     @MockitoBean
-    private EmbeddingDocumentBuilder documentBuilder;
+    private EmbeddingRebuildService rebuildService;
 
     @Autowired
     private AdminJwtService adminJwtService;
@@ -48,30 +46,18 @@ class EmbeddingAdminControllerTest {
 
     @Test
     void rebuildReturnsPreparedDocumentCount() throws Exception {
-        when(documentBuilder.buildDocuments()).thenReturn(List.of(
-                document("attack-on-titan"),
-                document("death-note")));
+        when(rebuildService.rebuild()).thenReturn(new EmbeddingRebuildResponse(2, 1, 1, "test-model"));
 
         mvc.perform(post("/api/admin/embeddings/rebuild")
                         .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.documentsPrepared").value(2))
+                .andExpect(jsonPath("$.embeddingsUpdated").value(1))
+                .andExpect(jsonPath("$.embeddingsSkipped").value(1))
+                .andExpect(jsonPath("$.model").value("test-model"))
                 .andExpect(jsonPath("$.id").doesNotExist())
                 .andExpect(jsonPath("$.tmdbId").doesNotExist())
                 .andExpect(jsonPath("$.syncedAt").doesNotExist());
-    }
-
-    private static AnimeSearchDocument document(String slug) {
-        return new AnimeSearchDocument(
-                slug,
-                slug,
-                "",
-                List.of(),
-                null,
-                null,
-                null,
-                List.of(),
-                "https://dondeanime.com/anime/" + slug);
     }
 
     private String bearerToken() {

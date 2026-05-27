@@ -56,6 +56,7 @@ Web, Data JPA, PostgreSQL Driver, Validation, Lombok, DevTools.
 ### APIs externas
 - **AniList** (GraphQL, sin auth, https://graphql.anilist.co) → fuente primaria de datos de anime.
 - **TMDb** (REST, requiere API key v4, https://api.themoviedb.org/3) → providers de streaming por país.
+- **OpenAI Embeddings** (REST, requiere `OPENAI_API_KEY`, apagado por defecto) → búsqueda semántica del Sprint 21.
 
 ---
 
@@ -164,6 +165,10 @@ Por eso `application.properties` apunta a `jdbc:postgresql://localhost:5433/dond
 
 ```
 TMDB_API_KEY=eyJ...                    # token v4 de TMDb (regenerado tras leak inicial)
+EMBEDDINGS_ENABLED=false
+EMBEDDING_MODEL=text-embedding-3-small
+OPENAI_API_BASE=https://api.openai.com
+OPENAI_API_KEY=
 ANILIST_API_BASE=https://graphql.anilist.co
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5433                     # ← 5433, no 5432
