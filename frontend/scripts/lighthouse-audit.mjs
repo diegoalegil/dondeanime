@@ -165,7 +165,7 @@ const startPreview = () => {
       cwd: rootDir,
       env: process.env,
       shell: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: 'ignore',
     });
   }
 
@@ -173,7 +173,7 @@ const startPreview = () => {
     cwd: rootDir,
     env: process.env,
     shell: false,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: 'ignore',
   });
 };
 
@@ -220,7 +220,7 @@ const runLighthouse = async ({ template, route, url }) => {
     '--throttling-method=provided',
     '--max-wait-for-load=45000',
     `--chrome-flags=${chromeFlags}`,
-  ], { allowFailure: true, stdio: 'pipe', timeoutMs: lighthouseTimeoutMs });
+  ], { allowFailure: true, stdio: 'ignore', timeoutMs: lighthouseTimeoutMs });
 
   const raw = JSON.parse(readFileSync(outputPath, 'utf8'));
   const scores = Object.fromEntries(
