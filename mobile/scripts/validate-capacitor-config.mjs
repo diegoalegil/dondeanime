@@ -37,6 +37,10 @@ if (pkg.dependencies?.['@capacitor/core'] !== '8.3.4') {
   fail('package.json debe fijar @capacitor/core 8.3.4');
 }
 
+if (pkg.dependencies?.['@capacitor/app'] !== '8.1.0') {
+  fail('package.json debe fijar @capacitor/app 8.1.0');
+}
+
 if (pkg.devDependencies?.['@capacitor/cli'] !== '8.3.4') {
   fail('package.json debe fijar @capacitor/cli 8.3.4');
 }
