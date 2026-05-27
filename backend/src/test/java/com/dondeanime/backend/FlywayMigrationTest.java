@@ -68,6 +68,7 @@ class FlywayMigrationTest {
                 "anime",
                 "anime_character",
                 "anime_character_role",
+                "anime_embedding",
                 "anime_tag",
                 "anime_genre",
                 "anime_studio",
@@ -101,6 +102,8 @@ class FlywayMigrationTest {
                 "idx_anime_genre_genre",
                 "idx_anime_episode_duration",
                 "idx_anime_studio_slug",
+                "idx_anime_embedding_model",
+                "idx_anime_embedding_content_hash",
                 "idx_anime_search_vector",
                 "idx_push_subscription_country",
                 "idx_push_subscription_email",
@@ -114,6 +117,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(12);
+        assertThat(successfulMigrations).isEqualTo(13);
     }
 }
