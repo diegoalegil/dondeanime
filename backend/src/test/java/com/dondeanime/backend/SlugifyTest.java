@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dondeanime.backend.anime.GenreSummaryDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
+import com.dondeanime.backend.studio.Studio;
 
 /**
  * Tests puros (sin Spring) de la normalización a slug que usan los
@@ -36,5 +37,12 @@ class SlugifyTest {
         assertThat(GenreSummaryDto.slugify("Action")).isEqualTo("action");
         assertThat(GenreSummaryDto.slugify("Slice of Life")).isEqualTo("slice-of-life");
         assertThat(GenreSummaryDto.slugify("Sci-Fi")).isEqualTo("sci-fi");
+    }
+
+    @Test
+    void studioSlugRemovesPunctuationAndAccents() {
+        assertThat(Studio.slugify("A-1 Pictures")).isEqualTo("a-1-pictures");
+        assertThat(Studio.slugify("Brain's Base")).isEqualTo("brains-base");
+        assertThat(Studio.slugify("Estúdio Pierrot")).isEqualTo("estudio-pierrot");
     }
 }

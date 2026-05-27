@@ -34,10 +34,10 @@ jobs:
           script: |
             const marker = '<!-- dondeanime-lighthouse-ci -->';
             const thresholds = {
-              performance: 80,
-              accessibility: 90,
-              seo: 80,
-              'best-practices': 80,
+              performance: 85,
+              accessibility: 95,
+              seo: 90,
+              'best-practices': 90,
             };
             const labels = {
               performance: 'Performance',
