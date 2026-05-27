@@ -76,8 +76,16 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
+                "X-API-Key",
                 RequestMdcFilter.REQUEST_ID_HEADER));
-        configuration.setExposedHeaders(List.of("WWW-Authenticate", RequestMdcFilter.REQUEST_ID_HEADER));
+        configuration.setExposedHeaders(List.of(
+                "WWW-Authenticate",
+                "X-RateLimit-Limit",
+                "X-RateLimit-Remaining",
+                "Deprecation",
+                "Sunset",
+                "Link",
+                RequestMdcFilter.REQUEST_ID_HEADER));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

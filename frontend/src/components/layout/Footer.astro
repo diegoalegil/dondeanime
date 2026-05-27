@@ -81,6 +81,8 @@ const featuredGenres = [
     <div class="mt-10 flex flex-col gap-3 border-t border-surface-2 pt-6 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between">
       <p>&copy; {year} {t('brand.name')}. {t('footer.dataAttribution')}</p>
       <p class="sm:text-right">
+        <a href="/api" class="transition-colors hover:text-fg-primary">{t('nav.api')}</a>
+        <span class="mx-2">&middot;</span>
         <a href={localizedPath('/legal/privacidad')} class="transition-colors hover:text-fg-primary">{t('footer.privacy')}</a>
         <span class="mx-2">&middot;</span>
         {t('footer.affiliateDisclosure')}

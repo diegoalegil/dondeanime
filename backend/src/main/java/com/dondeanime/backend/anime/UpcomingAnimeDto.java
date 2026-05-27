@@ -2,12 +2,15 @@ package com.dondeanime.backend.anime;
 
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Vista para listados de próximos estrenos.
  *
  * Incluye fecha completa porque aquí sí importa el día exacto. Mantiene
  * fuera id interno, tmdbId y syncedAt igual que AnimeSummaryDto.
  */
+@Schema(description = "Anime proximo a estrenarse con fecha completa")
 public record UpcomingAnimeDto(
         Long anilistId,
         String slug,
