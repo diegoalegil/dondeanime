@@ -20,3 +20,20 @@ test('static routes expose search index, robots and sitemap', async ({ request }
   expect(sitemap.ok()).toBe(true);
   expect(await sitemap.text()).toContain('<sitemapindex');
 });
+
+test('offline worker caches only recent anime detail pages', async ({ request }) => {
+  const offline = await request.get('/offline');
+  expect(offline.ok()).toBe(true);
+  expect(await offline.text()).toContain('ultimas fichas vistas');
+
+  const serviceWorker = await request.get('/sw.js');
+  expect(serviceWorker.ok()).toBe(true);
+  const serviceWorkerText = await serviceWorker.text();
+
+  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
+  expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
+  expect(serviceWorkerText).toContain('const MAX_CACHED_ANIME_PAGES = 12');
+  expect(serviceWorkerText).toContain('const ANIME_PAGE_PATTERN');
+  expect(serviceWorkerText).toContain("request.mode === 'navigate'");
+  expect(serviceWorkerText).toContain("contentType.includes('text/html')");
+});

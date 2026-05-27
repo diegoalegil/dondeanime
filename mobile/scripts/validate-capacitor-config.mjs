@@ -4,6 +4,8 @@ import path from 'node:path';
 const root = new URL('..', import.meta.url);
 const configPath = new URL('capacitor.config.json', root);
 const packagePath = new URL('package.json', root);
+const offlineDocPath = new URL('OFFLINE.md', root);
+const offlineCachePath = new URL('src/offlineCache.mjs', root);
 
 const fail = (message) => {
   console.error(message);
@@ -57,3 +59,5 @@ if (webDir !== expectedFrontend) {
 
 await access(packagePath);
 await access(configPath);
+await access(offlineDocPath);
+await access(offlineCachePath);
