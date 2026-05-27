@@ -6,6 +6,7 @@ const configPath = new URL('capacitor.config.json', root);
 const packagePath = new URL('package.json', root);
 const offlineDocPath = new URL('OFFLINE.md', root);
 const offlineCachePath = new URL('src/offlineCache.mjs', root);
+const releaseDocPath = new URL('RELEASE.md', root);
 
 const fail = (message) => {
   console.error(message);
@@ -13,10 +14,12 @@ const fail = (message) => {
 };
 
 const readJson = async (url) => JSON.parse(await readFile(url, 'utf8'));
+const readText = async (url) => readFile(url, 'utf8');
 
-const [config, pkg] = await Promise.all([
+const [config, pkg, releaseDoc] = await Promise.all([
   readJson(configPath),
   readJson(packagePath),
+  readText(releaseDocPath),
 ]);
 
 if (!/^com\.dondeanime\.[a-z0-9]+$/.test(config.appId ?? '')) {
@@ -61,3 +64,21 @@ await access(packagePath);
 await access(configPath);
 await access(offlineDocPath);
 await access(offlineCachePath);
+await access(releaseDocPath);
+
+[
+  '# Release movil',
+  '## Preflight',
+  '## Build interno Android',
+  '## Build interno iOS',
+  '## Checklist de privacidad',
+  '## Capturas',
+  '## Iconos',
+  '## Permisos',
+  '## Textos legales',
+  '## No publicar desde el equipo',
+].forEach((heading) => {
+  if (!releaseDoc.includes(heading)) {
+    fail(`RELEASE.md debe incluir ${heading}`);
+  }
+});
