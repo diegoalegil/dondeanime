@@ -25,5 +25,5 @@ sanitizados de fichas de anime.
 
 1. Construir el frontend desde `frontend/`.
 2. Sincronizar Capacitor cuando existan proyectos nativos.
-3. Generar builds internos siguiendo `mobile/RELEASE.md` cuando Sprint 23.5 lo
-   documente.
+3. Generar builds internos siguiendo `RELEASE.md`.
+4. Publicar en stores solo despues de revision manual de Diego.
