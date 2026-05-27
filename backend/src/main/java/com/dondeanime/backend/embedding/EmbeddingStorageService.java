@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,13 @@ public class EmbeddingStorageService {
         return repository.findByModelOrderByUpdatedAtDesc(safeModel).stream()
                 .map(this::toStoredEmbedding)
                 .toList();
+    }
+
+    public Optional<StoredAnimeEmbedding> findByAnimeIdAndModel(Long animeId, String model) {
+        Long safeAnimeId = requireAnimeId(animeId);
+        String safeModel = normalizeRequired(model, "model");
+        return repository.findByAnimeIdAndModel(safeAnimeId, safeModel)
+                .map(this::toStoredEmbedding);
     }
 
     private StoredAnimeEmbedding toStoredEmbedding(AnimeEmbedding entity) {
