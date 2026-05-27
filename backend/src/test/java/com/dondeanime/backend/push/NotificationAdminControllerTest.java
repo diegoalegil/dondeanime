@@ -110,6 +110,6 @@ class NotificationAdminControllerTest {
                         1,
                         201,
                         Instant.parse("2026-05-25T01:00:00Z"),
-                        null)));
+                null)));
     }
 }

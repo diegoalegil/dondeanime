@@ -30,6 +30,7 @@ import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.GenreController;
 import com.dondeanime.backend.anime.RecommendationService;
 import com.dondeanime.backend.anime.SeasonController;
+import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.config.SecurityConfig;
 import com.dondeanime.backend.provider.ProviderController;
 import com.dondeanime.backend.provider.ProviderSyncService;
@@ -89,6 +90,9 @@ class OpenApiDocumentationTest {
 
     @MockitoBean
     private AnimeDescriptionEnricher descriptionEnricher;
+
+    @MockitoBean
+    private TrailerSyncService trailerSyncService;
 
     @MockitoBean
     private WatchProviderRepository providerRepository;
