@@ -188,8 +188,22 @@ const stopPreview = async (preview) => {
     return;
   }
 
+  const waitForExit = () => new Promise((resolve) => preview.once('exit', resolve));
+  const waitForTimeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms, false));
+
   preview.kill('SIGTERM');
-  await new Promise((resolve) => preview.once('exit', resolve));
+  const terminated = await Promise.race([
+    waitForExit().then(() => true),
+    waitForTimeout(5_000),
+  ]);
+
+  if (terminated) return;
+
+  preview.kill('SIGKILL');
+  await Promise.race([
+    waitForExit(),
+    waitForTimeout(5_000),
+  ]);
 };
 
 const runLighthouse = async ({ template, route, url }) => {
