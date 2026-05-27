@@ -29,7 +29,7 @@ export default defineConfig({
     command: `npm run build && npm run preview -- --host 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI && !process.env.PUBLIC_API_URL && !process.env.PUBLIC_DATA_API_URL,
-    timeout: 300_000,
+    timeout: 600_000,
     env: {
       ...process.env,
       PUBLIC_API_URL: publicApiUrl,
