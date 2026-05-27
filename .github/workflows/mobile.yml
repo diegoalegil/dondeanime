@@ -35,5 +35,8 @@ jobs:
       - name: Lint mobile wrapper
         run: npm run lint
 
+      - name: Test mobile wrapper
+        run: npm test
+
       - name: Build mobile wrapper
         run: npm run build
