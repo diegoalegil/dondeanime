@@ -1,5 +1,6 @@
 ---
 import AnimeCard from '@/components/anime/AnimeCard.astro';
+import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getAllAnime } from '@/lib/api';
 
@@ -27,6 +28,10 @@ const anime = await getAllAnime();
           data-search-page-input
         />
       </form>
+    </div>
+
+    <div class="-mx-4">
+      <AnimeChatSearch />
     </div>
 
     <p class="mb-5 text-sm text-fg-muted" data-search-page-count>
