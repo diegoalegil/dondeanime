@@ -24,6 +24,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final List<RateLimitRule> RULES = List.of(
             new RateLimitRule("/api/search", false, 30),
             new RateLimitRule("/api/track/affiliate", false, 60),
+            new RateLimitRule("/api/trakt/oauth/", true, 20),
             new RateLimitRule("/api/admin/", true, 10));
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
