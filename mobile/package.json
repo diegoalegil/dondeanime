@@ -1,0 +1,16 @@
+{
+  "name": "@dondeanime/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "node scripts/validate-capacitor-config.mjs",
+    "build": "node scripts/validate-capacitor-config.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.3.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.3.4"
+  }
+}

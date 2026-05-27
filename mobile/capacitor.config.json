@@ -1,0 +1,8 @@
+{
+  "appId": "com.dondeanime.app",
+  "appName": "DondeAnime",
+  "webDir": "../frontend/dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
