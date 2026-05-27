@@ -24,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.anime.Anime;
+import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeOverride;
 import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.AnimeRepository;
@@ -52,6 +53,9 @@ class AnimeAdminControllerTest {
     @MockitoBean
     private AnimeOverrideService overrideService;
 
+    @MockitoBean
+    private AnimeMatchingService matchingService;
+
     @Autowired
     private AdminJwtService adminJwtService;
 
@@ -70,7 +74,7 @@ class AnimeAdminControllerTest {
         Anime anime = anime();
         AnimeOverride override = override(anime, "description", "Descripción propia");
 
-        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(anime));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(anime));
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of(override));
 
         mvc.perform(post("/api/admin/anime/attack-on-titan/override")
@@ -95,7 +99,7 @@ class AnimeAdminControllerTest {
     void deleteOverrideWithCredentialsReturnsFallbackDetail() throws Exception {
         Anime anime = anime();
 
-        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(anime));
+        when(animeRepository.findBySlugWithCharacters("attack-on-titan")).thenReturn(Optional.of(anime));
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of());
 
         mvc.perform(delete("/api/admin/anime/attack-on-titan/override")
@@ -124,6 +128,29 @@ class AnimeAdminControllerTest {
                 .andExpect(jsonPath("$[0].fieldName").value("title_english"))
                 .andExpect(jsonPath("$[0].fieldValue").value("Título propio"))
                 .andExpect(jsonPath("$[0].originalValue").value("Attack on Titan"));
+    }
+
+    @Test
+    void rematchWithCredentialsReturnsResult() throws Exception {
+        when(matchingService.rematch("attack-on-titan"))
+                .thenReturn(Optional.of(new AnimeMatchingService.RematchResult("attack-on-titan", true)));
+
+        mvc.perform(post("/api/admin/anime/attack-on-titan/rematch")
+                        .header("Authorization", bearerToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.slug").value("attack-on-titan"))
+                .andExpect(jsonPath("$.matched").value(true));
+
+        verify(matchingService).rematch("attack-on-titan");
+    }
+
+    @Test
+    void rematchUnknownSlugReturns404() throws Exception {
+        when(matchingService.rematch("inexistente")).thenReturn(Optional.empty());
+
+        mvc.perform(post("/api/admin/anime/inexistente/rematch")
+                        .header("Authorization", bearerToken()))
+                .andExpect(status().isNotFound());
     }
 
     private static Anime anime() {

@@ -12,31 +12,17 @@ import org.springframework.web.client.RestClient;
 import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
+import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 
 /**
- * Jobs programados que mantienen el catálogo al día sin intervención manual.
+ * Jobs programados que mantienen el catalogo al dia sin intervencion manual.
  *
- * Solo se activa si scheduling.enabled=true. En local lo dejamos a
- * false por defecto: no queremos que dispare syncs mientras desarrollamos.
- * En producción (Hetzner) se activará con scheduling.enabled=true.
- *
- * Cron expressions configurables vía properties para ajustar sin
- * recompilar. Defaults espaciados para no solapar:
- *   - sync-anilist:    cada 12h, 3am y 3pm
- *   - match-tmdb:      cada 24h, 4am
- *   - sync-providers:  cada 24h, 5am
- *
- * Cron de Spring tiene 6 campos (seg min hora día mes día_semana).
- * Distinto del cron Unix de 5 campos.
- *
- * Tras completar syncAniList y syncProviders dispara un Deploy Hook
- * de Vercel para que el frontend rebuildee con datos frescos. Solo
- * si vercel.deploy-hook está configurado (env var VERCEL_DEPLOY_HOOK
- * en .env.prod del VPS).
+ * Solo se activa si scheduling.enabled=true. En local lo dejamos a false
+ * por defecto: no queremos que dispare syncs mientras desarrollamos.
  */
 @Component
 @ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")
@@ -48,6 +34,7 @@ public class CatalogScheduler {
     private final AnimeMatchingService matchingService;
     private final AnimeDescriptionEnricher descriptionEnricher;
     private final ProviderSyncService providerSyncService;
+    private final TrailerSyncService trailerSyncService;
     private final RestClient restClient;
     private final MeterRegistry meterRegistry;
     private final ApplicationEventPublisher eventPublisher;
@@ -58,6 +45,7 @@ public class CatalogScheduler {
             AnimeMatchingService matchingService,
             AnimeDescriptionEnricher descriptionEnricher,
             ProviderSyncService providerSyncService,
+            TrailerSyncService trailerSyncService,
             RestClient.Builder restClientBuilder,
             MeterRegistry meterRegistry,
             ApplicationEventPublisher eventPublisher,
@@ -66,6 +54,7 @@ public class CatalogScheduler {
         this.matchingService = matchingService;
         this.descriptionEnricher = descriptionEnricher;
         this.providerSyncService = providerSyncService;
+        this.trailerSyncService = trailerSyncService;
         this.restClient = restClientBuilder.build();
         this.meterRegistry = meterRegistry;
         this.eventPublisher = eventPublisher;
@@ -78,7 +67,7 @@ public class CatalogScheduler {
         boolean ok = false;
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
-            int n = syncService.syncPopular(100);
+            int n = syncService.syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
             log.info("[scheduler] syncAniList: completado, {} anime", n);
             ok = true;
             recordSuccess("anilist", sample);
@@ -115,8 +104,10 @@ public class CatalogScheduler {
         Timer.Sample sample = Timer.start(meterRegistry);
         boolean ok = false;
         try {
-            int n = providerSyncService.syncAll();
-            log.info("[scheduler] syncProviders: completado, {} procesados", n);
+            int providers = providerSyncService.syncAll();
+            int trailers = trailerSyncService.syncAll();
+            log.info("[scheduler] syncProviders: completado, {} providers procesados, {} trailers procesados",
+                    providers, trailers);
             ok = true;
             recordSuccess("providers", sample);
         } catch (Exception e) {
@@ -129,15 +120,6 @@ public class CatalogScheduler {
         }
     }
 
-    /**
-     * Llama al Deploy Hook de Vercel para forzar rebuild del frontend
-     * con los datos frescos. Si vercel.deploy-hook no está configurado
-     * (string vacío) es no-op.
-     *
-     * El hook devuelve 201 Created con un JSON tipo
-     *   {"job":{"id":"...","state":"PENDING","createdAt":...}}
-     * No esperamos a que el build termine; Vercel lo procesa async.
-     */
     private void triggerVercelRebuild() {
         if (vercelDeployHook == null || vercelDeployHook.isBlank()) {
             log.debug("[scheduler] Vercel deploy hook no configurado, no se dispara rebuild");

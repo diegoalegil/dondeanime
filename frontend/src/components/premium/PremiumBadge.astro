@@ -1,0 +1,32 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = 'Premium activo' } = Astro.props;
+---
+<span
+  class="hidden items-center gap-2 rounded-md border border-warning/40 bg-warning/10 px-2.5 py-1 text-xs font-semibold text-warning"
+  data-premium-badge
+>
+  <span class="h-1.5 w-1.5 rounded-full bg-warning"></span>
+  <span data-premium-badge-label>{label}</span>
+</span>
+
+<script>
+  const badge = document.querySelector('[data-premium-badge]');
+  const label = document.querySelector('[data-premium-badge-label]');
+
+  try {
+    const premium = localStorage.getItem('dondeanime-premium') === 'true';
+    const tier = localStorage.getItem('dondeanime-premium-tier') || 'Premium';
+
+    if (premium && badge instanceof HTMLElement) {
+      if (label) label.textContent = `${tier} activo`;
+      badge.classList.remove('hidden');
+      badge.classList.add('inline-flex');
+    }
+  } catch (error) {
+    // LocalStorage puede estar bloqueado; el badge es solo una pista visual.
+  }
+</script>

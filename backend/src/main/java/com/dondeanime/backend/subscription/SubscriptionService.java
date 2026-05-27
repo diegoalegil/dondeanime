@@ -14,15 +14,19 @@ import org.springframework.web.server.ResponseStatusException;
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.email.EmailService;
+import com.dondeanime.backend.premium.SubscriberService;
 
 @Service
 public class SubscriptionService {
+
+    private static final int FREE_ALERT_LIMIT = 10;
 
     private final AppUserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final AnimeRepository animeRepository;
     private final EmailTokenService emailTokenService;
     private final EmailService emailService;
+    private final SubscriberService subscriberService;
     private final String apiUrl;
 
     public SubscriptionService(
@@ -31,12 +35,14 @@ public class SubscriptionService {
             AnimeRepository animeRepository,
             EmailTokenService emailTokenService,
             EmailService emailService,
+            SubscriberService subscriberService,
             @Value("${dondeanime.api-url}") String apiUrl) {
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.animeRepository = animeRepository;
         this.emailTokenService = emailTokenService;
         this.emailService = emailService;
+        this.subscriberService = subscriberService;
         this.apiUrl = trimTrailingSlash(apiUrl);
     }
 
@@ -129,6 +135,7 @@ public class SubscriptionService {
     private void createSubscriptionIfAbsent(AppUser user, Anime anime, String countryCode, Instant now) {
         subscriptionRepository.findByUser_IdAndAnime_IdAndCountryCode(user.getId(), anime.getId(), countryCode)
                 .orElseGet(() -> {
+                    assertAlertLimitAllows(user);
                     Subscription subscription = new Subscription();
                     subscription.setUser(user);
                     subscription.setAnime(anime);
@@ -136,6 +143,19 @@ public class SubscriptionService {
                     subscription.setCreatedAt(now);
                     return subscriptionRepository.save(subscription);
                 });
+    }
+
+    private void assertAlertLimitAllows(AppUser user) {
+        if (subscriberService.isPremium(user.getEmail())) {
+            return;
+        }
+
+        long activeAlerts = subscriptionRepository.countByUser_IdAndNotifiedAtIsNull(user.getId());
+        if (activeAlerts >= FREE_ALERT_LIMIT) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYMENT_REQUIRED,
+                    "El plan gratis permite hasta " + FREE_ALERT_LIMIT + " alertas activas");
+        }
     }
 
     private Anime findAnime(String slug) {

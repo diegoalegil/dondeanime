@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dondeanime.backend.character.CharacterDto;
+import com.dondeanime.backend.studio.StudioDto;
+
 /**
- * Vista completa de un anime para la página de detalle.
+ * Vista completa de un anime para la pagina de detalle.
  *
- * Incluye todo lo de AnimeSummaryDto más descripción larga, fechas
+ * Incluye todo lo de AnimeSummaryDto mas descripcion larga, fechas
  * detalladas y banner. Sigue ocultando id interno, syncedAt y tmdbId.
  */
 public record AnimeDetailDto(
@@ -16,6 +19,7 @@ public record AnimeDetailDto(
         String slug,
         String titleEnglish,
         String titleRomaji,
+        String trailerYoutubeId,
         String description,
         boolean descriptionTranslationPending,
         String format,
@@ -32,8 +36,10 @@ public record AnimeDetailDto(
         Integer endMonth,
         Integer endDay,
         Set<String> genres,
+        List<StudioDto> studios,
         String season,
-        Integer seasonYear
+        Integer seasonYear,
+        List<CharacterDto> characters
 ) {
     public static AnimeDetailDto from(Anime a) {
         return from(a, List.of());
@@ -60,6 +66,7 @@ public record AnimeDetailDto(
                 a.getSlug(),
                 overrideByField.getOrDefault("title_english", a.getTitleEnglish()),
                 overrideByField.getOrDefault("title_romaji", a.getTitleRomaji()),
+                a.getTrailerYoutubeId(),
                 publicDescription,
                 translationPending,
                 a.getFormat(),
@@ -76,8 +83,16 @@ public record AnimeDetailDto(
                 a.getEndMonth(),
                 a.getEndDay(),
                 a.getGenres(),
+                a.getStudios().stream()
+                        .map(StudioDto::from)
+                        .toList(),
                 a.getSeason(),
-                a.getSeasonYear()
+                a.getSeasonYear(),
+                a.getCharacterRoles().stream()
+                        .sorted((left, right) -> left.getCharacter().getName()
+                                .compareToIgnoreCase(right.getCharacter().getName()))
+                        .map(CharacterDto::from)
+                        .toList()
         );
     }
 
