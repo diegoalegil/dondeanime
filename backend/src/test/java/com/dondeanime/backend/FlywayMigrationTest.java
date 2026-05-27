@@ -76,6 +76,7 @@ class FlywayMigrationTest {
                 "api_key",
                 "api_key_endpoint_usage",
                 "availability_change_event",
+                "curator_profile",
                 "curated_list",
                 "curated_list_item",
                 "email_token",
@@ -114,12 +115,13 @@ class FlywayMigrationTest {
                 "idx_curated_list_status_visibility",
                 "idx_curated_list_owner",
                 "idx_curated_list_item_list_position",
-                "idx_curated_list_item_anime_slug");
+                "idx_curated_list_item_anime_slug",
+                "idx_curator_profile_approved");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(13);
+        assertThat(successfulMigrations).isEqualTo(14);
     }
 }
