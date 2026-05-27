@@ -2,6 +2,7 @@ package com.dondeanime.backend.anime;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -15,6 +16,9 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
 
     @EntityGraph(attributePaths = "genres")
     Optional<Anime> findBySlug(String slug);
+
+    @EntityGraph(attributePaths = "genres")
+    List<Anime> findBySlugIn(Set<String> slugs);
 
     @EntityGraph(attributePaths = {"genres", "studios"})
     @Query("SELECT a FROM Anime a WHERE a.slug = :slug")

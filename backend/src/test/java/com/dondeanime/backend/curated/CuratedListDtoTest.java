@@ -19,6 +19,12 @@ class CuratedListDtoTest {
         assertThat(dto.items())
                 .extracting(CuratedListItemDto::animeSlug)
                 .containsExactly("frieren-beyond-journeys-end", "naruto");
+        assertThat(dto.schema().type()).isEqualTo("ItemList");
+        assertThat(dto.schema().itemListElement())
+                .extracting(CuratedListSchemaItemDto::url)
+                .containsExactly(
+                        "https://dondeanime.com/anime/frieren-beyond-journeys-end",
+                        "https://dondeanime.com/anime/naruto");
     }
 
     @Test

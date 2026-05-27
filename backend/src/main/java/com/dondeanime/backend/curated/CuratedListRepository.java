@@ -19,4 +19,9 @@ public interface CuratedListRepository extends JpaRepository<CuratedList, Long> 
     Optional<CuratedList> findBySlugWithItems(@Param("slug") String slug);
 
     List<CuratedList> findAllByStatusOrderByTitleAsc(CuratedListStatus status);
+
+    @EntityGraph(attributePaths = "items")
+    List<CuratedList> findAllByStatusAndVisibilityOrderByTitleAsc(
+            CuratedListStatus status,
+            CuratedListVisibility visibility);
 }
