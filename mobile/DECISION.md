@@ -45,5 +45,7 @@ o cuentas de store. CI valida que el scaffold y la config sean coherentes.
   WebView y habilitara plugins nativos posteriores.
 - `@capacitor/app`: plugin oficial para recibir eventos `appUrlOpen`, necesario
   para resolver `dondeanime://anime/{slug}` y `dondeanime://buscar`.
+- `@capacitor/push-notifications`: plugin oficial para obtener el token nativo
+  del dispositivo y registrarlo solo para alertas solicitadas.
 - `@capacitor/cli`: herramienta de desarrollo para validar/sincronizar el
   wrapper; queda en `devDependencies` y no se ejecuta contra SDKs en CI.

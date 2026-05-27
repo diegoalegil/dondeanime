@@ -41,6 +41,10 @@ if (pkg.dependencies?.['@capacitor/app'] !== '8.1.0') {
   fail('package.json debe fijar @capacitor/app 8.1.0');
 }
 
+if (pkg.dependencies?.['@capacitor/push-notifications'] !== '8.1.1') {
+  fail('package.json debe fijar @capacitor/push-notifications 8.1.1');
+}
+
 if (pkg.devDependencies?.['@capacitor/cli'] !== '8.3.4') {
   fail('package.json debe fijar @capacitor/cli 8.3.4');
 }
