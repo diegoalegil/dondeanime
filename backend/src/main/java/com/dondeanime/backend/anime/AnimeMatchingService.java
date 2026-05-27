@@ -75,6 +75,18 @@ public class AnimeMatchingService {
         return matched;
     }
 
+    public Optional<RematchResult> rematch(String animeSlug) {
+        return repository.findBySlug(animeSlug)
+                .map(anime -> {
+                    Long tmdbId = findTmdbId(anime);
+                    anime.setTmdbId(tmdbId);
+                    repository.save(anime);
+                    log.info("Re-match TMDb slug={}: {}", anime.getSlug(),
+                            tmdbId == null ? "sin match" : "match actualizado");
+                    return new RematchResult(anime.getSlug(), tmdbId != null);
+                });
+    }
+
     private Long findTmdbId(Anime anime) {
         String title = anime.getTitleEnglish();
         if (isBlank(title)) {
@@ -144,4 +156,6 @@ public class AnimeMatchingService {
     private static boolean isBlank(String s) {
         return s == null || s.isBlank();
     }
+
+    public record RematchResult(String slug, boolean matched) {}
 }

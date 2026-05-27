@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -119,6 +120,61 @@ class AnimeMatchingServiceTest {
 
         assertThat(matched).isZero();
         // No se debe consultar TMDb ni guardar nada.
+        verify(client, never()).searchTv(any());
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    void rematchReprocessesAlreadyMatchedAnime() {
+        Anime anime = anime(1L, "My Hero Academia", 2016);
+        anime.setTmdbId(999L);
+        TmdbSearchResult correctYear = result(65930L, "JP", "2016-04-03", 23.8);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findBySlug("my-hero-academia")).thenReturn(Optional.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchTv(any())).thenReturn(new TmdbSearchResponse(1, List.of(correctYear), 1, 1));
+
+        Optional<AnimeMatchingService.RematchResult> result =
+                new AnimeMatchingService(client, repo).rematch("my-hero-academia");
+
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture());
+        assertThat(result).isPresent();
+        assertThat(result.get().matched()).isTrue();
+        assertThat(captor.getValue().getTmdbId()).isEqualTo(65930L);
+    }
+
+    @Test
+    void rematchClearsTmdbIdWhenNoResultExists() {
+        Anime anime = anime(1L, "Unknown Title", 2020);
+        anime.setTmdbId(999L);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findBySlug("unknown-title")).thenReturn(Optional.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchTv(any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
+
+        Optional<AnimeMatchingService.RematchResult> result =
+                new AnimeMatchingService(client, repo).rematch("unknown-title");
+
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture());
+        assertThat(result).isPresent();
+        assertThat(result.get().matched()).isFalse();
+        assertThat(captor.getValue().getTmdbId()).isNull();
+    }
+
+    @Test
+    void rematchUnknownSlugDoesNothing() {
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findBySlug("missing")).thenReturn(Optional.empty());
+        TmdbClient client = mock(TmdbClient.class);
+
+        Optional<AnimeMatchingService.RematchResult> result =
+                new AnimeMatchingService(client, repo).rematch("missing");
+
+        assertThat(result).isEmpty();
         verify(client, never()).searchTv(any());
         verify(repo, never()).save(any());
     }

@@ -2,6 +2,8 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeHero from '@/components/anime/AnimeHero.astro';
 import AnimeSynopsis from '@/components/anime/AnimeSynopsis.astro';
+import TrailerEmbed from '@/components/anime/TrailerEmbed.astro';
+import CharacterList from '@/components/anime/CharacterList.astro';
 import MetaList from '@/components/anime/MetaList.astro';
 import SimilarAnime from '@/components/anime/SimilarAnime.astro';
 import ProvidersByCountry from '@/components/providers/ProvidersByCountry.astro';
@@ -64,11 +66,13 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
   />
   <AnimeHero anime={detail.anime} />
   <ProvidersByCountry providersByCountry={detail.watchProvidersByCountry} animeSlug={slug!} />
+  <TrailerEmbed youtubeId={detail.anime.trailerYoutubeId} title={title} />
   <AdSlot position="inline" />
   <AnimeSynopsis
     description={detail.anime.description}
     translationPending={detail.anime.descriptionTranslationPending}
   />
+  <CharacterList characters={detail.anime.characters} />
   <MetaList anime={detail.anime} />
   <SimilarAnime anime={similarAnime} sourceSlug={slug!} />
 </BaseLayout>
