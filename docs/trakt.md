@@ -44,3 +44,12 @@ La respuesta del callback no expone tokens:
 ## Decision de seguridad
 
 En PR 22.1 no se guarda `refresh_token`. El backlog permite documentar esta limitacion si no hay cifrado aprobado todavia. El almacenamiento queda para PR 22.2, junto con `ExternalAccount` y una decision explicita sobre cifrado de tokens.
+
+## Modelo persistente
+
+PR 22.2 agrega:
+
+- `external_account`: cuenta externa por `provider + external_user_id`, email opcional, scopes normalizados y columnas `access_token_ciphertext` / `refresh_token_ciphertext`.
+- `user_watched_anime`: anime visto por cuenta externa, deduplicado por `external_account_id + anime_slug + source`.
+
+Los campos de token estan nombrados como `ciphertext` a proposito. No se debe guardar un token plano en esas columnas. El servicio de cuenta externa normaliza provider, email, scopes, slug y source antes de persistir.
