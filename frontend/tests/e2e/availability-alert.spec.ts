@@ -18,7 +18,7 @@ test('una página sin providers muestra alerta y confirma el alta', async ({ pag
   await expect(page.getByRole('heading', { name: /Aviso de disponibilidad/i })).toBeVisible();
 
   await page.getByRole('button', { name: 'Avisarme' }).click();
-  await page.getByLabel('Email').fill(`playwright-${Date.now()}@example.com`);
+  await page.getByLabel('Email', { exact: true }).fill(`playwright-${Date.now()}@example.com`);
   await page.getByLabel(/Acepto la política de privacidad/i).check();
   await page.getByRole('button', { name: 'Crear alerta' }).click();
 

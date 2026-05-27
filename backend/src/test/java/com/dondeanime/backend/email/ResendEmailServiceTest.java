@@ -50,6 +50,36 @@ class ResendEmailServiceTest {
     }
 
     @Test
+    void sendsPremiumReceiptEmailThroughResendRestApi() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        ResendEmailService service = new ResendEmailService(
+                builder,
+                "https://api.resend.com",
+                "re_test",
+                "alertas@dondeanime.com",
+                true);
+
+        server.expect(once(), requestTo("https://api.resend.com/emails"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("Authorization", "Bearer re_test"))
+                .andExpect(jsonPath("$.to[0]").value("diego@example.com"))
+                .andExpect(jsonPath("$.subject").value("Recibo Premium DondeAnime"))
+                .andExpect(jsonPath("$.text").value(org.hamcrest.Matchers.containsString("2026-05-25T10:00:00Z")))
+                .andRespond(withSuccess("""
+                        {"id":"email_456"}
+                        """, MediaType.APPLICATION_JSON));
+
+        service.sendPremiumReceiptEmail(
+                "diego@example.com",
+                "PREMIUM",
+                "2026-05-25T10:00:00Z",
+                "https://dondeanime.com/premium");
+
+        server.verify();
+    }
+
+    @Test
     void sendsNewsletterConfirmationEmailThroughResendRestApi() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
@@ -66,7 +96,7 @@ class ResendEmailServiceTest {
                 .andExpect(jsonPath("$.to[0]").value("diego@example.com"))
                 .andExpect(jsonPath("$.subject").value("Confirma tu newsletter de DondeAnime"))
                 .andRespond(withSuccess("""
-                        {"id":"email_456"}
+                        {"id":"email_789"}
                         """, MediaType.APPLICATION_JSON));
 
         service.sendNewsletterConfirmationEmail(
