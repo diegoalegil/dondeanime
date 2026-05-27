@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
@@ -21,12 +22,14 @@ class TraktSyncServiceTest {
     private final TraktHistoryClient traktHistoryClient = mock(TraktHistoryClient.class);
     private final ExternalAccountRepository accountRepository = mock(ExternalAccountRepository.class);
     private final ExternalAccountService externalAccountService = mock(ExternalAccountService.class);
+    private final TraktSyncEventRepository syncEventRepository = mock(TraktSyncEventRepository.class);
     private final AnimeRepository animeRepository = mock(AnimeRepository.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-05-27T12:00:00Z"), ZoneOffset.UTC);
     private final TraktSyncService service = new TraktSyncService(
             traktHistoryClient,
             accountRepository,
             externalAccountService,
+            syncEventRepository,
             animeRepository,
             clock);
 
@@ -65,6 +68,13 @@ class TraktSyncServiceTest {
                 Instant.parse("2026-05-22T19:00:00Z"),
                 "TRAKT");
         verify(accountRepository).save(account);
+        ArgumentCaptor<TraktSyncEvent> eventCaptor = ArgumentCaptor.forClass(TraktSyncEvent.class);
+        verify(syncEventRepository).save(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getProvider()).isEqualTo("trakt");
+        assertThat(eventCaptor.getValue().getWatchedImported()).isEqualTo(1);
+        assertThat(eventCaptor.getValue().getRatingsImported()).isEqualTo(1);
+        assertThat(eventCaptor.getValue().getUnmatchedCount()).isEqualTo(1);
+        assertThat(eventCaptor.getValue().getSyncedAt()).isEqualTo("2026-05-27T12:00:00Z");
         assertThat(account.getLastSyncedAt()).isEqualTo("2026-05-27T12:00:00Z");
     }
 

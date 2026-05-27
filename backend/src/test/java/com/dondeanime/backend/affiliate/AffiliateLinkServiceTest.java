@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import com.dondeanime.backend.anime.RecommendationEventRepository;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 class AffiliateLinkServiceTest {
 
@@ -30,6 +32,8 @@ class AffiliateLinkServiceTest {
             org.mockito.Mockito.mock(AvailabilityChangeEventRepository.class);
     private final RecommendationEventRepository recommendationEventRepository =
             org.mockito.Mockito.mock(RecommendationEventRepository.class);
+    private final TraktDashboardMetricsService traktDashboardMetricsService =
+            org.mockito.Mockito.mock(TraktDashboardMetricsService.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-05-25T12:00:00Z"), ZoneOffset.UTC);
 
     private final AffiliateLinkService service = new AffiliateLinkService(
@@ -39,6 +43,7 @@ class AffiliateLinkServiceTest {
             watchProviderRepository,
             availabilityChangeEventRepository,
             recommendationEventRepository,
+            traktDashboardMetricsService,
             clock);
 
     @Test
@@ -149,6 +154,8 @@ class AffiliateLinkServiceTest {
                 .thenReturn(List.of(availabilityChanges("frieren", 3L)));
         when(recommendationEventRepository.findTopRecommendationClicks(any(Instant.class), any()))
                 .thenReturn(List.of(recommendationClicks("frieren", "violet-evergarden", 5L)));
+        when(traktDashboardMetricsService.metrics())
+                .thenReturn(new TraktDashboardMetricsDto(2L, 1L, 4L, 3L));
 
         AffiliateDashboardDto dashboard = service.dashboard();
 
@@ -161,6 +168,8 @@ class AffiliateLinkServiceTest {
         assertThat(dashboard.topClickCountries().getFirst().countryCode()).isEqualTo("ES");
         assertThat(dashboard.topAvailabilityChanges().getFirst().changes()).isEqualTo(3L);
         assertThat(dashboard.topRecommendationClicks().getFirst().targetAnimeSlug()).isEqualTo("violet-evergarden");
+        assertThat(dashboard.trakt().connectedAccounts()).isEqualTo(2L);
+        assertThat(dashboard.trakt().failedMatchesLast30Days()).isEqualTo(3L);
     }
 
     private static AffiliateLink link() {

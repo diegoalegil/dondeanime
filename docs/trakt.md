@@ -28,6 +28,7 @@ TRAKT_REDIRECT_URI=https://api.dondeanime.com/api/trakt/oauth/callback
 - `GET /api/trakt/oauth/callback`: valida `state`, intercambia `code` por tokens y devuelve una respuesta segura.
 - `GET /api/trakt/watched?externalUserId=...`: devuelve slugs vistos para filtros frontend.
 - `POST /api/trakt/sync`: importa vistos y ratings para una cuenta externa existente usando un access token temporal en el body.
+- `GET /api/anime/{slug}/similar?watched=...`: acepta slugs vistos opcionales, excluye esos anime y prioriza generos/plataformas que aparecen en el historial.
 
 La respuesta del callback no expone tokens:
 
@@ -75,3 +76,5 @@ Ejemplo de request:
 ```
 
 La respuesta solo devuelve contadores y hasta 20 no matcheados. No devuelve tokens.
+
+Cada sync guarda un `trakt_sync_event` agregado con contadores anonimos. El dashboard admin usa esa tabla para mostrar cuentas conectadas, syncs 7/30 dias y matches fallidos sin exponer email, tokens ni ids internos.

@@ -15,13 +15,16 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Pageable;
 
+import com.dondeanime.backend.provider.WatchProviderRepository;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 class RecommendationServiceTest {
 
     private final AnimeRepository animeRepository = mock(AnimeRepository.class);
+    private final WatchProviderRepository watchProviderRepository = mock(WatchProviderRepository.class);
     private final RecommendationService recommendationService = new RecommendationService(
             animeRepository,
+            watchProviderRepository,
             Caffeine.newBuilder().maximumSize(100).build());
 
     @Test
@@ -84,6 +87,37 @@ class RecommendationServiceTest {
     }
 
     @Test
+    void personalizedRecommendationsExcludeWatchedAndPrioritizePreferredGenresAndProviders() {
+        Anime source = anime(1L, "source", 85, "Madhouse", "Action");
+        Anime watched = anime(2L, "seen", 90, "Bones", "Action");
+        Anime neutral = anime(3L, "neutral", 86, "Trigger", "Comedy");
+        Anime genrePreferred = anime(4L, "genre-preferred", 85, "Trigger", "Drama");
+        Anime providerPreferred = anime(5L, "provider-preferred", 84, "Trigger", "Comedy");
+        Anime watchedPreference = anime(6L, "watched-drama", 80, "Kyoto Animation", "Drama");
+
+        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(watched, neutral, providerPreferred, genrePreferred));
+        when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
+        when(animeRepository.findBySlugInWithGenres(any()))
+                .thenReturn(List.of(watchedPreference));
+        when(watchProviderRepository.findProviderSlugsByAnimeSlugs(any()))
+                .thenReturn(List.of(
+                        provider("watched-drama", "crunchyroll"),
+                        provider("provider-preferred", "crunchyroll")));
+
+        List<Anime> similar = recommendationService.findSimilar(
+                1L,
+                3,
+                List.of("seen", "watched-drama"));
+
+        assertThat(similar).containsExactly(genrePreferred, providerPreferred, neutral);
+    }
+
+    @Test
     void cachesResultsForSameAnimeAndLimit() {
         Anime source = anime(1L, "source", 85, null, "Action");
         Anime first = anime(2L, "first", 91, null, "Action");
@@ -102,9 +136,29 @@ class RecommendationServiceTest {
     }
 
     @Test
+    void emptyWatchedContextUsesSharedCache() {
+        Anime source = anime(1L, "source", 85, null, "Action");
+        Anime first = anime(2L, "first", 91, null, "Action");
+
+        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(first));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
+
+        recommendationService.findSimilar(1L, 10, List.of());
+        recommendationService.findSimilar(1L, 10);
+
+        verify(animeRepository).findByIdWithTags(1L);
+        verify(animeRepository, never()).findBySlugInWithGenres(any());
+    }
+
+    @Test
     void returnsEmptyForInvalidRequest() {
         assertThat(recommendationService.findSimilar(null, 10)).isEmpty();
         assertThat(recommendationService.findSimilar(1L, 0)).isEmpty();
+        assertThat(recommendationService.findSimilar(null, 10, List.of("seen"))).isEmpty();
+        assertThat(recommendationService.findSimilar(1L, 0, List.of("seen"))).isEmpty();
 
         verify(animeRepository, never()).findByIdWithTags(any());
     }
@@ -117,5 +171,19 @@ class RecommendationServiceTest {
         anime.setPrimaryStudio(studio);
         anime.setGenres(new LinkedHashSet<>(List.of(genres)));
         return anime;
+    }
+
+    private static WatchProviderRepository.AnimeProviderProjection provider(String animeSlug, String providerSlug) {
+        return new WatchProviderRepository.AnimeProviderProjection() {
+            @Override
+            public String getAnimeSlug() {
+                return animeSlug;
+            }
+
+            @Override
+            public String getProviderSlug() {
+                return providerSlug;
+            }
+        };
     }
 }

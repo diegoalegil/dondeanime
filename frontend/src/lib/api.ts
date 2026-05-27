@@ -170,8 +170,11 @@ export const getUpcomingAnime = async (days: number) => {
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
 
-export const getSimilarAnime = async (slug: string) => {
-  return fetchJsonAllowing404(`/api/anime/${slug}/similar`, () => [] as AnimeSummary[]);
+export const getSimilarAnime = async (slug: string, watchedSlugs: string[] = []) => {
+  const params = new URLSearchParams();
+  watchedSlugs.forEach((watched) => params.append('watched', watched));
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+  return fetchJsonAllowing404(`/api/anime/${slug}/similar${suffix}`, () => [] as AnimeSummary[]);
 };
 
 export const getProviders = () => fetchJson<ProviderSummary[]>('/api/providers');

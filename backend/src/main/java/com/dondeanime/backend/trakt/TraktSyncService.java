@@ -26,6 +26,7 @@ public class TraktSyncService {
     private final TraktHistoryClient traktHistoryClient;
     private final ExternalAccountRepository accountRepository;
     private final ExternalAccountService externalAccountService;
+    private final TraktSyncEventRepository syncEventRepository;
     private final AnimeRepository animeRepository;
     private final Clock clock;
 
@@ -33,11 +34,13 @@ public class TraktSyncService {
             TraktHistoryClient traktHistoryClient,
             ExternalAccountRepository accountRepository,
             ExternalAccountService externalAccountService,
+            TraktSyncEventRepository syncEventRepository,
             AnimeRepository animeRepository,
             Clock clock) {
         this.traktHistoryClient = traktHistoryClient;
         this.accountRepository = accountRepository;
         this.externalAccountService = externalAccountService;
+        this.syncEventRepository = syncEventRepository;
         this.animeRepository = animeRepository;
         this.clock = clock;
     }
@@ -87,12 +90,23 @@ public class TraktSyncService {
 
         account.setLastSyncedAt(Instant.now(clock));
         accountRepository.save(account);
+        saveSyncEvent(watchedImported, ratingsImported, unmatched.size());
 
         return new TraktSyncResponse(
                 watchedImported,
                 ratingsImported,
                 unmatched.size(),
                 unmatched.stream().limit(20).toList());
+    }
+
+    private void saveSyncEvent(int watchedImported, int ratingsImported, int unmatchedCount) {
+        TraktSyncEvent event = new TraktSyncEvent();
+        event.setProvider(PROVIDER);
+        event.setSyncedAt(Instant.now(clock));
+        event.setWatchedImported(watchedImported);
+        event.setRatingsImported(ratingsImported);
+        event.setUnmatchedCount(unmatchedCount);
+        syncEventRepository.save(event);
     }
 
     private static Optional<Anime> match(List<Anime> catalog, TraktShow show) {

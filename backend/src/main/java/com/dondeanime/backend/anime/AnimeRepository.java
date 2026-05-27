@@ -2,6 +2,7 @@ package com.dondeanime.backend.anime;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -37,6 +38,10 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @EntityGraph(attributePaths = "tags")
     @Query("SELECT a FROM Anime a WHERE a.id = :id")
     Optional<Anime> findByIdWithTags(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = "genres")
+    @Query("SELECT DISTINCT a FROM Anime a WHERE a.slug IN :slugs")
+    List<Anime> findBySlugInWithGenres(@Param("slugs") Set<String> slugs);
 
     /**
      * Anime disponibles en una plataforma concreta en un país concreto.

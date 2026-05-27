@@ -85,6 +85,7 @@ class FlywayMigrationTest {
                 "studio",
                 "subscriber",
                 "subscription",
+                "trakt_sync_event",
                 "user_watched_anime",
                 "watch_provider");
 
@@ -114,12 +115,14 @@ class FlywayMigrationTest {
                 "idx_external_account_email",
                 "idx_user_watched_anime_account",
                 "idx_user_watched_anime_slug",
-                "idx_user_watched_anime_rated_at");
+                "idx_user_watched_anime_rated_at",
+                "idx_trakt_sync_event_provider",
+                "idx_trakt_sync_event_synced_at");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(14);
+        assertThat(successfulMigrations).isEqualTo(15);
     }
 }
