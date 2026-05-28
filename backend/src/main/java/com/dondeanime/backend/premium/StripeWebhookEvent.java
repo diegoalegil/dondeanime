@@ -7,5 +7,6 @@ public record StripeWebhookEvent(
         String email,
         String customerId,
         Instant eventTime,
-        Instant currentPeriodEnd) {
+        Instant currentPeriodEnd,
+        String eventId) {
 }
