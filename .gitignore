@@ -49,7 +49,7 @@ out/
 data/postgres/
 pgdata/
 
-# ===== IDEs =====
+# ===== IDEs y agentes =====
 .idea/
 *.iml
 .vscode/
@@ -58,6 +58,7 @@ pgdata/
 .project
 .classpath
 .settings/
+.la documentación/
 
 # ===== Sistema operativo =====
 .DS_Store
