@@ -17,7 +17,7 @@ class ExternalAccountMigrationTest {
                 "resources",
                 "db",
                 "migration",
-                "V14__external_accounts_and_watched_anime.sql"));
+                "V15__external_accounts_and_watched_anime.sql"));
 
         assertThat(sql).contains("CREATE TABLE IF NOT EXISTS public.external_account");
         assertThat(sql).contains("access_token_ciphertext character varying(2048)");
@@ -36,7 +36,7 @@ class ExternalAccountMigrationTest {
                 "resources",
                 "db",
                 "migration",
-                "V15__user_watched_anime_ratings.sql"));
+                "V16__user_watched_anime_ratings.sql"));
 
         assertThat(sql).contains("ADD COLUMN IF NOT EXISTS rating integer");
         assertThat(sql).contains("ADD COLUMN IF NOT EXISTS rated_at timestamp(6) with time zone");
