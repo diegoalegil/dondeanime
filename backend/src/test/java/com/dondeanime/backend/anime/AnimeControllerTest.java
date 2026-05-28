@@ -202,7 +202,7 @@ class AnimeControllerTest {
         recommendation.setAverageScore(88);
 
         when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(source));
-        when(recommendationService.findSimilar(1L, 10)).thenReturn(List.of(recommendation));
+        when(recommendationService.findSimilar(1L, 10, null)).thenReturn(List.of(recommendation));
 
         mvc.perform(get("/api/v1/anime/attack-on-titan/similar"))
                 .andExpect(status().isOk())
@@ -212,6 +212,31 @@ class AnimeControllerTest {
                 .andExpect(jsonPath("$[0].id").doesNotExist())
                 .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
                 .andExpect(jsonPath("$[0].syncedAt").doesNotExist());
+    }
+
+    @Test
+    void getSimilarPassesWatchedContextWithoutExposingInternals() throws Exception {
+        Anime source = makeAnime("attack-on-titan", "Attack on Titan");
+        Anime recommendation = makeAnime("vinland-saga", "Vinland Saga");
+        recommendation.setId(2L);
+        recommendation.setAnilistId(456L);
+
+        when(animeRepository.findBySlug("attack-on-titan")).thenReturn(Optional.of(source));
+        when(recommendationService.findSimilar(
+                1L,
+                10,
+                List.of("death-note", "fullmetal-alchemist-brotherhood")))
+                .thenReturn(List.of(recommendation));
+
+        mvc.perform(get("/api/v1/anime/attack-on-titan/similar")
+                        .param("watched", "death-note", "fullmetal-alchemist-brotherhood"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].slug").value("vinland-saga"))
+                .andExpect(jsonPath("$[0].id").doesNotExist())
+                .andExpect(jsonPath("$[0].tmdbId").doesNotExist())
+                .andExpect(jsonPath("$[0].syncedAt").doesNotExist())
+                .andExpect(jsonPath("$[0].email").doesNotExist())
+                .andExpect(jsonPath("$[0].accessTokenCiphertext").doesNotExist());
     }
 
     @Test

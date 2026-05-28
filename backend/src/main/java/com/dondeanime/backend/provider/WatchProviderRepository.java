@@ -1,10 +1,12 @@
 package com.dondeanime.backend.provider;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface WatchProviderRepository extends JpaRepository<WatchProvider, Long> {
@@ -30,6 +32,20 @@ public interface WatchProviderRepository extends JpaRepository<WatchProvider, Lo
     @Transactional
     @Query("DELETE FROM WatchProvider w WHERE w.animeId = :animeId")
     void deleteByAnimeId(Long animeId);
+
+    @Query("""
+            SELECT a.slug AS animeSlug,
+                   LOWER(REPLACE(wp.providerName, ' ', '-')) AS providerSlug
+            FROM WatchProvider wp
+            JOIN Anime a ON a.id = wp.animeId
+            WHERE a.slug IN :animeSlugs
+            """)
+    List<AnimeProviderProjection> findProviderSlugsByAnimeSlugs(@Param("animeSlugs") Set<String> animeSlugs);
+
+    interface AnimeProviderProjection {
+        String getAnimeSlug();
+        String getProviderSlug();
+    }
 
     /**
      * Agrega providers a nivel global: por cada providerName devuelve

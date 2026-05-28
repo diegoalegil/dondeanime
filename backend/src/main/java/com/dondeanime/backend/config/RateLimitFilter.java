@@ -25,6 +25,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new RateLimitRule("/api/search", false, 30),
             new RateLimitRule("/api/track/affiliate", false, 60),
             new RateLimitRule("/api/track/recommendation", false, 60),
+            new RateLimitRule("/api/trakt/sync", false, 10),
+            new RateLimitRule("/api/trakt/watched", false, 60),
+            new RateLimitRule("/api/trakt/oauth/", true, 20),
             // Endpoints que disparan envío de email o crean sesiones de pago:
             // límite bajo por IP para frenar email-bombing y abuso de Stripe.
             new RateLimitRule("/api/newsletter/subscribe", false, 5),

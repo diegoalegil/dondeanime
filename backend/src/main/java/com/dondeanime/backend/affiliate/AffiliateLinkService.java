@@ -26,6 +26,7 @@ import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 @Service
 public class AffiliateLinkService {
@@ -36,6 +37,7 @@ public class AffiliateLinkService {
     private final WatchProviderRepository watchProviderRepository;
     private final AvailabilityChangeEventRepository availabilityChangeEventRepository;
     private final RecommendationEventRepository recommendationEventRepository;
+    private final TraktDashboardMetricsService traktDashboardMetricsService;
     private final Clock clock;
 
     public AffiliateLinkService(
@@ -45,6 +47,7 @@ public class AffiliateLinkService {
             WatchProviderRepository watchProviderRepository,
             AvailabilityChangeEventRepository availabilityChangeEventRepository,
             RecommendationEventRepository recommendationEventRepository,
+            TraktDashboardMetricsService traktDashboardMetricsService,
             Clock clock) {
         this.linkRepository = linkRepository;
         this.clickEventRepository = clickEventRepository;
@@ -52,6 +55,7 @@ public class AffiliateLinkService {
         this.watchProviderRepository = watchProviderRepository;
         this.availabilityChangeEventRepository = availabilityChangeEventRepository;
         this.recommendationEventRepository = recommendationEventRepository;
+        this.traktDashboardMetricsService = traktDashboardMetricsService;
         this.clock = clock;
     }
 
@@ -203,7 +207,8 @@ public class AffiliateLinkService {
                 platformConversions,
                 topClickCountries,
                 topAvailabilityChanges,
-                topRecommendationClicks);
+                topRecommendationClicks,
+                traktDashboardMetricsService.metrics());
     }
 
     private List<AffiliateDailyClicksDto> clicksByDay(Instant since) {
