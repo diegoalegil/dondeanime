@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClient;
 import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
+import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -28,10 +29,11 @@ class CatalogSchedulerTest {
         AnimeMatchingService matchingService = mock(AnimeMatchingService.class);
         AnimeDescriptionEnricher descriptionEnricher = mock(AnimeDescriptionEnricher.class);
         ProviderSyncService providerSyncService = mock(ProviderSyncService.class);
+        TrailerSyncService trailerSyncService = mock(TrailerSyncService.class);
         RestClient.Builder restClientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
 
-        when(syncService.syncPopular(100)).thenReturn(500);
+        when(syncService.syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT)).thenReturn(500);
         server.expect(requestTo("https://vercel.example/deploy"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess());
@@ -41,6 +43,7 @@ class CatalogSchedulerTest {
                 matchingService,
                 descriptionEnricher,
                 providerSyncService,
+                trailerSyncService,
                 restClientBuilder,
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),
@@ -57,12 +60,14 @@ class CatalogSchedulerTest {
         AnimeMatchingService matchingService = mock(AnimeMatchingService.class);
         AnimeDescriptionEnricher descriptionEnricher = mock(AnimeDescriptionEnricher.class);
         ProviderSyncService providerSyncService = mock(ProviderSyncService.class);
+        TrailerSyncService trailerSyncService = mock(TrailerSyncService.class);
 
         CatalogScheduler scheduler = new CatalogScheduler(
                 syncService,
                 matchingService,
                 descriptionEnricher,
                 providerSyncService,
+                trailerSyncService,
                 RestClient.builder(),
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),

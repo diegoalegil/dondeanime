@@ -3,6 +3,8 @@
   "nav.catalog": "Catalog",
   "nav.countries": "Countries",
   "nav.platforms": "Platforms",
+  "nav.api": "API",
+  "nav.premium": "Premium",
   "breadcrumbs.home": "Home",
   "breadcrumbs.aria": "Breadcrumbs",
   "breadcrumbs.admin": "Admin",
@@ -325,5 +327,7 @@
   "admin.editor.originalAniList": "Original AniList",
   "admin.editor.spanishOverride": "Spanish override",
   "admin.editor.save": "Save",
-  "admin.editor.reset": "Reset to original"
+  "admin.editor.reset": "Reset to original",
+  "admin.editor.beginnerRecommendationField": "Beginner recommendation",
+  "admin.editor.beginnerRecommendationHelper": "Visible on /empezar/ pages"
 }

@@ -7,14 +7,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping("/api/genres")
+@RequestMapping({"/api/genres", "/api/v1/genres"})
+@Tag(name = "Genres", description = "Generos de anime disponibles en el catalogo")
 public class GenreController {
 
     private final AnimeRepository animeRepository;
+    private final AnimeOverrideService overrideService;
 
-    public GenreController(AnimeRepository animeRepository) {
+    public GenreController(
+            AnimeRepository animeRepository,
+            AnimeOverrideService overrideService) {
         this.animeRepository = animeRepository;
+        this.overrideService = overrideService;
     }
 
     /**
@@ -22,6 +30,7 @@ public class GenreController {
      * Ordenado por count desc.
      */
     @GetMapping
+    @Operation(summary = "Lista generos", description = "Devuelve generos agregados con numero de anime.")
     public List<GenreSummaryDto> list() {
         return animeRepository.aggregateGenres().stream()
                 .map(r -> GenreSummaryDto.of(r.getGenre(), r.getAnimeCount()))
@@ -33,9 +42,18 @@ public class GenreController {
      * Ejemplo: GET /api/genres/action
      */
     @GetMapping("/{slug}")
+    @Operation(summary = "Lista anime por genero", description = "Devuelve anime de un genero ordenados por popularidad.")
     public List<AnimeSummaryDto> animesByGenre(@PathVariable String slug) {
         return animeRepository.findByGenreSlug(slug.toLowerCase()).stream()
                 .map(AnimeSummaryDto::from)
+                .toList();
+    }
+
+    @GetMapping("/{slug}/beginner")
+    public List<BeginnerAnimeDto> beginnerAnimesByGenre(@PathVariable String slug) {
+        return animeRepository.findByGenreSlug(slug.toLowerCase()).stream()
+                .limit(10)
+                .map(anime -> BeginnerAnimeDto.from(anime, overrideService.findSpanishOverrides(anime)))
                 .toList();
     }
 }

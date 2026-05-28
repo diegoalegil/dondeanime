@@ -181,6 +181,9 @@ test('genre and platform combination pages filter anime and are indexed', async 
   const animeCards = page.locator('article a[href^="/anime/"]');
   const resultCount = await animeCards.count();
   expect(resultCount).toBeGreaterThan(0);
+  const autoText = page.locator('[data-auto-text]');
+  await expect(autoText).toBeVisible();
+  expect((await autoText.innerText()).split(/\s+/).length).toBeGreaterThanOrEqual(150);
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
   const itemList = jsonLdBlocks
@@ -201,6 +204,112 @@ test('genre and platform combination pages filter anime and are indexed', async 
 
   expect(comboUrls.size).toBe(35);
   expect(comboUrls).toContain('https://dondeanime.com/anime/action/en/crunchyroll');
+});
+
+test('duration pages render and are indexed', async ({ page, request }) => {
+  await page.goto('/anime/duracion/24');
+
+  await expect(page.getByRole('heading', { name: /Anime de 24 minutos/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/anime/duracion/24',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Anime de 24 minutos por capitulo',
+    itemListElement: expect.any(Array),
+  }));
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  for (const minutes of [12, 22, 24, 25, 45, 60]) {
+    expect(allSitemapText).toContain(`https://dondeanime.com/anime/duracion/${minutes}`);
+  }
+});
+
+test('episode count pages render and are indexed', async ({ page, request }) => {
+  await page.goto('/anime/episodios/menos-de-12');
+
+  await expect(page.getByRole('heading', { name: /Anime con 12 episodios o menos/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/anime/episodios/menos-de-12',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Anime con 12 episodios o menos',
+    itemListElement: expect.any(Array),
+  }));
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  for (const maxEpisodes of [12, 24, 50, 100, 200]) {
+    expect(allSitemapText).toContain(`https://dondeanime.com/anime/episodios/menos-de-${maxEpisodes}`);
+  }
+});
+
+test('beginner genre pages render curated recommendations and are indexed', async ({ page, request }) => {
+  await page.goto('/empezar/action');
+
+  await expect(page.getByRole('heading', { name: /Anime para principiantes en Action/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/empezar/action',
+  );
+
+  const resultCount = await page.locator('[data-beginner-result]').count();
+  expect(resultCount).toBeGreaterThan(0);
+  expect(resultCount).toBeLessThanOrEqual(10);
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const itemList = jsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'ItemList');
+
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Anime para principiantes en Action',
+    numberOfItems: resultCount,
+    itemListElement: expect.any(Array),
+  }));
+  expect(itemList.itemListElement).toHaveLength(resultCount);
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  expect(allSitemapText).toContain('https://dondeanime.com/empezar/action');
+});
+
+test('studio ranking pages render schema and are indexed', async ({ page, request }) => {
+  await page.goto('/estudio/madhouse/mejores');
+
+  await expect(page.getByRole('heading', { name: /Mejor anime de Madhouse/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/estudio/madhouse/mejores',
+  );
+
+  const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const schemas = jsonLdBlocks.map((block) => JSON.parse(block));
+  const creativeWorkSeries = schemas.find((schema) => schema['@type'] === 'CreativeWorkSeries');
+  const itemList = schemas.find((schema) => schema['@type'] === 'ItemList');
+
+  expect(creativeWorkSeries).toEqual(expect.objectContaining({
+    name: 'Mejor anime de Madhouse',
+    creator: expect.objectContaining({ name: 'Madhouse' }),
+  }));
+  expect(itemList).toEqual(expect.objectContaining({
+    name: 'Mejor anime de Madhouse',
+    itemListElement: expect.any(Array),
+  }));
+
+  const allSitemapText = await allPartitionedSitemapText(request);
+  expect(allSitemapText).toContain('https://dondeanime.com/estudio/madhouse/mejores');
 });
 
 test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
@@ -342,6 +451,8 @@ test('offline page and service worker are generated', async ({ request }) => {
   const serviceWorkerText = await serviceWorker.text();
   expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
   expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
+  expect(serviceWorkerText).toContain('const MAX_CACHED_ANIME_PAGES = 12');
+  expect(serviceWorkerText).toContain('const ANIME_PAGE_PATTERN');
   expect(serviceWorkerText).toContain("request.mode === 'navigate'");
 });
 
@@ -452,11 +563,13 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
     const payload = route.request().postDataJSON();
     expect(payload).toEqual({ email: 'premium@dondeanime.test' });
 
+    // Por seguridad el portal ya no devuelve URL: el backend envia el enlace
+    // por email y responde con un acuse generico.
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       headers: corsHeaders,
-      body: JSON.stringify({ url: '/premium?portal=1' }),
+      body: JSON.stringify({ status: 'sent' }),
     });
   });
 
@@ -477,8 +590,7 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
   await page.getByRole('button', { name: 'Gestionar suscripción' }).click();
-  await page.waitForURL('**/premium?portal=1');
-  await expect(page.locator('[data-premium-status]')).toContainText('Portal de cliente cerrado');
+  await expect(page.locator('[data-premium-status]')).toContainText('te hemos enviado un enlace a tu email');
 });
 
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
@@ -501,6 +613,9 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(organization.sameAs.length).toBeGreaterThan(0);
 
   await page.locator('article a[href^="/anime/"]').first().click();
+  await page.waitForURL(/\/anime\/[^/]+$/);
+  await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
+  await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
 
   const detailSchemas = await page.locator('script[type="application/ld+json"]').allTextContents();
   const detailJson = detailSchemas.map((schema) => JSON.parse(schema));
@@ -513,21 +628,38 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(review.author.name).toBe('AniList');
 });
 
-test('search index is loaded lazily when the user searches', async ({ page }) => {
-  const searchIndexRequests: string[] = [];
+test('search results load lazily from the search API when the user searches', async ({ page }) => {
+  const searchRequests: string[] = [];
   page.on('request', (request) => {
-    if (new URL(request.url()).pathname === '/search-index.json') {
-      searchIndexRequests.push(request.url());
+    if (new URL(request.url()).pathname === '/api/search') {
+      searchRequests.push(request.url());
     }
   });
 
-  await page.goto('/');
-  expect(searchIndexRequests).toHaveLength(0);
+  await page.route('**/api/search**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          slug: 'attack-on-titan',
+          titleEnglish: 'Attack on Titan',
+          titleRomaji: 'Shingeki no Kyojin',
+          format: 'TV',
+          year: 2013,
+          coverImage: 'https://example.com/cover.jpg',
+        },
+      ]),
+    });
+  });
 
-  await page.getByPlaceholder('Buscar anime...').fill('naruto');
+  await page.goto('/');
+  expect(searchRequests).toHaveLength(0);
+
+  await page.getByPlaceholder('Buscar anime...').fill('ataque');
 
   await expect(page.locator('[data-search-results] a[href^="/anime/"]').first()).toBeVisible();
-  expect(searchIndexRequests).toHaveLength(1);
+  expect(searchRequests).toHaveLength(1);
 });
 
 function escapeRegExp(value: string) {

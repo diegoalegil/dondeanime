@@ -27,8 +27,14 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET", "POST", "DELETE", "OPTIONS")
-                .allowedHeaders("Content-Type", "Authorization", RequestMdcFilter.REQUEST_ID_HEADER)
-                .exposedHeaders(RequestMdcFilter.REQUEST_ID_HEADER)
+                .allowedHeaders("Content-Type", "Authorization", "X-API-Key", RequestMdcFilter.REQUEST_ID_HEADER)
+                .exposedHeaders(
+                        "X-RateLimit-Limit",
+                        "X-RateLimit-Remaining",
+                        "Deprecation",
+                        "Sunset",
+                        "Link",
+                        RequestMdcFilter.REQUEST_ID_HEADER)
                 .maxAge(3600);
     }
 

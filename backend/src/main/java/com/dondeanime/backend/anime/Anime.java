@@ -2,8 +2,12 @@ package com.dondeanime.backend.anime;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.dondeanime.backend.character.AnimeCharacterRole;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -14,7 +18,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+import com.dondeanime.backend.studio.Studio;
 
 @Entity
 @Table(
@@ -35,6 +46,9 @@ public class Anime {
 
     @Column(name = "tmdb_id")
     private Long tmdbId;
+
+    @Column(name = "trailer_youtube_id", length = 32)
+    private String trailerYoutubeId;
 
     @Column(name = "title_romaji")
     private String titleRomaji;
@@ -58,6 +72,12 @@ public class Anime {
     private String status; // FINISHED, RELEASING, NOT_YET_RELEASED, CANCELLED, HIATUS
 
     private Integer episodes;
+
+    @Column(name = "episode_duration")
+    private Integer episodeDuration;
+
+    @Column(length = 120)
+    private String studio;
 
     @Column(name = "start_year")
     private Integer startYear;
@@ -115,6 +135,20 @@ public class Anime {
     @Column(name = "season_year")
     private Integer seasonYear;
 
+    @ManyToMany
+    @JoinTable(
+            name = "anime_studio",
+            joinColumns = @JoinColumn(name = "anime_id"),
+            inverseJoinColumns = @JoinColumn(name = "studio_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_anime_studio",
+                    columnNames = {"anime_id", "studio_id"}))
+    @OrderBy("name ASC")
+    private Set<Studio> studios = new HashSet<>();
+
+    @OneToMany(mappedBy = "anime", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AnimeCharacterRole> characterRoles = new HashSet<>();
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "anime_tag", joinColumns = @JoinColumn(name = "anime_id"))
     private Set<AnimeTag> tags = new HashSet<>();
@@ -144,6 +178,14 @@ public class Anime {
 
     public void setTmdbId(Long tmdbId) {
         this.tmdbId = tmdbId;
+    }
+
+    public String getTrailerYoutubeId() {
+        return trailerYoutubeId;
+    }
+
+    public void setTrailerYoutubeId(String trailerYoutubeId) {
+        this.trailerYoutubeId = trailerYoutubeId;
     }
 
     public String getTitleRomaji() {
@@ -208,6 +250,22 @@ public class Anime {
 
     public void setEpisodes(Integer episodes) {
         this.episodes = episodes;
+    }
+
+    public Integer getEpisodeDuration() {
+        return episodeDuration;
+    }
+
+    public void setEpisodeDuration(Integer episodeDuration) {
+        this.episodeDuration = episodeDuration;
+    }
+
+    public String getStudio() {
+        return studio;
+    }
+
+    public void setStudio(String studio) {
+        this.studio = studio;
     }
 
     public Integer getStartYear() {
@@ -328,6 +386,30 @@ public class Anime {
 
     public void setSeasonYear(Integer seasonYear) {
         this.seasonYear = seasonYear;
+    }
+
+    public Set<Studio> getStudios() {
+        return studios;
+    }
+
+    public void setStudios(Set<Studio> studios) {
+        this.studios = studios;
+    }
+
+    public Set<AnimeCharacterRole> getCharacterRoles() {
+        return characterRoles;
+    }
+
+    public void setCharacterRoles(Set<AnimeCharacterRole> characterRoles) {
+        this.characterRoles = characterRoles;
+    }
+
+    public void replaceCharacterRoles(List<AnimeCharacterRole> roles) {
+        this.characterRoles.clear();
+        roles.forEach(role -> {
+            role.setAnime(this);
+            this.characterRoles.add(role);
+        });
     }
 
     public Set<AnimeTag> getTags() {

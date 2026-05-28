@@ -87,9 +87,10 @@ DondeAnime/
         │   │   ├── HttpClientConfig.java
         │   │   └── SecurityConfig.java        # HTTP Basic + CORS para /api/**
         │   ├── admin/
-        │   │   ├── AnimeAdminController.java  # /api/admin/anime/{slug}/override(s)
+        │   │   ├── AnimeAdminController.java  # /api/admin/anime/{slug}/override(s), /rematch
         │   │   ├── AnimeOverrideRequest.java
-        │   │   └── AnimeOverrideDto.java
+        │   │   ├── AnimeOverrideDto.java
+        │   │   └── AnimeRematchResponse.java
         │   ├── scheduling/
         │   │   └── CatalogScheduler.java      # 3 jobs @Scheduled (anilist, match, providers)
         │   ├── sitemap/
@@ -102,9 +103,14 @@ DondeAnime/
         │   │   ├── ProviderController.java    # GET /api/providers, /providers/{slug}/{country}
         │   │   ├── ProviderDto.java           # DTO público
         │   │   └── ProviderSummaryDto.java    # DTO agregado con count
+        │   ├── character/
+        │   │   ├── AnimeCharacter.java        # personaje AniList
+        │   │   ├── AnimeCharacterRole.java    # relación anime-personaje con role
+        │   │   ├── AnimeCharacterRepository.java
+        │   │   └── CharacterDto.java
         │   └── anime/
-        │       ├── Anime.java                 # entidad JPA (22 campos: +genres, season, seasonYear)
-        │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers
+        │       ├── Anime.java                 # entidad JPA + géneros, temporadas, estudios, trailers y personajes
+        │       ├── AnimeController.java       # GET, GET /{slug}, POST /sync, /match, /sync-providers, /sync-trailers
         │       ├── AnimeRepository.java       # + findByProviderSlugAndCountry, findByGenreSlug, etc.
         │       ├── AnimeSyncService.java
         │       ├── AnimeMatchingService.java
@@ -292,6 +298,11 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 curl -X POST https://api.dondeanime.com/api/anime/sync
 curl -X POST https://api.dondeanime.com/api/anime/match
 curl -X POST https://api.dondeanime.com/api/anime/sync-providers
+
+# Migración Sprint 8: subir catálogo de producción a 500 anime
+curl -X POST https://api.dondeanime.com/api/anime/sync?count=500
+curl -X POST https://api.dondeanime.com/api/anime/match
+curl -X POST https://api.dondeanime.com/api/anime/sync-providers
 ```
 
 ### Variables de entorno producción
@@ -330,6 +341,7 @@ Ver `DEPLOY.md` en la raíz del repo: troubleshooting, deploy desde cero a un VP
 - [x] Probado end-to-end: 84 matches de 100, 949 providers en BD, Attack on Titan en España devuelve Crunchyroll + Netflix + Prime Video (semana 3 cerrada, día 6)
 - [x] Scheduler `@Scheduled` con 3 jobs (sync AniList 12h, match 24h, providers 24h), toggle `scheduling.enabled` para activar/desactivar en local vs prod (semana 4 cerrada, día 7)
 - [x] Entidad `Anime` ampliada con `genres` (@ElementCollection → tabla anime_genre), `season` y `seasonYear`. Re-sync rellenó los 100 anime.
+- [x] Entidad `AnimeCharacter` + relación `anime_character_role` con `role`; AniList sync guarda hasta 6 personajes MAIN por anime.
 - [x] DTOs públicos `AnimeSummaryDto`, `AnimeDetailDto`, `ProviderDto` que esconden id interno, syncedAt, tmdbId, updatedAt, etc.
 - [x] Endpoints frontend: `/api/providers`, `/api/providers/{slug}/{country}`, `/api/genres`, `/api/genres/{slug}`, `/api/seasons`, `/api/seasons/{year}/{season}`, `/api/sitemap`
 - [x] Tests básicos: 31 verdes (SlugifyTest, AnimeMatchingServiceTest, AnimeControllerTest, AnimeOverrideRepositoryTest, AnimeDetailDtoTest, AnimeAdminControllerTest, AffiliateLinkServiceTest, AffiliateLinkAdminControllerTest)
@@ -390,6 +402,7 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | POST | `/api/admin/anime/{slug}/override` | Guardar override editorial de un campo (Basic Auth) |
 | DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Resetear override de un campo (Basic Auth) |
 | GET | `/api/admin/anime/{slug}/overrides` | Listar overrides activos de una ficha (Basic Auth) |
+| POST | `/api/admin/anime/{slug}/rematch` | Re-ejecutar matching TMDb de una ficha (Basic Auth) |
 | GET | `/api/admin/affiliate-links` | Listar links afiliados (Basic Auth) |
 | POST | `/api/admin/affiliate-links` | Crear/actualizar link afiliado por provider+país (Basic Auth) |
 | DELETE | `/api/admin/affiliate-links/{id}` | Borrar link afiliado (Basic Auth) |
@@ -472,9 +485,10 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/anime` | Lista plana (`AnimeSummaryDto[]`) |
 | GET | `/api/anime/upcoming?days=7` | Próximos estrenos con fecha completa (`UpcomingAnimeDto[]`) |
 | GET | `/api/anime/{slug}` | Detalle + providers agrupados por país (`AnimeDetailResponse`) |
-| POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100) |
+| POST | `/api/anime/sync?count=N` | Sincroniza N anime desde AniList (default 100, máximo 500) |
 | POST | `/api/anime/match` | Asigna `tmdbId` a cada anime sin matchear |
 | POST | `/api/anime/sync-providers` | Refresca la tabla `watch_provider` desde TMDb |
+| POST | `/api/anime/sync-trailers` | Refresca el primer trailer YouTube desde TMDb |
 | GET | `/api/providers` | Lista global de plataformas con count (`ProviderSummaryDto[]`) |
 | GET | `/api/providers?country=ES` | Mismo, filtrado por país |
 | GET | `/api/providers/{slug}/{country}` | Anime disponibles en esa plataforma en ese país |
@@ -482,10 +496,13 @@ Mientras tanto, mejora continua paralela: tests E2E con Playwright, Cloudflare E
 | GET | `/api/genres/{slug}` | Anime de un género, ordenados por popularidad |
 | GET | `/api/seasons` | Lista de temporadas con count (`SeasonSummaryDto[]`) |
 | GET | `/api/seasons/{year}/{season}` | Anime de una temporada (400 si season inválida) |
+| GET | `/api/studios` | Listado de estudios con count |
+| GET | `/api/studios/{slug}` | Anime de un estudio, ordenados por popularidad |
 | GET | `/api/sitemap` | Todos los slugs/ids para que el frontend genere sitemap.xml |
 | POST | `/api/admin/anime/{slug}/override` | Crea/actualiza override editorial. Devuelve `AnimeDetailDto` refrescado |
 | DELETE | `/api/admin/anime/{slug}/override?field=description&locale=es` | Borra override y vuelve al valor AniList |
 | GET | `/api/admin/anime/{slug}/overrides` | Lista overrides activos con valor original |
+| POST | `/api/admin/anime/{slug}/rematch` | Re-ejecuta la heurística TMDb existente para una ficha |
 | GET | `/api/admin/affiliate-links` | Lista links afiliados |
 | POST | `/api/admin/affiliate-links` | Crea/actualiza link afiliado |
 | DELETE | `/api/admin/affiliate-links/{id}` | Borra link afiliado |

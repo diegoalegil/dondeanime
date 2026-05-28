@@ -8,10 +8,12 @@ const schemaContext = new Set(['https://schema.org', 'http://schema.org']);
 const knownTypes = new Set([
   'BlogPosting',
   'BreadcrumbList',
+  'CreativeWorkSeries',
   'FAQPage',
   'ItemList',
   'Organization',
   'Review',
+  'Service',
   'TVSeries',
   'WebSite',
 ]);
@@ -127,6 +129,13 @@ function validateNode(node, file) {
       if (!isRecord(node.author)) errors.push(`${rel(file)}: Review.author debe existir`);
       requireRating(node, 'reviewRating', file, type);
     }
+    if (type === 'Service') {
+      requireString(node, 'name', file, type);
+      requireString(node, 'url', file, type);
+      requireString(node, 'serviceType', file, type);
+      requireString(node, 'description', file, type);
+      if (!isRecord(node.provider)) errors.push(`${rel(file)}: Service.provider debe existir`);
+    }
     if (type === 'FAQPage') {
       requireArray(node, 'mainEntity', file, type);
       for (const question of node.mainEntity ?? []) {
@@ -155,6 +164,11 @@ function validateNode(node, file) {
         errors.push(`${rel(file)}: Organization.logo.url debe existir`);
       }
       requireArray(node, 'sameAs', file, type);
+    }
+    if (type === 'CreativeWorkSeries') {
+      requireString(node, 'name', file, type);
+      requireString(node, 'url', file, type);
+      if (!isRecord(node.creator)) errors.push(`${rel(file)}: CreativeWorkSeries.creator debe existir`);
     }
   }
 }

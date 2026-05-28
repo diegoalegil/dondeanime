@@ -12,6 +12,7 @@ public record AniListMedia(
         AniListFuzzyDate startDate,
         AniListFuzzyDate endDate,
         Integer episodes,
+        Integer duration,
         String format,
         String status,
         Integer averageScore,
@@ -20,7 +21,9 @@ public record AniListMedia(
         AniListCoverImage coverImage,
         String bannerImage,
         List<String> genres,
+        AniListStudioConnection studios,
         String season,
         Integer seasonYear,
+        AniListCharacterConnection characters,
         List<AniListTag> tags
 ) {}

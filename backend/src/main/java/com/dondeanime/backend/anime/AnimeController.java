@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,14 +18,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping("/api/anime")
+@RequestMapping({"/api/anime", "/api/v1/anime"})
+@Tag(name = "Anime", description = "Catalogo publico de anime")
 public class AnimeController {
 
     private final AnimeRepository repository;
@@ -32,6 +39,7 @@ public class AnimeController {
     private final AnimeMatchingService matchingService;
     private final ProviderSyncService providerSyncService;
     private final AnimeDescriptionEnricher descriptionEnricher;
+    private final TrailerSyncService trailerSyncService;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -43,6 +51,7 @@ public class AnimeController {
             AnimeMatchingService matchingService,
             ProviderSyncService providerSyncService,
             AnimeDescriptionEnricher descriptionEnricher,
+            TrailerSyncService trailerSyncService,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService,
@@ -52,6 +61,7 @@ public class AnimeController {
         this.matchingService = matchingService;
         this.providerSyncService = providerSyncService;
         this.descriptionEnricher = descriptionEnricher;
+        this.trailerSyncService = trailerSyncService;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -59,18 +69,15 @@ public class AnimeController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista todos los anime", description = "Devuelve la vista resumida del catalogo ordenada como esta almacenada.")
     public List<AnimeSummaryDto> getAll() {
         return repository.findAllWithGenres().stream()
                 .map(AnimeSummaryDto::from)
                 .toList();
     }
 
-    /**
-     * Próximos estrenos con fecha completa, ordenados por startDate asc.
-     * Solo incluye anime con año, mes y día: si AniList devuelve fecha
-     * parcial no podemos prometer "próxima semana" con precisión.
-     */
     @GetMapping("/upcoming")
+    @Operation(summary = "Lista proximos estrenos", description = "Devuelve anime con fecha completa dentro del rango indicado.")
     public ResponseEntity<List<UpcomingAnimeDto>> upcoming(@RequestParam(defaultValue = "7") int days) {
         if (days < 1 || days > 365) {
             return ResponseEntity.badRequest().build();
@@ -105,15 +112,38 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Detalle de un anime + sus watch providers agrupados por país.
-     * 404 si el slug no existe.
-     */
+    @GetMapping("/duration/{minutes}")
+    @Operation(summary = "Lista anime por duracion", description = "Devuelve anime cuya duracion media por episodio coincide con los minutos indicados.")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeDuration(@PathVariable int minutes) {
+        if (minutes < 1 || minutes > 240) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodeDuration(minutes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
+    @GetMapping("/episodes/less-than/{maxEpisodes}")
+    @Operation(summary = "Lista anime por numero maximo de episodios", description = "Devuelve anime con numero de episodios conocido igual o inferior al limite.")
+    public ResponseEntity<List<AnimeSummaryDto>> getByEpisodeCount(@PathVariable int maxEpisodes) {
+        if (maxEpisodes < 1 || maxEpisodes > 10_000) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AnimeSummaryDto> anime = repository.findByEpisodesLessThanOrEqual(maxEpisodes).stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+        return ResponseEntity.ok(anime);
+    }
+
     @GetMapping("/{slug}")
+    @Operation(summary = "Obtiene el detalle de un anime", description = "Devuelve la ficha publica y providers agrupados por pais.")
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
-        return repository.findBySlug(slug)
+        return repository.findBySlugWithCharacters(slug)
                 .map(anime -> {
-                    Map<String, List<ProviderDto>> byCountry = providerRepository
+                    var byCountry = providerRepository
                             .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
                             .stream()
                             .map(affiliateLinkService::toProviderDto)
@@ -127,36 +157,37 @@ public class AnimeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Dispara el sync de AniList. Manual durante desarrollo; en semana 4
-     * lo automatizaremos con @Scheduled cada 12h.
-     *
-     * Ejemplo: POST /api/anime/sync?count=100
-     */
     @PostMapping("/sync")
+    @Hidden
     public Map<String, Integer> sync(@RequestParam(defaultValue = "100") int count) {
+        if (count < 1 || count > AnimeSyncService.MAX_POPULAR_SYNC_COUNT) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "count debe estar entre 1 y " + AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
+        }
         int synced = syncService.syncPopular(count);
         return Map.of("synced", synced);
     }
 
-    /**
-     * Cruza cada anime con su id de TMDb. Skip si ya está matcheado.
-     * Tarda ~30s para 100 anime (300ms de sleep entre requests).
-     */
     @PostMapping("/match")
+    @Hidden
     public Map<String, Integer> match() {
         int matched = matchingService.matchAll();
         int descriptionsEnriched = descriptionEnricher.enrichMissingSpanishDescriptions();
         return Map.of("matched", matched, "descriptionsEnriched", descriptionsEnriched);
     }
 
-    /**
-     * Sincroniza watch providers desde TMDb para cada anime con tmdbId.
-     * Tarda ~30s para 100 anime.
-     */
     @PostMapping("/sync-providers")
+    @Hidden
     public Map<String, Integer> syncProviders() {
         int processed = providerSyncService.syncAll();
+        return Map.of("processed", processed);
+    }
+
+    @PostMapping("/sync-trailers")
+    @Hidden
+    public Map<String, Integer> syncTrailers() {
+        int processed = trailerSyncService.syncAll();
         return Map.of("processed", processed);
     }
 

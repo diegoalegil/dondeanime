@@ -1,24 +1,19 @@
 # Lighthouse thresholds
 
-Current threshold:
+Threshold actual en CI:
 
 - Performance: 80
 - Accessibility: 90
 - Best Practices: 80
 - SEO: 80
 
-Target threshold:
+Threshold objetivo:
 
-- Performance: 90
-- Accessibility: 90
-- Best Practices: 90
-- SEO: 90
+- 90 en todas las categorias.
 
-Plan:
+Plan Sprint 18:
 
-- PR 18.2 must raise at least one affected threshold by 2-3 points after the Cloudflare cache rules work.
-- PR 18.3 must raise the relevant rendering and LCP-related threshold by 2-3 points after critical CSS work.
-- PR 18.4 must raise the relevant runtime and offline-related threshold by 2-3 points after service worker improvements.
-- PR 18.5 must leave all Lighthouse thresholds at 90.
-
-Accessibility is fixed at 90 throughout Sprint 18 and must not be lowered.
+- PR 18.2 debe subir 2-3 puntos segun la mejora de cache aplicada.
+- PR 18.3 debe subir 2-3 puntos segun las mejoras de imagenes y assets.
+- PR 18.4 debe subir 2-3 puntos segun las mejoras de carga critica.
+- PR 18.5 debe dejar el threshold final en 90 para Performance, Accessibility, Best Practices y SEO.

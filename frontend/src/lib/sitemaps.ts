@@ -4,6 +4,7 @@ import {
   getProviders,
   getProvidersByCountry,
   getSeasons,
+  getStudios,
 } from './api';
 import { getCollection } from 'astro:content';
 import { BEST_ANIME_YEARS } from './bestYears';
@@ -11,6 +12,15 @@ import { COUNTRIES, COUNTRY_SLUGS } from './countries';
 import { localizedPath } from './localizedRoutes';
 import { isHiddenVariant } from './platforms';
 import { t } from '@/i18n';
+import {
+  DURATION_MINUTES,
+  EPISODE_LIMITS,
+  TOP_STUDIO_LIMIT,
+  beginnerGenrePath,
+  durationPath,
+  episodeLimitPath,
+  studioPath,
+} from './programmaticSeo';
 
 export const LANGUAGE_SITEMAP_ENTRIES = [
   { name: 'Spanish', path: '/sitemap-es.xml' },
@@ -159,9 +169,22 @@ export const combinationSitemapPaths = async (): Promise<string[]> => {
     .filter((provider) => !isHiddenVariant(provider.slug))
     .slice(0, topProviderLimit);
 
-  return topGenres.flatMap((genre) =>
+  const genreProviderPaths = topGenres.flatMap((genre) =>
     topProviders.map((provider) => `/anime/${genre.slug}/en/${provider.slug}`),
   );
+  const durationPaths = DURATION_MINUTES.map((minutes) => durationPath(minutes));
+  const episodeLimitPaths = EPISODE_LIMITS.map((maxEpisodes) => episodeLimitPath(maxEpisodes));
+  const beginnerGenrePaths = genres.map((genre) => beginnerGenrePath(genre.slug));
+  const studioPaths = (await getStudios()).slice(0, TOP_STUDIO_LIMIT)
+    .map((studio) => studioPath(studio.slug));
+
+  return [
+    ...genreProviderPaths,
+    ...durationPaths,
+    ...episodeLimitPaths,
+    ...beginnerGenrePaths,
+    ...studioPaths,
+  ];
 };
 
 export const spanishSitemapPaths = async (): Promise<string[]> => {

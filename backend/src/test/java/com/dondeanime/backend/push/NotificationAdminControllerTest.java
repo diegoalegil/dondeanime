@@ -88,6 +88,10 @@ class NotificationAdminControllerTest {
         verify(notificationDashboardService).sendTestPush(1L);
     }
 
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
+    }
+
     private static NotificationStatsDto stats() {
         return new NotificationStatsDto(
                 1,
@@ -107,9 +111,5 @@ class NotificationAdminControllerTest {
                         201,
                         Instant.parse("2026-05-25T01:00:00Z"),
                 null)));
-    }
-
-    private String bearerToken() {
-        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 }

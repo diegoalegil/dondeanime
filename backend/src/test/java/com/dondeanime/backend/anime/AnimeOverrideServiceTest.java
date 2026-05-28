@@ -2,6 +2,8 @@ package com.dondeanime.backend.anime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class AnimeOverrideServiceTest {
 
-    private final AnimeOverrideRepository repository = org.mockito.Mockito.mock(AnimeOverrideRepository.class);
+    private final AnimeOverrideRepository repository = mock(AnimeOverrideRepository.class);
     private final AnimeOverrideService service = new AnimeOverrideService(repository);
 
     @Test
@@ -20,22 +22,42 @@ class AnimeOverrideServiceTest {
         Anime anime = anime();
         when(repository.findByAnime_IdAndFieldNameAndLocale(1L, "title_english", "es"))
                 .thenReturn(Optional.empty());
-        when(repository.save(org.mockito.ArgumentMatchers.any(AnimeOverride.class)))
+        when(repository.save(any(AnimeOverride.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         AnimeOverride saved = service.saveOverride(
                 anime,
                 " titleEnglish ",
-                " Título propio ",
+                " Titulo propio ",
                 null,
                 "admin");
 
         assertThat(saved.getAnime()).isSameAs(anime);
         assertThat(saved.getFieldName()).isEqualTo("title_english");
-        assertThat(saved.getFieldValue()).isEqualTo("Título propio");
+        assertThat(saved.getFieldValue()).isEqualTo("Titulo propio");
         assertThat(saved.getLocale()).isEqualTo("es");
         assertThat(saved.getUpdatedAt()).isNotNull();
         assertThat(saved.getUpdatedBy()).isEqualTo("admin");
+    }
+
+    @Test
+    void saveOverrideAllowsBeginnerRecommendationAlias() {
+        Anime anime = anime();
+        when(repository.findByAnime_IdAndFieldNameAndLocale(1L, "beginner_recommendation", "es"))
+                .thenReturn(Optional.empty());
+        when(repository.save(any(AnimeOverride.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AnimeOverride override = service.saveOverride(
+                anime,
+                "beginnerRecommendation",
+                "Buena primera serie si buscas accion directa.",
+                "ES",
+                "admin");
+
+        assertThat(override.getFieldName()).isEqualTo("beginner_recommendation");
+        assertThat(override.getFieldValue()).isEqualTo("Buena primera serie si buscas accion directa.");
+        assertThat(override.getLocale()).isEqualTo("es");
+        verify(repository).save(override);
     }
 
     @Test
@@ -53,13 +75,15 @@ class AnimeOverrideServiceTest {
     @Test
     void originalValueReturnsSelectedField() {
         Anime anime = anime();
-        anime.setDescription("Descripción AniList");
-        anime.setTitleEnglish("Attack on Titan");
-        anime.setTitleRomaji("Shingeki no Kyojin");
 
-        assertThat(service.originalValue(anime, "description")).isEqualTo("Descripción AniList");
+        assertThat(service.originalValue(anime, "description")).isEqualTo("Descripcion AniList");
         assertThat(service.originalValue(anime, "title_english")).isEqualTo("Attack on Titan");
         assertThat(service.originalValue(anime, "titleRomaji")).isEqualTo("Shingeki no Kyojin");
+    }
+
+    @Test
+    void originalValueForBeginnerRecommendationIsEmptyBecauseItIsEditorialOnly() {
+        assertThat(service.originalValue(anime(), "beginner_recommendation")).isNull();
     }
 
     @Test
@@ -79,6 +103,9 @@ class AnimeOverrideServiceTest {
         Anime anime = new Anime();
         anime.setId(1L);
         anime.setSlug("attack-on-titan");
+        anime.setTitleEnglish("Attack on Titan");
+        anime.setTitleRomaji("Shingeki no Kyojin");
+        anime.setDescription("Descripcion AniList");
         return anime;
     }
 }

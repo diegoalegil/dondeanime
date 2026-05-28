@@ -7,11 +7,12 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run validate:i18n && astro build && npm run validate:autotext && npm run validate:jsonld",
     "preview": "astro preview",
     "astro": "astro",
     "validate:i18n": "node scripts/validate-i18n.mjs",
     "audit:lighthouse": "node scripts/lighthouse-audit.mjs",
+    "validate:autotext": "node scripts/validate-autotext.mjs",
     "validate:jsonld": "node scripts/validate-jsonld.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

@@ -26,6 +26,7 @@ public class AniListClient {
               startDate { year month day }
               endDate { year month day }
               episodes
+              duration
               format
               status
               averageScore
@@ -34,8 +35,19 @@ public class AniListClient {
               coverImage { large }
               bannerImage
               genres
+              studios { nodes { id name isAnimationStudio } }
               season
               seasonYear
+              characters(perPage: 6, role: MAIN) {
+                edges {
+                  role
+                  node {
+                    id
+                    name { full native }
+                    image { large medium }
+                  }
+                }
+              }
               tags { name rank }
             }
           }
