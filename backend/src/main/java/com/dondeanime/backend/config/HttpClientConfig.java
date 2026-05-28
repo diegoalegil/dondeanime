@@ -27,6 +27,14 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class HttpClientConfig {
 
+    /**
+     * User-Agent identificable. AniList está detrás de Cloudflare y bloquea
+     * (error 1010 → se manifiesta como 400 "Invalid token") a los clientes
+     * sin User-Agent de navegador, como el cliente HTTP de Java por defecto.
+     * Con un UA propio identificable, Cloudflare deja pasar la petición.
+     */
+    private static final String USER_AGENT = "DondeAnime/1.0 (+https://dondeanime.com)";
+
     @Bean
     RestClient.Builder restClientBuilder() {
         HttpClient httpClient = HttpClient.newBuilder()
@@ -34,6 +42,8 @@ public class HttpClientConfig {
                 .build();
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
         factory.setReadTimeout(Duration.ofSeconds(60));
-        return RestClient.builder().requestFactory(factory);
+        return RestClient.builder()
+                .requestFactory(factory)
+                .defaultHeader("User-Agent", USER_AGENT);
     }
 }
