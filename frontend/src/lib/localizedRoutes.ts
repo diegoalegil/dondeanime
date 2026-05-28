@@ -83,13 +83,13 @@ export const spanishPathFromLocalized = (path: string): string => {
   return trimPath(path.replace(/^\/en/, '') || '/');
 };
 
-export const localizedPath = (
-  path: string,
-  locale: Locale = getLocale(),
-): string => {
-  const spanishPath = spanishPathFromLocalized(path);
-  if (locale === 'es') return spanishPath;
-
+/**
+ * Mapea una ruta española a su equivalente inglesa REAL, o devuelve null
+ * si esa página inglesa no existe (premium, buscar, api, empezar, estudio,
+ * anime/duracion, anime/episodios, índices sin traducir...). Usar null en
+ * lugar de inventar una /en/... que daría 404.
+ */
+const localizedEnPath = (spanishPath: string): string | null => {
   const segments = segmentsOf(spanishPath);
   const [section, first, second, third] = segments;
   if (!section) return '/en';
@@ -113,6 +113,7 @@ export const localizedPath = (
   if (section === 'estrenos') {
     if (first === 'proxima-semana') return '/en/upcoming/next-week';
     if (first === 'proximo-mes') return '/en/upcoming/next-month';
+    return null;
   }
 
   if (section === 'blog') return first ? `/en/blog/${first}` : '/en/blog';
@@ -120,9 +121,12 @@ export const localizedPath = (
   if (section === 'legal') {
     if (first === 'privacidad') return '/en/legal/privacy';
     if (first === 'afiliados') return '/en/legal/affiliates';
+    return null;
   }
 
   if (section === 'anime' && first) {
+    // /anime/duracion/* y /anime/episodios/* son solo-español.
+    if (first === 'duracion' || first === 'episodios') return null;
     if (second === 'en' && third) return `/en/anime/${first}/on/${third}`;
     const country = canonicalCountrySlug(second);
     return country
@@ -130,14 +134,34 @@ export const localizedPath = (
       : `/en/anime/${first}`;
   }
 
-  return `/en/${segments.join('/')}`;
+  return null;
 };
 
-export const localeAlternates = (path: string) => {
+export const localizedPath = (
+  path: string,
+  locale: Locale = getLocale(),
+): string => {
   const spanishPath = spanishPathFromLocalized(path);
+  if (locale === 'es') return spanishPath;
+
+  // Para CONSTRUIR enlaces mantenemos un fallback aunque la página inglesa
+  // no exista, para no romper la navegación ya existente.
+  const segments = segmentsOf(spanishPath);
+  return localizedEnPath(spanishPath) ?? `/en/${segments.join('/')}`;
+};
+
+export const localeAlternates = (path: string): Array<{ hreflang: string; path: string }> => {
+  const spanishPath = spanishPathFromLocalized(path);
+  const enPath = localizedEnPath(spanishPath);
+  // Solo emitimos hreflang cuando la versión inglesa EXISTE. Para páginas
+  // solo-español no emitimos nada: un hreflang apuntando a un 404 hace que
+  // Google ignore (o penalice) el clúster de idiomas.
+  if (!enPath) {
+    return [];
+  }
   return [
-    { hreflang: 'es', path: localizedPath(spanishPath, 'es') },
-    { hreflang: 'en', path: localizedPath(spanishPath, 'en') },
-    { hreflang: 'x-default', path: localizedPath(spanishPath, 'es') },
+    { hreflang: 'es', path: spanishPath },
+    { hreflang: 'en', path: enPath },
+    { hreflang: 'x-default', path: spanishPath },
   ];
 };

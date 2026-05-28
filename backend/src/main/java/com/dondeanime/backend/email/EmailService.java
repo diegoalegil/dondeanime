@@ -37,4 +37,9 @@ public interface EmailService {
             String email,
             String planTier,
             String premiumUrl);
+
+    void sendPremiumPortalEmail(
+            String email,
+            String planTier,
+            String portalUrl);
 }

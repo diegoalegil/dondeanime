@@ -47,6 +47,8 @@ api.dondeanime.com {
 		X-Frame-Options "DENY"
 		# Política de referrer mínima.
 		Referrer-Policy "no-referrer"
+		# HSTS: fuerza HTTPS (2 años). La API solo debe hablar por TLS.
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
 		# Quita la cabecera Server por defecto que delata Caddy.
 		-Server
 	}
