@@ -28,7 +28,7 @@ if (score !== null) {
   else scoreClass = 'bg-danger/15 text-danger';
 }
 ---
-<article class="group">
+<article class="group" data-anime-filter-item data-anime-slug={anime.slug}>
   <a href={localizedPath(`/anime/${anime.slug}`)} class="block" {...recommendationAttributes}>
     <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
       <AnimePicture

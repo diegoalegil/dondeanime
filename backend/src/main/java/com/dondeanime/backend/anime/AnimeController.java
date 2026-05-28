@@ -103,10 +103,12 @@ public class AnimeController {
     }
 
     @GetMapping("/{slug}/similar")
-    public ResponseEntity<List<AnimeSummaryDto>> getSimilar(@PathVariable String slug) {
+    public ResponseEntity<List<AnimeSummaryDto>> getSimilar(
+            @PathVariable String slug,
+            @RequestParam(required = false) List<String> watched) {
         return repository.findBySlug(slug)
                 .map(anime -> ResponseEntity.ok(
-                        recommendationService.findSimilar(anime.getId(), 10).stream()
+                        recommendationService.findSimilar(anime.getId(), 10, watched).stream()
                                 .map(AnimeSummaryDto::from)
                                 .toList()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
