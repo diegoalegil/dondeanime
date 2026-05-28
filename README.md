@@ -28,14 +28,20 @@ No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con p
 
 | Métrica | Valor |
 |---|---|
-| Anime catalogados | 100 (objetivo Sprint 8: 500) |
-| Páginas estáticas generadas | 720 |
-| Países soportados | 5 |
+| Anime catalogados | 100 en producción · infraestructura lista para 500+ (Sprint 8) |
+| Páginas estáticas generadas | 720 en producción · 5000+ con programmatic SEO (Sprint 17, en cola de deploy) |
+| Países soportados | 5 (ES, MX, AR, CL, CO) |
+| Idiomas | Español + Inglés (`/en/`, Sprint 13) |
 | Plataformas indexadas | 8+ |
-| Tiempo de build frontend | 3.4 segundos |
-| Tests backend (verdes) | 31 |
-| Endpoints REST públicos | 11 |
+| Tiempo de build frontend | ~3-4 segundos |
+| Tests backend | 266 (verdes en CI con Postgres + Testcontainers) |
+| Endpoints REST | ~25 (catálogo, búsqueda fulltext, API v1, premium, push, listas) |
 | Sync automático | AniList 12h / TMDb match 24h / Providers 24h |
+
+> Nota de estado: el repositorio (rama `main`) contiene 20+ sprints de
+> features. El backend en producción se actualiza por deploy manual al VPS;
+> algunas capacidades nuevas (búsqueda fulltext, API v1, Premium, push) están
+> en `main` y se activan en producción con el siguiente deploy.
 
 ---
 
