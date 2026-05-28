@@ -1,5 +1,6 @@
 ---
 import { t } from '@/i18n';
+import { sanitizeHtml } from '@/lib/sanitizeHtml';
 
 interface Props {
   description: string | null;
@@ -7,8 +8,11 @@ interface Props {
 }
 
 const { description, translationPending = false } = Astro.props;
+// La descripción puede venir de la API o de un override editorial del admin.
+// Sanitizamos antes del set:html para no permitir XSS almacenado.
+const safeDescription = sanitizeHtml(description);
 ---
-{description && (
+{safeDescription && (
   <section class="mx-auto max-w-6xl px-4 py-8">
     <div class="mb-4 flex flex-wrap items-center gap-3">
       <h2 class="text-lg font-semibold text-fg-primary">{t('anime.synopsis.title')}</h2>
@@ -20,7 +24,7 @@ const { description, translationPending = false } = Astro.props;
     </div>
     <div
       class="max-w-3xl text-base leading-relaxed text-fg-secondary"
-      set:html={description}
+      set:html={safeDescription}
     />
   </section>
 )}

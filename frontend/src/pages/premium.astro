@@ -225,9 +225,27 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
         return;
       }
 
-      setStatus('Abriendo portal de cliente...');
-      if (!(await redirectToPremiumUrl('/api/premium/portal', email))) {
-        setStatus('No se pudo abrir el portal para ese email.', 'danger');
+      // Por seguridad el backend NO devuelve la URL del portal: la envía al
+      // email del titular. Respuesta genérica para no revelar quién es
+      // suscriptor. Deshabilitamos el botón para evitar envíos duplicados.
+      const button = portalButton instanceof HTMLButtonElement ? portalButton : null;
+      if (button) button.disabled = true;
+      setStatus('Enviando enlace del portal...');
+      try {
+        const response = await fetch(`${apiUrl}/api/premium/portal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (response.ok) {
+          setStatus('Si tienes una suscripción activa, te hemos enviado un enlace a tu email.', 'success');
+        } else {
+          setStatus('No se pudo procesar la solicitud. Inténtalo más tarde.', 'danger');
+        }
+      } catch (error) {
+        setStatus('No se pudo conectar con el servidor.', 'danger');
+      } finally {
+        if (button) button.disabled = false;
       }
     });
   </script>

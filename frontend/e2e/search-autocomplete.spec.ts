@@ -28,7 +28,7 @@ test('header search autocompletes via API and navigates on result click', async 
   await expect(form).toBeVisible();
 
   await page.keyboard.press('/');
-  const input = page.getByRole('searchbox', { name: /Buscar anime/i });
+  const input = page.getByRole('combobox', { name: /Buscar anime/i });
   await expect(input).toBeFocused();
 
   await input.fill('ataque');
