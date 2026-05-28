@@ -52,6 +52,11 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      # Permite que el cliente HTTP de Java (java.net.http) mande el header
+      # User-Agent custom. Sin esto, el JDK trata User-Agent como header
+      # restringido y lo ignora, y AniList (tras Cloudflare) bloquea la
+      # petición sin User-Agent de navegador (error 1010 → 400 Invalid token).
+      JAVA_TOOL_OPTIONS: "-Djdk.httpclient.allowRestrictedHeaders=user-agent"
       # Conecta a Postgres por nombre de servicio dentro de la red Docker.
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
