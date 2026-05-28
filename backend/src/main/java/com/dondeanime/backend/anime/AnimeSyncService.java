@@ -271,8 +271,10 @@ public class AnimeSyncService {
         }
 
         // Dedupe: si el slug existe ya en otro anime distinto, sufija con anilistId.
+        // Objects.equals porque getAnilistId() puede ser null (NPE-safe, igual
+        // que buildStudioSlug más arriba).
         Optional<Anime> existing = repository.findBySlug(slug);
-        if (existing.isPresent() && !existing.get().getAnilistId().equals(media.id())) {
+        if (existing.isPresent() && !Objects.equals(existing.get().getAnilistId(), media.id())) {
             slug = slug + "-" + media.id();
         }
         return slug;
