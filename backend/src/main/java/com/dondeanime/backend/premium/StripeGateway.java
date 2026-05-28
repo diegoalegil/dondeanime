@@ -70,7 +70,8 @@ public class StripeGateway {
                     email,
                     subscription.getCustomer(),
                     toInstant(event.getCreated()),
-                    toInstant(subscription.getCurrentPeriodEnd()));
+                    toInstant(subscription.getCurrentPeriodEnd()),
+                    event.getId());
         }
         if (object instanceof Invoice invoice) {
             return new StripeWebhookEvent(
@@ -78,9 +79,11 @@ public class StripeGateway {
                     invoice.getCustomerEmail(),
                     invoice.getCustomer(),
                     toInstant(event.getCreated()),
-                    null);
+                    null,
+                    event.getId());
         }
-        return new StripeWebhookEvent(event.getType(), null, null, toInstant(event.getCreated()), null);
+        return new StripeWebhookEvent(
+                event.getType(), null, null, toInstant(event.getCreated()), null, event.getId());
     }
 
     private static Instant toInstant(Long epochSeconds) {

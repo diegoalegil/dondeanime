@@ -45,17 +45,14 @@ class PremiumControllerTest {
     }
 
     @Test
-    void portalReturnsStripeCustomerPortalUrl() throws Exception {
-        when(stripeService.createCustomerPortalSession("diego@example.com"))
-                .thenReturn("https://billing.stripe.test/session");
-
+    void portalReturnsGenericStatusAndRequestsPortalLink() throws Exception {
         mvc.perform(post("/api/premium/portal")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"diego@example.com\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("https://billing.stripe.test/session"));
+                .andExpect(jsonPath("$.status").value("email_sent"));
 
-        verify(stripeService).createCustomerPortalSession("diego@example.com");
+        verify(stripeService).requestCustomerPortalLink("diego@example.com");
     }
 
     @Test

@@ -24,6 +24,18 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final List<RateLimitRule> RULES = List.of(
             new RateLimitRule("/api/search", false, 30),
             new RateLimitRule("/api/track/affiliate", false, 60),
+            new RateLimitRule("/api/track/recommendation", false, 60),
+            // Endpoints que disparan envío de email o crean sesiones de pago:
+            // límite bajo por IP para frenar email-bombing y abuso de Stripe.
+            new RateLimitRule("/api/newsletter/subscribe", false, 5),
+            new RateLimitRule("/api/subscriptions/unsubscribe", false, 10),
+            new RateLimitRule("/api/subscriptions", false, 5),
+            new RateLimitRule("/api/alerts", false, 5),
+            new RateLimitRule("/api/push/subscribe", false, 10),
+            new RateLimitRule("/api/mobile/push/register", false, 10),
+            new RateLimitRule("/api/premium/checkout", false, 5),
+            new RateLimitRule("/api/premium/portal", false, 5),
+            new RateLimitRule("/api/users/", true, 5),
             new RateLimitRule("/api/admin/", true, 10));
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
@@ -33,6 +45,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+        // El preflight CORS no debe consumir cuota de rate limit.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         RateLimitRule rule = findRule(request.getRequestURI());
         if (rule == null) {
             filterChain.doFilter(request, response);
@@ -73,9 +90,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private static String clientIp(HttpServletRequest request) {
+        // Detrás de un único proxy de confianza (Caddy), la IP real del
+        // cliente es la ÚLTIMA entrada de X-Forwarded-For: Caddy la añade
+        // al final. Tomar la primera permitiría a un cliente spoofear el
+        // header y crear un bucket nuevo por request (bypass del límite).
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",", 2)[0].trim();
+            String[] hops = forwardedFor.split(",");
+            String realIp = hops[hops.length - 1].trim();
+            if (!realIp.isBlank()) {
+                return realIp;
+            }
         }
         return request.getRemoteAddr();
     }
