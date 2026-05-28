@@ -145,9 +145,11 @@
       type="search"
       placeholder={placeholder}
       autocomplete="off"
+      role="combobox"
       class="w-32 bg-transparent text-sm text-fg-primary placeholder:text-fg-muted focus:outline-none md:w-48"
       aria-autocomplete="list"
-      aria-controls={listId}
+      aria-haspopup="listbox"
+      aria-controls={open ? listId : undefined}
       aria-expanded={open}
       on:input={scheduleSearch}
       on:focus={() => query.trim().length >= 2 && (open = true)}
