@@ -193,9 +193,13 @@ Tarda unos 4 minutos en total. Al terminar tienes 100 anime con providers reales
 
 ### Tests
 
+> **Requiere Docker en marcha.** Los tests de integración usan Testcontainers,
+> que arranca un Postgres efímero. Sin el daemon de Docker, esos tests fallan
+> (el contexto tarda ~60s en dar timeout). En CI ya hay Docker disponible.
+
 ```bash
 cd backend
-./mvnw test    # 31 tests, ~10 segundos
+./mvnw test
 ```
 
 ---

@@ -563,11 +563,13 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
     const payload = route.request().postDataJSON();
     expect(payload).toEqual({ email: 'premium@dondeanime.test' });
 
+    // Por seguridad el portal ya no devuelve URL: el backend envia el enlace
+    // por email y responde con un acuse generico.
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       headers: corsHeaders,
-      body: JSON.stringify({ url: '/premium?portal=1' }),
+      body: JSON.stringify({ status: 'sent' }),
     });
   });
 
@@ -588,8 +590,7 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
   await page.getByRole('button', { name: 'Gestionar suscripción' }).click();
-  await page.waitForURL('**/premium?portal=1');
-  await expect(page.locator('[data-premium-status]')).toContainText('Portal de cliente cerrado');
+  await expect(page.locator('[data-premium-status]')).toContainText('te hemos enviado un enlace a tu email');
 });
 
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
@@ -612,6 +613,9 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(organization.sameAs.length).toBeGreaterThan(0);
 
   await page.locator('article a[href^="/anime/"]').first().click();
+  await page.waitForURL(/\/anime\/[^/]+$/);
+  await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
+  await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
 
   const detailSchemas = await page.locator('script[type="application/ld+json"]').allTextContents();
   const detailJson = detailSchemas.map((schema) => JSON.parse(schema));
@@ -624,21 +628,38 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   expect(review.author.name).toBe('AniList');
 });
 
-test('search index is loaded lazily when the user searches', async ({ page }) => {
-  const searchIndexRequests: string[] = [];
+test('search results load lazily from the search API when the user searches', async ({ page }) => {
+  const searchRequests: string[] = [];
   page.on('request', (request) => {
-    if (new URL(request.url()).pathname === '/search-index.json') {
-      searchIndexRequests.push(request.url());
+    if (new URL(request.url()).pathname === '/api/search') {
+      searchRequests.push(request.url());
     }
   });
 
-  await page.goto('/');
-  expect(searchIndexRequests).toHaveLength(0);
+  await page.route('**/api/search**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          slug: 'attack-on-titan',
+          titleEnglish: 'Attack on Titan',
+          titleRomaji: 'Shingeki no Kyojin',
+          format: 'TV',
+          year: 2013,
+          coverImage: 'https://example.com/cover.jpg',
+        },
+      ]),
+    });
+  });
 
-  await page.getByPlaceholder('Buscar anime...').fill('naruto');
+  await page.goto('/');
+  expect(searchRequests).toHaveLength(0);
+
+  await page.getByPlaceholder('Buscar anime...').fill('ataque');
 
   await expect(page.locator('[data-search-results] a[href^="/anime/"]').first()).toBeVisible();
-  expect(searchIndexRequests).toHaveLength(1);
+  expect(searchRequests).toHaveLength(1);
 });
 
 function escapeRegExp(value: string) {

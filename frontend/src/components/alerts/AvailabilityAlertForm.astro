@@ -43,7 +43,7 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
       </button>
     </div>
 
-    <form class="mt-5 hidden grid gap-4 md:grid-cols-[1fr_auto]" data-alert-panel>
+    <form class="mt-5 hidden gap-4 md:grid-cols-[1fr_auto]" data-alert-panel>
       <label class="block">
         <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('alert.email')}</span>
         <input
@@ -152,16 +152,24 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
       };
 
       openButton?.addEventListener('click', () => {
+        // 'hidden' y 'grid' nunca coexisten: al mostrar quitamos hidden y
+        // ponemos grid (layout), al ocultar al revés. Evita el conflicto de
+        // dos utilidades display en el mismo nodo.
         panel?.classList.toggle('hidden');
+        panel?.classList.toggle('grid');
       });
 
       panel?.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const form = event.currentTarget;
+        const form = event.currentTarget as HTMLFormElement;
+        const submitButton = form.querySelector('button[type="submit"]');
+        // Evita envíos duplicados por doble click mientras hay petición en curso.
+        if (submitButton instanceof HTMLButtonElement && submitButton.disabled) return;
         const data = new FormData(form);
         const email = String(data.get('email') ?? '').trim();
         const payload = { email, animeSlug, country };
 
+        if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
         setStatus(creatingMessage);
         try {
           const response = await fetch(alertApiUrl, {
@@ -192,6 +200,8 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
             }
           }
           setStatus(errorMessage, 'danger');
+        } finally {
+          if (submitButton instanceof HTMLButtonElement) submitButton.disabled = false;
         }
       });
     });

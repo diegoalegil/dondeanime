@@ -83,6 +83,7 @@ class FlywayMigrationTest {
                 "push_subscription",
                 "recommendation_event",
                 "studio",
+                "stripe_processed_event",
                 "subscriber",
                 "subscription",
                 "watch_provider");
@@ -117,6 +118,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(13);
+        assertThat(successfulMigrations).isEqualTo(14);
     }
 }
