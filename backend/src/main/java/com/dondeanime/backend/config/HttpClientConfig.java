@@ -1,8 +1,11 @@
 package com.dondeanime.backend.config;
 
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -35,6 +38,8 @@ public class HttpClientConfig {
      */
     private static final String USER_AGENT = "DondeAnime/1.0 (+https://dondeanime.com)";
 
+    private static final Logger log = LoggerFactory.getLogger(HttpClientConfig.class);
+
     @Bean
     RestClient.Builder restClientBuilder() {
         HttpClient httpClient = HttpClient.newBuilder()
@@ -44,6 +49,14 @@ public class HttpClientConfig {
         factory.setReadTimeout(Duration.ofSeconds(60));
         return RestClient.builder()
                 .requestFactory(factory)
-                .defaultHeader("User-Agent", USER_AGENT);
+                .defaultHeader("User-Agent", USER_AGENT)
+                .requestInterceptor((request, body, execution) -> {
+                    // TEMPORAL: diagnóstico del body que sale (quitar tras debug)
+                    log.warn("HTTP-OUT {} {} ct={} body={}",
+                            request.getMethod(), request.getURI(),
+                            request.getHeaders().getContentType(),
+                            new String(body, StandardCharsets.UTF_8));
+                    return execution.execute(request, body);
+                });
     }
 }
