@@ -77,6 +77,7 @@ class FlywayMigrationTest {
                 "api_key_endpoint_usage",
                 "availability_change_event",
                 "email_token",
+                "external_account",
                 "mobile_push_device",
                 "newsletter_subscriber",
                 "newsletter_token",
@@ -86,6 +87,8 @@ class FlywayMigrationTest {
                 "stripe_processed_event",
                 "subscriber",
                 "subscription",
+                "trakt_sync_event",
+                "user_watched_anime",
                 "watch_provider");
 
         List<String> indexes = jdbc.queryForList("""
@@ -111,6 +114,12 @@ class FlywayMigrationTest {
                 "idx_api_key_tier",
                 "idx_api_key_endpoint_usage_api_key",
                 "idx_api_key_endpoint_usage_endpoint",
+                "idx_external_account_email",
+                "idx_user_watched_anime_account",
+                "idx_user_watched_anime_slug",
+                "idx_user_watched_anime_rated_at",
+                "idx_trakt_sync_event_provider",
+                "idx_trakt_sync_event_synced_at",
                 "idx_mobile_push_device_country",
                 "idx_mobile_push_device_platform");
 
@@ -118,6 +127,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(14);
+        assertThat(successfulMigrations).isEqualTo(17);
     }
 }

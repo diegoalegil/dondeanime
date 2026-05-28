@@ -56,6 +56,7 @@ Web, Data JPA, PostgreSQL Driver, Validation, Lombok, DevTools.
 ### APIs externas
 - **AniList** (GraphQL, sin auth, https://graphql.anilist.co) → fuente primaria de datos de anime.
 - **TMDb** (REST, requiere API key v4, https://api.themoviedb.org/3) → providers de streaming por país.
+- **Trakt.tv** (OAuth + REST, https://trakt.tv / https://api.trakt.tv) → historial visto opcional desde Sprint 22. OAuth no guarda refresh token hasta aprobar almacenamiento cifrado.
 
 ---
 

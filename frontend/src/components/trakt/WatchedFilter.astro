@@ -1,0 +1,6 @@
+---
+import WatchedFilterIsland from './WatchedFilter.svelte';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+---
+<WatchedFilterIsland apiUrl={apiUrl} client:load />
