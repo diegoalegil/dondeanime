@@ -3,6 +3,7 @@ import { FALLBACK_TOP_STUDIOS, studioSlug } from './programmaticSeo';
 const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
 const JSON_CACHE = new Map<string, Promise<unknown>>();
 const FETCH_ATTEMPTS = 3;
+const FETCH_TIMEOUT_MS = 15_000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -133,8 +134,11 @@ async function fetchWithRetry(path: string): Promise<Response> {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
     try {
-      const res = await fetch(`${API_URL}${path}`);
+      const res = await fetch(`${API_URL}${path}`, { signal: controller.signal });
       if (res.status < 500 || attempt === FETCH_ATTEMPTS) {
         return res;
       }
@@ -143,6 +147,8 @@ async function fetchWithRetry(path: string): Promise<Response> {
       if (attempt === FETCH_ATTEMPTS) {
         throw error;
       }
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     await sleep(400 * attempt);

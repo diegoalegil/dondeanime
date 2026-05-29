@@ -83,6 +83,7 @@ coverage/
 .lighthouseci/
 playwright-report/
 test-results/
+frontend/lighthouse-report.json
 
 # ===== Docker (si se mete más adelante) =====
 docker-compose.override.yml

@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "validate:i18n": "node scripts/validate-i18n.mjs",
+    "audit:lighthouse": "node scripts/lighthouse-audit.mjs",
     "validate:autotext": "node scripts/validate-autotext.mjs",
     "validate:jsonld": "node scripts/validate-jsonld.mjs",
     "test:e2e": "playwright test",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
-    "@playwright/test": "^1.60.0"
+    "@playwright/test": "^1.60.0",
+    "lighthouse": "^13.3.0"
   }
 }
