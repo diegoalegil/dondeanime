@@ -6,6 +6,10 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   locale?: string;
+  // Cuando una página canonicaliza a OTRA URL (p.ej. país sin providers → ficha
+  // base) no debe emitir hreflang propio: un clúster hreflang con una URL no
+  // canónica hace que Google lo descarte. true = no emitir alternates.
+  suppressAlternates?: boolean;
 }
 
 import { localeFromPath, setLocale, t } from '@/i18n';
@@ -18,6 +22,7 @@ const {
   image,
   type = 'website',
   locale,
+  suppressAlternates = false,
 } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL;
@@ -47,7 +52,7 @@ const alternates = localeAlternates(cleanPathname || '/');
   <meta property="og:locale:alternate" content={alternateLocale} />
 ))}
 
-{alternates.map((alternate) => (
+{!suppressAlternates && alternates.map((alternate) => (
   <link rel="alternate" hreflang={alternate.hreflang} href={new URL(alternate.path, siteUrl).toString()} />
 ))}
 

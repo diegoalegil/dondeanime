@@ -59,21 +59,31 @@ const seoDescription = hasProviders
 const pageUrl = absoluteUrl(`/anime/${slug}/${countrySlug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
 const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
+
+// Canonical: las páginas país SIN providers son thin content (todas dicen "no
+// disponible"), así que canonicalizan a la ficha base para no diluir SEO ni gastar
+// crawl budget. Las que tienen streaming real en ese país aportan info diferencial
+// (providers distintos por país) y mantienen self-canonical.
+const canonicalOverride = hasProviders ? undefined : absoluteUrl(localizedPath(`/anime/${slug}`));
 ---
 <BaseLayout
   title={seoTitle}
   description={seoDescription}
+  canonical={canonicalOverride}
+  suppressAlternates={!hasProviders}
   image={detail.anime.bannerImage ?? detail.anime.coverImage}
   type="article"
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={tvSchema} />
   {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
-  <AlternateLangs
-    slot="head"
-    basePathWithSlug={`/anime/${slug}`}
-    defaultPath={`/anime/${slug}`}
-  />
+  {hasProviders && (
+    <AlternateLangs
+      slot="head"
+      basePathWithSlug={`/anime/${slug}`}
+      defaultPath={`/anime/${slug}`}
+    />
+  )}
 
   <Breadcrumbs
     items={[
