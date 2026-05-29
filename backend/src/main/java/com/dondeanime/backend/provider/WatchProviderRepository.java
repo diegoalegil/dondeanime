@@ -14,6 +14,14 @@ public interface WatchProviderRepository extends JpaRepository<WatchProvider, Lo
     /** Todos los providers de un anime, ordenados de forma estable para la UI. */
     List<WatchProvider> findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(Long animeId);
 
+    @Query("""
+            SELECT wp FROM WatchProvider wp
+            WHERE wp.animeId IN :animeIds
+            ORDER BY wp.animeId ASC, wp.countryCode ASC, wp.providerType ASC, wp.providerName ASC
+            """)
+    List<WatchProvider> findByAnimeIdInOrderByAnimeIdAscCountryCodeAscProviderTypeAscProviderNameAsc(
+            @Param("animeIds") List<Long> animeIds);
+
     /**
      * Borra todos los providers de un anime e inmediatamente los persiste.
      *

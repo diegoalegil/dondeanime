@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
@@ -106,6 +107,7 @@ const itemListSchema = buildItemListSchema(
     </p>
   </section>
 
+  <AnimeChatSearch />
   <WatchedFilter />
 
   <section class="mx-auto max-w-6xl px-4 pb-12">

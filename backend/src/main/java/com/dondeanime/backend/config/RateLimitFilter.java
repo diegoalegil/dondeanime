@@ -23,6 +23,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final List<RateLimitRule> RULES = List.of(
             new RateLimitRule("/api/search", false, 30),
+            new RateLimitRule("/api/chat/search", false, 20),
             new RateLimitRule("/api/track/affiliate", false, 60),
             new RateLimitRule("/api/track/recommendation", false, 60),
             new RateLimitRule("/api/trakt/sync", false, 10),

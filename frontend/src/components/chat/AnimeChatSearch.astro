@@ -1,0 +1,11 @@
+---
+import { localizedPath } from '@/lib/localizedRoutes';
+import AnimeChatSearchIsland from './AnimeChatSearch.svelte';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+---
+<AnimeChatSearchIsland
+  apiUrl={apiUrl}
+  animePathPrefix={localizedPath('/anime')}
+  client:load
+/>

@@ -89,6 +89,11 @@ services:
       PLAUSIBLE_ENABLED: ${PLAUSIBLE_ENABLED:-false}
       PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY:-}
       PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-dondeanime.com}
+      # --- Embeddings (Sprint 21, apagado hasta configurar OpenAI) ---
+      EMBEDDINGS_ENABLED: ${EMBEDDINGS_ENABLED:-false}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      OPENAI_API_BASE: ${OPENAI_API_BASE:-https://api.openai.com}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       # --- Alertas críticas Telegram (Sprint 6, opcional) ---
       TELEGRAM_ENABLED: ${TELEGRAM_ENABLED:-false}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}

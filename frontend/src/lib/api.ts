@@ -26,6 +26,17 @@ export interface AnimeSummary {
   seasonYear: number | null;
 }
 
+export interface ChatRecommendation {
+  anime: AnimeSummary;
+  canonicalUrl: string;
+  explanation: string;
+}
+
+export interface ChatSearchResponse {
+  answer: string;
+  recommendations: ChatRecommendation[];
+}
+
 export interface TraktWatchedResponse {
   slugs: string[];
 }

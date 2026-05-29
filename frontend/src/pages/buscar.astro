@@ -1,5 +1,6 @@
 ---
 import AnimeCard from '@/components/anime/AnimeCard.astro';
+import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import WatchedFilter from '@/components/trakt/WatchedFilter.astro';
 import { getAllAnime } from '@/lib/api';
@@ -31,6 +32,7 @@ const anime = await getAllAnime();
     </div>
 
     <div class="-mx-4">
+      <AnimeChatSearch />
       <WatchedFilter />
     </div>
 
