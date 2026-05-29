@@ -13,6 +13,8 @@ import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.TrailerSyncService;
+import com.dondeanime.backend.news.NewsIngestionResult;
+import com.dondeanime.backend.news.NewsIngestionService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -39,6 +41,8 @@ public class CatalogScheduler {
     private final MeterRegistry meterRegistry;
     private final ApplicationEventPublisher eventPublisher;
     private final String vercelDeployHook;
+    private final NewsIngestionService newsIngestionService;
+    private final boolean newsIngestionEnabled;
 
     public CatalogScheduler(
             AnimeSyncService syncService,
@@ -49,7 +53,9 @@ public class CatalogScheduler {
             RestClient.Builder restClientBuilder,
             MeterRegistry meterRegistry,
             ApplicationEventPublisher eventPublisher,
-            @Value("${vercel.deploy-hook:}") String vercelDeployHook) {
+            NewsIngestionService newsIngestionService,
+            @Value("${vercel.deploy-hook:}") String vercelDeployHook,
+            @Value("${news.ingestion.enabled:false}") boolean newsIngestionEnabled) {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.descriptionEnricher = descriptionEnricher;
@@ -58,7 +64,9 @@ public class CatalogScheduler {
         this.restClient = restClientBuilder.build();
         this.meterRegistry = meterRegistry;
         this.eventPublisher = eventPublisher;
+        this.newsIngestionService = newsIngestionService;
         this.vercelDeployHook = vercelDeployHook;
+        this.newsIngestionEnabled = newsIngestionEnabled;
     }
 
     @Scheduled(cron = "${dondeanime.cron.sync-anilist:0 0 3,15 * * *}")
@@ -117,6 +125,38 @@ public class CatalogScheduler {
         }
         if (ok) {
             triggerVercelRebuild();
+        }
+    }
+
+    /**
+     * Ingesta noticias de los feeds RSS. Independiente del resto: aunque el
+     * scheduler esté activo, esto solo corre si news.ingestion.enabled=true,
+     * para poder encenderlo por separado cuando el News Engine esté listo.
+     */
+    @Scheduled(cron = "${dondeanime.cron.ingest-news:0 30 */6 * * *}")
+    public void ingestNews() {
+        if (!newsIngestionEnabled) {
+            log.debug("[scheduler] ingestNews: desactivado (news.ingestion.enabled=false)");
+            return;
+        }
+        log.info("[scheduler] ingestNews: iniciando");
+        Timer.Sample sample = Timer.start(meterRegistry);
+        try {
+            NewsIngestionResult result = newsIngestionService.ingestAll();
+            if (result.itemsErrored() > 0) {
+                // Fallos reales de guardado: que la métrica no lo confunda con "sin novedades".
+                log.warn("[scheduler] ingestNews: completado con {} errores de guardado ({} nuevas, {} fuentes)",
+                        result.itemsErrored(), result.itemsCreated(), result.sourcesProcessed());
+                recordError("news", sample);
+            } else {
+                log.info("[scheduler] ingestNews: completado, {} nuevas de {} fuentes",
+                        result.itemsCreated(), result.sourcesProcessed());
+                recordSuccess("news", sample);
+            }
+        } catch (Exception e) {
+            log.error("[scheduler] ingestNews: ERROR", e);
+            recordError("news", sample);
+            publishJobFailure("news", e);
         }
     }
 

@@ -17,6 +17,7 @@ import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
 import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.TrailerSyncService;
+import com.dondeanime.backend.news.NewsIngestionService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -47,7 +48,9 @@ class CatalogSchedulerTest {
                 restClientBuilder,
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),
-                "https://vercel.example/deploy");
+                mock(NewsIngestionService.class),
+                "https://vercel.example/deploy",
+                false);
 
         scheduler.syncAniList();
 
@@ -71,7 +74,9 @@ class CatalogSchedulerTest {
                 RestClient.builder(),
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),
-                "");
+                mock(NewsIngestionService.class),
+                "",
+                false);
 
         scheduler.matchTmdb();
 

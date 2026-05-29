@@ -34,5 +34,6 @@ public abstract class AbstractIntegrationTest {
         registry.add("alerts.jwt-secret", () -> "test-secret-with-enough-entropy-for-integration-tests");
         registry.add("resend.enabled", () -> "false");
         registry.add("plausible.enabled", () -> "false");
+        registry.add("news.seed-sources.enabled", () -> "false");
     }
 }

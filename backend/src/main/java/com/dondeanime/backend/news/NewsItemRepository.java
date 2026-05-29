@@ -14,7 +14,7 @@ public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
 
     Optional<NewsItem> findBySlugAndStatus(String slug, NewsStatus status);
 
-    Optional<NewsItem> findBySlug(String slug);
+    boolean existsBySlug(String slug);
 
     boolean existsBySourceUrl(String sourceUrl);
 }
