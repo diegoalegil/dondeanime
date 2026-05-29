@@ -43,6 +43,14 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     Optional<Anime> findByIdWithTags(@Param("id") Long id);
 
     @EntityGraph(attributePaths = "genres")
+    @Query("SELECT a FROM Anime a WHERE a.id = :id")
+    Optional<Anime> findByIdWithGenres(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = "genres")
+    @Query("SELECT DISTINCT a FROM Anime a WHERE a.id IN :ids")
+    List<Anime> findByIdInWithGenres(@Param("ids") List<Long> ids);
+
+    @EntityGraph(attributePaths = "genres")
     @Query("SELECT DISTINCT a FROM Anime a WHERE a.slug IN :slugs")
     List<Anime> findBySlugInWithGenres(@Param("slugs") Set<String> slugs);
 

@@ -8,8 +8,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,18 @@ class RecommendationServiceTest {
             watchProviderRepository,
             Caffeine.newBuilder().maximumSize(100).build());
 
+    private final Map<Long, Anime> animeById = new HashMap<>();
+
+    {
+        // Las queries findSimilarBy* no traen genres; el service recarga las
+        // recomendaciones por id con findByIdInWithGenres. Devolvemos los mismos
+        // anime de prueba (ya tienen genres) buscando por id.
+        when(animeRepository.findByIdInWithGenres(any())).thenAnswer(invocation -> {
+            List<Long> ids = invocation.getArgument(0);
+            return ids.stream().map(animeById::get).filter(Objects::nonNull).toList();
+        });
+    }
+
     @Test
     void findsSimilarAnimeByPrimaryGenreThenStudioWithoutDuplicates() {
         Anime source = anime(1L, "source", 85, "Madhouse", "Drama", "Action");
@@ -34,7 +49,7 @@ class RecommendationServiceTest {
         Anime sharedMatch = anime(3L, "shared", 88, "Madhouse", "Action");
         Anime studioMatch = anime(4L, "studio", 82, "Madhouse", "Comedy");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(genreMatch, sharedMatch));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
@@ -54,7 +69,7 @@ class RecommendationServiceTest {
         Anime studioMatch = anime(3L, "studio", 88, "Madhouse", "Comedy");
         Anime tagMatch = anime(4L, "tag", 84, "Trigger", "Sci-Fi");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(genreMatch));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
@@ -73,7 +88,7 @@ class RecommendationServiceTest {
         Anime first = anime(2L, "first", 91, "Bones", "Action");
         Anime second = anime(3L, "second", 88, "Madhouse", "Action");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(first, second));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
@@ -95,7 +110,7 @@ class RecommendationServiceTest {
         Anime providerPreferred = anime(5L, "provider-preferred", 84, "Trigger", "Comedy");
         Anime watchedPreference = anime(6L, "watched-drama", 80, "Kyoto Animation", "Drama");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(watched, neutral, providerPreferred, genrePreferred));
         when(animeRepository.findSimilarByPrimaryStudio(eq(1L), eq("Madhouse"), eq(70), any(Pageable.class)))
@@ -122,7 +137,7 @@ class RecommendationServiceTest {
         Anime source = anime(1L, "source", 85, null, "Action");
         Anime first = anime(2L, "first", 91, null, "Action");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(first));
         when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
@@ -131,7 +146,7 @@ class RecommendationServiceTest {
         recommendationService.findSimilar(1L, 10);
         recommendationService.findSimilar(1L, 10);
 
-        verify(animeRepository).findByIdWithTags(1L);
+        verify(animeRepository).findByIdWithGenres(1L);
         verify(animeRepository).findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class));
     }
 
@@ -140,7 +155,7 @@ class RecommendationServiceTest {
         Anime source = anime(1L, "source", 85, null, "Action");
         Anime first = anime(2L, "first", 91, null, "Action");
 
-        when(animeRepository.findByIdWithTags(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
         when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
                 .thenReturn(List.of(first));
         when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
@@ -149,7 +164,7 @@ class RecommendationServiceTest {
         recommendationService.findSimilar(1L, 10, List.of());
         recommendationService.findSimilar(1L, 10);
 
-        verify(animeRepository).findByIdWithTags(1L);
+        verify(animeRepository).findByIdWithGenres(1L);
         verify(animeRepository, never()).findBySlugInWithGenres(any());
     }
 
@@ -160,16 +175,17 @@ class RecommendationServiceTest {
         assertThat(recommendationService.findSimilar(null, 10, List.of("seen"))).isEmpty();
         assertThat(recommendationService.findSimilar(1L, 0, List.of("seen"))).isEmpty();
 
-        verify(animeRepository, never()).findByIdWithTags(any());
+        verify(animeRepository, never()).findByIdWithGenres(any());
     }
 
-    private static Anime anime(Long id, String slug, Integer score, String studio, String... genres) {
+    private Anime anime(Long id, String slug, Integer score, String studio, String... genres) {
         Anime anime = new Anime();
         anime.setId(id);
         anime.setSlug(slug);
         anime.setAverageScore(score);
         anime.setPrimaryStudio(studio);
         anime.setGenres(new LinkedHashSet<>(List.of(genres)));
+        animeById.put(id, anime);
         return anime;
     }
 

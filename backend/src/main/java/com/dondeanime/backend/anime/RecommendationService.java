@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -81,7 +82,7 @@ public class RecommendationService {
     }
 
     private List<Anime> findSimilarUncached(RecommendationKey key) {
-        Optional<Anime> source = animeRepository.findByIdWithTags(key.animeId());
+        Optional<Anime> source = animeRepository.findByIdWithGenres(key.animeId());
         if (source.isEmpty()) {
             return List.of();
         }
@@ -115,8 +116,29 @@ public class RecommendationService {
                         MIN_TAG_RANK,
                         PageRequest.of(0, TAG_LIMIT)));
 
-        return recommendations.values().stream()
+        List<Long> orderedIds = recommendations.values().stream()
+                .map(Anime::getId)
                 .limit(key.limit())
+                .toList();
+        return reloadWithGenres(orderedIds);
+    }
+
+    /**
+     * Recarga las recomendaciones por id trayendo genres (vía EntityGraph) y
+     * preservando el orden. Necesario porque las queries findSimilarBy* NO traen
+     * genres: al cachear y serializar fuera de sesion (open-in-view=false),
+     * AnimeSummaryDto leeria anime.getGenres() lazy y lanzaria
+     * LazyInitializationException (rompia GET /api/anime/{slug}/similar con 500).
+     */
+    private List<Anime> reloadWithGenres(List<Long> orderedIds) {
+        if (orderedIds.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Anime> byId = animeRepository.findByIdInWithGenres(orderedIds).stream()
+                .collect(Collectors.toMap(Anime::getId, Function.identity()));
+        return orderedIds.stream()
+                .map(byId::get)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
