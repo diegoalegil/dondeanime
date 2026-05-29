@@ -154,9 +154,9 @@ Textos minimos para ficha de store o build interno:
   para el usuario.
 - Aviso push: las notificaciones se usan solo para alertas solicitadas.
 
-## No publicar desde el equipo
+## Publicación manual
 
-el flujo de desarrollo puede preparar codigo, docs y PRs. No debe:
+La publicación en stores es siempre manual y revisada. El proceso de preparación cubre codigo, docs y PRs, pero nunca debe:
 
 - Entrar en cuentas Apple, Google, Vercel, Cloudflare ni VPS.
 - Crear certificados, provisioning profiles o keystores reales.

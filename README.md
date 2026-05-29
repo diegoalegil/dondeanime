@@ -112,10 +112,6 @@ El scheduler dentro del backend dispara los syncs periódicos. Tras cada sync de
 ```
 DondeAnime/
 ├── README.md                          ← Estás aquí
-├── la documentación                          ← Documentación operativa del proyecto
-├── las convenciones                          ← Convenciones de desarrollo
-├── las convenciones                           ← Convenciones, vetos, sprints 1-4
-├── el backlog                ← Sprints 5-12 (~40 PRs)
 ├── DEPLOY.md                          ← Operación producción
 ├── docker-compose.yml                 ← Postgres local (puerto 5433)
 ├── docker-compose.prod.yml            ← Stack producción (3 servicios + Caddyfile)
@@ -220,7 +216,7 @@ cd backend
 | POST | `/api/admin/anime/{slug}/override` | (Auth) Override editorial de un campo |
 | GET | `/api/admin/dashboard` | (Auth) Métricas de monetización y analítica |
 
-Lista completa en [`la documentación`](./la documentación#endpoints-rest-disponibles).
+Lista completa en los controladores REST de `backend/src/main/java/com/dondeanime/backend/`.
 
 ---
 
@@ -255,7 +251,7 @@ curl -X POST https://api.dondeanime.com/api/anime/sync
 | Sprint 2 — Alertas email con doble opt-in (Resend) | Mergeado |
 | Sprint 3 — Monetización afiliados + Plausible + AdSense slot | Mergeado |
 | Sprint 4 — CI + Playwright + backups + ops Cloudflare | En curso |
-| Sprint 5-12 — Backlog detallado | Documentado en [`el backlog`](./el backlog) |
+| Sprint 5-12 — Testing, observabilidad, PWA, búsqueda fulltext | Mergeado |
 
 Backlog futuro cubre: testing al 70%+ coverage con Testcontainers, migración a Flyway, observabilidad con Prometheus, PWA + Core Web Vitals, expansión catálogo a 500-2000 anime, búsqueda fulltext con autocomplete, hardening VPS, panel admin con JWT + 2FA, newsletter.
 
@@ -281,4 +277,4 @@ Repositorio privado. Todos los derechos reservados.
 
 [@diegoalegil](https://github.com/diegoalegil) — Estudiante DAM, España.
 
-Proyecto desarrollado por el autor (el autor). Decisiones técnicas, modelo de datos, estrategia SEO y monetización son del autor.
+Proyecto diseñado y desarrollado por Diego Gil. Decisiones técnicas, modelo de datos, estrategia SEO y monetización propias.

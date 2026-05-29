@@ -76,7 +76,7 @@ await access(releaseDocPath);
   '## Iconos',
   '## Permisos',
   '## Textos legales',
-  '## No publicar desde el equipo',
+  '## Publicación manual',
 ].forEach((heading) => {
   if (!releaseDoc.includes(heading)) {
     fail(`RELEASE.md debe incluir ${heading}`);

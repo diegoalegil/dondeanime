@@ -54,7 +54,6 @@ pgdata/
 .project
 .classpath
 .settings/
-.la documentación/
 
 # ===== Sistema operativo =====
 .DS_Store
