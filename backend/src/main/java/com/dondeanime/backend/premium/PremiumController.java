@@ -21,7 +21,9 @@ public class PremiumController {
 
     @PostMapping("/checkout")
     public PremiumCheckoutResponse checkout(@Valid @RequestBody PremiumCheckoutRequest request) {
-        return new PremiumCheckoutResponse(stripeService.createCheckoutSession(request.email()));
+        return new PremiumCheckoutResponse(stripeService.createCheckoutSession(
+                request.email(),
+                request.sourceListSlug()));
     }
 
     @PostMapping("/portal")

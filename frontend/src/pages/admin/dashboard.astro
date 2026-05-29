@@ -115,6 +115,25 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </article>
     </div>
 
+    <div class="mt-4 grid gap-4 md:grid-cols-4">
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Vistas de listas 30d</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-list-views-30>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Clicks a anime desde listas 30d</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-list-anime-clicks-30>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Clicks Premium desde listas 30d</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-list-premium-clicks-30>0</p>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <p class="text-sm text-fg-muted">Conversiones Premium desde listas 30d</p>
+        <p class="mt-2 text-3xl font-semibold text-fg-primary" data-list-premium-conversions-30>0</p>
+      </article>
+    </div>
+
     <div class="mt-6 grid gap-4 md:grid-cols-4">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <p class="text-sm text-fg-muted">Cuentas Trakt conectadas</p>
@@ -168,7 +187,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       </article>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Paises con mas clicks</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-countries></div>
@@ -176,6 +195,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
         <h2 class="text-base font-semibold text-fg-primary">Cambios de availability</h2>
         <div class="mt-4 space-y-3 text-sm" data-top-availability></div>
+      </article>
+      <article class="rounded-lg border border-surface-2 bg-surface-1 p-5">
+        <h2 class="text-base font-semibold text-fg-primary">Listas con mas vistas</h2>
+        <div class="mt-4 space-y-3 text-sm" data-top-curated-lists></div>
       </article>
     </div>
   </section>
@@ -342,6 +365,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
 
       document.querySelector('[data-clicks-7]').textContent = data.clicksLast7Days ?? 0;
       document.querySelector('[data-clicks-30]').textContent = data.clicksLast30Days ?? 0;
+      document.querySelector('[data-list-views-30]').textContent = data.curatedListViewsLast30Days ?? 0;
+      document.querySelector('[data-list-anime-clicks-30]').textContent = data.curatedListAnimeClicksLast30Days ?? 0;
+      document.querySelector('[data-list-premium-clicks-30]').textContent = data.curatedListPremiumClicksLast30Days ?? 0;
+      document.querySelector('[data-list-premium-conversions-30]').textContent = data.curatedListPremiumConversionsLast30Days ?? 0;
       document.querySelector('[data-trakt-connected]').textContent = data.trakt?.connectedAccounts ?? 0;
       document.querySelector('[data-trakt-syncs-7]').textContent = data.trakt?.syncsLast7Days ?? 0;
       document.querySelector('[data-trakt-syncs-30]').textContent = data.trakt?.syncsLast30Days ?? 0;
@@ -371,6 +398,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       document.querySelector('[data-top-availability]').innerHTML =
         data.topAvailabilityChanges?.length
           ? data.topAvailabilityChanges.map((item) => row(item.animeSlug, item.changes)).join('')
+          : empty();
+      document.querySelector('[data-top-curated-lists]').innerHTML =
+        data.topCuratedLists?.length
+          ? data.topCuratedLists.map((item) => row(item.listSlug, item.events)).join('')
           : empty();
       await renderCharts(data);
       setStatus(messages.loaded, 'success');

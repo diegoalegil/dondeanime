@@ -24,7 +24,7 @@ class PremiumControllerTest {
 
     @Test
     void checkoutReturnsStripeUrl() throws Exception {
-        when(stripeService.createCheckoutSession("diego@example.com"))
+        when(stripeService.createCheckoutSession("diego@example.com", null))
                 .thenReturn("https://checkout.stripe.test/session");
 
         mvc.perform(post("/api/premium/checkout")
@@ -33,7 +33,21 @@ class PremiumControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("https://checkout.stripe.test/session"));
 
-        verify(stripeService).createCheckoutSession("diego@example.com");
+        verify(stripeService).createCheckoutSession("diego@example.com", null);
+    }
+
+    @Test
+    void checkoutPassesSourceListSlug() throws Exception {
+        when(stripeService.createCheckoutSession("diego@example.com", "anime-para-empezar"))
+                .thenReturn("https://checkout.stripe.test/session");
+
+        mvc.perform(post("/api/premium/checkout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"diego@example.com\",\"sourceListSlug\":\"anime-para-empezar\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.url").value("https://checkout.stripe.test/session"));
+
+        verify(stripeService).createCheckoutSession("diego@example.com", "anime-para-empezar");
     }
 
     @Test

@@ -76,6 +76,10 @@ class FlywayMigrationTest {
                 "api_key",
                 "api_key_endpoint_usage",
                 "availability_change_event",
+                "curator_profile",
+                "curated_list",
+                "curated_list_item",
+                "curated_list_metric_event",
                 "email_token",
                 "external_account",
                 "mobile_push_device",
@@ -114,6 +118,13 @@ class FlywayMigrationTest {
                 "idx_api_key_tier",
                 "idx_api_key_endpoint_usage_api_key",
                 "idx_api_key_endpoint_usage_endpoint",
+                "idx_curated_list_status_visibility",
+                "idx_curated_list_owner",
+                "idx_curated_list_item_list_position",
+                "idx_curated_list_item_anime_slug",
+                "idx_curator_profile_approved",
+                "idx_curated_list_metric_event_type_time",
+                "idx_curated_list_metric_event_list_time",
                 "idx_external_account_email",
                 "idx_user_watched_anime_account",
                 "idx_user_watched_anime_slug",
@@ -127,6 +138,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(17);
+        assertThat(successfulMigrations).isEqualTo(20);
     }
 }

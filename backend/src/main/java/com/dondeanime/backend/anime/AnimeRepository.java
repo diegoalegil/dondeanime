@@ -17,6 +17,9 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @EntityGraph(attributePaths = "genres")
     Optional<Anime> findBySlug(String slug);
 
+    @EntityGraph(attributePaths = "genres")
+    List<Anime> findBySlugIn(Set<String> slugs);
+
     @EntityGraph(attributePaths = {"genres", "studios"})
     @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
     Optional<Anime> findBySlugWithStudios(String slug);
