@@ -5,7 +5,7 @@ Run this on the VPS only. Do not run these commands from local.
 ## 1. SSH and pull main
 
 ```bash
-ssh deploy@46.224.162.174
+ssh deploy@IP_VPS   # IP real del servidor (la tienes en .env.prod / gestor de secretos, no en el repo)
 cd /opt/dondeanime
 git pull origin main
 ```
