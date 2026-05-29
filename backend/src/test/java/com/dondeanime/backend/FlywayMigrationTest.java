@@ -84,6 +84,8 @@ class FlywayMigrationTest {
                 "email_token",
                 "external_account",
                 "mobile_push_device",
+                "news_item",
+                "news_source",
                 "newsletter_subscriber",
                 "newsletter_token",
                 "push_subscription",
@@ -135,12 +137,14 @@ class FlywayMigrationTest {
                 "idx_trakt_sync_event_provider",
                 "idx_trakt_sync_event_synced_at",
                 "idx_mobile_push_device_country",
-                "idx_mobile_push_device_platform");
+                "idx_mobile_push_device_platform",
+                "idx_news_item_status_published",
+                "idx_news_item_anime");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(21);
+        assertThat(successfulMigrations).isEqualTo(22);
     }
 }
