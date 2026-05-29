@@ -19,7 +19,7 @@ import com.stripe.param.checkout.SessionCreateParams;
 public class StripeGateway {
 
     public String createCheckoutSession(StripeCheckoutCommand command) throws StripeException {
-        SessionCreateParams params = SessionCreateParams.builder()
+        SessionCreateParams.Builder builder = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                 .setCustomerEmail(command.email())
                 .setSuccessUrl(command.successUrl())
@@ -32,8 +32,18 @@ public class StripeGateway {
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setPrice(command.priceId())
                         .setQuantity(1L)
-                        .build())
-                .build();
+                        .build());
+
+        if (command.sourceListSlug() != null && !command.sourceListSlug().isBlank()) {
+            builder.putMetadata("sourceListSlug", command.sourceListSlug())
+                    .setSubscriptionData(SessionCreateParams.SubscriptionData.builder()
+                            .putMetadata("email", command.email())
+                            .putMetadata("planTier", "PREMIUM")
+                            .putMetadata("sourceListSlug", command.sourceListSlug())
+                            .build());
+        }
+
+        SessionCreateParams params = builder.build();
         RequestOptions options = RequestOptions.builder()
                 .setApiKey(command.apiKey())
                 .build();
@@ -65,10 +75,12 @@ public class StripeGateway {
         if (object instanceof com.stripe.model.Subscription subscription) {
             Map<String, String> metadata = subscription.getMetadata();
             String email = metadata == null ? null : metadata.get("email");
+            String sourceListSlug = metadata == null ? null : metadata.get("sourceListSlug");
             return new StripeWebhookEvent(
                     event.getType(),
                     email,
                     subscription.getCustomer(),
+                    sourceListSlug,
                     toInstant(event.getCreated()),
                     toInstant(subscription.getCurrentPeriodEnd()),
                     event.getId());
@@ -78,12 +90,13 @@ public class StripeGateway {
                     event.getType(),
                     invoice.getCustomerEmail(),
                     invoice.getCustomer(),
+                    null,
                     toInstant(event.getCreated()),
                     null,
                     event.getId());
         }
         return new StripeWebhookEvent(
-                event.getType(), null, null, toInstant(event.getCreated()), null, event.getId());
+                event.getType(), null, null, null, toInstant(event.getCreated()), null, event.getId());
     }
 
     private static Instant toInstant(Long epochSeconds) {

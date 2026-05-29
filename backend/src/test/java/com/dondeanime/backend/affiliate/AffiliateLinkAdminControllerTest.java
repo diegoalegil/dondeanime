@@ -177,6 +177,11 @@ class AffiliateLinkAdminControllerTest {
                 List.of(new AffiliateCountryClicksDto("ES", 5L)),
                 List.of(new AvailabilityAnimeChangesDto("frieren", 2L)),
                 List.of(new RecommendationClickDto("frieren", "violet-evergarden", 3L)),
+                12L,
+                6L,
+                2L,
+                1L,
+                List.of(new com.dondeanime.backend.curated.CuratedListMetricDto("anime-para-empezar", 12L)),
                 new TraktDashboardMetricsDto(2L, 1L, 4L, 3L)));
 
         mvc.perform(get("/api/admin/dashboard")
@@ -187,6 +192,9 @@ class AffiliateLinkAdminControllerTest {
                 .andExpect(jsonPath("$.topClickCountries[0].countryCode").value("ES"))
                 .andExpect(jsonPath("$.topAvailabilityChanges[0].changes").value(2))
                 .andExpect(jsonPath("$.topRecommendationClicks[0].targetAnimeSlug").value("violet-evergarden"))
+                .andExpect(jsonPath("$.curatedListViewsLast30Days").value(12))
+                .andExpect(jsonPath("$.curatedListPremiumConversionsLast30Days").value(1))
+                .andExpect(jsonPath("$.topCuratedLists[0].listSlug").value("anime-para-empezar"))
                 .andExpect(jsonPath("$.trakt.connectedAccounts").value(2))
                 .andExpect(jsonPath("$.trakt.failedMatchesLast30Days").value(3))
                 .andExpect(jsonPath("$.trakt.email").doesNotExist())

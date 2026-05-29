@@ -4,5 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record PremiumCheckoutRequest(
-        @NotBlank @Email String email) {
+        @NotBlank @Email String email,
+        String sourceListSlug) {
 }

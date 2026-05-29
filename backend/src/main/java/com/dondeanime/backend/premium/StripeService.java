@@ -1,6 +1,7 @@
 package com.dondeanime.backend.premium;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dondeanime.backend.curated.CuratedListTrackingService;
 import com.dondeanime.backend.email.EmailService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -18,6 +20,7 @@ public class StripeService {
 
     private final StripeGateway stripeGateway;
     private final SubscriberService subscriberService;
+    private final CuratedListTrackingService curatedListTrackingService;
     private final EmailService emailService;
     private final StripeProcessedEventRepository processedEventRepository;
     private final String apiKey;
@@ -30,6 +33,7 @@ public class StripeService {
     public StripeService(
             StripeGateway stripeGateway,
             SubscriberService subscriberService,
+            CuratedListTrackingService curatedListTrackingService,
             EmailService emailService,
             StripeProcessedEventRepository processedEventRepository,
             @Value("${STRIPE_SECRET_KEY:}") String apiKey,
@@ -40,6 +44,7 @@ public class StripeService {
             @Value("${STRIPE_PORTAL_RETURN_URL:https://dondeanime.com/premium}") String portalReturnUrl) {
         this.stripeGateway = stripeGateway;
         this.subscriberService = subscriberService;
+        this.curatedListTrackingService = curatedListTrackingService;
         this.emailService = emailService;
         this.processedEventRepository = processedEventRepository;
         this.apiKey = apiKey;
@@ -51,6 +56,10 @@ public class StripeService {
     }
 
     public String createCheckoutSession(String email) {
+        return createCheckoutSession(email, null);
+    }
+
+    public String createCheckoutSession(String email, String sourceListSlug) {
         String normalizedEmail = SubscriberService.normalizeEmail(email);
         if (normalizedEmail.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email requerido");
@@ -61,6 +70,7 @@ public class StripeService {
                     apiKey,
                     priceId,
                     normalizedEmail,
+                    normalizeSourceListSlug(sourceListSlug),
                     successUrl,
                     cancelUrl));
         } catch (StripeException e) {
@@ -129,6 +139,7 @@ public class StripeService {
                         event.currentPeriodEnd(),
                         null);
                 sendWelcomeEmail(event);
+                curatedListTrackingService.trackConversion(event.sourceListSlug());
             }
             case "customer.subscription.updated" -> subscriberService.upsertPremium(
                         event.email(),
@@ -179,6 +190,10 @@ public class StripeService {
             return email;
         }
         return subscriberService.findEmailByStripeCustomerId(event.customerId()).orElse("");
+    }
+
+    private static String normalizeSourceListSlug(String sourceListSlug) {
+        return sourceListSlug == null ? "" : sourceListSlug.trim().toLowerCase(Locale.ROOT);
     }
 
     private void assertCheckoutConfigured() {
