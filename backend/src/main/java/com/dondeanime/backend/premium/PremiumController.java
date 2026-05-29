@@ -28,7 +28,10 @@ public class PremiumController {
 
     @PostMapping("/portal")
     public PremiumPortalResponse portal(@Valid @RequestBody PremiumPortalRequest request) {
-        return new PremiumPortalResponse(stripeService.createCustomerPortalSession(request.email()));
+        // Si hay suscripción activa, enviamos el enlace al email del titular.
+        // Respuesta siempre genérica para no revelar quién es suscriptor.
+        stripeService.requestCustomerPortalLink(request.email());
+        return new PremiumPortalResponse("email_sent");
     }
 
     @PostMapping("/webhook")

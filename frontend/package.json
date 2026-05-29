@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && npm run validate:autotext",
+    "build": "npm run validate:i18n && astro build && npm run validate:autotext && npm run validate:jsonld",
     "preview": "astro preview",
     "astro": "astro",
     "validate:i18n": "node scripts/validate-i18n.mjs",

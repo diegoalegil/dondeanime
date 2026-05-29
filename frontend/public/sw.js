@@ -1,6 +1,8 @@
 const PAGE_CACHE = 'dondeanime-pages-v1';
 const STATIC_CACHE = 'dondeanime-static-v1';
 const OFFLINE_URL = '/offline';
+const MAX_CACHED_ANIME_PAGES = 12;
+const ANIME_PAGE_PATTERN = /^\/(?:en\/)?anime\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const ALERT_SYNC_TAG = 'dondeanime-alerts-sync';
 const ALERT_DB_NAME = 'dondeanime-alerts';
 const ALERT_STORE = 'alerts';
@@ -33,8 +35,19 @@ self.addEventListener('activate', (event) => {
 
 const cachePage = async (request, response) => {
   if (!response || !response.ok || response.type === 'opaque') return;
+  const url = new URL(request.url);
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!ANIME_PAGE_PATTERN.test(url.pathname) || !contentType.includes('text/html')) return;
+
   const cache = await caches.open(PAGE_CACHE);
+  await cache.delete(request);
   await cache.put(request, response.clone());
+
+  const cachedPages = await cache.keys();
+  const overflow = cachedPages.length - MAX_CACHED_ANIME_PAGES;
+  if (overflow <= 0) return;
+
+  await Promise.all(cachedPages.slice(0, overflow).map((cachedRequest) => cache.delete(cachedRequest)));
 };
 
 const navigationResponse = async (request) => {

@@ -52,11 +52,22 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      # Permite que el cliente HTTP de Java (java.net.http) mande el header
+      # User-Agent custom. Sin esto, el JDK trata User-Agent como header
+      # restringido y lo ignora, y AniList (tras Cloudflare) bloquea la
+      # petición sin User-Agent de navegador (error 1010 → 400 Invalid token).
+      JAVA_TOOL_OPTIONS: "-Djdk.httpclient.allowRestrictedHeaders=user-agent"
       # Conecta a Postgres por nombre de servicio dentro de la red Docker.
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       TMDB_API_KEY: ${TMDB_API_KEY}
+      # --- Trakt.tv OAuth (Sprint 22, opcional) ---
+      TRAKT_API_BASE: ${TRAKT_API_BASE:-https://api.trakt.tv}
+      TRAKT_OAUTH_BASE: ${TRAKT_OAUTH_BASE:-https://trakt.tv}
+      TRAKT_CLIENT_ID: ${TRAKT_CLIENT_ID:-}
+      TRAKT_CLIENT_SECRET: ${TRAKT_CLIENT_SECRET:-}
+      TRAKT_REDIRECT_URI: ${TRAKT_REDIRECT_URI:-https://api.dondeanime.com/api/trakt/oauth/callback}
       # Vacío si no usamos webhook. Se rellena cuando configuremos
       # el Deploy Hook de Vercel.
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
@@ -78,6 +89,21 @@ services:
       PLAUSIBLE_ENABLED: ${PLAUSIBLE_ENABLED:-false}
       PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY:-}
       PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-dondeanime.com}
+      # --- Alertas críticas Telegram (Sprint 6, opcional) ---
+      TELEGRAM_ENABLED: ${TELEGRAM_ENABLED:-false}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      # --- Web Push (Sprint 14, opcional hasta configurar VAPID) ---
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contacto@dondeanime.com}
+      # --- Stripe Premium (Sprint 15, opcional hasta activar Premium) ---
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-https://dondeanime.com/premium?success=1}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-https://dondeanime.com/premium?canceled=1}
+      STRIPE_PORTAL_RETURN_URL: ${STRIPE_PORTAL_RETURN_URL:-https://dondeanime.com/premium}
     # NO mapeamos puerto al host. Caddy lo proxea desde fuera.
     networks:
       - internal

@@ -21,6 +21,8 @@ import com.dondeanime.backend.curated.CuratedListMetricRepository;
 import com.dondeanime.backend.curated.CuratedListMetricType;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 class AffiliateLinkServiceTest {
 
@@ -34,6 +36,8 @@ class AffiliateLinkServiceTest {
             org.mockito.Mockito.mock(RecommendationEventRepository.class);
     private final CuratedListMetricRepository curatedListMetricRepository =
             org.mockito.Mockito.mock(CuratedListMetricRepository.class);
+    private final TraktDashboardMetricsService traktDashboardMetricsService =
+            org.mockito.Mockito.mock(TraktDashboardMetricsService.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-05-25T12:00:00Z"), ZoneOffset.UTC);
 
     private final AffiliateLinkService service = new AffiliateLinkService(
@@ -44,6 +48,7 @@ class AffiliateLinkServiceTest {
             availabilityChangeEventRepository,
             recommendationEventRepository,
             curatedListMetricRepository,
+            traktDashboardMetricsService,
             clock);
 
     @Test
@@ -164,6 +169,8 @@ class AffiliateLinkServiceTest {
                 .thenReturn(1L);
         when(curatedListMetricRepository.findTopLists(any(), any(), any()))
                 .thenReturn(List.of(listMetric("anime-para-empezar", 11L)));
+        when(traktDashboardMetricsService.metrics())
+                .thenReturn(new TraktDashboardMetricsDto(2L, 1L, 4L, 3L));
 
         AffiliateDashboardDto dashboard = service.dashboard();
 
@@ -180,6 +187,8 @@ class AffiliateLinkServiceTest {
         assertThat(dashboard.curatedListPremiumClicksLast30Days()).isEqualTo(2L);
         assertThat(dashboard.curatedListPremiumConversionsLast30Days()).isEqualTo(1L);
         assertThat(dashboard.topCuratedLists().getFirst().listSlug()).isEqualTo("anime-para-empezar");
+        assertThat(dashboard.trakt().connectedAccounts()).isEqualTo(2L);
+        assertThat(dashboard.trakt().failedMatchesLast30Days()).isEqualTo(3L);
     }
 
     private static AffiliateLink link() {

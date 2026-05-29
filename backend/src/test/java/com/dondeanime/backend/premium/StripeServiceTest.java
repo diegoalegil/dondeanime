@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,11 +27,14 @@ class StripeServiceTest {
     private final SubscriberService subscriberService = mock(SubscriberService.class);
     private final CuratedListTrackingService curatedListTrackingService = mock(CuratedListTrackingService.class);
     private final EmailService emailService = mock(EmailService.class);
+    private final StripeProcessedEventRepository processedEventRepository =
+            mock(StripeProcessedEventRepository.class);
     private final StripeService service = new StripeService(
             stripeGateway,
             subscriberService,
             curatedListTrackingService,
             emailService,
+            processedEventRepository,
             "sk_test_123",
             "price_test_123",
             "whsec_test_123",
@@ -59,6 +63,7 @@ class StripeServiceTest {
                 subscriberService,
                 curatedListTrackingService,
                 emailService,
+                processedEventRepository,
                 "",
                 "price_test_123",
                 "whsec_test_123",
@@ -84,29 +89,31 @@ class StripeServiceTest {
     }
 
     @Test
-    void createCustomerPortalSessionBuildsStripeCommand() throws Exception {
+    void requestCustomerPortalLinkEmailsPortalUrlToActiveSubscriber() throws Exception {
         when(subscriberService.findActiveStripeCustomerId("diego@example.com"))
                 .thenReturn(java.util.Optional.of("cus_test_123"));
         when(stripeGateway.createCustomerPortalSession(any(StripePortalCommand.class)))
                 .thenReturn("https://billing.stripe.test/session");
 
-        String url = service.createCustomerPortalSession(" Diego@Example.com ");
+        service.requestCustomerPortalLink(" Diego@Example.com ");
 
-        assertThat(url).isEqualTo("https://billing.stripe.test/session");
         ArgumentCaptor<StripePortalCommand> captor = ArgumentCaptor.forClass(StripePortalCommand.class);
         verify(stripeGateway).createCustomerPortalSession(captor.capture());
         assertThat(captor.getValue().customerId()).isEqualTo("cus_test_123");
         assertThat(captor.getValue().returnUrl()).isEqualTo("https://dondeanime.com/premium");
+        verify(emailService).sendPremiumPortalEmail(
+                "diego@example.com", "PREMIUM", "https://billing.stripe.test/session");
     }
 
     @Test
-    void createCustomerPortalSessionReturnsNotFoundForUnknownPremiumEmail() {
+    void requestCustomerPortalLinkDoesNothingForUnknownEmailWithoutLeaking() throws Exception {
         when(subscriberService.findActiveStripeCustomerId("diego@example.com"))
                 .thenReturn(java.util.Optional.empty());
 
-        assertThatThrownBy(() -> service.createCustomerPortalSession("diego@example.com"))
-                .isInstanceOfSatisfying(ResponseStatusException.class, e ->
-                        assertThat(e.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+        service.requestCustomerPortalLink("diego@example.com");
+
+        verify(stripeGateway, never()).createCustomerPortalSession(any());
+        verify(emailService, never()).sendPremiumPortalEmail(any(), any(), any());
     }
 
     @Test
@@ -118,7 +125,8 @@ class StripeServiceTest {
                         "cus_test_123",
                         "anime-para-empezar",
                         NOW,
-                        NOW.plusSeconds(2_592_000)));
+                        NOW.plusSeconds(2_592_000),
+                        "evt_created_1"));
 
         String received = service.handleWebhook("{}", "sig");
 
@@ -135,6 +143,28 @@ class StripeServiceTest {
                 "PREMIUM",
                 "https://dondeanime.com/premium");
         verify(curatedListTrackingService).trackConversion("anime-para-empezar");
+        verify(processedEventRepository).save(any(StripeProcessedEvent.class));
+    }
+
+    @Test
+    void handleWebhookSkipsAlreadyProcessedEvent() throws Exception {
+        when(stripeGateway.constructWebhookEvent("{}", "sig", "whsec_test_123"))
+                .thenReturn(new StripeWebhookEvent(
+                        "invoice.payment_succeeded",
+                        "diego@example.com",
+                        "cus_test_123",
+                        null,
+                        NOW,
+                        null,
+                        "evt_dup_1"));
+        when(processedEventRepository.existsById("evt_dup_1")).thenReturn(true);
+
+        String received = service.handleWebhook("{}", "sig");
+
+        assertThat(received).isEqualTo("invoice.payment_succeeded");
+        verify(subscriberService, never()).recordPaymentSucceeded(any(), any(), any());
+        verify(emailService, never()).sendPremiumReceiptEmail(any(), any(), any(), any());
+        verify(processedEventRepository, never()).save(any());
     }
 
     @Test
@@ -146,7 +176,8 @@ class StripeServiceTest {
                         "cus_test_123",
                         null,
                         NOW,
-                        null));
+                        null,
+                        "evt_invoice_1"));
 
         String received = service.handleWebhook("{}", "sig");
 
@@ -168,7 +199,8 @@ class StripeServiceTest {
                         "cus_test_123",
                         null,
                         NOW,
-                        null));
+                        null,
+                        "evt_deleted_1"));
 
         String received = service.handleWebhook("{}", "sig");
 

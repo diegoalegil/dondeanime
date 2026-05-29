@@ -81,13 +81,18 @@ class FlywayMigrationTest {
                 "curated_list_item",
                 "curated_list_metric_event",
                 "email_token",
+                "external_account",
+                "mobile_push_device",
                 "newsletter_subscriber",
                 "newsletter_token",
                 "push_subscription",
                 "recommendation_event",
                 "studio",
+                "stripe_processed_event",
                 "subscriber",
                 "subscription",
+                "trakt_sync_event",
+                "user_watched_anime",
                 "watch_provider");
 
         List<String> indexes = jdbc.queryForList("""
@@ -119,12 +124,20 @@ class FlywayMigrationTest {
                 "idx_curated_list_item_anime_slug",
                 "idx_curator_profile_approved",
                 "idx_curated_list_metric_event_type_time",
-                "idx_curated_list_metric_event_list_time");
+                "idx_curated_list_metric_event_list_time",
+                "idx_external_account_email",
+                "idx_user_watched_anime_account",
+                "idx_user_watched_anime_slug",
+                "idx_user_watched_anime_rated_at",
+                "idx_trakt_sync_event_provider",
+                "idx_trakt_sync_event_synced_at",
+                "idx_mobile_push_device_country",
+                "idx_mobile_push_device_platform");
 
         Integer successfulMigrations = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(15);
+        assertThat(successfulMigrations).isEqualTo(20);
     }
 }

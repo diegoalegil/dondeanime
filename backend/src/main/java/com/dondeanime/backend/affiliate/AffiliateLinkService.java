@@ -29,6 +29,7 @@ import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 @Service
 public class AffiliateLinkService {
@@ -40,6 +41,7 @@ public class AffiliateLinkService {
     private final AvailabilityChangeEventRepository availabilityChangeEventRepository;
     private final RecommendationEventRepository recommendationEventRepository;
     private final CuratedListMetricRepository curatedListMetricRepository;
+    private final TraktDashboardMetricsService traktDashboardMetricsService;
     private final Clock clock;
 
     public AffiliateLinkService(
@@ -50,6 +52,7 @@ public class AffiliateLinkService {
             AvailabilityChangeEventRepository availabilityChangeEventRepository,
             RecommendationEventRepository recommendationEventRepository,
             CuratedListMetricRepository curatedListMetricRepository,
+            TraktDashboardMetricsService traktDashboardMetricsService,
             Clock clock) {
         this.linkRepository = linkRepository;
         this.clickEventRepository = clickEventRepository;
@@ -58,6 +61,7 @@ public class AffiliateLinkService {
         this.availabilityChangeEventRepository = availabilityChangeEventRepository;
         this.recommendationEventRepository = recommendationEventRepository;
         this.curatedListMetricRepository = curatedListMetricRepository;
+        this.traktDashboardMetricsService = traktDashboardMetricsService;
         this.clock = clock;
     }
 
@@ -223,7 +227,8 @@ public class AffiliateLinkService {
                         CuratedListMetricType.PREMIUM_CTA_CLICK, thirtyDaysAgo),
                 curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(
                         CuratedListMetricType.PREMIUM_CONVERSION, thirtyDaysAgo),
-                topCuratedLists);
+                topCuratedLists,
+                traktDashboardMetricsService.metrics());
     }
 
     private List<AffiliateDailyClicksDto> clicksByDay(Instant since) {

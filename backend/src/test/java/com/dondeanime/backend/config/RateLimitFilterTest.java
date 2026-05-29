@@ -47,6 +47,39 @@ class RateLimitFilterTest {
         assertThat(result.rejected().getHeader(HttpHeaders.RETRY_AFTER)).isNotBlank();
     }
 
+    @Test
+    void traktOAuthAllowsTwentyRequestsPerMinutePerIpAndRejectsTwentyFirst() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+
+        RateLimitResult result = exhaust(filter, "/api/trakt/oauth/start", "203.0.113.40", 20);
+
+        assertThat(result.passed()).isEqualTo(20);
+        assertThat(result.rejected().getStatus()).isEqualTo(429);
+        assertThat(result.rejected().getHeader(HttpHeaders.RETRY_AFTER)).isNotBlank();
+    }
+
+    @Test
+    void traktSyncAllowsTenRequestsPerMinutePerIpAndRejectsEleventh() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+
+        RateLimitResult result = exhaust(filter, "/api/trakt/sync", "203.0.113.50", 10);
+
+        assertThat(result.passed()).isEqualTo(10);
+        assertThat(result.rejected().getStatus()).isEqualTo(429);
+        assertThat(result.rejected().getHeader(HttpHeaders.RETRY_AFTER)).isNotBlank();
+    }
+
+    @Test
+    void traktWatchedAllowsSixtyRequestsPerMinutePerIpAndRejectsSixtyFirst() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+
+        RateLimitResult result = exhaust(filter, "/api/trakt/watched", "203.0.113.60", 60);
+
+        assertThat(result.passed()).isEqualTo(60);
+        assertThat(result.rejected().getStatus()).isEqualTo(429);
+        assertThat(result.rejected().getHeader(HttpHeaders.RETRY_AFTER)).isNotBlank();
+    }
+
     private static RateLimitResult exhaust(
             RateLimitFilter filter,
             String path,
