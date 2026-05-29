@@ -46,7 +46,7 @@ import com.dondeanime.backend.studio.StudioRepository;
 @Service
 public class AnimeSyncService {
 
-    public static final int MAX_POPULAR_SYNC_COUNT = 500;
+    public static final int MAX_POPULAR_SYNC_COUNT = 1000;
 
     private static final Logger log = LoggerFactory.getLogger(AnimeSyncService.class);
 

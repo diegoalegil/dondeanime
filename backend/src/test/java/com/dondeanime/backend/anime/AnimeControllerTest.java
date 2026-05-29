@@ -271,7 +271,7 @@ class AnimeControllerTest {
 
     @Test
     void syncRejectsCountsAboveSprintLimit() throws Exception {
-        mvc.perform(post("/api/anime/sync").param("count", "501"))
+        mvc.perform(post("/api/anime/sync").param("count", String.valueOf(AnimeSyncService.MAX_POPULAR_SYNC_COUNT + 1)))
                 .andExpect(status().isBadRequest());
 
         verify(syncService, never()).syncPopular(anyInt());

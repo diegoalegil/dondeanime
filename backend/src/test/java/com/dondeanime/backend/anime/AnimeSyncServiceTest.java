@@ -59,9 +59,9 @@ class AnimeSyncServiceTest {
         AnimeCharacterRepository characterRepository = mock(AnimeCharacterRepository.class);
         AnimeSyncService service = new AnimeSyncService(client, repository, studioRepository, characterRepository);
 
-        assertThatThrownBy(() -> service.syncPopular(501))
+        assertThatThrownBy(() -> service.syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT + 1))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("500");
+                .hasMessageContaining(String.valueOf(AnimeSyncService.MAX_POPULAR_SYNC_COUNT));
 
         verify(client, never()).fetchPopular(anyInt());
     }
