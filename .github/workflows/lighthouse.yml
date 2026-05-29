@@ -28,10 +28,10 @@ jobs:
       LIGHTHOUSE_MIN_SEO_SCORE: 80
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22.19.0
           cache: npm
@@ -48,7 +48,7 @@ jobs:
 
       - name: Upload Lighthouse report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lighthouse-report
           path: frontend/lighthouse-report.json
