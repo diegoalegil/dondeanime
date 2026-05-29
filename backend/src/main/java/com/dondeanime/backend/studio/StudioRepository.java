@@ -15,6 +15,7 @@ public interface StudioRepository extends JpaRepository<Studio, Long> {
     @Query("""
             SELECT s AS studio, COUNT(DISTINCT a.id) AS animeCount
             FROM Anime a JOIN a.studios s
+            WHERE s.animationStudio = true
             GROUP BY s
             ORDER BY COUNT(DISTINCT a.id) DESC, s.name ASC
             """)
