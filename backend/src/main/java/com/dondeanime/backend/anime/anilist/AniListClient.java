@@ -20,7 +20,7 @@ public class AniListClient {
     private static final String GRAPHQL_QUERY = """
         query ($page: Int, $perPage: Int) {
           Page(page: $page, perPage: $perPage) {
-            media(type: ANIME, sort: POPULARITY_DESC) {
+            media(type: ANIME, sort: [POPULARITY_DESC, ID]) {
               id
               title { romaji english }
               startDate { year month day }
