@@ -5,6 +5,7 @@ import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
+import WatchedFilter from '@/components/trakt/WatchedFilter.astro';
 import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
 import { getHomeFaqs, buildFAQPageSchema, buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { formatSeason } from '@/lib/format';
@@ -107,6 +108,7 @@ const itemListSchema = buildItemListSchema(
   </section>
 
   <AnimeChatSearch />
+  <WatchedFilter />
 
   <section class="mx-auto max-w-6xl px-4 pb-12">
     <div class="mb-5 flex items-baseline justify-between">

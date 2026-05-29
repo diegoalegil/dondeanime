@@ -3,6 +3,8 @@ package com.dondeanime.backend.affiliate;
 import java.util.List;
 
 import com.dondeanime.backend.anime.RecommendationClickDto;
+import com.dondeanime.backend.curated.CuratedListMetricDto;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
 
 public record AffiliateDashboardDto(
         Long clicksLast7Days,
@@ -14,5 +16,11 @@ public record AffiliateDashboardDto(
         List<AffiliatePlatformConversionDto> platformConversions,
         List<AffiliateCountryClicksDto> topClickCountries,
         List<AvailabilityAnimeChangesDto> topAvailabilityChanges,
-        List<RecommendationClickDto> topRecommendationClicks
+        List<RecommendationClickDto> topRecommendationClicks,
+        Long curatedListViewsLast30Days,
+        Long curatedListAnimeClicksLast30Days,
+        Long curatedListPremiumClicksLast30Days,
+        Long curatedListPremiumConversionsLast30Days,
+        List<CuratedListMetricDto> topCuratedLists,
+        TraktDashboardMetricsDto trakt
 ) {}

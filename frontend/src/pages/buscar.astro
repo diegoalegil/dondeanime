@@ -2,6 +2,7 @@
 import AnimeCard from '@/components/anime/AnimeCard.astro';
 import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import WatchedFilter from '@/components/trakt/WatchedFilter.astro';
 import { getAllAnime } from '@/lib/api';
 
 const anime = await getAllAnime();
@@ -32,6 +33,7 @@ const anime = await getAllAnime();
 
     <div class="-mx-4">
       <AnimeChatSearch />
+      <WatchedFilter />
     </div>
 
     <p class="mb-5 text-sm text-fg-muted" data-search-page-count>
@@ -42,6 +44,8 @@ const anime = await getAllAnime();
       {anime.map((item) => (
         <div
           data-search-page-card
+          data-anime-filter-item
+          data-anime-slug={item.slug}
           data-search-text={`${item.titleEnglish} ${item.titleRomaji} ${item.slug}`.toLowerCase()}
         >
           <AnimeCard anime={item} />

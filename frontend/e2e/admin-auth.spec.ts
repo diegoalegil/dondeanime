@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 async function mockAdminShell(page) {
-  await page.route('https://api.dondeanime.com/api/admin/dashboard', async (route) => {
+  await page.route('**/api/admin/dashboard', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -14,7 +14,7 @@ async function mockAdminShell(page) {
       }),
     });
   });
-  await page.route('https://api.dondeanime.com/api/admin/2fa', async (route) => {
+  await page.route('**/api/admin/2fa', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -25,7 +25,7 @@ async function mockAdminShell(page) {
 
 test('admin login stores JWT token in localStorage and redirects', async ({ page }) => {
   await mockAdminShell(page);
-  await page.route('https://api.dondeanime.com/api/admin/login', async (route) => {
+  await page.route('**/api/admin/login', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -50,7 +50,7 @@ test('admin login stores JWT token in localStorage and redirects', async ({ page
 
 test('admin login asks for TOTP code when enabled', async ({ page }) => {
   await mockAdminShell(page);
-  await page.route('https://api.dondeanime.com/api/admin/login', async (route) => {
+  await page.route('**/api/admin/login', async (route) => {
     const body = route.request().postDataJSON();
     if (!body.totpCode) {
       await route.fulfill({

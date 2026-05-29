@@ -21,11 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dondeanime.backend.anime.RecommendationClickDto;
 import com.dondeanime.backend.anime.RecommendationEventRepository;
+import com.dondeanime.backend.curated.CuratedListMetricDto;
+import com.dondeanime.backend.curated.CuratedListMetricRepository;
+import com.dondeanime.backend.curated.CuratedListMetricType;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.ProviderDto;
 import com.dondeanime.backend.provider.ProviderSummaryDto;
 import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 @Service
 public class AffiliateLinkService {
@@ -36,6 +40,8 @@ public class AffiliateLinkService {
     private final WatchProviderRepository watchProviderRepository;
     private final AvailabilityChangeEventRepository availabilityChangeEventRepository;
     private final RecommendationEventRepository recommendationEventRepository;
+    private final CuratedListMetricRepository curatedListMetricRepository;
+    private final TraktDashboardMetricsService traktDashboardMetricsService;
     private final Clock clock;
 
     public AffiliateLinkService(
@@ -45,6 +51,8 @@ public class AffiliateLinkService {
             WatchProviderRepository watchProviderRepository,
             AvailabilityChangeEventRepository availabilityChangeEventRepository,
             RecommendationEventRepository recommendationEventRepository,
+            CuratedListMetricRepository curatedListMetricRepository,
+            TraktDashboardMetricsService traktDashboardMetricsService,
             Clock clock) {
         this.linkRepository = linkRepository;
         this.clickEventRepository = clickEventRepository;
@@ -52,6 +60,8 @@ public class AffiliateLinkService {
         this.watchProviderRepository = watchProviderRepository;
         this.availabilityChangeEventRepository = availabilityChangeEventRepository;
         this.recommendationEventRepository = recommendationEventRepository;
+        this.curatedListMetricRepository = curatedListMetricRepository;
+        this.traktDashboardMetricsService = traktDashboardMetricsService;
         this.clock = clock;
     }
 
@@ -192,6 +202,11 @@ public class AffiliateLinkService {
                         row.getTargetAnimeSlug(),
                         row.getClicks()))
                 .toList();
+        List<CuratedListMetricDto> topCuratedLists = curatedListMetricRepository
+                .findTopLists(CuratedListMetricType.VIEW, thirtyDaysAgo, PageRequest.of(0, 10))
+                .stream()
+                .map(row -> new CuratedListMetricDto(row.getListSlug(), row.getEvents()))
+                .toList();
 
         return new AffiliateDashboardDto(
                 clickEventRepository.countByClickedAtAfter(sevenDaysAgo),
@@ -203,7 +218,17 @@ public class AffiliateLinkService {
                 platformConversions,
                 topClickCountries,
                 topAvailabilityChanges,
-                topRecommendationClicks);
+                topRecommendationClicks,
+                curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(
+                        CuratedListMetricType.VIEW, thirtyDaysAgo),
+                curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(
+                        CuratedListMetricType.ANIME_CLICK, thirtyDaysAgo),
+                curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(
+                        CuratedListMetricType.PREMIUM_CTA_CLICK, thirtyDaysAgo),
+                curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(
+                        CuratedListMetricType.PREMIUM_CONVERSION, thirtyDaysAgo),
+                topCuratedLists,
+                traktDashboardMetricsService.metrics());
     }
 
     private List<AffiliateDailyClicksDto> clicksByDay(Instant since) {

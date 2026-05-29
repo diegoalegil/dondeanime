@@ -28,6 +28,7 @@ import com.dondeanime.backend.anime.RecommendationTrackRequest;
 import com.dondeanime.backend.anime.RecommendationTrackingController;
 import com.dondeanime.backend.anime.RecommendationTrackingService;
 import com.dondeanime.backend.config.SecurityConfig;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
 
 @WebMvcTest({
         AffiliateLinkAdminController.class,
@@ -175,7 +176,13 @@ class AffiliateLinkAdminControllerTest {
                 List.of(new AffiliatePlatformConversionDto("crunchyroll", 4L, 100L, 0.04)),
                 List.of(new AffiliateCountryClicksDto("ES", 5L)),
                 List.of(new AvailabilityAnimeChangesDto("frieren", 2L)),
-                List.of(new RecommendationClickDto("frieren", "violet-evergarden", 3L))));
+                List.of(new RecommendationClickDto("frieren", "violet-evergarden", 3L)),
+                12L,
+                6L,
+                2L,
+                1L,
+                List.of(new com.dondeanime.backend.curated.CuratedListMetricDto("anime-para-empezar", 12L)),
+                new TraktDashboardMetricsDto(2L, 1L, 4L, 3L)));
 
         mvc.perform(get("/api/admin/dashboard")
                         .header("Authorization", bearerToken()))
@@ -184,7 +191,14 @@ class AffiliateLinkAdminControllerTest {
                 .andExpect(jsonPath("$.platformConversions[0].conversionRate").value(0.04))
                 .andExpect(jsonPath("$.topClickCountries[0].countryCode").value("ES"))
                 .andExpect(jsonPath("$.topAvailabilityChanges[0].changes").value(2))
-                .andExpect(jsonPath("$.topRecommendationClicks[0].targetAnimeSlug").value("violet-evergarden"));
+                .andExpect(jsonPath("$.topRecommendationClicks[0].targetAnimeSlug").value("violet-evergarden"))
+                .andExpect(jsonPath("$.curatedListViewsLast30Days").value(12))
+                .andExpect(jsonPath("$.curatedListPremiumConversionsLast30Days").value(1))
+                .andExpect(jsonPath("$.topCuratedLists[0].listSlug").value("anime-para-empezar"))
+                .andExpect(jsonPath("$.trakt.connectedAccounts").value(2))
+                .andExpect(jsonPath("$.trakt.failedMatchesLast30Days").value(3))
+                .andExpect(jsonPath("$.trakt.email").doesNotExist())
+                .andExpect(jsonPath("$.trakt.accessTokenCiphertext").doesNotExist());
     }
 
     private static AffiliateLinkDto dto() {

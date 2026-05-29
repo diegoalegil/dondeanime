@@ -24,7 +24,7 @@ class PremiumControllerTest {
 
     @Test
     void checkoutReturnsStripeUrl() throws Exception {
-        when(stripeService.createCheckoutSession("diego@example.com"))
+        when(stripeService.createCheckoutSession("diego@example.com", null))
                 .thenReturn("https://checkout.stripe.test/session");
 
         mvc.perform(post("/api/premium/checkout")
@@ -33,7 +33,21 @@ class PremiumControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("https://checkout.stripe.test/session"));
 
-        verify(stripeService).createCheckoutSession("diego@example.com");
+        verify(stripeService).createCheckoutSession("diego@example.com", null);
+    }
+
+    @Test
+    void checkoutPassesSourceListSlug() throws Exception {
+        when(stripeService.createCheckoutSession("diego@example.com", "anime-para-empezar"))
+                .thenReturn("https://checkout.stripe.test/session");
+
+        mvc.perform(post("/api/premium/checkout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"diego@example.com\",\"sourceListSlug\":\"anime-para-empezar\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.url").value("https://checkout.stripe.test/session"));
+
+        verify(stripeService).createCheckoutSession("diego@example.com", "anime-para-empezar");
     }
 
     @Test
@@ -45,17 +59,14 @@ class PremiumControllerTest {
     }
 
     @Test
-    void portalReturnsStripeCustomerPortalUrl() throws Exception {
-        when(stripeService.createCustomerPortalSession("diego@example.com"))
-                .thenReturn("https://billing.stripe.test/session");
-
+    void portalReturnsGenericStatusAndRequestsPortalLink() throws Exception {
         mvc.perform(post("/api/premium/portal")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"diego@example.com\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("https://billing.stripe.test/session"));
+                .andExpect(jsonPath("$.status").value("email_sent"));
 
-        verify(stripeService).createCustomerPortalSession("diego@example.com");
+        verify(stripeService).requestCustomerPortalLink("diego@example.com");
     }
 
     @Test

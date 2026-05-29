@@ -17,8 +17,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import com.dondeanime.backend.anime.RecommendationEventRepository;
+import com.dondeanime.backend.curated.CuratedListMetricRepository;
+import com.dondeanime.backend.curated.CuratedListMetricType;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
 import com.dondeanime.backend.provider.WatchProviderRepository;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
+import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
 
 class AffiliateLinkServiceTest {
 
@@ -30,6 +34,10 @@ class AffiliateLinkServiceTest {
             org.mockito.Mockito.mock(AvailabilityChangeEventRepository.class);
     private final RecommendationEventRepository recommendationEventRepository =
             org.mockito.Mockito.mock(RecommendationEventRepository.class);
+    private final CuratedListMetricRepository curatedListMetricRepository =
+            org.mockito.Mockito.mock(CuratedListMetricRepository.class);
+    private final TraktDashboardMetricsService traktDashboardMetricsService =
+            org.mockito.Mockito.mock(TraktDashboardMetricsService.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-05-25T12:00:00Z"), ZoneOffset.UTC);
 
     private final AffiliateLinkService service = new AffiliateLinkService(
@@ -39,6 +47,8 @@ class AffiliateLinkServiceTest {
             watchProviderRepository,
             availabilityChangeEventRepository,
             recommendationEventRepository,
+            curatedListMetricRepository,
+            traktDashboardMetricsService,
             clock);
 
     @Test
@@ -149,6 +159,18 @@ class AffiliateLinkServiceTest {
                 .thenReturn(List.of(availabilityChanges("frieren", 3L)));
         when(recommendationEventRepository.findTopRecommendationClicks(any(Instant.class), any()))
                 .thenReturn(List.of(recommendationClicks("frieren", "violet-evergarden", 5L)));
+        when(curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(eq(CuratedListMetricType.VIEW), any()))
+                .thenReturn(11L);
+        when(curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(eq(CuratedListMetricType.ANIME_CLICK), any()))
+                .thenReturn(6L);
+        when(curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(eq(CuratedListMetricType.PREMIUM_CTA_CLICK), any()))
+                .thenReturn(2L);
+        when(curatedListMetricRepository.countByEventTypeAndOccurredAtAfter(eq(CuratedListMetricType.PREMIUM_CONVERSION), any()))
+                .thenReturn(1L);
+        when(curatedListMetricRepository.findTopLists(any(), any(), any()))
+                .thenReturn(List.of(listMetric("anime-para-empezar", 11L)));
+        when(traktDashboardMetricsService.metrics())
+                .thenReturn(new TraktDashboardMetricsDto(2L, 1L, 4L, 3L));
 
         AffiliateDashboardDto dashboard = service.dashboard();
 
@@ -161,6 +183,12 @@ class AffiliateLinkServiceTest {
         assertThat(dashboard.topClickCountries().getFirst().countryCode()).isEqualTo("ES");
         assertThat(dashboard.topAvailabilityChanges().getFirst().changes()).isEqualTo(3L);
         assertThat(dashboard.topRecommendationClicks().getFirst().targetAnimeSlug()).isEqualTo("violet-evergarden");
+        assertThat(dashboard.curatedListViewsLast30Days()).isEqualTo(11L);
+        assertThat(dashboard.curatedListPremiumClicksLast30Days()).isEqualTo(2L);
+        assertThat(dashboard.curatedListPremiumConversionsLast30Days()).isEqualTo(1L);
+        assertThat(dashboard.topCuratedLists().getFirst().listSlug()).isEqualTo("anime-para-empezar");
+        assertThat(dashboard.trakt().connectedAccounts()).isEqualTo(2L);
+        assertThat(dashboard.trakt().failedMatchesLast30Days()).isEqualTo(3L);
     }
 
     private static AffiliateLink link() {
@@ -280,6 +308,20 @@ class AffiliateLinkServiceTest {
             @Override
             public Long getClicks() {
                 return clicks;
+            }
+        };
+    }
+
+    private static CuratedListMetricRepository.ListMetricProjection listMetric(String listSlug, Long events) {
+        return new CuratedListMetricRepository.ListMetricProjection() {
+            @Override
+            public String getListSlug() {
+                return listSlug;
+            }
+
+            @Override
+            public Long getEvents() {
+                return events;
             }
         };
     }
