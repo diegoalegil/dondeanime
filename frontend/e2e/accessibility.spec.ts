@@ -16,6 +16,10 @@ for (const theme of themes) {
 
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          // El iframe del trailer carga el reproductor de YouTube (terceros): sus
+          // violaciones WCAG son de Google, no nuestras, y no podemos corregirlas.
+          // WCAG aplica a nuestro contenido; el iframe en sí ya lleva su `title`.
+          .exclude('iframe[src*="youtube"]')
           .analyze();
 
         expect(results.violations).toEqual([]);
