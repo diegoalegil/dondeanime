@@ -1,6 +1,7 @@
 ---
 import type { AnimeDetail } from '@/lib/api';
 import { formatType, formatStatus, formatDate, formatSeasonYear, formatNumber } from '@/lib/format';
+import { formatStudioName } from '@/lib/programmaticSeo';
 import { t } from '@/i18n';
 
 interface Props {
@@ -43,7 +44,7 @@ const rows: Array<{ label: string; value: string; mono?: boolean }> = [
           href={`/estudio/${studio.slug}`}
           class="rounded-full border border-surface-2 bg-surface-1 px-4 py-2 text-sm text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
         >
-          {studio.name}
+          {formatStudioName(studio.name)}
         </a>
       ))}
     </div>

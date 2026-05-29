@@ -1,4 +1,4 @@
-import { FALLBACK_TOP_STUDIOS, studioSlug } from './programmaticSeo';
+import { FALLBACK_TOP_STUDIOS, formatStudioName, studioSlug } from './programmaticSeo';
 
 const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
 const JSON_CACHE = new Map<string, Promise<unknown>>();
@@ -308,9 +308,11 @@ const summarizeStudiosFromAnime = (anime: AnimeSummary[]): StudioSummary[] => {
 };
 
 export const getStudios = async (): Promise<StudioSummary[]> => {
-  return fetchJsonAllowing404('/api/studios', async () => {
+  const studios = await fetchJsonAllowing404<StudioSummary[]>('/api/studios', async () => {
     return summarizeStudiosFromAnime(await getAllAnime());
   });
+  // Normalizamos el casing del nombre para mostrar; el slug se mantiene del backend.
+  return studios.map((studio) => ({ ...studio, name: formatStudioName(studio.name) }));
 };
 
 export const getAnimeByStudio = async (slug: string) => {
