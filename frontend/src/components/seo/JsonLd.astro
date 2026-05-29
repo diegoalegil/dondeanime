@@ -4,6 +4,11 @@ interface Props {
 }
 
 const { data } = Astro.props;
-const json = JSON.stringify(data, (_, v) => (v === undefined ? undefined : v));
+// Escapar <, > y & evita que un título/nombre con "</script>" (datos de API u
+// overrides sin sanitizar) rompa el bloque e inyecte HTML. Sigue siendo JSON válido.
+const json = JSON.stringify(data, (_, v) => (v === undefined ? undefined : v))
+  .replace(/</g, '\\u003c')
+  .replace(/>/g, '\\u003e')
+  .replace(/&/g, '\\u0026');
 ---
 <script type="application/ld+json" set:html={json} />

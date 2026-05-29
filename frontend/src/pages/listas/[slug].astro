@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const list = await getCuratedListBySlug(slug!);
-const items = list.items.toSorted((a, b) => a.position - b.position);
+const items = (list.items ?? []).toSorted((a, b) => a.position - b.position);
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? 'https://api.dondeanime.com';
 const titles = items
   .map((item) => item.anime?.titleEnglish || item.anime?.titleRomaji || item.animeSlug)
