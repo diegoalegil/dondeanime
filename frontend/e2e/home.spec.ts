@@ -28,7 +28,10 @@ test('home carga, el buscador filtra y un resultado abre la ficha', async ({ pag
   await result.click();
 
   await expect(page).toHaveURL(new RegExp(`/anime/${escapeRegExp(target!.slug)}$`));
-  await expect(page.getByRole('heading', { name: targetTitle })).toBeVisible();
+  // .first(): la ficha lista anime relacionados cuyo título contiene el del anime
+  // (p.ej. "Attack on Titan: Final Season"), así que getByRole por nombre encuentra
+  // varios headings. El H1 principal es el primero en el DOM.
+  await expect(page.getByRole('heading', { name: targetTitle }).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: /Dónde verlo/i })).toBeVisible();
 });
 
