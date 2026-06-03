@@ -50,6 +50,23 @@ public class TmdbClient {
                 .body(TmdbSearchResponse.class);
     }
 
+    /**
+     * Busca series y películas a la vez por título. Cada resultado trae
+     * {@code media_type} ("tv"/"movie"), lo que permite distinguir serie de
+     * película al cruzar contra AniList. Lenguaje fijado a es-ES.
+     */
+    public TmdbSearchResponse searchMulti(String query) {
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search/multi")
+                        .queryParam("query", query)
+                        .queryParam("language", "es-ES")
+                        .queryParam("include_adult", false)
+                        .build())
+                .retrieve()
+                .body(TmdbSearchResponse.class);
+    }
+
     public TmdbTvDetailsResponse getTvDetails(Long tmdbId, String language) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder

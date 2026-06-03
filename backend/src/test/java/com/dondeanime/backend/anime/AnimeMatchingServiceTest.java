@@ -193,6 +193,7 @@ class AnimeMatchingServiceTest {
 
     private static TmdbSearchResult result(long id, String origin, String firstAirDate, double popularity) {
         return new TmdbSearchResult(id, "Name " + id, "Orig " + id, "overview",
-                firstAirDate, List.of(origin), null, popularity);
+                firstAirDate, List.of(origin), null, popularity,
+                null, null, null, "tv", "ja");
     }
 }
