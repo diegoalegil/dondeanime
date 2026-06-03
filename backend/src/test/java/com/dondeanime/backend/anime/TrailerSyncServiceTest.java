@@ -12,9 +12,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbVideo;
-import com.dondeanime.backend.anime.tmdb.TmdbVideosResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbVideo;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbVideosResponse;
 
 class TrailerSyncServiceTest {
 
@@ -25,7 +25,7 @@ class TrailerSyncServiceTest {
         when(repository.findAll()).thenReturn(List.of(anime));
 
         TmdbClient client = mock(TmdbClient.class);
-        when(client.getTrailers(100L, "es")).thenReturn(new TmdbVideosResponse(100L, List.of(
+        when(client.getTrailers(100L, "es-ES")).thenReturn(new TmdbVideosResponse(100L, List.of(
                 new TmdbVideo("clip-ignored", "YouTube", "Clip", "Clip"),
                 new TmdbVideo("vimeo-ignored", "Vimeo", "Trailer", "Trailer"),
                 new TmdbVideo("abc123DEF45", "YouTube", "Trailer", "Trailer español"),
@@ -48,7 +48,7 @@ class TrailerSyncServiceTest {
         when(repository.findAll()).thenReturn(List.of(anime));
 
         TmdbClient client = mock(TmdbClient.class);
-        when(client.getTrailers(100L, "es")).thenReturn(new TmdbVideosResponse(100L, List.of(
+        when(client.getTrailers(100L, "es-ES")).thenReturn(new TmdbVideosResponse(100L, List.of(
                 new TmdbVideo("featurette", "YouTube", "Featurette", "Making of")
         )));
 

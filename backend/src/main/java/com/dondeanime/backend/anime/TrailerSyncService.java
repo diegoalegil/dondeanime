@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbVideo;
-import com.dondeanime.backend.anime.tmdb.TmdbVideosResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbVideo;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbVideosResponse;
 
 /**
  * Sincroniza el primer trailer oficial disponible en TMDb.
@@ -66,7 +66,7 @@ public class TrailerSyncService {
     }
 
     private String findFirstYoutubeTrailerId(Long tmdbId) {
-        TmdbVideosResponse response = client.getTrailers(tmdbId, "es");
+        TmdbVideosResponse response = client.getTrailers(tmdbId, "es-ES");
         if (response == null || response.results() == null) {
             return null;
         }

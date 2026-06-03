@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbSearchResponse;
-import com.dondeanime.backend.anime.tmdb.TmdbSearchResult;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResult;
 
 /**
  * Cruce AniList ↔ TMDb. Para cada anime en BD sin tmdbId, busca en
@@ -97,7 +97,7 @@ public class AnimeMatchingService {
             return null;
         }
 
-        TmdbSearchResponse resp = client.searchTv(title);
+        TmdbSearchResponse resp = client.searchTv(title, "es-ES");
         if (resp == null || resp.results() == null || resp.results().isEmpty()) {
             log.warn("TMDb sin resultados para '{}' (slug={})", title, anime.getSlug());
             return null;

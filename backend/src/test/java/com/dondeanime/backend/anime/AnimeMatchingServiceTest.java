@@ -13,9 +13,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbSearchResponse;
-import com.dondeanime.backend.anime.tmdb.TmdbSearchResult;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResult;
 
 /**
  * Tests unitarios de la heurística de matching contra TMDb.
@@ -40,7 +40,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findAll()).thenReturn(List.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(
+        when(client.searchTv(any(), any())).thenReturn(
                 new TmdbSearchResponse(1, List.of(wrongYearMorePopular, correctYear), 2, 1));
 
         new AnimeMatchingService(client, repo).matchAll();
@@ -60,7 +60,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findAll()).thenReturn(List.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(
+        when(client.searchTv(any(), any())).thenReturn(
                 new TmdbSearchResponse(1, List.of(jpFar, jpFarMorePopular), 2, 1));
 
         new AnimeMatchingService(client, repo).matchAll();
@@ -81,7 +81,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findAll()).thenReturn(List.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(
+        when(client.searchTv(any(), any())).thenReturn(
                 new TmdbSearchResponse(1, List.of(usLow, krHigh), 2, 1));
 
         new AnimeMatchingService(client, repo).matchAll();
@@ -99,7 +99,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findAll()).thenReturn(List.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
+        when(client.searchTv(any(), any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
 
         int matched = new AnimeMatchingService(client, repo).matchAll();
 
@@ -120,7 +120,7 @@ class AnimeMatchingServiceTest {
 
         assertThat(matched).isZero();
         // No se debe consultar TMDb ni guardar nada.
-        verify(client, never()).searchTv(any());
+        verify(client, never()).searchTv(any(), any());
         verify(repo, never()).save(any());
     }
 
@@ -133,7 +133,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findBySlug("my-hero-academia")).thenReturn(Optional.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(new TmdbSearchResponse(1, List.of(correctYear), 1, 1));
+        when(client.searchTv(any(), any())).thenReturn(new TmdbSearchResponse(1, List.of(correctYear), 1, 1));
 
         Optional<AnimeMatchingService.RematchResult> result =
                 new AnimeMatchingService(client, repo).rematch("my-hero-academia");
@@ -153,7 +153,7 @@ class AnimeMatchingServiceTest {
         AnimeRepository repo = mock(AnimeRepository.class);
         when(repo.findBySlug("unknown-title")).thenReturn(Optional.of(anime));
         TmdbClient client = mock(TmdbClient.class);
-        when(client.searchTv(any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
+        when(client.searchTv(any(), any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
 
         Optional<AnimeMatchingService.RematchResult> result =
                 new AnimeMatchingService(client, repo).rematch("unknown-title");
@@ -175,7 +175,7 @@ class AnimeMatchingServiceTest {
                 new AnimeMatchingService(client, repo).rematch("missing");
 
         assertThat(result).isEmpty();
-        verify(client, never()).searchTv(any());
+        verify(client, never()).searchTv(any(), any());
         verify(repo, never()).save(any());
     }
 

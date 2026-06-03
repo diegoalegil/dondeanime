@@ -96,6 +96,18 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.18.3</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.diegoalegil</groupId>
+			<artifactId>tsunagi</artifactId>
+			<version>1.1.0</version>
+			<exclusions>
+				<!-- jackson-annotations es compartido; deja que el BOM de Boot 4 imponga la 2.x -->
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -248,11 +260,6 @@
 						<exclude>com/dondeanime/backend/anime/Anime.class</exclude>
 						<exclude>com/dondeanime/backend/anime/AnimeOverride.class</exclude>
 						<exclude>com/dondeanime/backend/anime/AnimeSyncService.class</exclude>
-						<exclude>com/dondeanime/backend/anime/anilist/**</exclude>
-						<exclude>com/dondeanime/backend/anime/tmdb/TmdbClient.class</exclude>
-						<exclude>com/dondeanime/backend/anime/tmdb/TmdbCountryProviders.class</exclude>
-						<exclude>com/dondeanime/backend/anime/tmdb/TmdbProvider.class</exclude>
-						<exclude>com/dondeanime/backend/anime/tmdb/TmdbSearchResult.class</exclude>
 						<exclude>com/dondeanime/backend/provider/WatchProvider.class</exclude>
 						<exclude>com/dondeanime/backend/provider/ProviderSyncService.class</exclude>
 						<exclude>com/dondeanime/backend/provider/ProviderSyncService$*.class</exclude>
