@@ -8,19 +8,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.dondeanime.animetitlematcher.api.AnimeTitleMatcher;
+import com.dondeanime.animetitlematcher.api.MatchDecision;
+import com.dondeanime.animetitlematcher.api.MatchResult;
+import com.dondeanime.animetitlematcher.domain.AniListAnime;
+import com.dondeanime.animetitlematcher.domain.AnimeFormat;
+import com.dondeanime.animetitlematcher.domain.TmdbMediaType;
+import com.dondeanime.animetitlematcher.domain.TmdbTitle;
 import com.dondeanime.backend.anime.tmdb.TmdbClient;
 import com.dondeanime.backend.anime.tmdb.TmdbSearchResponse;
 import com.dondeanime.backend.anime.tmdb.TmdbSearchResult;
 
 /**
- * Cruce AniList ↔ TMDb. Para cada anime en BD sin tmdbId, busca en
- * TMDb por título inglés (fallback romaji) y guarda el ID del primer
- * resultado. Heurística simple; los matches malos se corregirán a
- * mano en mes 3 (top 50).
+ * Cruce AniList ↔ TMDb. Para cada anime en BD sin tmdbId, busca en TMDb
+ * (series y películas) y resuelve el equivalente con la librería
+ * {@code anime-title-matcher}.
  *
- * Idempotente: si un anime ya tiene tmdbId, se salta.
- * Sin @Transactional: cada save es su propia tx, un fallo no
- * arrastra al resto.
+ * <p>Política: aceptamos automáticamente el candidato del matcher solo cuando
+ * la decisión es {@code EXACT_MATCH} o {@code HIGH_CONFIDENCE}. Para el resto
+ * (medium/low/ambiguous/no-match) caemos a la heurística histórica de "el más
+ * popular priorizando origen JP + año cercano", que conserva el comportamiento
+ * actual y el desempate por popularidad.
+ *
+ * <p>Idempotente: si un anime ya tiene tmdbId, se salta. Sin {@code @Transactional}:
+ * cada save es su propia tx, un fallo no arrastra al resto.
  */
 @Service
 public class AnimeMatchingService {
@@ -35,14 +46,16 @@ public class AnimeMatchingService {
 
     private final TmdbClient client;
     private final AnimeRepository repository;
+    private final AnimeTitleMatcher matcher;
 
-    public AnimeMatchingService(TmdbClient client, AnimeRepository repository) {
+    public AnimeMatchingService(TmdbClient client, AnimeRepository repository, AnimeTitleMatcher matcher) {
         this.client = client;
         this.repository = repository;
+        this.matcher = matcher;
     }
 
     public int matchAll() {
-        List<Anime> animes = repository.findAll();
+        List<Anime> animes = repository.findAllWithSynonyms();
         log.info("Matching TMDb iniciado: {} anime a procesar", animes.size());
 
         int matched = 0;
@@ -76,7 +89,7 @@ public class AnimeMatchingService {
     }
 
     public Optional<RematchResult> rematch(String animeSlug) {
-        return repository.findBySlug(animeSlug)
+        return repository.findBySlugWithSynonyms(animeSlug)
                 .map(anime -> {
                     Long tmdbId = findTmdbId(anime);
                     anime.setTmdbId(tmdbId);
@@ -88,45 +101,108 @@ public class AnimeMatchingService {
     }
 
     private Long findTmdbId(Anime anime) {
-        String title = anime.getTitleEnglish();
-        if (isBlank(title)) {
-            title = anime.getTitleRomaji();
-        }
-        if (isBlank(title)) {
+        return resolve(anime).tmdbId();
+    }
+
+    /**
+     * Resuelve el tmdbId de un anime sin persistir nada. Reutilizable por el
+     * dry-run. Indica además de dónde salió la decisión.
+     */
+    Resolution resolve(Anime anime) {
+        String query = primaryQuery(anime);
+        if (isBlank(query)) {
             log.warn("Anime id={} no tiene título usable, skip", anime.getId());
-            return null;
+            return Resolution.none(MatchSource.NO_TITLE);
         }
 
-        TmdbSearchResponse resp = client.searchTv(title);
-        if (resp == null || resp.results() == null || resp.results().isEmpty()) {
-            log.warn("TMDb sin resultados para '{}' (slug={})", title, anime.getSlug());
-            return null;
+        TmdbSearchResponse resp = client.searchMulti(query);
+        List<TmdbSearchResult> results = resp == null || resp.results() == null ? List.of() : resp.results();
+        if (results.isEmpty()) {
+            log.warn("TMDb sin resultados para '{}' (slug={})", query, anime.getSlug());
+            return Resolution.none(MatchSource.NO_RESULTS);
         }
 
-        // Heurística en tres pasadas, cada una más permisiva:
-        //   1. Origen JP + año de estreno coincide con AniList (±1 año).
-        //   2. Origen JP, cualquier año.
-        //   3. Cualquier resultado.
-        // Dentro de cada pasada elegimos el más popular.
-        //
-        // Por qué la fecha: la "popularity" de TMDb es muy dinámica y un
-        // spin-off recién estrenado puede tener boost de novedad encima
-        // de la serie original (caso real: "My Hero Academia: Vigilantes"
-        // 2025 ganaba a "My Hero Academia" 2016 si solo miramos popularidad).
-        Integer animeYear = anime.getStartYear();
+        List<TmdbTitle> candidates = results.stream()
+                .filter(r -> r.id() != null && (r.isTv() || r.isMovie()))
+                .map(AnimeMatchingService::toTmdbTitle)
+                .toList();
+
+        MatchResult match = matcher.findBestMatch(toAniListAnime(anime), candidates);
+        if (isConfident(match.decision()) && match.bestCandidate() != null) {
+            return new Resolution(match.bestCandidate().tmdbTitle().id(),
+                    MatchSource.MATCHER, match.decision(), match.score());
+        }
+
+        Long fallback = fallbackTmdbId(results, anime.getStartYear());
+        MatchSource source = fallback == null ? MatchSource.NONE : MatchSource.FALLBACK;
+        return new Resolution(fallback, source, match.decision(), match.score());
+    }
+
+    /** Solo aceptamos automáticamente las decisiones fuertes del matcher. */
+    private static boolean isConfident(MatchDecision decision) {
+        return decision == MatchDecision.EXACT_MATCH || decision == MatchDecision.HIGH_CONFIDENCE;
+    }
+
+    private static String primaryQuery(Anime anime) {
+        if (!isBlank(anime.getTitleEnglish())) {
+            return anime.getTitleEnglish();
+        }
+        if (!isBlank(anime.getTitleRomaji())) {
+            return anime.getTitleRomaji();
+        }
+        return anime.getTitleNative();
+    }
+
+    private static AniListAnime toAniListAnime(Anime anime) {
+        return AniListAnime.builder()
+                .id(anime.getAnilistId() != null ? anime.getAnilistId() : 0L)
+                .romajiTitle(anime.getTitleRomaji())
+                .englishTitle(anime.getTitleEnglish())
+                .nativeTitle(anime.getTitleNative())
+                .synonyms(List.copyOf(anime.getSynonyms()))
+                .year(anime.getStartYear())
+                .format(AnimeFormat.parse(anime.getFormat()))
+                .episodes(anime.getEpisodes())
+                .build();
+    }
+
+    private static TmdbTitle toTmdbTitle(TmdbSearchResult r) {
+        return TmdbTitle.builder()
+                .id(r.id())
+                .title(r.displayName())
+                .originalTitle(r.displayOriginalName())
+                .year(parseYear(r.displayDate()))
+                .mediaType(TmdbMediaType.fromTmdbString(r.mediaType()))
+                .originalLanguage(r.originalLanguage())
+                .popularity(r.popularity())
+                .build();
+    }
+
+    /**
+     * Heurística histórica de respaldo: entre los resultados de serie elige el
+     * más popular, priorizando origen JP + año cercano (±1). La fecha importa
+     * porque la popularidad de TMDb es muy dinámica: un spin-off recién
+     * estrenado puede superar a la serie original (caso real "My Hero Academia:
+     * Vigilantes" 2025 vs "My Hero Academia" 2016).
+     */
+    private static Long fallbackTmdbId(List<TmdbSearchResult> results, Integer animeYear) {
+        List<TmdbSearchResult> series = results.stream().filter(TmdbSearchResult::isTv).toList();
+        if (series.isEmpty()) {
+            return null;
+        }
         Comparator<TmdbSearchResult> byPopDesc = Comparator.comparingDouble(
                 r -> Optional.ofNullable(r.popularity()).orElse(0.0));
 
-        Optional<TmdbSearchResult> best = resp.results().stream()
+        return series.stream()
                 .filter(AnimeMatchingService::isJapanese)
                 .filter(r -> yearMatches(r, animeYear))
                 .max(byPopDesc)
-                .or(() -> resp.results().stream()
+                .or(() -> series.stream()
                         .filter(AnimeMatchingService::isJapanese)
                         .max(byPopDesc))
-                .or(() -> resp.results().stream().max(byPopDesc));
-
-        return best.map(TmdbSearchResult::id).orElse(null);
+                .or(() -> series.stream().max(byPopDesc))
+                .map(TmdbSearchResult::id)
+                .orElse(null);
     }
 
     private static boolean isJapanese(TmdbSearchResult r) {
@@ -134,14 +210,18 @@ public class AnimeMatchingService {
     }
 
     private static boolean yearMatches(TmdbSearchResult r, Integer animeYear) {
-        if (animeYear == null || r.firstAirDate() == null || r.firstAirDate().length() < 4) {
-            return false;
+        Integer tmdbYear = parseYear(r.displayDate());
+        return animeYear != null && tmdbYear != null && Math.abs(tmdbYear - animeYear) <= 1;
+    }
+
+    private static Integer parseYear(String date) {
+        if (date == null || date.length() < 4) {
+            return null;
         }
         try {
-            int tmdbYear = Integer.parseInt(r.firstAirDate().substring(0, 4));
-            return Math.abs(tmdbYear - animeYear) <= 1;
+            return Integer.parseInt(date.substring(0, 4));
         } catch (NumberFormatException e) {
-            return false;
+            return null;
         }
     }
 
@@ -155,6 +235,18 @@ public class AnimeMatchingService {
 
     private static boolean isBlank(String s) {
         return s == null || s.isBlank();
+    }
+
+    /** De dónde salió el tmdbId resuelto. */
+    public enum MatchSource {
+        MATCHER, FALLBACK, NONE, NO_RESULTS, NO_TITLE
+    }
+
+    /** Resultado de resolver un anime, sin persistir. */
+    public record Resolution(Long tmdbId, MatchSource source, MatchDecision decision, double score) {
+        static Resolution none(MatchSource source) {
+            return new Resolution(null, source, MatchDecision.NO_MATCH, 0.0);
+        }
     }
 
     public record RematchResult(String slug, boolean matched) {}
