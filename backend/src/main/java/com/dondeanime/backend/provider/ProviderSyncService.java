@@ -18,10 +18,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbCountryProviders;
-import com.dondeanime.backend.anime.tmdb.TmdbProvider;
-import com.dondeanime.backend.anime.tmdb.TmdbProvidersResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbCountryProviders;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbProvider;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbProvidersResponse;
 import com.dondeanime.backend.subscription.AlertService;
 
 /**
@@ -172,7 +172,7 @@ public class ProviderSyncService {
             wp.setProviderName(p.providerName());
             wp.setProviderType(type);
             wp.setTmdbProviderId(p.providerId());
-            wp.setLogoUrl(TmdbClient.fullLogoUrl(p.logoPath()));
+            wp.setLogoUrl(TmdbImageUrls.fullLogoUrl(p.logoPath()));
             wp.setUpdatedAt(now);
             providers.add(wp);
         }

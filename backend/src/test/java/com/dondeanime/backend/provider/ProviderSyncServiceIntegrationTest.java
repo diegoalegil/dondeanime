@@ -15,10 +15,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.dondeanime.backend.AbstractIntegrationTest;
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbCountryProviders;
-import com.dondeanime.backend.anime.tmdb.TmdbProvider;
-import com.dondeanime.backend.anime.tmdb.TmdbProvidersResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbCountryProviders;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbProvider;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbProvidersResponse;
 import com.dondeanime.backend.subscription.AlertService;
 
 @SpringBootTest

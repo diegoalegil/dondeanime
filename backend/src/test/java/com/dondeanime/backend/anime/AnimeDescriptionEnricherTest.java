@@ -13,8 +13,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbTvDetailsResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbTvDetailsResponse;
 
 class AnimeDescriptionEnricherTest {
 

@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.dondeanime.backend.anime.tmdb.TmdbClient;
-import com.dondeanime.backend.anime.tmdb.TmdbTvDetailsResponse;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
+import io.github.diegoalegil.tsunagi.tmdb.TmdbTvDetailsResponse;
 
 /**
  * Completa descripciones localizadas desde TMDb es-ES para anime ya
