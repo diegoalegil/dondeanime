@@ -97,6 +97,13 @@
 			<version>1.18.3</version>
 		</dependency>
 
+		<!-- AniList <-> TMDb fuzzy title matcher (zero transitive dependencies). -->
+		<dependency>
+			<groupId>com.github.diegoalegil</groupId>
+			<artifactId>anime-title-matcher</artifactId>
+			<version>v0.1.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -170,6 +177,14 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<!-- Resolves com.github.diegoalegil:anime-title-matcher from GitHub via JitPack. -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
