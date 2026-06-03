@@ -204,6 +204,36 @@ class AnimeMatchingServiceTest {
         assertThat(captor.getValue().getTmdbId()).isEqualTo(2L);
     }
 
+    // --- dry-run ---
+
+    @Test
+    void dryRunReportsDiffsWithoutSaving() {
+        Anime unmatched = anime(1L, "Steins;Gate", 2011); // sin tmdbId actual
+        Anime alreadyCorrect = anime(2L, "Cowboy Bebop", 1998);
+        alreadyCorrect.setTmdbId(30991L);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(unmatched, alreadyCorrect));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti("Steins;Gate")).thenReturn(new TmdbSearchResponse(
+                1, List.of(tvResult(222L, "Steins;Gate", "JP", "2011-04-06", 5.0)), 1, 1));
+        when(client.searchMulti("Cowboy Bebop")).thenReturn(new TmdbSearchResponse(
+                1, List.of(tvResult(30991L, "Cowboy Bebop", "JP", "1998-04-03", 50.0)), 1, 1));
+
+        AnimeMatchingService.DryRunReport report = service(client, repo).dryRunMatchAll();
+
+        assertThat(report.total()).isEqualTo(2);
+        assertThat(report.changed()).isEqualTo(1);
+        assertThat(report.unchanged()).isEqualTo(1);
+        assertThat(report.nowMatched()).isEqualTo(1);
+        assertThat(report.diffs()).singleElement().satisfies(diff -> {
+            assertThat(diff.slug()).isEqualTo("steinsgate");
+            assertThat(diff.currentTmdbId()).isNull();
+            assertThat(diff.proposedTmdbId()).isEqualTo(222L);
+        });
+        verify(repo, never()).save(any());
+    }
+
     // --- rematch ---
 
     @Test

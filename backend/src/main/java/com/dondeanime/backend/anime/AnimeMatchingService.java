@@ -1,7 +1,9 @@
 package com.dondeanime.backend.anime;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -98,6 +100,57 @@ public class AnimeMatchingService {
                             tmdbId == null ? "sin match" : "match actualizado");
                     return new RematchResult(anime.getSlug(), tmdbId != null);
                 });
+    }
+
+    /**
+     * Recorre todos los anime y calcula qué tmdbId propondría el matcher SIN
+     * guardar nada. Sirve para validar el cambio comparando contra los tmdbId
+     * actuales antes de activarlo. Igual de costoso que matchAll (una búsqueda
+     * por anime) y respeta el rate limit.
+     */
+    public DryRunReport dryRunMatchAll() {
+        List<Anime> animes = repository.findAllWithSynonyms();
+        log.info("Dry-run matching iniciado: {} anime", animes.size());
+
+        int changed = 0;
+        int unchanged = 0;
+        int nowMatched = 0;
+        int nowUnmatched = 0;
+        int matcherWins = 0;
+        List<DryRunDiff> diffs = new ArrayList<>();
+
+        for (Anime a : animes) {
+            Long current = a.getTmdbId();
+            Resolution resolution;
+            try {
+                resolution = resolve(a);
+            } catch (Exception e) {
+                log.error("Dry-run error slug={}: {}", a.getSlug(), e.getMessage());
+                continue;
+            }
+            Long proposed = resolution.tmdbId();
+            if (resolution.source() == MatchSource.MATCHER) {
+                matcherWins++;
+            }
+            if (Objects.equals(current, proposed)) {
+                unchanged++;
+            } else {
+                changed++;
+                if (current == null) {
+                    nowMatched++;
+                } else if (proposed == null) {
+                    nowUnmatched++;
+                }
+                diffs.add(new DryRunDiff(a.getSlug(), current, proposed,
+                        resolution.source(), resolution.decision(), resolution.score()));
+            }
+            sleep(RATE_LIMIT_SLEEP_MS);
+        }
+
+        DryRunReport report = new DryRunReport(animes.size(), changed, unchanged,
+                nowMatched, nowUnmatched, matcherWins, diffs);
+        log.info("Dry-run completado: {}", report.summary());
+        return report;
     }
 
     private Long findTmdbId(Anime anime) {
@@ -246,6 +299,20 @@ public class AnimeMatchingService {
     public record Resolution(Long tmdbId, MatchSource source, MatchDecision decision, double score) {
         static Resolution none(MatchSource source) {
             return new Resolution(null, source, MatchDecision.NO_MATCH, 0.0);
+        }
+    }
+
+    /** Una diferencia detectada por el dry-run (tmdbId actual vs propuesto). */
+    public record DryRunDiff(String slug, Long currentTmdbId, Long proposedTmdbId,
+                             MatchSource source, MatchDecision decision, double score) {}
+
+    /** Informe agregado del dry-run. {@code diffs} solo incluye los que cambian. */
+    public record DryRunReport(int total, int changed, int unchanged, int nowMatched,
+                               int nowUnmatched, int matcherWins, List<DryRunDiff> diffs) {
+        public String summary() {
+            return "total=" + total + " changed=" + changed + " unchanged=" + unchanged
+                    + " nowMatched=" + nowMatched + " nowUnmatched=" + nowUnmatched
+                    + " matcherWins=" + matcherWins;
         }
     }
 
