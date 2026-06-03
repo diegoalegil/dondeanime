@@ -56,6 +56,9 @@ public class Anime {
     @Column(name = "title_english")
     private String titleEnglish;
 
+    @Column(name = "title_native")
+    private String titleNative;
+
     @Column(unique = true)
     private String slug;
 
@@ -127,6 +130,17 @@ public class Anime {
     )
     @Column(name = "genre", length = 50, nullable = false)
     private Set<String> genres = new HashSet<>();
+
+    /**
+     * Títulos alternativos de AniList (synonyms). Solo se usan para el cruce
+     * con TMDb, no se exponen en respuestas JSON, de ahí LAZY.
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "anime_synonym",
+            joinColumns = @JoinColumn(name = "anime_id"))
+    @Column(name = "synonym", length = 255, nullable = false)
+    private Set<String> synonyms = new HashSet<>();
 
     /** Temporada del estreno: WINTER, SPRING, SUMMER, FALL. */
     @Column(length = 10)
@@ -202,6 +216,14 @@ public class Anime {
 
     public void setTitleEnglish(String titleEnglish) {
         this.titleEnglish = titleEnglish;
+    }
+
+    public String getTitleNative() {
+        return titleNative;
+    }
+
+    public void setTitleNative(String titleNative) {
+        this.titleNative = titleNative;
     }
 
     public String getSlug() {
@@ -370,6 +392,14 @@ public class Anime {
 
     public void setGenres(Set<String> genres) {
         this.genres = genres;
+    }
+
+    public Set<String> getSynonyms() {
+        return synonyms;
+    }
+
+    public void setSynonyms(Set<String> synonyms) {
+        this.synonyms = synonyms;
     }
 
     public String getSeason() {

@@ -22,7 +22,8 @@ public class AniListClient {
           Page(page: $page, perPage: $perPage) {
             media(type: ANIME, sort: [POPULARITY_DESC, ID]) {
               id
-              title { romaji english }
+              title { romaji english nativeTitle: native }
+              synonyms
               startDate { year month day }
               endDate { year month day }
               episodes
