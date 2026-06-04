@@ -150,8 +150,6 @@ public class AnimeSyncService {
 
         anime.setSynonyms(mapSynonyms(media.synonyms()));
 
-        anime.setStudios(mapStudios(media.studios()));
-
         if (media.tags() != null) {
             HashSet<AnimeTag> tags = new HashSet<>();
             for (AniListTag tag : media.tags()) {
@@ -165,6 +163,19 @@ public class AnimeSyncService {
         }
 
         anime.setSyncedAt(Instant.now());
+
+        // studios (anime_studio) y characterRoles (anime_character_role) tienen
+        // un unique constraint en su tabla join. Al RE-sincronizar un anime que
+        // ya existe, vaciamos esas relaciones y hacemos flush ANTES de insertar
+        // las nuevas: si no, Hibernate emite el INSERT antes que el DELETE y
+        // choca con uk_anime_studio / uk_anime_character_role. El loader trae
+        // ambas colecciones inicializadas para poder limpiarlas aquí.
+        if (anime.getId() != null) {
+            anime.getStudios().clear();
+            anime.replaceCharacterRoles(List.of());
+            repository.saveAndFlush(anime);
+        }
+        anime.getStudios().addAll(mapStudios(media.studios()));
         anime.replaceCharacterRoles(mapCharacters(media.characters()));
 
         repository.save(anime);
