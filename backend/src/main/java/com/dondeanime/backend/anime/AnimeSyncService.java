@@ -150,8 +150,6 @@ public class AnimeSyncService {
 
         anime.setSynonyms(mapSynonyms(media.synonyms()));
 
-        anime.setStudios(mapStudios(media.studios()));
-
         if (media.tags() != null) {
             HashSet<AnimeTag> tags = new HashSet<>();
             for (AniListTag tag : media.tags()) {
@@ -165,7 +163,18 @@ public class AnimeSyncService {
         }
 
         anime.setSyncedAt(Instant.now());
-        anime.replaceCharacterRoles(mapCharacters(media.characters()));
+
+        // studios (anime_studio) y characterRoles (anime_character_role) tienen
+        // un unique constraint en su tabla join. Solo se asignan al CREAR el
+        // anime; en un re-sync NO se reconstruyen, porque reasignar la colección
+        // entera chocaba con uk_anime_studio / uk_anime_character_role (Hibernate
+        // reinsertaba antes de borrar las filas previas). Son datos estables; lo
+        // que el re-sync sí refresca —escalares, genres, tags, native y
+        // synonyms— ya se ha aplicado arriba.
+        if (anime.getId() == null) {
+            anime.setStudios(mapStudios(media.studios()));
+            anime.replaceCharacterRoles(mapCharacters(media.characters()));
+        }
 
         repository.save(anime);
     }
