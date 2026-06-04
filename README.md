@@ -1,15 +1,19 @@
+<div align="center">
+
 # DondeAnime
 
-> Dónde y cuándo ver cualquier anime en streaming en España y Latinoamérica, en menos de 5 segundos.
+**Dónde y cuándo ver cualquier anime en streaming en España y Latinoamérica — en menos de 5 segundos.**
 
-**En producción:** [https://dondeanime.com](https://dondeanime.com)
-**API pública:** [https://api.dondeanime.com/api/anime](https://api.dondeanime.com/api/anime)
+[![Status](https://img.shields.io/badge/status-en%20producción-success)](https://dondeanime.com)
+[![Backend](https://img.shields.io/badge/backend-Spring%20Boot%204-6DB33F?logo=spring)](#stack-técnico)
+[![Frontend](https://img.shields.io/badge/frontend-Astro%206-FF5D01?logo=astro)](#stack-técnico)
+[![Database](https://img.shields.io/badge/db-PostgreSQL%2016-4169E1?logo=postgresql)](#stack-técnico)
+[![Java](https://img.shields.io/badge/java-21-007396?logo=openjdk)](#stack-técnico)
+[![Data SDK](https://img.shields.io/maven-central/v/io.github.diegoalegil/tsunagi?label=tsunagi&logo=apachemaven&color=C71A36)](https://central.sonatype.com/artifact/io.github.diegoalegil/tsunagi)
 
-![Status](https://img.shields.io/badge/status-en%20producción-success)
-![Backend](https://img.shields.io/badge/backend-Spring%20Boot%204-6DB33F?logo=spring)
-![Frontend](https://img.shields.io/badge/frontend-Astro%206-FF5D01?logo=astro)
-![Database](https://img.shields.io/badge/db-PostgreSQL%2016-4169E1?logo=postgresql)
-![Java](https://img.shields.io/badge/java-21-007396?logo=openjdk)
+🌐 **[dondeanime.com](https://dondeanime.com)**  ·  🔌 **[API pública](https://api.dondeanime.com/api/anime)**
+
+</div>
 
 ---
 
@@ -20,7 +24,41 @@ Web pública en español que responde dos preguntas concretas para cualquier ani
 1. **¿Está disponible en mi país?**
 2. **¿En qué plataforma de streaming legal puedo verlo?**
 
-No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con páginas estáticas indexables por país, plataforma, género y temporada. Cubre los 5 mercados hispanohablantes principales (España, México, Argentina, Chile, Colombia) y las 8 plataformas relevantes (Crunchyroll, Netflix, Prime Video, HBO Max, Disney+, Apple TV+, Hulu, Pluto TV).
+No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con páginas estáticas indexables por país, plataforma, género y temporada. Cubre los 5 mercados hispanohablantes principales (España, México, Argentina, Chile, Colombia) y las plataformas relevantes (Crunchyroll, Netflix, Prime Video, HBO Max, Disney+, Apple TV+, Hulu, Pluto TV).
+
+---
+
+## ⚡ Powered by Tsunagi — mi propio SDK de datos de anime
+
+<div align="center">
+
+![Tsunagi — Anime Data SDK for Java](docs/img/tsunagi-banner.png)
+
+</div>
+
+La capa de datos de DondeAnime no usa clientes HTTP a medida: corre sobre **[Tsunagi](https://github.com/diegoalegil/tsunagi)**, un SDK de anime para Java que **escribí desde cero y publiqué en Maven Central**, libre para que lo use cualquiera.
+
+```xml
+<dependency>
+    <groupId>io.github.diegoalegil</groupId>
+    <artifactId>tsunagi</artifactId>
+    <version>1.2.0</version>
+</dependency>
+```
+
+| | Capacidad |
+|---|---|
+| 🧩 **Unified Model** | Modelo de datos unificado sobre múltiples fuentes |
+| 🌐 **3 fuentes** | **AniList** (GraphQL) · **TMDb** (REST) · **Jikan** (REST) |
+| 🚦 **Rate Limiting** | Token bucket configurable por cliente |
+| 🔁 **Retries** | Reintentos con backoff exponencial sobre fallos transitorios |
+| 🗃️ **Caching** | Caché en memoria con TTL y evicción LRU |
+
+DondeAnime consume `AniListClient.fetchPopular(...)` para el catálogo y `TmdbClient` para watch-providers, trailers y descripciones localizadas — toda la **política de negocio** (países, idiomas, slugs, mapeo JPA) se queda en DondeAnime; Tsunagi solo aporta los datos crudos.
+
+> **Cruce AniList ↔ TMDb:** el matching de cada anime con su entrada en TMDb lo resuelve **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)**, otra librería propia: similitud difusa de títulos (Levenshtein + Jaro-Winkler + token-set), normalización de temporadas/numerales y veto serie-vs-película, todo explicable.
+
+📦 **[Tsunagi en Maven Central](https://central.sonatype.com/artifact/io.github.diegoalegil/tsunagi)**  ·  📖 **[Repo y docs](https://github.com/diegoalegil/tsunagi)**
 
 ---
 
@@ -28,32 +66,33 @@ No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con p
 
 | Métrica | Valor |
 |---|---|
-| Anime catalogados | 100 en producción · infraestructura lista para 500+ (Sprint 8) |
-| Páginas estáticas generadas | 720 en producción · 5000+ con programmatic SEO (Sprint 17, en cola de deploy) |
+| Anime catalogados | ~930 en producción (infraestructura lista hasta 1000) |
+| Páginas estáticas | Programmatic SEO — miles de páginas (anime, país, plataforma, género, temporada) |
 | Países soportados | 5 (ES, MX, AR, CL, CO) |
-| Idiomas | Español + Inglés (`/en/`, Sprint 13) |
+| Idiomas | Español + Inglés (`/en/`) |
 | Plataformas indexadas | 8+ |
-| Tiempo de build frontend | ~3-4 segundos |
-| Tests backend | 266 (verdes en CI con Postgres + Testcontainers) |
+| Capa de datos | **Tsunagi 1.2.0** (SDK propio en Maven Central) |
+| Tests backend | 391 (verdes en CI con Postgres + Testcontainers) |
 | Endpoints REST | ~25 (catálogo, búsqueda fulltext, API v1, premium, push, listas) |
-| Sync automático | AniList 12h / TMDb match 24h / Providers 24h |
+| Sync automático | AniList 12h · TMDb match (title-matcher) 24h · Providers 24h |
 
-> Nota de estado: el repositorio (rama `main`) contiene 20+ sprints de
-> features. El backend en producción se actualiza por deploy manual al VPS;
-> algunas capacidades nuevas (búsqueda fulltext, API v1, Premium, push) están
-> en `main` y se activan en producción con el siguiente deploy.
+> Nota de estado: la rama `main` contiene 20+ sprints de features. El backend en
+> producción se actualiza por **deploy manual** al VPS, así que algunas capacidades
+> recién mergeadas (p. ej. el title-matcher sobre Tsunagi 1.2.0) se activan en
+> producción con el siguiente deploy.
 
 ---
 
 ## Stack técnico
 
 ### Backend
-- **Java 21** + **Spring Boot 4.0.6**
-- **Hibernate 7.2** sobre Spring Data JPA
-- **PostgreSQL 16** (en Docker tanto local como producción)
-- **RestClient** (síncrono, Spring 6.1+) para llamadas a APIs externas
+- **Java 21** + **Spring Boot 4.0.x**
+- **Hibernate 7** sobre Spring Data JPA
+- **PostgreSQL 16** (en Docker tanto local como producción), migraciones con **Flyway**
+- **[Tsunagi](https://github.com/diegoalegil/tsunagi)** (SDK propio) como capa de acceso a AniList / TMDb / Jikan
+- **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)** (librería propia) para el cruce difuso AniList ↔ TMDb
 - **Jackson 3.x** (paquetes `tools.jackson.*` propios de Spring Boot 4)
-- **Spring Security** con HTTP Basic para `/api/admin/**` y JWT para flujos públicos (alertas, doble opt-in)
+- **Spring Security** (HTTP Basic + 2FA para `/api/admin/**`, JWT para flujos públicos)
 - **Resend** para email transaccional
 
 ### Frontend
@@ -68,11 +107,14 @@ No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con p
 - **Vercel** free tier para el frontend estático
 - **Cloudflare** para DNS, proxy, Email Routing
 - **Cloudflare R2** para backups diarios automatizados de Postgres (cron + rotación 30 días)
-- **GitHub Actions** para CI (backend tests + frontend build)
+- **GitHub Actions** para CI (backend tests + frontend build + e2e + lighthouse)
 
 ### Fuentes de datos
-- **AniList** (GraphQL, sin auth, 90 req/min) — metadata de anime
-- **TMDb** (REST + API key v4) — providers de streaming por país
+- **AniList** (GraphQL, sin auth) — metadata de anime
+- **TMDb** (REST + API key v4) — providers de streaming por país, trailers, descripciones
+- **Jikan** (REST) — fallback disponible vía Tsunagi
+
+> Acceso encapsulado en **Tsunagi**; DondeAnime no habla HTTP con estas APIs directamente.
 
 ---
 
@@ -92,7 +134,7 @@ No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con p
 │  │  Caddy   │─▶│  Backend   │─▶│Postgres│   │
 │  │  (SSL)   │  │ Spring 4   │  │   16   │   │
 │  └──────────┘  └─────┬──────┘  └────────┘   │
-│                      │                      │
+│                      │ vía Tsunagi (SDK)    │
 └──────────────────────┼──────────────────────┘
                        │
             ┌──────────┼──────────┐
@@ -117,20 +159,21 @@ DondeAnime/
 ├── docker-compose.prod.yml            ← Stack producción (3 servicios + Caddyfile)
 ├── Caddyfile                          ← Reverse proxy + SSL
 ├── .env.example                       ← Plantilla variables locales
-├── .env.prod.example                  ← Plantilla variables producción
 ├── backend/                           ← Spring Boot 4
-│   ├── pom.xml
+│   ├── pom.xml                        ← Depende de io.github.diegoalegil:tsunagi
 │   ├── src/main/java/com/dondeanime/backend/
-│   │   ├── admin/                     ← Auth + overrides editoriales
+│   │   ├── admin/                     ← Auth 2FA + overrides editoriales
 │   │   ├── alerts/                    ← Email alerts (doble opt-in JWT)
 │   │   ├── affiliate/                 ← Tracking links afiliados
-│   │   ├── anime/                     ← Entidad central + clientes AniList/TMDb
+│   │   ├── anime/                     ← Entidad central + sync + matching (datos vía Tsunagi)
+│   │   ├── config/                    ← Beans de Tsunagi y del title-matcher
 │   │   ├── provider/                  ← Watch providers por país
 │   │   ├── scheduling/                ← Jobs @Scheduled
 │   │   └── sitemap/                   ← Datos para sitemap.xml
 │   └── src/main/resources/
 │       ├── application.properties     ← Config base (dev local)
-│       └── application-prod.properties ← Overrides para prod
+│       ├── application-prod.properties ← Overrides para prod
+│       └── db/migration/              ← Migraciones Flyway
 ├── frontend/                          ← Astro 6 + Tailwind 4
 │   └── src/
 │       ├── pages/                     ← Rutas SSG (anime/[slug], pais/[slug], plataforma/...)
@@ -138,7 +181,7 @@ DondeAnime/
 │       ├── lib/                       ← Helpers (api, countries, platforms, seo)
 │       └── layouts/                   ← BaseLayout
 ├── scripts/                           ← Validación de APIs y utilidades
-└── docs/                              ← Brief, arquitectura, APIs, roadmap original
+└── docs/                              ← Brief, arquitectura, APIs, assets
 ```
 
 ---
@@ -185,17 +228,17 @@ curl -X POST http://localhost:8080/api/anime/sync-providers
 curl -X POST http://localhost:8080/api/anime/sync-trailers
 ```
 
-Tarda unos 4 minutos en total. Al terminar tienes 100 anime con providers reales y trailers cuando TMDb los expone.
+Tarda unos minutos. Al terminar tienes el catálogo con providers reales y trailers cuando TMDb los expone.
 
 ### Tests
 
 > **Requiere Docker en marcha.** Los tests de integración usan Testcontainers,
-> que arranca un Postgres efímero. Sin el daemon de Docker, esos tests fallan
-> (el contexto tarda ~60s en dar timeout). En CI ya hay Docker disponible.
+> que arranca un Postgres efímero. Sin el daemon de Docker, esos tests fallan.
+> En CI ya hay Docker disponible.
 
 ```bash
 cd backend
-./mvnw test
+./mvnw verify
 ```
 
 ---
@@ -214,7 +257,7 @@ cd backend
 | GET | `/api/sitemap` | Todos los slugs/ids para generar sitemap.xml |
 | POST | `/api/track/affiliate` | Tracking público de clicks afiliados |
 | POST | `/api/admin/anime/{slug}/override` | (Auth) Override editorial de un campo |
-| GET | `/api/admin/dashboard` | (Auth) Métricas de monetización y analítica |
+| GET | `/api/admin/anime/matching/dry-run` | (Auth) Dry-run del title-matcher sobre el catálogo |
 
 Lista completa en los controladores REST de `backend/src/main/java/com/dondeanime/backend/`.
 
@@ -244,24 +287,23 @@ curl -X POST https://api.dondeanime.com/api/anime/sync
 
 | Fase | Estado |
 |---|---|
-| Backend funcional + catálogo 100 anime | Completado |
-| Frontend SEO 720 páginas | Completado |
-| Deploy producción + SSL + scheduler | Completado |
-| Sprint 1 — Panel admin + overrides editoriales | Mergeado |
-| Sprint 2 — Alertas email con doble opt-in (Resend) | Mergeado |
-| Sprint 3 — Monetización afiliados + Plausible + AdSense slot | Mergeado |
-| Sprint 4 — CI + Playwright + backups + ops Cloudflare | En curso |
-| Sprint 5-12 — Testing, observabilidad, PWA, búsqueda fulltext | Mergeado |
-
-Backlog futuro cubre: testing al 70%+ coverage con Testcontainers, migración a Flyway, observabilidad con Prometheus, PWA + Core Web Vitals, expansión catálogo a 500-2000 anime, búsqueda fulltext con autocomplete, hardening VPS, panel admin con JWT + 2FA, newsletter.
+| Backend funcional + catálogo | Completado |
+| Frontend SEO + deploy producción + SSL + scheduler | Completado |
+| Panel admin + overrides editoriales | Mergeado |
+| Alertas email con doble opt-in (Resend) | Mergeado |
+| Monetización afiliados + AdSense | Mergeado |
+| Búsqueda fulltext · API v1 · Premium · push · listas | Mergeado |
+| Migración de la capa de datos a Tsunagi (SDK propio) | Mergeado |
+| Tsunagi 1.2.0 + cruce AniList↔TMDb con title-matcher | Mergeado |
+| News Engine (noticias frescas para Top Stories) | En curso |
 
 ---
 
 ## Filosofía del proyecto
 
-1. **Velocidad sobre completitud.** Mejor 500 anime bien presentados y al día que 30000 con datos rancios.
+1. **Velocidad sobre completitud.** Mejor un catálogo bien presentado y al día que decenas de miles con datos rancios.
 2. **SEO-first.** Cada decisión técnica considera el impacto en posicionamiento orgánico.
-3. **Datos verificados en el top.** El top 50 se enriquece con texto editorial propio. El resto se queda automático.
+3. **Datos verificados en el top.** El top se enriquece con texto editorial propio. El resto se queda automático.
 4. **Sin humo.** Sin cookies superfluas, sin newsletters spam, sin pop-ups, sin oscurecer la pantalla con ads.
 5. **Honestidad de afiliados.** Footer + `/legal/afiliados` declaran la relación. Sin trampas.
 
@@ -269,7 +311,9 @@ Backlog futuro cubre: testing al 70%+ coverage con Testcontainers, migración a 
 
 ## Licencia
 
-Repositorio privado. Todos los derechos reservados.
+Código público en GitHub. Todos los derechos reservados — no es open source.
+
+(La capa de datos sí es libre: [Tsunagi](https://github.com/diegoalegil/tsunagi) está publicada bajo MIT en Maven Central.)
 
 ---
 
@@ -277,4 +321,4 @@ Repositorio privado. Todos los derechos reservados.
 
 [@diegoalegil](https://github.com/diegoalegil) — Estudiante DAM, España.
 
-Proyecto diseñado y desarrollado por Diego Gil. Decisiones técnicas, modelo de datos, estrategia SEO y monetización propias.
+Proyecto diseñado y desarrollado por Diego Gil: arquitectura, modelo de datos, estrategia SEO, monetización y el SDK de datos ([Tsunagi](https://github.com/diegoalegil/tsunagi)) propios.
