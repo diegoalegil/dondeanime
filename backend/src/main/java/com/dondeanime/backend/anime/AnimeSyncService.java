@@ -2,8 +2,12 @@ package com.dondeanime.backend.anime;
 
 import java.text.Normalizer;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -184,9 +188,16 @@ public class AnimeSyncService {
             return new HashSet<>();
         }
 
-        Set<Studio> studios = new HashSet<>();
+        // AniList puede listar el MISMO studio dos veces en nodes() (verificado:
+        // anilistId 235 'Detective Conan' repite "TMS Entertainment" id 73).
+        // Deduplicamos por el id de AniList del studio antes de construir el Set;
+        // de lo contrario se intentaba insertar dos veces la fila
+        // (anime_id, studio_id) → violación de uk_anime_studio → rollback del anime.
+        // (Studio no tiene equals/hashCode, así que el Set por sí solo no dedup.)
+        Map<Long, Studio> byAnilistId = new LinkedHashMap<>();
         for (AniListStudio node : connection.nodes()) {
-            if (node == null || node.id() == null || isBlank(node.name())) {
+            if (node == null || node.id() == null || isBlank(node.name())
+                    || byAnilistId.containsKey(node.id())) {
                 continue;
             }
 
@@ -196,9 +207,9 @@ public class AnimeSyncService {
             studio.setName(node.name());
             studio.setSlug(buildStudioSlug(node));
             studio.setAnimationStudio(Boolean.TRUE.equals(node.isAnimationStudio()));
-            studios.add(studioRepository.save(studio));
+            byAnilistId.put(node.id(), studioRepository.save(studio));
         }
-        return studios;
+        return new LinkedHashSet<>(byAnilistId.values());
     }
 
     private String buildStudioSlug(AniListStudio studio) {
@@ -219,11 +230,23 @@ public class AnimeSyncService {
             return List.of();
         }
 
-        return connection.edges().stream()
-                .limit(6)
-                .map(this::mapCharacterRole)
-                .flatMap(Optional::stream)
-                .toList();
+        // Mismo motivo que en mapStudios: AniList puede repetir un personaje en
+        // edges(); crear dos AnimeCharacterRole con el mismo character_id violaría
+        // uk_anime_character_role. Deduplicamos por el id de AniList del personaje
+        // y tomamos los 6 primeros DISTINTOS.
+        Set<Long> seen = new HashSet<>();
+        List<AnimeCharacterRole> roles = new ArrayList<>();
+        for (AniListCharacterEdge edge : connection.edges()) {
+            if (roles.size() >= 6) {
+                break;
+            }
+            if (edge == null || edge.node() == null || edge.node().id() == null
+                    || !seen.add(edge.node().id())) {
+                continue;
+            }
+            mapCharacterRole(edge).ifPresent(roles::add);
+        }
+        return roles;
     }
 
     private Optional<AnimeCharacterRole> mapCharacterRole(AniListCharacterEdge edge) {
