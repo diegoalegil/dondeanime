@@ -95,4 +95,14 @@ public class AnimeAdminController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    /**
+     * Dry-run del matcher sobre todo el catálogo: compara el tmdbId propuesto
+     * con el actual sin guardar nada. Operación larga (una búsqueda TMDb por
+     * anime); el resumen también queda en logs.
+     */
+    @GetMapping("/matching/dry-run")
+    public ResponseEntity<AnimeMatchingService.DryRunReport> dryRunMatching() {
+        return ResponseEntity.ok(matchingService.dryRunMatchAll());
+    }
 }

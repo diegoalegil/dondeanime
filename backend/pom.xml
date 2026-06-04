@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>io.github.diegoalegil</groupId>
 			<artifactId>tsunagi</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.0</version>
 			<exclusions>
 				<!-- jackson-annotations es compartido; deja que el BOM de Boot 4 imponga la 2.x -->
 				<exclusion>
@@ -107,6 +107,13 @@
 					<artifactId>jackson-annotations</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<!-- AniList <-> TMDb fuzzy title matcher (zero transitive dependencies). -->
+		<dependency>
+			<groupId>com.github.diegoalegil</groupId>
+			<artifactId>anime-title-matcher</artifactId>
+			<version>v0.1.0</version>
 		</dependency>
 
 		<dependency>
@@ -182,6 +189,14 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<!-- Resolves com.github.diegoalegil:anime-title-matcher from GitHub via JitPack. -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>

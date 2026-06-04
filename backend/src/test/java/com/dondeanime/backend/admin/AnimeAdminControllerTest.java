@@ -153,6 +153,25 @@ class AnimeAdminControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void dryRunMatchingReturnsReport() throws Exception {
+        when(matchingService.dryRunMatchAll()).thenReturn(new AnimeMatchingService.DryRunReport(
+                929, 120, 809, 95, 25, 540, List.of()));
+
+        mvc.perform(get("/api/admin/anime/matching/dry-run")
+                        .header("Authorization", bearerToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(929))
+                .andExpect(jsonPath("$.changed").value(120))
+                .andExpect(jsonPath("$.matcherWins").value(540));
+    }
+
+    @Test
+    void dryRunMatchingRequiresBearerToken() throws Exception {
+        mvc.perform(get("/api/admin/anime/matching/dry-run"))
+                .andExpect(status().isUnauthorized());
+    }
+
     private static Anime anime() {
         Anime anime = new Anime();
         anime.setId(1L);
