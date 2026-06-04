@@ -41,7 +41,7 @@ const {
   ariaHidden = false,
 } = Astro.props;
 
-const canUseVercelOptimizer = canOptimizeAnimeImage(src);
+const canUseSrcset = canOptimizeAnimeImage(src);
 const normalizedWidths = normalizeImageWidths(widths);
 const fallbackWidth = normalizedWidths[Math.min(1, normalizedWidths.length - 1)] ?? width ?? 320;
 const imageAlt = ariaHidden ? '' : alt;
@@ -49,16 +49,10 @@ const optimizedSrc = buildAnimeImageUrl(src, fallbackWidth, quality);
 const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
 ---
 <picture class={className} aria-hidden={ariaHidden ? 'true' : undefined}>
-  {canUseVercelOptimizer && (
-    <>
-      <source type="image/avif" srcset={optimizedSrcset} sizes={sizes} />
-      <source type="image/webp" srcset={optimizedSrcset} sizes={sizes} />
-    </>
-  )}
   <img
     src={optimizedSrc}
     srcset={optimizedSrcset}
-    sizes={canUseVercelOptimizer ? sizes : undefined}
+    sizes={canUseSrcset ? sizes : undefined}
     alt={imageAlt}
     width={width}
     height={height}
