@@ -104,6 +104,7 @@ public class AnimeSyncService {
         if (title != null) {
             anime.setTitleRomaji(title.romaji());
             anime.setTitleEnglish(title.english());
+            anime.setTitleNative(title.nativeTitle());
         }
 
         anime.setSlug(buildSlug(media));
@@ -146,6 +147,8 @@ public class AnimeSyncService {
         } else {
             anime.setGenres(new HashSet<>());
         }
+
+        anime.setSynonyms(mapSynonyms(media.synonyms()));
 
         anime.setStudios(mapStudios(media.studios()));
 
@@ -306,5 +309,19 @@ public class AnimeSyncService {
                 .filter(name -> !isBlank(name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /** Filtra synonyms nulos/vacíos y los que exceden el límite de la columna. */
+    private static Set<String> mapSynonyms(List<String> synonyms) {
+        if (synonyms == null) {
+            return new HashSet<>();
+        }
+        Set<String> result = new HashSet<>();
+        for (String synonym : synonyms) {
+            if (synonym != null && !synonym.isBlank() && synonym.length() <= 255) {
+                result.add(synonym);
+            }
+        }
+        return result;
     }
 }

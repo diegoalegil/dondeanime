@@ -38,6 +38,21 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             """)
     List<Anime> findAllWithGenres();
 
+    /**
+     * Carga todos los anime con sus synonyms inicializados. Necesario para el
+     * matching, que corre desde el scheduler (sin Open Session In View) y
+     * accede a la colección LAZY.
+     */
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.synonyms
+            """)
+    List<Anime> findAllWithSynonyms();
+
+    @EntityGraph(attributePaths = "synonyms")
+    @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
+    Optional<Anime> findBySlugWithSynonyms(String slug);
+
     @EntityGraph(attributePaths = "tags")
     @Query("SELECT a FROM Anime a WHERE a.id = :id")
     Optional<Anime> findByIdWithTags(@Param("id") Long id);

@@ -193,7 +193,7 @@ class AnimeSyncServiceTest {
             List<AniListTag> tags) {
         return new AniListMedia(
                 16498L,
-                new AniListTitle("Shingeki no Kyojin", "Attack on Titan"),
+                new AniListTitle("Shingeki no Kyojin", "Attack on Titan", "進撃の巨人"),
                 new AniListFuzzyDate(2013, 4, 7),
                 null,
                 25,
@@ -206,6 +206,7 @@ class AnimeSyncServiceTest {
                 new AniListCoverImage("https://example.com/cover.jpg"),
                 null,
                 List.of("Action"),
+                List.of("AoT", "Ataque a los Titanes"),
                 new AniListStudioConnection(studios),
                 "SPRING",
                 2013,
