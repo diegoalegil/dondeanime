@@ -32,7 +32,7 @@ No es un wiki ni un foro. Es un buscador rápido orientado a SEO long-tail con p
 
 <div align="center">
 
-![Tsunagi — Anime Data SDK for Java](docs/img/tsunagi-banner.png)
+![Tsunagi — Anime Data SDK for Java](docs/img/tsunagi-banner.webp)
 
 </div>
 
