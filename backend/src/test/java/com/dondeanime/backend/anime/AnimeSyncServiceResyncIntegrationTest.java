@@ -82,6 +82,54 @@ class AnimeSyncServiceResyncIntegrationTest extends AbstractIntegrationTest {
                 .contains("AoT", "Ataque a los Titanes");
     }
 
+    @Test
+    void syncingAnimeWithDuplicateStudioAndCharacterDoesNotViolateJoinConstraints() {
+        when(aniListClient.fetchPopular(1)).thenReturn(List.of(mediaWithDuplicates()));
+
+        int synced = service.syncPopular(1);
+
+        // Antes petaba con duplicate key (uk_anime_studio / uk_anime_character_role)
+        // y devolvía 0: AniList repite el mismo studio/personaje en sus listas.
+        assertThat(synced).isEqualTo(1);
+
+        Anime anime = animeRepository.findBySlugWithCharacters("attack-on-titan").orElseThrow();
+        assertThat(anime.getStudios())
+                .extracting(Studio::getName)
+                .containsExactly("WIT Studio");
+        assertThat(anime.getCharacterRoles())
+                .extracting(role -> role.getCharacter().getName())
+                .containsExactlyInAnyOrder("Eren Yeager", "Mikasa Ackerman");
+    }
+
+    /** Misma media que {@link #media()} pero con un studio y un personaje repetidos. */
+    private static AniListMedia mediaWithDuplicates() {
+        AniListStudio wit = new AniListStudio(858L, "WIT Studio", true);
+        return new AniListMedia(
+                16498L,
+                new AniListTitle("Shingeki no Kyojin", "Attack on Titan", "進撃の巨人"),
+                new AniListFuzzyDate(2013, 4, 7),
+                null,
+                25,
+                24,
+                "TV",
+                "FINISHED",
+                85,
+                500000,
+                "Descripcion",
+                new AniListCoverImage("https://example.com/cover.jpg"),
+                null,
+                List.of("Action"),
+                List.of("AoT", "Ataque a los Titanes"),
+                new AniListStudioConnection(List.of(wit, wit)),
+                "SPRING",
+                2013,
+                new AniListCharacterConnection(List.of(
+                        edge(40882L, "Eren Yeager"),
+                        edge(40882L, "Eren Yeager"),
+                        edge(40881L, "Mikasa Ackerman"))),
+                List.of(new AniListTag("Time Travel", 94)));
+    }
+
     private static AniListMedia media() {
         return new AniListMedia(
                 16498L,
