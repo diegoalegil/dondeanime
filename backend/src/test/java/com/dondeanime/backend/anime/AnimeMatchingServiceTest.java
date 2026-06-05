@@ -179,6 +179,30 @@ class AnimeMatchingServiceTest {
     }
 
     @Test
+    void fallbackForMovieFormatPicksMovieNotSeries() {
+        // Título de relleno => el matcher NO confía => entra el respaldo. Antes,
+        // el respaldo solo miraba series, así que esta película habría caído a la
+        // serie (id 1). Con el fix, para formato MOVIE el respaldo mira películas.
+        Anime movie = anime(1L, "Some Film", 2020);
+        movie.setFormat("MOVIE");
+
+        TmdbSearchResult fillerSeries = result(1L, "JP", "2020-01-01", 100.0); // tv, ja, más popular
+        TmdbSearchResult fillerMovie = movieFiller(2L, "2020-01-01", 5.0); // movie, ja, menos popular
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(movie));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(
+                new TmdbSearchResponse(1, List.of(fillerSeries, fillerMovie), 2, 1));
+
+        service(client, repo).matchAll();
+
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture());
+        assertThat(captor.getValue().getTmdbId()).isEqualTo(2L);
+    }
+
+    @Test
     void matcherMatchesThroughASynonym() {
         Anime anime = new Anime();
         anime.setId(1L);
@@ -322,5 +346,12 @@ class AnimeMatchingServiceTest {
         return new TmdbSearchResult(id, null, null, "overview",
                 null, null, null, popularity,
                 title, title, releaseDate, "movie", "ja");
+    }
+
+    /** Resultado de película con título de relleno ("Name N") => no matchea. */
+    private static TmdbSearchResult movieFiller(long id, String releaseDate, double popularity) {
+        return new TmdbSearchResult(id, null, null, "overview",
+                null, null, null, popularity,
+                "Name " + id, "Orig " + id, releaseDate, "movie", "ja");
     }
 }

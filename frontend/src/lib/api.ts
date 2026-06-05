@@ -203,6 +203,25 @@ async function fetchJsonAllowing404<T>(path: string, fallback: () => Promise<T> 
   return res.json() as Promise<T>;
 }
 
+/**
+ * Como fetchJson pero NUNCA lanza: ante cualquier fallo (5xx, timeout, red,
+ * 404) devuelve el fallback. Para datos NO críticos cuya ausencia no debe
+ * tumbar el build estático (p.ej. noticias, decoración de la ficha). Un hipo
+ * transitorio de la API —incluido un 502 mientras el backend reinicia— no
+ * puede abortar la generación de 13k páginas.
+ */
+async function fetchJsonSafe<T>(path: string, fallback: T): Promise<T> {
+  try {
+    const res = await fetchWithRetry(path);
+    if (!res.ok) {
+      return fallback;
+    }
+    return (await res.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export const getAllAnime = () => fetchJson<AnimeSummary[]>('/api/anime');
 
 export const getUpcomingAnime = async (days: number) => {
@@ -357,13 +376,15 @@ export interface NewsDetail {
   publishedAt: string;
 }
 
-// La API devuelve vacío/404 mientras no haya noticias PUBLISHED (la ingesta
-// crea DRAFTs; pasan a PUBLISHED vía LLM/admin). Las páginas degradan a vacío.
+// Noticias = contenido NO crítico (la ficha y la home las muestran como
+// decoración; el índice degrada a vacío). Usamos fetchJsonSafe para que NINGÚN
+// fallo de la API —vacío, 404, 5xx, timeout, o un 502 mientras el backend
+// reinicia— pueda tumbar el build estático de 13k páginas.
 export const getNews = (limit = 30) =>
-  fetchJsonAllowing404<NewsSummary[]>(`/api/news?limit=${limit}`, () => []);
+  fetchJsonSafe<NewsSummary[]>(`/api/news?limit=${limit}`, []);
 
 export const getNewsBySlug = (slug: string) =>
-  fetchJsonAllowing404<NewsDetail | null>(`/api/news/${slug}`, () => null);
+  fetchJsonSafe<NewsDetail | null>(`/api/news/${slug}`, null);
 
 export const getAnimeNews = (slug: string) =>
-  fetchJsonAllowing404<NewsSummary[]>(`/api/news/anime/${slug}`, () => []);
+  fetchJsonSafe<NewsSummary[]>(`/api/news/anime/${slug}`, []);
