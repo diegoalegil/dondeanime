@@ -29,7 +29,10 @@ export default defineConfig({
     command: `npm run build && npm run preview -- --host 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI && !process.env.PUBLIC_API_URL && !process.env.PUBLIC_DATA_API_URL,
-    timeout: 600_000,
+    // El webServer hace su propio `npm run build` (12k+ páginas) antes de servir.
+    // Con el catálogo creciendo (~1000 anime) el build ronda los 10 min, así que
+    // damos margen para no abortar el arranque del server de e2e.
+    timeout: 1_200_000,
     env: {
       ...process.env,
       PUBLIC_API_URL: publicApiUrl,
