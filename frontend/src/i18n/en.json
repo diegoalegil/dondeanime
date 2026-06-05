@@ -330,5 +330,20 @@
   "admin.editor.save": "Save",
   "admin.editor.reset": "Reset to original",
   "admin.editor.beginnerRecommendationField": "Beginner recommendation",
-  "admin.editor.beginnerRecommendationHelper": "Visible on /empezar/ pages"
+  "admin.editor.beginnerRecommendationHelper": "Visible on /empezar/ pages",
+  "breadcrumbs.news": "News",
+  "news.index.title": "Anime news | DondeAnime",
+  "news.index.description": "Latest anime news: premieres, announcements and updates.",
+  "news.index.heading": "Latest anime news",
+  "news.index.empty": "No news published yet. Check back soon.",
+  "news.detail.title": "{title} | DondeAnime News",
+  "news.detail.source": "Source",
+  "news.detail.readOriginal": "Read the original story",
+  "news.latest.title": "Latest news",
+  "news.latest.viewAll": "View all",
+  "news.anime.title": "{title} news",
+  "news.anime.heading": "Related news",
+  "news.card.readMore": "Read more",
+  "news.rss.title": "DondeAnime — News",
+  "news.rss.description": "Latest anime news."
 }

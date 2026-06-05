@@ -8,7 +8,8 @@ import AdSlot from '@/components/ads/AdSlot.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import AlternateLangs from '@/components/seo/AlternateLangs.astro';
-import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import NewsLatest from '@/components/news/NewsLatest.astro';
+import { getAllAnime, getAnimeBySlug, getAnimeNews } from '@/lib/api';
 import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
@@ -22,6 +23,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const detail = await getAnimeBySlug(slug!);
+const animeNews = await getAnimeNews(slug!);
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
 
 const allProviders = Object.values(detail.watchProvidersByCountry).flat();
@@ -66,4 +68,6 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
     translationPending={detail.anime.descriptionTranslationPending}
   />
   <MetaList anime={detail.anime} />
+
+  <NewsLatest items={animeNews} heading={t('news.anime.heading')} />
 </BaseLayout>

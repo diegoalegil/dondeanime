@@ -69,6 +69,8 @@ export const spanishPathFromLocalized = (path: string): string => {
 
   if (section === 'blog') return first ? `/blog/${first}` : '/blog';
 
+  if (section === 'news') return first ? `/noticias/${first}` : '/noticias';
+
   if (section === 'legal') {
     if (first === 'privacy') return '/legal/privacidad';
     if (first === 'affiliates') return '/legal/afiliados';
@@ -117,6 +119,8 @@ const localizedEnPath = (spanishPath: string): string | null => {
   }
 
   if (section === 'blog') return first ? `/en/blog/${first}` : '/en/blog';
+
+  if (section === 'noticias') return first ? `/en/news/${first}` : '/en/news';
 
   if (section === 'legal') {
     if (first === 'privacidad') return '/en/legal/privacy';

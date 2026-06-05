@@ -30,4 +30,9 @@ public class NewsController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/anime/{slug}")
+    public List<NewsSummaryDto> byAnimeSlug(@PathVariable String slug) {
+        return newsService.publishedForAnimeSlug(slug);
+    }
 }

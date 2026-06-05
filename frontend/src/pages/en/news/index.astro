@@ -1,0 +1,46 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import NewsList from '@/components/news/NewsList.astro';
+import { getNews } from '@/lib/api';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('en');
+
+const news = await getNews(50);
+const pageUrl = absoluteUrl('/noticias');
+const rssHref = `${import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '')}/en/news/rss.xml`;
+const itemList = buildItemListSchema(
+  news.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  pageUrl,
+  t('news.index.heading'),
+);
+---
+<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={t('news.rss.title')} href={rssHref} />
+  {news.length > 0 && <JsonLd slot="head" data={itemList} />}
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.news'), url: '/noticias' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-20">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{t('news.index.heading')}</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">{t('news.index.description')}</p>
+
+    <div class="mt-10">
+      {news.length === 0 ? (
+        <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+          {t('news.index.empty')}
+        </p>
+      ) : (
+        <NewsList items={news} />
+      )}
+    </div>
+  </section>
+</BaseLayout>

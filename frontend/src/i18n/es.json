@@ -330,5 +330,20 @@
   "admin.editor.save": "Guardar",
   "admin.editor.reset": "Resetear al original",
   "admin.editor.beginnerRecommendationField": "Recomendacion para principiantes",
-  "admin.editor.beginnerRecommendationHelper": "Visible en las paginas /empezar/"
+  "admin.editor.beginnerRecommendationHelper": "Visible en las paginas /empezar/",
+  "breadcrumbs.news": "Noticias",
+  "news.index.title": "Noticias de anime | DondeAnime",
+  "news.index.description": "Últimas noticias del mundo del anime: estrenos, anuncios y novedades en español.",
+  "news.index.heading": "Últimas noticias de anime",
+  "news.index.empty": "Todavía no hay noticias publicadas. Vuelve pronto.",
+  "news.detail.title": "{title} | Noticias DondeAnime",
+  "news.detail.source": "Fuente",
+  "news.detail.readOriginal": "Leer la noticia original",
+  "news.latest.title": "Últimas noticias",
+  "news.latest.viewAll": "Ver todas",
+  "news.anime.title": "Noticias de {title}",
+  "news.anime.heading": "Noticias relacionadas",
+  "news.card.readMore": "Leer más",
+  "news.rss.title": "DondeAnime — Noticias",
+  "news.rss.description": "Últimas noticias de anime en español."
 }

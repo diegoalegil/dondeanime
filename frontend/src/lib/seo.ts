@@ -1,5 +1,5 @@
-import { t } from '@/i18n';
-import type { AnimeDetail, AnimeSummary, WatchProvider } from './api';
+import { getLocale, t } from '@/i18n';
+import type { AnimeDetail, AnimeSummary, NewsDetail, WatchProvider } from './api';
 import { localizedPath } from './localizedRoutes';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL;
@@ -117,6 +117,33 @@ export const buildAnimeReviewSchema = (
     },
   };
 };
+
+export const buildNewsArticleSchema = (news: NewsDetail, pageUrl: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: news.title,
+  description: news.summary ?? undefined,
+  image: news.imageUrl ?? undefined,
+  datePublished: news.publishedAt,
+  dateModified: news.publishedAt,
+  inLanguage: getLocale(),
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': pageUrl,
+  },
+  author: {
+    '@type': 'Organization',
+    name: news.sourceName,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: t('brand.name'),
+    logo: {
+      '@type': 'ImageObject',
+      url: absoluteUrl('/og-default.png'),
+    },
+  },
+});
 
 export const buildBreadcrumbSchema = (items: BreadcrumbItem[]) => ({
   '@context': 'https://schema.org',
