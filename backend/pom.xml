@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>io.github.diegoalegil</groupId>
 			<artifactId>tsunagi</artifactId>
-			<version>1.2.0</version>
+			<version>1.3.0</version>
 			<exclusions>
 				<!-- jackson-annotations es compartido; deja que el BOM de Boot 4 imponga la 2.x -->
 				<exclusion>
