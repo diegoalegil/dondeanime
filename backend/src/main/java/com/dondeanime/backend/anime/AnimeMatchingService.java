@@ -186,7 +186,7 @@ public class AnimeMatchingService {
                     MatchSource.MATCHER, match.decision(), match.score());
         }
 
-        Long fallback = fallbackTmdbId(results, anime.getStartYear());
+        Long fallback = fallbackTmdbId(results, anime.getStartYear(), isMovieFormat(anime));
         MatchSource source = fallback == null ? MatchSource.NONE : MatchSource.FALLBACK;
         return new Resolution(fallback, source, match.decision(), match.score());
     }
@@ -238,27 +238,42 @@ public class AnimeMatchingService {
      * estrenado puede superar a la serie original (caso real "My Hero Academia:
      * Vigilantes" 2025 vs "My Hero Academia" 2016).
      */
-    private static Long fallbackTmdbId(List<TmdbSearchResult> results, Integer animeYear) {
-        List<TmdbSearchResult> series = results.stream().filter(TmdbSearchResult::isTv).toList();
-        if (series.isEmpty()) {
+    private static Long fallbackTmdbId(List<TmdbSearchResult> results, Integer animeYear, boolean preferMovie) {
+        // Para anime de formato película el respaldo mira PELÍCULAS; para el
+        // resto, series. Antes solo miraba series, así que una película que el
+        // matcher no confirmaba caía a null o —peor— a una serie de nombre
+        // parecido.
+        List<TmdbSearchResult> pool = results.stream()
+                .filter(preferMovie ? TmdbSearchResult::isMovie : TmdbSearchResult::isTv)
+                .toList();
+        if (pool.isEmpty()) {
             return null;
         }
         Comparator<TmdbSearchResult> byPopDesc = Comparator.comparingDouble(
                 r -> Optional.ofNullable(r.popularity()).orElse(0.0));
 
-        return series.stream()
-                .filter(AnimeMatchingService::isJapanese)
+        return pool.stream()
+                .filter(r -> isJapanese(r, preferMovie))
                 .filter(r -> yearMatches(r, animeYear))
                 .max(byPopDesc)
-                .or(() -> series.stream()
-                        .filter(AnimeMatchingService::isJapanese)
+                .or(() -> pool.stream()
+                        .filter(r -> isJapanese(r, preferMovie))
                         .max(byPopDesc))
-                .or(() -> series.stream().max(byPopDesc))
+                .or(() -> pool.stream().max(byPopDesc))
                 .map(TmdbSearchResult::id)
                 .orElse(null);
     }
 
-    private static boolean isJapanese(TmdbSearchResult r) {
+    private static boolean isMovieFormat(Anime anime) {
+        return "MOVIE".equalsIgnoreCase(anime.getFormat());
+    }
+
+    private static boolean isJapanese(TmdbSearchResult r, boolean isMovie) {
+        // Las películas de TMDb no traen origin_country (es un campo de TV); para
+        // ellas el idioma original es la señal de origen japonés.
+        if (isMovie) {
+            return "ja".equalsIgnoreCase(r.originalLanguage());
+        }
         return r.originCountry() != null && r.originCountry().contains("JP");
     }
 
