@@ -332,3 +332,38 @@ export const getBestAnimeByStudio = async (slug: string) => {
       .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
   });
 };
+
+export interface NewsSummary {
+  slug: string;
+  title: string;
+  summary: string | null;
+  imageUrl: string | null;
+  sourceName: string;
+  animeId: number | null;
+  publishedAt: string;
+}
+
+export interface NewsDetail {
+  slug: string;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  imageUrl: string | null;
+  sourceName: string;
+  sourceUrl: string;
+  animeId: number | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  publishedAt: string;
+}
+
+// La API devuelve vacío/404 mientras no haya noticias PUBLISHED (la ingesta
+// crea DRAFTs; pasan a PUBLISHED vía LLM/admin). Las páginas degradan a vacío.
+export const getNews = (limit = 30) =>
+  fetchJsonAllowing404<NewsSummary[]>(`/api/news?limit=${limit}`, () => []);
+
+export const getNewsBySlug = (slug: string) =>
+  fetchJsonAllowing404<NewsDetail | null>(`/api/news/${slug}`, () => null);
+
+export const getAnimeNews = (slug: string) =>
+  fetchJsonAllowing404<NewsSummary[]>(`/api/news/anime/${slug}`, () => []);

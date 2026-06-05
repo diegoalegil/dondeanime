@@ -7,15 +7,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dondeanime.backend.anime.AnimeRepository;
+
 @Service
 public class NewsService {
 
     private static final int MAX_LIMIT = 100;
 
     private final NewsItemRepository newsItemRepository;
+    private final AnimeRepository animeRepository;
 
-    public NewsService(NewsItemRepository newsItemRepository) {
+    public NewsService(NewsItemRepository newsItemRepository, AnimeRepository animeRepository) {
         this.newsItemRepository = newsItemRepository;
+        this.animeRepository = animeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -40,5 +44,19 @@ public class NewsService {
                 .stream()
                 .map(NewsSummaryDto::from)
                 .toList();
+    }
+
+    /**
+     * Noticias PUBLISHED de un anime identificado por su slug público. El
+     * frontend solo conoce slug/anilistId (no el id interno que referencia
+     * {@code news_item.anime_id}), así que resolvemos slug → id aquí. Si el
+     * slug no existe devolvemos lista vacía (no 404: la ficha simplemente no
+     * muestra la sección de noticias).
+     */
+    @Transactional(readOnly = true)
+    public List<NewsSummaryDto> publishedForAnimeSlug(String slug) {
+        return animeRepository.findBySlug(slug)
+                .map(anime -> publishedForAnime(anime.getId()))
+                .orElseGet(List::of);
     }
 }

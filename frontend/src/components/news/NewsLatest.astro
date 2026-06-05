@@ -1,0 +1,23 @@
+---
+import type { NewsSummary } from '@/lib/api';
+import NewsList from './NewsList.astro';
+import { localizedPath } from '@/lib/localizedRoutes';
+import { t } from '@/i18n';
+
+interface Props {
+  items: NewsSummary[];
+  heading?: string;
+}
+
+const { items, heading } = Astro.props;
+const viewAll = localizedPath('/noticias');
+---
+{items.length > 0 && (
+  <section class="mx-auto max-w-6xl px-4 pb-12">
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="text-2xl font-semibold">{heading ?? t('news.latest.title')}</h2>
+      <a href={viewAll} class="text-sm text-accent-violet hover:underline">{t('news.latest.viewAll')} →</a>
+    </div>
+    <NewsList items={items} />
+  </section>
+)}

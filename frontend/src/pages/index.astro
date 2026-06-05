@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
+import NewsLatest from '@/components/news/NewsLatest.astro';
 import AnimeChatSearch from '@/components/chat/AnimeChatSearch.astro';
 import NewsletterForm from '@/components/newsletter/NewsletterForm.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
 import WatchedFilter from '@/components/trakt/WatchedFilter.astro';
-import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason } from '@/lib/api';
+import { getAllAnime, getGenres, getSeasons, getAnimeByGenre, getAnimeBySeason, getNews } from '@/lib/api';
 import { getHomeFaqs, buildFAQPageSchema, buildWebSiteSchema, buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { formatSeason } from '@/lib/format';
 import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
@@ -22,6 +23,8 @@ import {
 } from '@/lib/images';
 
 setLocale('es');
+
+const latestNews = await getNews(6);
 
 const SEASON_ORDER: Record<string, number> = { WINTER: 0, SPRING: 1, SUMMER: 2, FALL: 3 };
 
@@ -117,6 +120,8 @@ const itemListSchema = buildItemListSchema(
     </div>
     <AnimeGrid anime={trending} />
   </section>
+
+  <NewsLatest items={latestNews} />
 
   {homeSeason && homeSeasonAnime.length > 0 && (
     <section class="mx-auto max-w-6xl px-4 pb-12">
