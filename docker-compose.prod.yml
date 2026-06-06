@@ -73,6 +73,10 @@ services:
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
       # Activamos el scheduler en producción (en local está OFF).
       SCHEDULING_ENABLED: "true"
+      # News Engine: ingesta RSS (ANN + Crunchyroll -> DRAFT) cada 6h.
+      # OFF por defecto; pon NEWS_INGESTION_ENABLED=true en .env.prod
+      # para encenderla. El scheduler debe estar activo (arriba).
+      NEWS_INGESTION_ENABLED: ${NEWS_INGESTION_ENABLED:-false}
       # --- Admin (Sprint 1) ---
       # Usuario único del panel admin. La contraseña vive en .env.prod.
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}

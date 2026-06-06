@@ -1,14 +1,9 @@
 package com.dondeanime.backend.news;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -16,24 +11,29 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.util.HtmlUtils;
 
-import com.rometools.rome.feed.synd.SyndContent;
-import com.rometools.rome.feed.synd.SyndEnclosure;
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
+import io.github.diegoalegil.animefeed.FeedFetchException;
+import io.github.diegoalegil.animefeed.FeedParseException;
+import io.github.diegoalegil.animefeed.http.FeedClient;
+import io.github.diegoalegil.animefeed.http.FeedHttpConfig;
+import io.github.diegoalegil.animefeed.model.FeedItem;
+import io.github.diegoalegil.animefeed.parse.FeedParserDispatcher;
 
 /**
- * Descarga y parsea feeds RSS/Atom con ROME.
+ * Descarga y parsea feeds RSS/Atom usando la librería {@code anime-feed-parser}
+ * (parseo RSS 2.0/Atom + XML seguro anti-XXE + fetch HTTP que sigue redirects).
+ *
+ * El parseo y la descarga los hace la librería; aquí queda la lógica propia de
+ * DondeAnime que la librería no cubre: limpiar el cuerpo a texto plano para el
+ * excerpt, extraer la imagen del HTML del cuerpo (saltando píxeles de tracking)
+ * cuando el feed no la trae estructurada, y absolutizar enlaces relativos de
+ * Atom contra la URL del feed.
  *
  * Resiliente a propósito: ante un error de red o un XML malformado registra un
  * WARN y devuelve lista vacía, para que el fallo de una fuente no tumbe toda la
- * ingesta. ROME tolera RSS 0.9x/1.0/2.0 y Atom, así que no asumimos formato.
+ * ingesta.
  */
 @Component
 public class RssNewsFetcher {
@@ -43,59 +43,31 @@ public class RssNewsFetcher {
     /** Recorte defensivo del texto original; el LLM resume después. */
     private static final int MAX_EXCERPT_LENGTH = 2000;
 
-    /** Tope del cuerpo en memoria: corta feeds gigantes o redirects hostiles. */
-    private static final int MAX_FEED_BYTES = 10 * 1024 * 1024;
+    /** Tope del cuerpo: corta feeds gigantes o redirects hostiles. */
+    private static final long MAX_FEED_BYTES = 10L * 1024 * 1024;
 
-    private final RestClient restClient;
+    private final FeedClient feedClient;
+    private final FeedParserDispatcher dispatcher;
 
-    public RssNewsFetcher(RestClient.Builder builder) {
-        // Cliente propio que SÍ sigue redirecciones: varios feeds (p.ej. ANN)
-        // hacen 301 a una URL con parámetros de edición, y feedburner redirige
-        // al origen. El cliente compartido usa Redirect.NEVER.
-        HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build();
-        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
-        factory.setReadTimeout(Duration.ofSeconds(30));
-        this.restClient = builder.requestFactory(factory).build();
+    public RssNewsFetcher() {
+        // La librería ya sigue redirects (ANN/feedburner hacen 301) y acota el
+        // cuerpo en streaming. Subimos el tope a 10MB (default de la lib: 5MB).
+        this.feedClient = new FeedClient(FeedHttpConfig.defaults()
+                .withMaxResponseBytes(MAX_FEED_BYTES)
+                .withRequestTimeout(Duration.ofSeconds(30)));
+        this.dispatcher = new FeedParserDispatcher();
     }
 
     /** Descarga el feed y lo parsea. Lista vacía si algo falla. */
     public List<FetchedNewsItem> fetch(String feedUrl) {
         byte[] xml;
         try {
-            // URI.create evita que DefaultUriBuilderFactory trate la URL como
-            // plantilla (un '{' en el feed reventaría y re-codificaría %xx).
-            // exchange permite acotar el cuerpo en heap en vez de bufferizarlo a ciegas.
-            xml = restClient.get()
-                    .uri(URI.create(feedUrl))
-                    .exchange((request, response) -> {
-                        if (!response.getStatusCode().is2xxSuccessful()) {
-                            log.warn("[news] feed {} respondio {}", feedUrl, response.getStatusCode());
-                            return null;
-                        }
-                        return readCapped(response.getBody());
-                    });
-        } catch (Exception e) {
+            xml = feedClient.fetch(feedUrl);
+        } catch (FeedFetchException e) {
             log.warn("[news] no se pudo descargar feed {}: {}", feedUrl, e.getMessage());
             return List.of();
         }
-        if (xml == null || xml.length == 0) {
-            log.warn("[news] feed {} devolvio cuerpo vacio o excedio el limite", feedUrl);
-            return List.of();
-        }
         return parse(xml, feedUrl);
-    }
-
-    /** Lee como máximo {@code MAX_FEED_BYTES}; si el feed los supera, lo descarta (null). */
-    private byte[] readCapped(InputStream body) throws IOException {
-        byte[] data = body.readNBytes(MAX_FEED_BYTES + 1);
-        if (data.length > MAX_FEED_BYTES) {
-            log.warn("[news] feed excede el limite de {} bytes, descartado", MAX_FEED_BYTES);
-            return null;
-        }
-        return data;
     }
 
     /**
@@ -104,17 +76,16 @@ public class RssNewsFetcher {
      * e imágenes relativas (típico en Atom).
      */
     List<FetchedNewsItem> parse(byte[] xml, String feedUrl) {
-        SyndFeed feed;
-        try (ByteArrayInputStream in = new ByteArrayInputStream(xml)) {
-            // XmlReader detecta el charset desde la declaración XML / cabeceras.
-            feed = new SyndFeedInput().build(new XmlReader(in));
-        } catch (Exception e) {
+        List<FeedItem> feedItems;
+        try {
+            feedItems = dispatcher.parse(xml);
+        } catch (FeedParseException e) {
             log.warn("[news] feed {} no es RSS/Atom valido: {}", feedUrl, e.getMessage());
             return List.of();
         }
 
         List<FetchedNewsItem> items = new ArrayList<>();
-        for (SyndEntry entry : feed.getEntries()) {
+        for (FeedItem entry : feedItems) {
             FetchedNewsItem item = toItem(entry, feedUrl);
             if (item != null) {
                 items.add(item);
@@ -123,19 +94,21 @@ public class RssNewsFetcher {
         return items;
     }
 
-    private FetchedNewsItem toItem(SyndEntry entry, String feedUrl) {
+    private FetchedNewsItem toItem(FeedItem entry, String feedUrl) {
         // Atom puede dar un link relativo (/news/123): lo absolutizamos contra el
         // feed para que valga como source_url (dedup y "ver en origen").
-        String url = absolutize(trimToNull(entry.getLink()), feedUrl);
-        String title = trimToNull(entry.getTitle());
+        String url = absolutize(trimToNull(entry.link()), feedUrl);
+        String title = trimToNull(entry.title());
         // Sin URL no podemos deduplicar ni enlazar a la fuente; sin titulo no hay nada.
         if (url == null || title == null) {
             return null;
         }
-        String excerpt = extractExcerpt(entry);
-        String imageUrl = extractImage(entry, url);
-        Date date = entry.getPublishedDate() != null ? entry.getPublishedDate() : entry.getUpdatedDate();
-        Instant publishedAt = date != null ? date.toInstant() : null;
+        String body = entry.summary();
+        String excerpt = extractExcerpt(body);
+        // La librería ya extrae la imagen estructurada (media:thumbnail/content,
+        // enclosure de imagen); si no la trae, la buscamos en el HTML del cuerpo.
+        String imageUrl = entry.imageUrl() != null ? entry.imageUrl() : extractImageFromBody(body, url);
+        Instant publishedAt = entry.publishedAt() != null ? entry.publishedAt().toInstant() : null;
         return new FetchedNewsItem(title, url, excerpt, imageUrl, publishedAt);
     }
 
@@ -143,12 +116,10 @@ public class RssNewsFetcher {
      * Texto plano del cuerpo. El orden importa: primero des-escapamos entidades
      * HTML (un feed doble-escapado trae {@code &lt;b&gt;} en vez de {@code <b>})
      * y luego Jsoup quita los tags. Jsoup, al ser un parser HTML real, respeta
-     * comparaciones tipo "bajó <5%" (un '<' sin letra detrás no abre tag), cosa
-     * que el viejo regex se comía.
+     * comparaciones tipo "bajó <5%" (un '<' sin letra detrás no abre tag).
      */
-    private String extractExcerpt(SyndEntry entry) {
-        String raw = rawBody(entry);
-        if (raw == null) {
+    private String extractExcerpt(String raw) {
+        if (raw == null || raw.isBlank()) {
             return null;
         }
         String text = Jsoup.parse(HtmlUtils.htmlUnescape(raw)).text().trim();
@@ -158,54 +129,34 @@ public class RssNewsFetcher {
         return text.length() > MAX_EXCERPT_LENGTH ? text.substring(0, MAX_EXCERPT_LENGTH) : text;
     }
 
-    private String extractImage(SyndEntry entry, String baseUri) {
-        // 1) enclosure de tipo imagen (Crunchyroll expone la miniatura asi).
-        for (SyndEnclosure enclosure : entry.getEnclosures()) {
-            String type = enclosure.getType();
-            String url = trimToNull(enclosure.getUrl());
-            if (url != null && type != null && type.toLowerCase().startsWith("image")) {
-                return url;
-            }
+    /**
+     * Primer {@code <img>} "real" del HTML del cuerpo: resuelve relativas contra
+     * {@code baseUri} y salta píxeles de tracking 1x1 (feedburner mete uno).
+     */
+    private String extractImageFromBody(String html, String baseUri) {
+        if (html == null || html.isBlank()) {
+            return null;
         }
-        // 2) primer <img> "real" del HTML: resolvemos relativas contra baseUri y
-        // saltamos pixeles de tracking 1x1 (feedburner mete uno al principio).
-        String html = rawBody(entry);
-        if (html != null) {
-            Document doc = Jsoup.parse(html, baseUri != null ? baseUri : "");
-            for (Element img : doc.select("img")) {
-                String src = img.hasAttr("src") ? img.absUrl("src")
-                        : img.hasAttr("data-src") ? img.absUrl("data-src")
-                        : "";
-                src = trimToNull(src);
-                // absUrl deja "" si no pudo absolutizar (relativa sin base, o data:).
-                if (src == null || !(src.startsWith("http://") || src.startsWith("https://"))) {
-                    continue;
-                }
-                if (isTrackingPixel(img)) {
-                    continue;
-                }
-                return src;
+        Document doc = Jsoup.parse(html, baseUri != null ? baseUri : "");
+        for (Element img : doc.select("img")) {
+            String src = img.hasAttr("src") ? img.absUrl("src")
+                    : img.hasAttr("data-src") ? img.absUrl("data-src")
+                    : "";
+            src = trimToNull(src);
+            // absUrl deja "" si no pudo absolutizar (relativa sin base, o data:).
+            if (src == null || !(src.startsWith("http://") || src.startsWith("https://"))) {
+                continue;
             }
+            if (isTrackingPixel(img)) {
+                continue;
+            }
+            return src;
         }
         return null;
     }
 
     private boolean isTrackingPixel(Element img) {
         return "1".equals(img.attr("width").trim()) || "1".equals(img.attr("height").trim());
-    }
-
-    /** Cuerpo crudo del item: prefiere description, cae a content:encoded. */
-    private String rawBody(SyndEntry entry) {
-        if (entry.getDescription() != null && entry.getDescription().getValue() != null
-                && !entry.getDescription().getValue().isBlank()) {
-            return entry.getDescription().getValue();
-        }
-        for (SyndContent content : entry.getContents()) {
-            if (content.getValue() != null && !content.getValue().isBlank()) {
-                return content.getValue();
-            }
-        }
-        return null;
     }
 
     /** Link absoluto; resuelve uno relativo contra la base; null si no se puede. */

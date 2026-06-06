@@ -87,11 +87,15 @@
 			<artifactId>caffeine</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.rometools</groupId>
-			<artifactId>rome</artifactId>
-			<version>2.1.0</version>
+			<!-- Parseo RSS 2.0/Atom + fetch con redirects + dedup. Librería propia
+			     en Maven Central; reemplaza a ROME en la ingesta de noticias. -->
+			<groupId>io.github.diegoalegil</groupId>
+			<artifactId>anime-feed-parser</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
+			<!-- Sigue haciendo falta: limpieza HTML del excerpt a texto plano y
+			     extracción de imagen del cuerpo (lo que la librería no cubre). -->
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.18.3</version>
