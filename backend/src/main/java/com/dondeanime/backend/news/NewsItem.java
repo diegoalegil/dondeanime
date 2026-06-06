@@ -24,7 +24,8 @@ import jakarta.validation.constraints.Size;
         name = "news_item",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_news_item_slug", columnNames = "slug"),
-                @UniqueConstraint(name = "uk_news_item_source_url", columnNames = "source_url")
+                @UniqueConstraint(name = "uk_news_item_source_url", columnNames = "source_url"),
+                @UniqueConstraint(name = "uk_news_item_dedup_key", columnNames = "dedup_key")
         },
         indexes = {
                 @Index(name = "idx_news_item_status_published", columnList = "status,published_at"),
@@ -107,6 +108,21 @@ public class NewsItem {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    /**
+     * Clave de deduplicación estable (URL canónica, con fallback fuente+título)
+     * calculada por la librería anime-feed-parser. Es la barrera dura de
+     * idempotencia: mata duplicados que difieren solo en utm_*, barra final,
+     * http/https o reescrituras de feedburner que source_url no pillaba.
+     */
+    @Size(max = 800)
+    @Column(name = "dedup_key", length = 800)
+    private String dedupKey;
+
+    /** Hash del contenido (título+excerpt normalizados); señal de edición upstream. */
+    @Size(max = 64)
+    @Column(name = "content_hash", length = 64)
+    private String contentHash;
 
     public NewsItem() {
     }
@@ -208,6 +224,22 @@ public class NewsItem {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getDedupKey() {
+        return dedupKey;
+    }
+
+    public void setDedupKey(String dedupKey) {
+        this.dedupKey = dedupKey;
+    }
+
+    public String getContentHash() {
+        return contentHash;
+    }
+
+    public void setContentHash(String contentHash) {
+        this.contentHash = contentHash;
     }
 
     public String getOriginalTitle() {

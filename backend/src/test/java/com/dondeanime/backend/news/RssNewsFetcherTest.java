@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.web.client.RestClient;
 
 /**
  * Tests del parseo sin red: ejercitan {@link RssNewsFetcher#parse} con fixtures
@@ -15,7 +14,7 @@ import org.springframework.web.client.RestClient;
  */
 class RssNewsFetcherTest {
 
-    private final RssNewsFetcher fetcher = new RssNewsFetcher(RestClient.builder());
+    private final RssNewsFetcher fetcher = new RssNewsFetcher();
 
     private List<FetchedNewsItem> parse(String xml, String feedUrl) {
         return fetcher.parse(xml.getBytes(StandardCharsets.UTF_8), feedUrl);

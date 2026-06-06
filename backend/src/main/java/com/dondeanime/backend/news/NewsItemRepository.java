@@ -17,4 +17,6 @@ public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
     boolean existsBySlug(String slug);
 
     boolean existsBySourceUrl(String sourceUrl);
+
+    boolean existsByDedupKey(String dedupKey);
 }

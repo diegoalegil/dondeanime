@@ -58,7 +58,9 @@ DondeAnime consume `AniListClient.fetchPopular(...)` para el catálogo y `TmdbCl
 
 > **Cruce AniList ↔ TMDb:** el matching de cada anime con su entrada en TMDb lo resuelve **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)**, otra librería propia: similitud difusa de títulos (Levenshtein + Jaro-Winkler + token-set), normalización de temporadas/numerales y veto serie-vs-película, todo explicable.
 
-📦 **[Tsunagi en Maven Central](https://central.sonatype.com/artifact/io.github.diegoalegil/tsunagi)**  ·  📖 **[Repo y docs](https://github.com/diegoalegil/tsunagi)**
+> **Noticias:** la ingesta de feeds RSS/Atom de noticias de anime corre sobre **[anime-feed-parser](https://github.com/diegoalegil/anime-feed-parser)**, una tercera librería propia en Maven Central: parser RSS 2.0/Atom sin dependencias, XML seguro anti-XXE, fetch que sigue redirects y deduplicación por URL canónica.
+
+📦 Tres librerías propias en Maven Central: **[Tsunagi](https://central.sonatype.com/artifact/io.github.diegoalegil/tsunagi)** (datos) · **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)** (matching) · **[anime-feed-parser](https://central.sonatype.com/artifact/io.github.diegoalegil/anime-feed-parser)** (noticias)
 
 ---
 
@@ -71,14 +73,15 @@ DondeAnime consume `AniListClient.fetchPopular(...)` para el catálogo y `TmdbCl
 | Países soportados | 5 (ES, MX, AR, CL, CO) |
 | Idiomas | Español + Inglés (`/en/`) |
 | Plataformas indexadas | 8+ |
-| Capa de datos | **Tsunagi 1.2.0** (SDK propio en Maven Central) |
+| Capa de datos | **Tsunagi 1.3.0** (SDK propio en Maven Central) |
+| Ingesta de noticias | **anime-feed-parser 1.0.1** (librería propia en Maven Central) |
 | Tests backend | 391 (verdes en CI con Postgres + Testcontainers) |
 | Endpoints REST | ~25 (catálogo, búsqueda fulltext, API v1, premium, push, listas) |
 | Sync automático | AniList 12h · TMDb match (title-matcher) 24h · Providers 24h |
 
 > Nota de estado: la rama `main` contiene 20+ sprints de features. El backend en
 > producción se actualiza por **deploy manual** al VPS, así que algunas capacidades
-> recién mergeadas (p. ej. el title-matcher sobre Tsunagi 1.2.0) se activan en
+> recién mergeadas (p. ej. el title-matcher sobre Tsunagi 1.3.0) se activan en
 > producción con el siguiente deploy.
 
 ---
@@ -91,6 +94,7 @@ DondeAnime consume `AniListClient.fetchPopular(...)` para el catálogo y `TmdbCl
 - **PostgreSQL 16** (en Docker tanto local como producción), migraciones con **Flyway**
 - **[Tsunagi](https://github.com/diegoalegil/tsunagi)** (SDK propio) como capa de acceso a AniList / TMDb / Jikan
 - **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)** (librería propia) para el cruce difuso AniList ↔ TMDb
+- **[anime-feed-parser](https://github.com/diegoalegil/anime-feed-parser)** (librería propia) para la ingesta RSS/Atom de noticias
 - **Jackson 3.x** (paquetes `tools.jackson.*` propios de Spring Boot 4)
 - **Spring Security** (HTTP Basic + 2FA para `/api/admin/**`, JWT para flujos públicos)
 - **Resend** para email transaccional

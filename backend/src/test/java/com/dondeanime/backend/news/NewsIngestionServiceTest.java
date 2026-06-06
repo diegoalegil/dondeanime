@@ -17,6 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import io.github.diegoalegil.animefeed.text.DeduplicationKeyBuilder;
+import io.github.diegoalegil.animefeed.text.TextNormalizer;
+import io.github.diegoalegil.animefeed.text.UrlNormalizer;
+
 /** Tests con mocks de la lógica de dedup, slug y conteo de errores de ingesta. */
 class NewsIngestionServiceTest {
 
@@ -40,13 +44,18 @@ class NewsIngestionServiceTest {
         return new FetchedNewsItem(title, url, "excerpt", null, Instant.parse("2026-05-27T10:00:00Z"));
     }
 
+    /** Misma clave que calcula el servicio (URL canónica vía la librería). */
+    private String dedupKey(String title, String url) {
+        return DeduplicationKeyBuilder.build(
+                UrlNormalizer.normalize(url).orElse(null), ann.getName(), TextNormalizer.normalizeTitle(title));
+    }
+
     @Test
     void skipsItemsAlreadyInDb() {
         when(fetcher.fetch(anyString())).thenReturn(List.of(
                 item("Nuevo", "https://ann.example/1"),
                 item("Viejo", "https://ann.example/2")));
-        when(itemRepository.existsBySourceUrl("https://ann.example/1")).thenReturn(false);
-        when(itemRepository.existsBySourceUrl("https://ann.example/2")).thenReturn(true);
+        when(itemRepository.existsByDedupKey(dedupKey("Viejo", "https://ann.example/2"))).thenReturn(true);
         when(itemRepository.existsBySlug(anyString())).thenReturn(false);
 
         NewsIngestionResult result = service.ingestAll();
@@ -62,7 +71,7 @@ class NewsIngestionServiceTest {
         when(fetcher.fetch(anyString())).thenReturn(List.of(
                 item("A", "https://ann.example/dup"),
                 item("B", "https://ann.example/dup")));
-        when(itemRepository.existsBySourceUrl(anyString())).thenReturn(false);
+        when(itemRepository.existsByDedupKey(anyString())).thenReturn(false);
         when(itemRepository.existsBySlug(anyString())).thenReturn(false);
 
         NewsIngestionResult result = service.ingestAll();
@@ -75,7 +84,7 @@ class NewsIngestionServiceTest {
     @Test
     void appendsNumericSuffixOnSlugCollision() {
         when(fetcher.fetch(anyString())).thenReturn(List.of(item("Anime X", "https://ann.example/x")));
-        when(itemRepository.existsBySourceUrl(anyString())).thenReturn(false);
+        when(itemRepository.existsByDedupKey(anyString())).thenReturn(false);
         when(itemRepository.existsBySlug("anime-x")).thenReturn(true);
         when(itemRepository.existsBySlug("anime-x-2")).thenReturn(false);
 
@@ -89,7 +98,7 @@ class NewsIngestionServiceTest {
     @Test
     void constraintRaceCountsAsSkippedNotError() {
         when(fetcher.fetch(anyString())).thenReturn(List.of(item("A", "https://ann.example/a")));
-        when(itemRepository.existsBySourceUrl(anyString())).thenReturn(false);
+        when(itemRepository.existsByDedupKey(anyString())).thenReturn(false);
         when(itemRepository.existsBySlug(anyString())).thenReturn(false);
         when(itemRepository.save(any(NewsItem.class)))
                 .thenThrow(new DataIntegrityViolationException("uk_news_item_source_url"));
@@ -104,7 +113,7 @@ class NewsIngestionServiceTest {
     @Test
     void realSaveErrorCountsAsError() {
         when(fetcher.fetch(anyString())).thenReturn(List.of(item("A", "https://ann.example/a")));
-        when(itemRepository.existsBySourceUrl(anyString())).thenReturn(false);
+        when(itemRepository.existsByDedupKey(anyString())).thenReturn(false);
         when(itemRepository.existsBySlug(anyString())).thenReturn(false);
         when(itemRepository.save(any(NewsItem.class)))
                 .thenThrow(new RuntimeException("connection pool agotado"));
