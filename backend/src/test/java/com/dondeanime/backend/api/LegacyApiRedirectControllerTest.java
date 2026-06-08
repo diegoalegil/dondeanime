@@ -29,10 +29,22 @@ class LegacyApiRedirectControllerTest {
     }
 
     @Test
-    void skipsMaintenanceRoutes() throws Exception {
-        MockHttpServletResponse response = doFilter("/api/anime/sync");
+    void addsDeprecationHeadersToLegacyAnimeUtilityRoutes() throws Exception {
+        assertThat(doFilter("/api/anime/duration/24").getHeader("Deprecation")).isEqualTo("true");
+        assertThat(doFilter("/api/anime/episodes/less-than/12").getHeader("Deprecation")).isEqualTo("true");
+    }
 
-        assertThat(response.getHeader("Deprecation")).isNull();
+    @Test
+    void addsDeprecationHeadersToLegacyContentRoutes() throws Exception {
+        assertThat(doFilter("/api/lists/anime-para-empezar").getHeader("Deprecation")).isEqualTo("true");
+        assertThat(doFilter("/api/news/anime/solo-leveling").getHeader("Deprecation")).isEqualTo("true");
+        assertThat(doFilter("/api/studios/wit-studio/best").getHeader("Deprecation")).isEqualTo("true");
+    }
+
+    @Test
+    void skipsMaintenanceRoutes() throws Exception {
+        assertThat(doFilter("/api/anime/sync").getHeader("Deprecation")).isNull();
+        assertThat(doFilter("/api/anime/sync-trailers").getHeader("Deprecation")).isNull();
     }
 
     @Test

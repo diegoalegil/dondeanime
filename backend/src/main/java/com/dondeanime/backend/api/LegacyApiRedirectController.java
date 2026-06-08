@@ -19,7 +19,8 @@ public class LegacyApiRedirectController extends OncePerRequestFilter {
     private static final Set<String> ANIME_ACTION_PATHS = Set.of(
             "sync",
             "match",
-            "sync-providers");
+            "sync-providers",
+            "sync-trailers");
 
     @Override
     protected void doFilterInternal(
@@ -43,11 +44,18 @@ public class LegacyApiRedirectController extends OncePerRequestFilter {
                 || path.equals("/api/providers")
                 || path.equals("/api/genres")
                 || path.equals("/api/seasons")
+                || path.equals("/api/lists")
+                || path.equals("/api/news")
+                || path.equals("/api/studios")
                 || path.equals("/api/sitemap")) {
             return true;
         }
 
         if (path.startsWith("/api/anime/")) {
+            if (hasSegments(path, "/api/anime/duration/", 1)
+                    || hasSegments(path, "/api/anime/episodes/less-than/", 1)) {
+                return true;
+            }
             String[] segments = path.substring("/api/anime/".length()).split("/");
             return (segments.length == 1 && !ANIME_ACTION_PATHS.contains(segments[0]))
                     || segments.length == 2 && "similar".equals(segments[1]);
@@ -55,7 +63,12 @@ public class LegacyApiRedirectController extends OncePerRequestFilter {
 
         return hasSegments(path, "/api/providers/", 2)
                 || hasSegments(path, "/api/genres/", 1)
-                || hasSegments(path, "/api/seasons/", 2);
+                || hasSegments(path, "/api/seasons/", 2)
+                || hasSegments(path, "/api/lists/", 1)
+                || hasSegments(path, "/api/news/", 1)
+                || hasSegments(path, "/api/news/anime/", 1)
+                || hasSegments(path, "/api/studios/", 1)
+                || hasSegments(path, "/api/studios/", 2);
     }
 
     private static boolean hasSegments(String path, String prefix, int expectedSegments) {

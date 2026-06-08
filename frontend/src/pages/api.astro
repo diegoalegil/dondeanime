@@ -29,7 +29,7 @@ const serviceSchema = {
   name: 'DondeAnime Public API',
   serviceType: 'Anime streaming availability API',
   url: `${siteUrl}/api`,
-  description: 'API publica para consultar anime, plataformas, generos y temporadas disponibles en DondeAnime.',
+  description: 'API publica para consultar anime, plataformas, generos, temporadas, noticias, listas y estudios disponibles en DondeAnime.',
   provider: {
     '@type': 'Organization',
     name: 'DondeAnime',
@@ -40,7 +40,7 @@ const serviceSchema = {
 ---
 <BaseLayout
   title="API DondeAnime"
-  description="API publica de DondeAnime para consultar catalogo, plataformas, generos y temporadas de anime."
+  description="API publica de DondeAnime para consultar catalogo, plataformas, generos, temporadas, noticias, listas y estudios de anime."
   canonical={`${siteUrl}/api`}
 >
   <JsonLd slot="head" data={serviceSchema} />
@@ -61,7 +61,7 @@ const serviceSchema = {
             API DondeAnime
           </h1>
           <p class="mt-4 max-w-2xl text-lg leading-8 text-fg-secondary">
-            Consulta catalogo, plataformas, generos y temporadas con endpoints versionados en
+            Consulta catalogo, plataformas, generos, temporadas, noticias y listas con endpoints versionados en
             <span class="font-mono text-fg-primary">/api/v1</span>.
           </p>
         </div>
@@ -152,6 +152,26 @@ const serviceSchema = {
                   <td class="px-5 py-4 font-mono text-fg-primary">GET</td>
                   <td class="px-5 py-4 font-mono">/api/v1/seasons</td>
                   <td class="px-5 py-4">Temporadas y estrenos por anio.</td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-4 font-mono text-fg-primary">GET</td>
+                  <td class="px-5 py-4 font-mono">/api/v1/news</td>
+                  <td class="px-5 py-4">Ultimas noticias publicadas.</td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-4 font-mono text-fg-primary">GET</td>
+                  <td class="px-5 py-4 font-mono">/api/v1/lists</td>
+                  <td class="px-5 py-4">Listas curadas publicas.</td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-4 font-mono text-fg-primary">GET</td>
+                  <td class="px-5 py-4 font-mono">/api/v1/studios</td>
+                  <td class="px-5 py-4">Estudios y anime asociados.</td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-4 font-mono text-fg-primary">GET</td>
+                  <td class="px-5 py-4 font-mono">/api/v1/sitemap</td>
+                  <td class="px-5 py-4">Slugs y pares para sitemap estatico.</td>
                 </tr>
               </tbody>
             </table>

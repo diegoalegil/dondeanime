@@ -6,26 +6,20 @@ import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
 import com.dondeanime.backend.provider.ProviderDto;
-import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -35,11 +29,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AnimeController {
 
     private final AnimeRepository repository;
-    private final AnimeSyncService syncService;
-    private final AnimeMatchingService matchingService;
-    private final ProviderSyncService providerSyncService;
-    private final AnimeDescriptionEnricher descriptionEnricher;
-    private final TrailerSyncService trailerSyncService;
     private final WatchProviderRepository providerRepository;
     private final AnimeOverrideService overrideService;
     private final AffiliateLinkService affiliateLinkService;
@@ -47,21 +36,11 @@ public class AnimeController {
 
     public AnimeController(
             AnimeRepository repository,
-            AnimeSyncService syncService,
-            AnimeMatchingService matchingService,
-            ProviderSyncService providerSyncService,
-            AnimeDescriptionEnricher descriptionEnricher,
-            TrailerSyncService trailerSyncService,
             WatchProviderRepository providerRepository,
             AnimeOverrideService overrideService,
             AffiliateLinkService affiliateLinkService,
             RecommendationService recommendationService) {
         this.repository = repository;
-        this.syncService = syncService;
-        this.matchingService = matchingService;
-        this.providerSyncService = providerSyncService;
-        this.descriptionEnricher = descriptionEnricher;
-        this.trailerSyncService = trailerSyncService;
         this.providerRepository = providerRepository;
         this.overrideService = overrideService;
         this.affiliateLinkService = affiliateLinkService;
@@ -157,40 +136,6 @@ public class AnimeController {
                             AnimeDetailDto.from(anime, overrideService.findSpanishOverrides(anime)), byCountry));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/sync")
-    @Hidden
-    public Map<String, Integer> sync(@RequestParam(defaultValue = "100") int count) {
-        if (count < 1 || count > AnimeSyncService.MAX_POPULAR_SYNC_COUNT) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "count debe estar entre 1 y " + AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
-        }
-        int synced = syncService.syncPopular(count);
-        return Map.of("synced", synced);
-    }
-
-    @PostMapping("/match")
-    @Hidden
-    public Map<String, Integer> match() {
-        int matched = matchingService.matchAll();
-        int descriptionsEnriched = descriptionEnricher.enrichMissingSpanishDescriptions();
-        return Map.of("matched", matched, "descriptionsEnriched", descriptionsEnriched);
-    }
-
-    @PostMapping("/sync-providers")
-    @Hidden
-    public Map<String, Integer> syncProviders() {
-        int processed = providerSyncService.syncAll();
-        return Map.of("processed", processed);
-    }
-
-    @PostMapping("/sync-trailers")
-    @Hidden
-    public Map<String, Integer> syncTrailers() {
-        int processed = trailerSyncService.syncAll();
-        return Map.of("processed", processed);
     }
 
     private static Optional<AnimeWithStartDate> withStartDate(Anime anime) {

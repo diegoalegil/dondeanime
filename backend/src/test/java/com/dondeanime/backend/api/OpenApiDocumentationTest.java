@@ -21,21 +21,23 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.affiliate.AffiliateLinkService;
-import com.dondeanime.backend.anime.AnimeDescriptionEnricher;
-import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeRepository;
-import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.AnimeController;
 import com.dondeanime.backend.anime.AnimeOverrideService;
 import com.dondeanime.backend.anime.GenreController;
 import com.dondeanime.backend.anime.RecommendationService;
 import com.dondeanime.backend.anime.SeasonController;
-import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.config.SecurityConfig;
+import com.dondeanime.backend.curated.CuratedListController;
+import com.dondeanime.backend.curated.CuratedListService;
+import com.dondeanime.backend.news.NewsController;
+import com.dondeanime.backend.news.NewsService;
+import com.dondeanime.backend.premium.PremiumAccessService;
 import com.dondeanime.backend.provider.ProviderController;
-import com.dondeanime.backend.provider.ProviderSyncService;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 import com.dondeanime.backend.sitemap.SitemapController;
+import com.dondeanime.backend.studio.StudioController;
+import com.dondeanime.backend.studio.StudioRepository;
 
 import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springdoc.core.properties.SpringDocConfigProperties;
@@ -50,6 +52,9 @@ import org.springdoc.webmvc.ui.SwaggerConfig;
         ProviderController.class,
         GenreController.class,
         SeasonController.class,
+        NewsController.class,
+        CuratedListController.class,
+        StudioController.class,
         SitemapController.class,
         OpenApiDocsController.class
 })
@@ -80,21 +85,6 @@ class OpenApiDocumentationTest {
     private AnimeRepository animeRepository;
 
     @MockitoBean
-    private AnimeSyncService syncService;
-
-    @MockitoBean
-    private AnimeMatchingService matchingService;
-
-    @MockitoBean
-    private ProviderSyncService providerSyncService;
-
-    @MockitoBean
-    private AnimeDescriptionEnricher descriptionEnricher;
-
-    @MockitoBean
-    private TrailerSyncService trailerSyncService;
-
-    @MockitoBean
     private WatchProviderRepository providerRepository;
 
     @MockitoBean
@@ -106,6 +96,18 @@ class OpenApiDocumentationTest {
     @MockitoBean
     private RecommendationService recommendationService;
 
+    @MockitoBean
+    private NewsService newsService;
+
+    @MockitoBean
+    private CuratedListService curatedListService;
+
+    @MockitoBean
+    private PremiumAccessService premiumAccessService;
+
+    @MockitoBean
+    private StudioRepository studioRepository;
+
     @Test
     void openApiYamlGeneratesPublicV1Spec() throws Exception {
         when(animeRepository.findAll()).thenReturn(List.of());
@@ -116,7 +118,16 @@ class OpenApiDocumentationTest {
                 .andExpect(content().string(containsString("openapi:")))
                 .andExpect(content().string(containsString("ApiKeyAuth")))
                 .andExpect(content().string(containsString("/api/v1/anime")))
+                .andExpect(content().string(containsString("/api/v1/providers")))
+                .andExpect(content().string(containsString("/api/v1/genres")))
+                .andExpect(content().string(containsString("/api/v1/seasons")))
+                .andExpect(content().string(containsString("/api/v1/news")))
+                .andExpect(content().string(containsString("/api/v1/lists")))
+                .andExpect(content().string(containsString("/api/v1/studios")))
+                .andExpect(content().string(containsString("/api/v1/sitemap")))
+                .andExpect(content().string(not(containsString("/api/anime"))))
                 .andExpect(content().string(not(containsString("/api/v1/anime/match"))))
+                .andExpect(content().string(not(containsString("/api/v1/anime/sync"))))
                 .andExpect(content().string(not(containsString("/api/admin"))));
     }
 
