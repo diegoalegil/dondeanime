@@ -24,15 +24,15 @@ public class NewsController {
         return newsService.latestPublished(limit);
     }
 
+    @GetMapping("/anime/{slug}")
+    public List<NewsSummaryDto> byAnimeSlug(@PathVariable String slug) {
+        return newsService.publishedForAnimeSlug(slug);
+    }
+
     @GetMapping("/{slug}")
     public ResponseEntity<NewsDetailDto> bySlug(@PathVariable String slug) {
         return newsService.publishedBySlug(slug)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/anime/{slug}")
-    public List<NewsSummaryDto> byAnimeSlug(@PathVariable String slug) {
-        return newsService.publishedForAnimeSlug(slug);
     }
 }

@@ -77,5 +77,5 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
   <MetaList anime={detail.anime} />
   <SimilarAnime anime={similarAnime} sourceSlug={slug!} />
 
-  <NewsLatest items={animeNews} heading={t('news.anime.heading')} />
+  <NewsLatest items={animeNews} heading={t('news.anime.heading')} viewAllHref={`/anime/${slug}/noticias`} />
 </BaseLayout>

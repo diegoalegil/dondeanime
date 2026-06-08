@@ -69,5 +69,5 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   />
   <MetaList anime={detail.anime} />
 
-  <NewsLatest items={animeNews} heading={t('news.anime.heading')} />
+  <NewsLatest items={animeNews} heading={t('news.anime.heading')} viewAllHref={`/anime/${slug}/noticias`} />
 </BaseLayout>

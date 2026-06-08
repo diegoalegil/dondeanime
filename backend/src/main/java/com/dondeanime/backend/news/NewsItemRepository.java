@@ -10,6 +10,8 @@ public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
 
     List<NewsItem> findByStatusOrderByPublishedAtDesc(NewsStatus status, Pageable pageable);
 
+    List<NewsItem> findByStatusOrderByFetchedAtAsc(NewsStatus status, Pageable pageable);
+
     List<NewsItem> findByAnimeIdAndStatusOrderByPublishedAtDesc(Long animeId, NewsStatus status);
 
     Optional<NewsItem> findBySlugAndStatus(String slug, NewsStatus status);

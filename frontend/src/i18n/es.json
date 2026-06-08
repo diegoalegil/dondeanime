@@ -347,7 +347,9 @@
   "news.latest.title": "Últimas noticias",
   "news.latest.viewAll": "Ver todas",
   "news.anime.title": "Noticias de {title}",
+  "news.anime.description": "Noticias, estrenos y anuncios relacionados con {title}.",
   "news.anime.heading": "Noticias relacionadas",
+  "news.anime.empty": "Todavía no hay noticias publicadas para este anime.",
   "news.card.readMore": "Leer más",
   "news.rss.title": "DondeAnime — Noticias",
   "news.rss.description": "Últimas noticias de anime en español."

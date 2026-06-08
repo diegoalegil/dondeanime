@@ -440,6 +440,7 @@ export interface NewsSummary {
   imageUrl: string | null;
   sourceName: string;
   animeId: number | null;
+  animeSlug: string | null;
   publishedAt: string;
 }
 
