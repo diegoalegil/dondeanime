@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
-import com.dondeanime.backend.premium.SubscriberService;
 
 @Service
 public class CuratedListService {
@@ -24,17 +23,14 @@ public class CuratedListService {
 
     private final CuratedListRepository listRepository;
     private final AnimeRepository animeRepository;
-    private final SubscriberService subscriberService;
     private final String siteUrl;
 
     public CuratedListService(
             CuratedListRepository listRepository,
             AnimeRepository animeRepository,
-            SubscriberService subscriberService,
             @Value("${dondeanime.site-url:https://dondeanime.com}") String siteUrl) {
         this.listRepository = listRepository;
         this.animeRepository = animeRepository;
-        this.subscriberService = subscriberService;
         this.siteUrl = siteUrl;
     }
 
@@ -50,14 +46,14 @@ public class CuratedListService {
 
     @Transactional(readOnly = true)
     public Optional<CuratedListDetailDto> publishedList(String slug) {
-        return publishedList(slug, null);
+        return publishedList(slug, false);
     }
 
     @Transactional(readOnly = true)
-    public Optional<CuratedListDetailDto> publishedList(String slug, String viewerEmail) {
+    public Optional<CuratedListDetailDto> publishedList(String slug, boolean premiumViewer) {
         return listRepository.findBySlugWithItems(slug)
                 .filter(this::isPublishedPublic)
-                .map(list -> toDetailDto(list, subscriberService.isPremium(viewerEmail)));
+                .map(list -> toDetailDto(list, premiumViewer));
     }
 
     @Transactional(readOnly = true)

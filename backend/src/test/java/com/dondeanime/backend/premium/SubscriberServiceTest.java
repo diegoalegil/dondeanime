@@ -56,6 +56,27 @@ class SubscriberServiceTest {
     }
 
     @Test
+    void findActiveEntitlementReturnsNormalizedPremiumData() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(60), NOW.plusSeconds(60));
+        subscriber.setPlanTier(" premium ");
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findActiveEntitlement(" Diego@Example.com "))
+                .contains(new PremiumEntitlement(
+                        "diego@example.com",
+                        "PREMIUM",
+                        NOW.plusSeconds(60)));
+    }
+
+    @Test
+    void findActiveEntitlementRejectsExpiredSubscriber() {
+        Subscriber subscriber = subscriber(NOW.minusSeconds(120), NOW.minusSeconds(1));
+        when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));
+
+        assertThat(service.findActiveEntitlement("diego@example.com")).isEmpty();
+    }
+
+    @Test
     void findActiveStripeCustomerIdReturnsCustomerForActivePremiumSubscriber() {
         Subscriber subscriber = subscriber(NOW.minusSeconds(60), NOW.plusSeconds(60));
         when(subscriberRepository.findByEmail("diego@example.com")).thenReturn(Optional.of(subscriber));

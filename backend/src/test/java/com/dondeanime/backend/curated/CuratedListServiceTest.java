@@ -13,17 +13,14 @@ import org.junit.jupiter.api.Test;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
-import com.dondeanime.backend.premium.SubscriberService;
 
 class CuratedListServiceTest {
 
     private final CuratedListRepository listRepository = mock(CuratedListRepository.class);
     private final AnimeRepository animeRepository = mock(AnimeRepository.class);
-    private final SubscriberService subscriberService = mock(SubscriberService.class);
     private final CuratedListService service = new CuratedListService(
             listRepository,
             animeRepository,
-            subscriberService,
             "https://dondeanime.com/");
 
     @Test
@@ -76,7 +73,7 @@ class CuratedListServiceTest {
     }
 
     @Test
-    void premiumOnlyListReturnsPreviewForFreeViewer() {
+    void premiumOnlyListReturnsPreviewWithoutVerifiedAccess() {
         CuratedList list = list(CuratedListStatus.PUBLISHED, CuratedListVisibility.PUBLIC);
         list.setPremiumOnly(true);
         list.addItem(item("one", 1));
@@ -90,9 +87,8 @@ class CuratedListServiceTest {
                         anime("two", "Two"),
                         anime("three", "Three"),
                         anime("four", "Four")));
-        when(subscriberService.isPremium("free@example.com")).thenReturn(false);
 
-        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar", "free@example.com");
+        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar");
 
         assertThat(result).isPresent();
         assertThat(result.get().premiumOnly()).isTrue();
@@ -102,7 +98,7 @@ class CuratedListServiceTest {
     }
 
     @Test
-    void premiumOnlyListReturnsFullListForPremiumViewer() {
+    void premiumOnlyListReturnsFullListForVerifiedPremiumViewer() {
         CuratedList list = list(CuratedListStatus.PUBLISHED, CuratedListVisibility.PUBLIC);
         list.setPremiumOnly(true);
         list.addItem(item("one", 1));
@@ -116,9 +112,8 @@ class CuratedListServiceTest {
                         anime("two", "Two"),
                         anime("three", "Three"),
                         anime("four", "Four")));
-        when(subscriberService.isPremium("premium@example.com")).thenReturn(true);
 
-        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar", "premium@example.com");
+        Optional<CuratedListDetailDto> result = service.publishedList("anime-para-empezar", true);
 
         assertThat(result).isPresent();
         assertThat(result.get().premiumPreview()).isFalse();

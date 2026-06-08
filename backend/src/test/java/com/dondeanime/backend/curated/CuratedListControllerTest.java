@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.dondeanime.backend.admin.auth.AdminJwtService;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
 import com.dondeanime.backend.config.SecurityConfig;
+import com.dondeanime.backend.premium.PremiumAccessService;
 
 @WebMvcTest(CuratedListController.class)
 @Import(SecurityConfig.class)
@@ -34,6 +35,9 @@ class CuratedListControllerTest {
 
     @MockitoBean
     private CuratedListService service;
+
+    @MockitoBean
+    private PremiumAccessService premiumAccessService;
 
     @MockitoBean
     private AdminJwtService adminJwtService;
@@ -60,7 +64,7 @@ class CuratedListControllerTest {
     @Test
     void detailReturnsOrderedAnimeAndItemListSchema() throws Exception {
         CuratedListDetailDto detail = detailDto();
-        when(service.publishedList("anime-para-empezar")).thenReturn(Optional.of(detail));
+        when(service.publishedList("anime-para-empezar", false)).thenReturn(Optional.of(detail));
 
         mvc.perform(get("/api/lists/anime-para-empezar"))
                 .andExpect(status().isOk())
@@ -76,24 +80,40 @@ class CuratedListControllerTest {
 
     @Test
     void detailIgnoresSpoofedPremiumViewerHeader() throws Exception {
-        CuratedListDetailDto detail = detailDto();
-        when(service.publishedList("anime-para-empezar")).thenReturn(Optional.of(detail));
+        CuratedListDetailDto detail = detailDto(true);
+        when(service.publishedList("anime-para-empezar", false)).thenReturn(Optional.of(detail));
 
         mvc.perform(get("/api/lists/anime-para-empezar")
                         .header("X-User-Email", "premium@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.premiumPreview").value(true));
+    }
+
+    @Test
+    void detailUsesVerifiedPremiumBearer() throws Exception {
+        CuratedListDetailDto detail = detailDto(false);
+        when(premiumAccessService.hasActivePremiumAccess("Bearer premium-token")).thenReturn(true);
+        when(service.publishedList("anime-para-empezar", true)).thenReturn(Optional.of(detail));
+
+        mvc.perform(get("/api/lists/anime-para-empezar")
+                        .header("Authorization", "Bearer premium-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.premiumPreview").value(false));
     }
 
     @Test
     void detailReturns404WhenListIsNotPublished() throws Exception {
-        when(service.publishedList("draft-list")).thenReturn(Optional.empty());
+        when(service.publishedList("draft-list", false)).thenReturn(Optional.empty());
 
         mvc.perform(get("/api/lists/draft-list"))
                 .andExpect(status().isNotFound());
     }
 
     private static CuratedListDetailDto detailDto() {
+        return detailDto(false);
+    }
+
+    private static CuratedListDetailDto detailDto(boolean premiumPreview) {
         AnimeSummaryDto anime = new AnimeSummaryDto(
                 154587L,
                 "frieren-beyond-journeys-end",
@@ -123,6 +143,12 @@ class CuratedListControllerTest {
         list.setOwner("Diego");
         list.setVisibility(CuratedListVisibility.PUBLIC);
         list.setStatus(CuratedListStatus.PUBLISHED);
-        return CuratedListDetailDto.from(list, items, "https://dondeanime.com", false, null);
+        list.setPremiumOnly(premiumPreview);
+        return CuratedListDetailDto.from(
+                list,
+                items,
+                "https://dondeanime.com",
+                premiumPreview,
+                premiumPreview ? "https://dondeanime.com/premium" : null);
     }
 }

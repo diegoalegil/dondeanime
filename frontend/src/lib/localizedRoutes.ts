@@ -88,7 +88,7 @@ export const spanishPathFromLocalized = (path: string): string => {
 
 /**
  * Mapea una ruta española a su equivalente inglesa REAL, o devuelve null
- * si esa página inglesa no existe (premium, buscar, api, empezar, estudio,
+ * si esa página inglesa no existe (buscar, api, empezar, estudio,
  * anime/duracion, anime/episodios, índices sin traducir...). Usar null en
  * lugar de inventar una /en/... que daría 404.
  */
@@ -128,6 +128,8 @@ const localizedEnPath = (spanishPath: string): string | null => {
     if (first === 'afiliados') return '/en/legal/affiliates';
     return null;
   }
+
+  if (section === 'premium') return '/en/premium';
 
   if (section === 'anime' && first) {
     // /anime/duracion/* y /anime/episodios/* son solo-español.

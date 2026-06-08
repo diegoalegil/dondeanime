@@ -42,4 +42,9 @@ public interface EmailService {
             String email,
             String planTier,
             String portalUrl);
+
+    void sendPremiumAccessEmail(
+            String email,
+            String planTier,
+            String accessUrl);
 }

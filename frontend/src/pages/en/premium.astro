@@ -1,5 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { setLocale } from '@/i18n';
+
+setLocale('en');
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
@@ -7,11 +10,11 @@ const stripeMode = publishableKey.startsWith('pk_live_')
   ? 'Live'
   : publishableKey.startsWith('pk_test_')
     ? 'Test'
-    : 'Pendiente';
+    : 'Pending';
 ---
 <BaseLayout
-  title="Premium DondeAnime"
-  description="Plan Premium de DondeAnime con experiencia sin anuncios y mejoras para usuarios frecuentes."
+  title="DondeAnime Premium"
+  description="DondeAnime Premium plan with fewer ads and improvements for frequent users."
 >
   <section
     class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_24rem]"
@@ -24,30 +27,30 @@ const stripeMode = publishableKey.startsWith('pk_live_')
       <div class="max-w-3xl">
         <p class="text-xs font-semibold uppercase text-warning">Premium</p>
         <h1 class="mt-2 text-4xl font-semibold text-fg-primary md:text-5xl">
-          Premium DondeAnime
+          DondeAnime Premium
         </h1>
         <p class="mt-4 max-w-2xl text-lg leading-8 text-fg-secondary">
-          Una versi&oacute;n sin anuncios para consultar estrenos, plataformas y fichas con menos ruido.
+          A cleaner experience for checking premieres, platforms and anime pages with less noise.
         </p>
       </div>
 
       <div class="grid gap-4 md:grid-cols-3">
         <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-          <p class="text-sm font-semibold text-fg-primary">Sin anuncios</p>
+          <p class="text-sm font-semibold text-fg-primary">No ads</p>
           <p class="mt-2 text-sm leading-6 text-fg-secondary">
-            Los slots AdSense se ocultan cuando hay una sesi&oacute;n Premium verificada.
+            Ad slots are hidden when this browser has a verified Premium session.
           </p>
         </div>
         <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-          <p class="text-sm font-semibold text-fg-primary">Soporte al proyecto</p>
+          <p class="text-sm font-semibold text-fg-primary">Support the project</p>
           <p class="mt-2 text-sm leading-6 text-fg-secondary">
-            Ayuda a mantener el cat&aacute;logo, alertas y mejoras sin depender solo de afiliados.
+            Help maintain the catalog, alerts and improvements without relying only on affiliates.
           </p>
         </div>
         <div class="rounded-lg border border-surface-2 bg-surface-1 p-5">
-          <p class="text-sm font-semibold text-fg-primary">Base para futuras ventajas</p>
+          <p class="text-sm font-semibold text-fg-primary">Ready for real benefits</p>
           <p class="mt-2 text-sm leading-6 text-fg-secondary">
-            La infraestructura queda lista para activar ventajas reales desde Stripe.
+            The infrastructure is ready to enable Stripe-backed Premium benefits.
           </p>
         </div>
       </div>
@@ -62,31 +65,31 @@ const stripeMode = publishableKey.startsWith('pk_live_')
           <table class="w-full min-w-[38rem] text-left text-sm">
             <thead class="bg-surface-1 text-xs uppercase text-fg-muted">
               <tr>
-                <th class="px-5 py-3 font-semibold">Funci&oacute;n</th>
+                <th class="px-5 py-3 font-semibold">Feature</th>
                 <th class="px-5 py-3 font-semibold">Free</th>
                 <th class="px-5 py-3 font-semibold">Premium</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-surface-2 text-fg-secondary">
               <tr>
-                <td class="px-5 py-4 text-fg-primary">Cat&aacute;logo y fichas SEO</td>
-                <td class="px-5 py-4">Incluido</td>
-                <td class="px-5 py-4">Incluido</td>
+                <td class="px-5 py-4 text-fg-primary">Catalog and SEO pages</td>
+                <td class="px-5 py-4">Included</td>
+                <td class="px-5 py-4">Included</td>
               </tr>
               <tr>
-                <td class="px-5 py-4 text-fg-primary">Alertas de estrenos</td>
-                <td class="px-5 py-4">Incluido</td>
-                <td class="px-5 py-4">Incluido</td>
+                <td class="px-5 py-4 text-fg-primary">Premiere alerts</td>
+                <td class="px-5 py-4">Included</td>
+                <td class="px-5 py-4">Included</td>
               </tr>
               <tr>
-                <td class="px-5 py-4 text-fg-primary">Anuncios display</td>
-                <td class="px-5 py-4">Pueden mostrarse</td>
-                <td class="px-5 py-4">Ocultos</td>
+                <td class="px-5 py-4 text-fg-primary">Display ads</td>
+                <td class="px-5 py-4">May appear</td>
+                <td class="px-5 py-4">Hidden</td>
               </tr>
               <tr>
-                <td class="px-5 py-4 text-fg-primary">Badge de estado</td>
+                <td class="px-5 py-4 text-fg-primary">Status badge</td>
                 <td class="px-5 py-4">No</td>
-                <td class="px-5 py-4">S&iacute;</td>
+                <td class="px-5 py-4">Yes</td>
               </tr>
             </tbody>
           </table>
@@ -97,11 +100,11 @@ const stripeMode = publishableKey.startsWith('pk_live_')
     <aside class="h-fit rounded-lg border border-surface-2 bg-surface-1 p-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-fg-secondary">Plan mensual</p>
-          <p class="mt-2 text-4xl font-semibold text-fg-primary">3,99&nbsp;&euro;</p>
+          <p class="text-sm font-semibold text-fg-secondary">Monthly plan</p>
+          <p class="mt-2 text-4xl font-semibold text-fg-primary">3.99&nbsp;&euro;</p>
         </div>
         <span class="rounded-md border border-warning/40 bg-warning/10 px-2 py-1 text-xs font-semibold text-warning">
-          {stripeMode === 'Live' ? 'Live' : stripeMode === 'Test' ? 'Test mode' : 'Config pendiente'}
+          {stripeMode === 'Live' ? 'Live' : stripeMode === 'Test' ? 'Test mode' : 'Config pending'}
         </span>
       </div>
 
@@ -113,7 +116,7 @@ const stripeMode = publishableKey.startsWith('pk_live_')
             type="email"
             autocomplete="email"
             required
-            placeholder="tu@email.com"
+            placeholder="you@email.com"
             class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none transition-colors focus:border-warning"
           />
         </label>
@@ -121,27 +124,27 @@ const stripeMode = publishableKey.startsWith('pk_live_')
           type="submit"
           class="w-full rounded-md bg-warning px-4 py-2.5 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
         >
-          Ir a checkout
+          Go to checkout
         </button>
         <button
           type="button"
           class="w-full rounded-md border border-surface-2 px-4 py-2.5 text-sm font-semibold text-fg-secondary transition-colors hover:border-warning hover:text-warning"
           data-premium-portal-button
         >
-          Gestionar suscripci&oacute;n
+          Manage subscription
         </button>
         <button
           type="button"
           class="w-full rounded-md border border-surface-2 px-4 py-2.5 text-sm font-semibold text-fg-secondary transition-colors hover:border-warning hover:text-warning"
           data-premium-access-button
         >
-          Activar en este navegador
+          Activate on this browser
         </button>
         <p class="min-h-5 text-sm text-fg-muted" data-premium-status></p>
       </form>
 
       <p class="mt-4 text-xs leading-5 text-fg-muted">
-        Checkout preparado para Stripe. La activaci&oacute;n real depende del webhook del backend y del enlace enviado por email.
+        Checkout is ready for Stripe. Real activation depends on the backend webhook and the link sent by email.
       </p>
     </aside>
   </section>
@@ -189,11 +192,11 @@ const stripeMode = publishableKey.startsWith('pk_live_')
       const body = response.ok ? await response.json() : null;
       if (body?.premium === true) {
         storePremiumSession(token, body);
-        setStatus('Premium activo en este navegador.', 'success');
+        setStatus('Premium is active on this browser.', 'success');
         return true;
       }
       clearPremiumSession();
-      setStatus('El enlace Premium no es valido o ha caducado.', 'danger');
+      setStatus('The Premium link is invalid or has expired.', 'danger');
       return false;
     };
 
@@ -202,13 +205,13 @@ const stripeMode = publishableKey.startsWith('pk_live_')
       try {
         localStorage.removeItem('dondeanime-premium-source-list');
       } catch (error) {}
-      setStatus('Pago completado. Activaremos Premium cuando el webhook confirme la suscripción.', 'success');
+      setStatus('Payment completed. Premium will activate when the webhook confirms the subscription.', 'success');
     } else if (params.get('canceled') === '1') {
-      setStatus('Checkout cancelado. No se ha cambiado tu plan.');
+      setStatus('Checkout canceled. Your plan has not changed.');
     } else if (params.get('manage') === '1') {
-      setStatus('Introduce tu email para abrir el portal de cliente.');
+      setStatus('Enter your email to open the customer portal.');
     } else if (params.get('portal') === '1') {
-      setStatus('Portal de cliente cerrado.');
+      setStatus('Customer portal closed.');
     }
 
     const accessToken = params.get('access_token') || params.get('premium_token');
@@ -219,7 +222,7 @@ const stripeMode = publishableKey.startsWith('pk_live_')
         params.delete('premium_token');
         const nextUrl = params.toString() ? `${window.location.pathname}?${params}` : window.location.pathname;
         window.history.replaceState({}, '', nextUrl);
-      }).catch(() => setStatus('No se pudo verificar Premium ahora mismo.', 'danger'));
+      }).catch(() => setStatus('Premium could not be verified right now.', 'danger'));
     }
 
     const currentEmail = () => {
@@ -259,45 +262,42 @@ const stripeMode = publishableKey.startsWith('pk_live_')
       event.preventDefault();
 
       if (!apiUrl) {
-        setStatus('API no configurada.', 'danger');
+        setStatus('API is not configured.', 'danger');
         return;
       }
 
       if (!isStripePublishableKey(stripeKey)) {
-        setStatus('Clave publica Stripe no valida.', 'danger');
+        setStatus('Stripe public key is not valid.', 'danger');
         return;
       }
 
       const email = currentEmail();
       if (!email) {
-        setStatus('Introduce un email.', 'danger');
+        setStatus('Enter an email.', 'danger');
         return;
       }
 
-      setStatus('Creando checkout...');
+      setStatus('Creating checkout...');
       if (!(await redirectToPremiumUrl('/api/premium/checkout', email))) {
-        setStatus('No se pudo crear el checkout.', 'danger');
+        setStatus('Checkout could not be created.', 'danger');
       }
     });
 
     portalButton?.addEventListener('click', async () => {
       if (!apiUrl) {
-        setStatus('API no configurada.', 'danger');
+        setStatus('API is not configured.', 'danger');
         return;
       }
 
       const email = currentEmail();
       if (!email) {
-        setStatus('Introduce un email.', 'danger');
+        setStatus('Enter an email.', 'danger');
         return;
       }
 
-      // Por seguridad el backend NO devuelve la URL del portal: la envía al
-      // email del titular. Respuesta genérica para no revelar quién es
-      // suscriptor. Deshabilitamos el botón para evitar envíos duplicados.
       const button = portalButton instanceof HTMLButtonElement ? portalButton : null;
       if (button) button.disabled = true;
-      setStatus('Enviando enlace del portal...');
+      setStatus('Sending customer portal link...');
       try {
         const response = await fetch(`${apiUrl}/api/premium/portal`, {
           method: 'POST',
@@ -305,12 +305,12 @@ const stripeMode = publishableKey.startsWith('pk_live_')
           body: JSON.stringify({ email }),
         });
         if (response.ok) {
-          setStatus('Si tienes una suscripción activa, te hemos enviado un enlace a tu email.', 'success');
+          setStatus('If you have an active subscription, we have emailed you a customer portal link.', 'success');
         } else {
-          setStatus('No se pudo procesar la solicitud. Inténtalo más tarde.', 'danger');
+          setStatus('The request could not be processed. Try again later.', 'danger');
         }
       } catch (error) {
-        setStatus('No se pudo conectar con el servidor.', 'danger');
+        setStatus('Could not connect to the server.', 'danger');
       } finally {
         if (button) button.disabled = false;
       }
@@ -318,19 +318,19 @@ const stripeMode = publishableKey.startsWith('pk_live_')
 
     accessButton?.addEventListener('click', async () => {
       if (!apiUrl) {
-        setStatus('API no configurada.', 'danger');
+        setStatus('API is not configured.', 'danger');
         return;
       }
 
       const email = currentEmail();
       if (!email) {
-        setStatus('Introduce un email.', 'danger');
+        setStatus('Enter an email.', 'danger');
         return;
       }
 
       const button = accessButton instanceof HTMLButtonElement ? accessButton : null;
       if (button) button.disabled = true;
-      setStatus('Enviando enlace de acceso...');
+      setStatus('Sending access link...');
       try {
         const response = await fetch(`${apiUrl}/api/premium/access-link`, {
           method: 'POST',
@@ -338,12 +338,12 @@ const stripeMode = publishableKey.startsWith('pk_live_')
           body: JSON.stringify({ email }),
         });
         if (response.ok) {
-          setStatus('Si tienes Premium activo, te hemos enviado un enlace de acceso a tu email.', 'success');
+          setStatus('If you have active Premium, we have emailed you an access link.', 'success');
         } else {
-          setStatus('No se pudo procesar la solicitud. Inténtalo más tarde.', 'danger');
+          setStatus('The request could not be processed. Try again later.', 'danger');
         }
       } catch (error) {
-        setStatus('No se pudo conectar con el servidor.', 'danger');
+        setStatus('Could not connect to the server.', 'danger');
       } finally {
         if (button) button.disabled = false;
       }
