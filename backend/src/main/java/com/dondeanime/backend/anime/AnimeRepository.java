@@ -89,6 +89,17 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
             """)
     List<Anime> findByProviderSlugAndCountry(String providerSlug, String countryCode);
 
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
+            WHERE a.id IN (
+                SELECT wp.animeId FROM WatchProvider wp
+                WHERE wp.countryCode = :countryCode
+            )
+            ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
+            """)
+    List<Anime> findByCountryWithGenres(String countryCode);
+
     /**
      * Anime que tienen un género concreto.
      * El género se compara case-insensitive con el slug recibido:
@@ -165,15 +176,16 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      * La columna y su índice GIN se crean en V3__anime_search_vector.sql.
      */
     @Query(value = """
-            SELECT *
+            SELECT id
             FROM anime
             WHERE search_vector @@ plainto_tsquery('spanish', :query)
             ORDER BY
                 ts_rank(search_vector, plainto_tsquery('spanish', :query)) DESC,
                 popularity DESC NULLS LAST,
                 title_english ASC
+            LIMIT :limit
             """, nativeQuery = true)
-    List<Anime> findBySearchVectorMatching(@Param("query") String query);
+    List<Long> findIdsBySearchVectorMatching(@Param("query") String query, @Param("limit") int limit);
 
     /**
      * Anime con una duracion media concreta por episodio, en minutos.

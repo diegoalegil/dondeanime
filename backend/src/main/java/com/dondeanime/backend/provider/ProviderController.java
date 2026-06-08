@@ -44,6 +44,16 @@ public class ProviderController {
                 .toList();
     }
 
+    @GetMapping("/country/{country}/anime")
+    @Operation(summary = "Lista anime por pais", description = "Devuelve anime disponibles en cualquier plataforma de un pais.")
+    public List<AnimeSummaryDto> animesByCountry(@PathVariable String country) {
+        return animeRepository
+                .findByCountryWithGenres(country.toUpperCase())
+                .stream()
+                .map(AnimeSummaryDto::from)
+                .toList();
+    }
+
     /**
      * Anime disponibles en una plataforma en un país concreto.
      * Ejemplo: GET /api/providers/crunchyroll/ES

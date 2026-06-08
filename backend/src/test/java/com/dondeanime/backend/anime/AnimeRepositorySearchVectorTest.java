@@ -13,13 +13,15 @@ class AnimeRepositorySearchVectorTest {
     @Test
     void repositoryMethodUsesPostgresFullTextQuery() throws NoSuchMethodException {
         Query query = AnimeRepository.class
-                .getMethod("findBySearchVectorMatching", String.class)
+                .getMethod("findIdsBySearchVectorMatching", String.class, int.class)
                 .getAnnotation(Query.class);
 
         assertThat(query).isNotNull();
         assertThat(query.nativeQuery()).isTrue();
+        assertThat(query.value()).contains("SELECT id");
         assertThat(query.value()).contains("search_vector @@ plainto_tsquery('spanish', :query)");
         assertThat(query.value()).contains("ts_rank(search_vector, plainto_tsquery('spanish', :query))");
+        assertThat(query.value()).contains("LIMIT :limit");
     }
 
     @Test

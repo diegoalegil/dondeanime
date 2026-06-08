@@ -2,6 +2,7 @@ package com.dondeanime.backend.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,12 +23,15 @@ class AlertServiceTest {
     private final EmailTokenService emailTokenService = org.mockito.Mockito.mock(EmailTokenService.class);
     private final SubscriptionService subscriptionService = org.mockito.Mockito.mock(SubscriptionService.class);
     private final EmailService emailService = org.mockito.Mockito.mock(EmailService.class);
+    private final SubscriptionNotificationMarker notificationMarker =
+            org.mockito.Mockito.mock(SubscriptionNotificationMarker.class);
 
     private final AlertService alertService = new AlertService(
             subscriptionRepository,
             emailTokenService,
             subscriptionService,
-            emailService);
+            emailService,
+            notificationMarker);
 
     @Test
     void sendsAlertAndMarksSubscriptionAsNotified() {
@@ -40,6 +44,8 @@ class AlertServiceTest {
         when(subscriptionRepository.findPendingAlerts(1L, "ES")).thenReturn(List.of(subscription));
         when(emailTokenService.createUnsubscribeToken(user, anime, "ES"))
                 .thenReturn(new IssuedEmailToken("raw.jwt", token));
+        when(notificationMarker.markNotifiedIfPending(eq(20L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(true);
         when(subscriptionService.unsubscribeUrl("raw.jwt")).thenReturn("https://api/unsubscribe");
         when(subscriptionService.eraseUrl("diego@example.com", "raw.jwt")).thenReturn("https://api/erase");
 
@@ -54,7 +60,26 @@ class AlertServiceTest {
                 List.of("Crunchyroll"),
                 "https://api/unsubscribe",
                 "https://api/erase");
-        verify(subscriptionRepository).save(subscription);
+        verify(notificationMarker).markNotifiedIfPending(eq(20L), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void skipsEmailWhenSubscriptionWasAlreadyClaimed() {
+        Anime anime = anime();
+        AppUser user = user();
+        Subscription subscription = subscription(user, anime);
+        EmailToken token = token(user, anime);
+
+        when(subscriptionRepository.findPendingAlerts(1L, "ES")).thenReturn(List.of(subscription));
+        when(emailTokenService.createUnsubscribeToken(user, anime, "ES"))
+                .thenReturn(new IssuedEmailToken("raw.jwt", token));
+        when(notificationMarker.markNotifiedIfPending(eq(20L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(false);
+
+        int sent = alertService.notifyNewProviders(anime, Map.of("ES", List.of(provider("Crunchyroll"))));
+
+        assertThat(sent).isZero();
+        verify(emailService, never()).sendAlertEmail(any(), any(), any(), any(), any(), any());
     }
 
     @Test
