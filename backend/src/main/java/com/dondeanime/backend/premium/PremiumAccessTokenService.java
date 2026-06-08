@@ -14,6 +14,7 @@ import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,11 +38,11 @@ public class PremiumAccessTokenService {
     private final ObjectMapper objectMapper;
     private final Duration ttl;
 
+    @Autowired
     public PremiumAccessTokenService(
             @Value("${premium.access-token-secret:${alerts.jwt-secret}}") String secret,
-            Clock clock,
-            ObjectMapper objectMapper) {
-        this(secret, clock, objectMapper, DEFAULT_TTL);
+            Clock clock) {
+        this(secret, clock, new ObjectMapper(), DEFAULT_TTL);
     }
 
     PremiumAccessTokenService(String secret, Clock clock, ObjectMapper objectMapper, Duration ttl) {
