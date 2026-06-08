@@ -7,6 +7,7 @@ import { getSeasons, getAnimeBySeason } from '@/lib/api';
 import { formatSeason } from '@/lib/format';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -32,11 +33,11 @@ const seoDescription = t('season.seo.description', {
   titles: previewTitles,
 });
 
-const pageUrl = absoluteUrl(`/temporada/${year}/${season}`);
+const pageUrl = absoluteUrl(`/en/season/${year}/${season}`);
 const itemListSchema = buildItemListSchema(
   anime.map((a) => ({
     name: a.titleEnglish || a.titleRomaji,
-    url: absoluteUrl(`/anime/${a.slug}`),
+    url: absoluteUrl(`/en/anime/${a.slug}`),
   })),
   pageUrl,
   t('season.schema.name', { season: seasonLabel, year: year! }),
@@ -47,9 +48,9 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.seasons'), url: '/' },
-      { name: `${seasonLabel} ${year}`, url: `/temporada/${year}/${season}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.seasons'), url: localizedPath('/') },
+      { name: `${seasonLabel} ${year}`, url: localizedPath(`/temporada/${year}/${season}`) },
     ]}
   />
 

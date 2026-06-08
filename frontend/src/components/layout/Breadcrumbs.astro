@@ -12,7 +12,7 @@ const { items } = Astro.props;
 const localizedItems = items.map((item) => ({ ...item, url: localizedPath(item.url) }));
 
 const schema = buildBreadcrumbSchema(
-  items.map((i) => ({ name: i.name, url: absoluteUrl(i.url) }))
+  localizedItems.map((i) => ({ name: i.name, url: absoluteUrl(i.url) }))
 );
 ---
 <nav class="mx-auto max-w-6xl px-4 pt-4" aria-label={t('breadcrumbs.aria')}>

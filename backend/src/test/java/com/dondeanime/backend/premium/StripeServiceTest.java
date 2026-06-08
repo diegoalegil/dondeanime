@@ -3,6 +3,7 @@ package com.dondeanime.backend.premium;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -127,6 +128,7 @@ class StripeServiceTest {
                         NOW,
                         NOW.plusSeconds(2_592_000),
                         "evt_created_1"));
+        when(processedEventRepository.claimProcessing(eq("evt_created_1"), any(Instant.class))).thenReturn(1);
 
         String received = service.handleWebhook("{}", "sig");
 
@@ -143,7 +145,7 @@ class StripeServiceTest {
                 "PREMIUM",
                 "https://dondeanime.com/premium");
         verify(curatedListTrackingService).trackConversion("anime-para-empezar");
-        verify(processedEventRepository).save(any(StripeProcessedEvent.class));
+        verify(processedEventRepository).claimProcessing(eq("evt_created_1"), any(Instant.class));
     }
 
     @Test
@@ -157,14 +159,13 @@ class StripeServiceTest {
                         NOW,
                         null,
                         "evt_dup_1"));
-        when(processedEventRepository.existsById("evt_dup_1")).thenReturn(true);
+        when(processedEventRepository.claimProcessing(eq("evt_dup_1"), any(Instant.class))).thenReturn(0);
 
         String received = service.handleWebhook("{}", "sig");
 
         assertThat(received).isEqualTo("invoice.payment_succeeded");
         verify(subscriberService, never()).recordPaymentSucceeded(any(), any(), any());
         verify(emailService, never()).sendPremiumReceiptEmail(any(), any(), any(), any());
-        verify(processedEventRepository, never()).save(any());
     }
 
     @Test
@@ -178,6 +179,7 @@ class StripeServiceTest {
                         NOW,
                         null,
                         "evt_invoice_1"));
+        when(processedEventRepository.claimProcessing(eq("evt_invoice_1"), any(Instant.class))).thenReturn(1);
 
         String received = service.handleWebhook("{}", "sig");
 
@@ -201,6 +203,7 @@ class StripeServiceTest {
                         NOW,
                         null,
                         "evt_deleted_1"));
+        when(processedEventRepository.claimProcessing(eq("evt_deleted_1"), any(Instant.class))).thenReturn(1);
 
         String received = service.handleWebhook("{}", "sig");
 

@@ -6,6 +6,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getGenres, getAnimeByGenre } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -30,11 +31,11 @@ const seoDescription = t('genre.seo.description', {
   remaining: Math.max(0, total - 5),
 });
 
-const pageUrl = absoluteUrl(`/genero/${genero}`);
+const pageUrl = absoluteUrl(`/en/genre/${genero}`);
 const itemListSchema = buildItemListSchema(
   anime.slice(0, 30).map((a) => ({
     name: a.titleEnglish || a.titleRomaji,
-    url: absoluteUrl(`/anime/${a.slug}`),
+    url: absoluteUrl(`/en/anime/${a.slug}`),
   })),
   pageUrl,
   t('genre.schema.name', { genre: genreName }),
@@ -45,9 +46,9 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.genres'), url: '/' },
-      { name: genreName, url: `/genero/${genero}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.genres'), url: localizedPath('/') },
+      { name: genreName, url: localizedPath(`/genero/${genero}`) },
     ]}
   />
 

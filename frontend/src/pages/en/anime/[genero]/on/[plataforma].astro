@@ -9,15 +9,15 @@ import { COUNTRIES } from '@/lib/countries';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
 interface Props {
   genreName: string;
+  genreSlug: string;
   provider: ProviderSummary;
 }
-
-const slugifyGenre = (genre: string): string => genre.toLowerCase().replace(/\s+/g, '-');
 
 export async function getStaticPaths() {
   const topGenreLimit = 7;
@@ -40,6 +40,7 @@ export async function getStaticPaths() {
       },
       props: {
         genreName: genre.name,
+        genreSlug: genre.slug,
         provider,
       },
     }))
@@ -47,7 +48,7 @@ export async function getStaticPaths() {
 }
 
 const { genero, plataforma } = Astro.params;
-const { genreName, provider } = Astro.props as Props;
+const { genreName, genreSlug, provider } = Astro.props as Props;
 const platformName = getPlatform(provider.slug)?.name ?? provider.providerName;
 
 const animeByCountry = await Promise.all(
@@ -59,7 +60,7 @@ const providerAnime = Array.from(
 );
 
 const anime = providerAnime
-  .filter((item) => item.genres.some((genre) => slugifyGenre(genre) === genero))
+  .filter((item) => item.genres.some((genre) => genre === genreName || genre === genreSlug))
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
 
 const seoTitle = t('combo.seo.title', { genre: genreName, platform: platformName });
@@ -71,11 +72,11 @@ const seoDescription = anime.length > 0
     })
   : t('combo.seo.description.empty', { genre: genreName, platform: platformName });
 
-const pageUrl = absoluteUrl(`/anime/${genero}/en/${plataforma}`);
+const pageUrl = absoluteUrl(`/en/anime/${genero}/on/${plataforma}`);
 const itemListSchema = buildItemListSchema(
   anime.slice(0, 30).map((item: AnimeSummary) => ({
     name: item.titleEnglish || item.titleRomaji,
-    url: absoluteUrl(`/anime/${item.slug}`),
+    url: absoluteUrl(`/en/anime/${item.slug}`),
   })),
   pageUrl,
   t('combo.schema.name', { genre: genreName, platform: platformName }),
@@ -86,10 +87,10 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.genres'), url: `/genero/${genero}` },
-      { name: platformName, url: `/plataforma/${plataforma}` },
-      { name: t('combo.schema.name', { genre: genreName, platform: platformName }), url: `/anime/${genero}/en/${plataforma}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.genres'), url: localizedPath(`/genero/${genero}`) },
+      { name: platformName, url: localizedPath(`/plataforma/${plataforma}`) },
+      { name: t('combo.schema.name', { genre: genreName, platform: platformName }), url: localizedPath(`/anime/${genero}/en/${plataforma}`) },
     ]}
   />
 

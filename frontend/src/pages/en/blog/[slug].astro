@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -23,7 +24,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as Props;
 const { Content } = await render(post);
-const pageUrl = absoluteUrl(`/blog/${post.id}`);
+const pageUrl = absoluteUrl(`/en/blog/${post.id}`);
 const published = post.data.pubDate.toISOString();
 const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 const activeLocale = getLocale();
@@ -64,9 +65,9 @@ const blogPostingSchema = {
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.blog'), url: '/blog' },
-      { name: post.data.title, url: `/blog/${post.id}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.blog'), url: localizedPath('/blog') },
+      { name: post.data.title, url: localizedPath(`/blog/${post.id}`) },
     ]}
   />
 

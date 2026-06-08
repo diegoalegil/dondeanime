@@ -10,8 +10,8 @@ import AvailabilityAlertForm from '@/components/alerts/AvailabilityAlertForm.ast
 import AdSlot from '@/components/ads/AdSlot.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import AlternateLangs from '@/components/seo/AlternateLangs.astro';
-import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { getBuildableAnimeDetails } from '@/lib/api';
+import type { AnimeDetail } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
@@ -20,11 +20,16 @@ import { canonicalCountrySlug, localizedCountryName, localizedPath } from '@/lib
 
 setLocale('es');
 
+interface Props {
+  detail: AnimeDetail;
+}
+
 export async function getStaticPaths() {
-  const all = await getAllAnime();
-  return all.flatMap((a) =>
+  const entries = await getBuildableAnimeDetails();
+  return entries.flatMap(({ detail }) =>
     COUNTRY_SLUGS.map((countrySlug) => ({
-      params: { slug: a.slug, pais: countrySlug },
+      params: { slug: detail.anime.slug, pais: countrySlug },
+      props: { detail },
     })),
   );
 }
@@ -35,7 +40,7 @@ if (!countrySlug) throw new Error(`Unknown country slug: ${pais}`);
 const country = COUNTRIES[countrySlug];
 const countryName = localizedCountryName(countrySlug);
 
-const detail = await getAnimeBySlug(slug!);
+const { detail } = Astro.props as Props;
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
 
 const providersRaw = detail.watchProvidersByCountry[country.iso] ?? [];
@@ -77,13 +82,6 @@ const canonicalOverride = hasProviders ? undefined : absoluteUrl(localizedPath(`
 >
   <JsonLd slot="head" data={tvSchema} />
   {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
-  {hasProviders && (
-    <AlternateLangs
-      slot="head"
-      basePathWithSlug={`/anime/${slug}`}
-      defaultPath={`/anime/${slug}`}
-    />
-  )}
 
   <Breadcrumbs
     items={[

@@ -601,8 +601,8 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
   await page.getByRole('button', { name: 'Ir a checkout' }).click();
   await page.waitForURL('**/premium?success=1');
-  await expect(page.locator('[data-premium-status]')).toContainText('Premium activo');
-  expect(await page.evaluate(() => localStorage.getItem('dondeanime-premium'))).toBe('true');
+  await expect(page.locator('[data-premium-status]')).toContainText('webhook confirme');
+  expect(await page.evaluate(() => localStorage.getItem('dondeanime-premium'))).toBeNull();
 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
   await page.getByRole('button', { name: 'Gestionar suscripción' }).click();

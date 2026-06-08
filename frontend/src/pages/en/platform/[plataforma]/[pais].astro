@@ -8,7 +8,7 @@ import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
-import { canonicalCountrySlug, countryParamForLocale, localizedCountryName } from '@/lib/localizedRoutes';
+import { canonicalCountrySlug, countryParamForLocale, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -50,11 +50,11 @@ const seoDescription = t('platformCountry.seo.description', {
   count: anime.length,
 });
 
-const pageUrl = absoluteUrl(`/plataforma/${plataforma}/${countrySlug}`);
+const pageUrl = absoluteUrl(localizedPath(`/plataforma/${plataforma}/${countrySlug}`));
 const itemListSchema = buildItemListSchema(
   anime.slice(0, 30).map((a) => ({
     name: a.titleEnglish || a.titleRomaji,
-    url: absoluteUrl(`/anime/${a.slug}/${countrySlug}`),
+    url: absoluteUrl(localizedPath(`/anime/${a.slug}/${countrySlug}`)),
   })),
   pageUrl,
   t('platformCountry.schema.name', { platform: displayName, country: countryName }),
@@ -69,9 +69,9 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: displayName, url: `/plataforma/${plataforma}` },
-      { name: countryName, url: `/plataforma/${plataforma}/${countrySlug}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: displayName, url: localizedPath(`/plataforma/${plataforma}`) },
+      { name: countryName, url: localizedPath(`/plataforma/${plataforma}/${countrySlug}`) },
     ]}
   />
 

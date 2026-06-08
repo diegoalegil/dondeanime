@@ -77,7 +77,6 @@ public class SecurityConfig {
                 "Authorization",
                 "Content-Type",
                 "X-API-Key",
-                "X-User-Email",
                 RequestMdcFilter.REQUEST_ID_HEADER));
         configuration.setExposedHeaders(List.of(
                 "WWW-Authenticate",

@@ -145,10 +145,10 @@ public class AnimeController {
     public ResponseEntity<AnimeDetailResponse> getBySlug(@PathVariable String slug) {
         return repository.findBySlugWithCharacters(slug)
                 .map(anime -> {
-                    var byCountry = providerRepository
-                            .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId())
+                    var providers = providerRepository
+                            .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(anime.getId());
+                    var byCountry = affiliateLinkService.toProviderDtos(providers)
                             .stream()
-                            .map(affiliateLinkService::toProviderDto)
                             .collect(Collectors.groupingBy(
                                     ProviderDto::countryCode,
                                     LinkedHashMap::new,

@@ -179,7 +179,8 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      * Anime con una duracion media concreta por episodio, en minutos.
      */
     @Query("""
-            SELECT a FROM Anime a
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.episodeDuration = :minutes
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
@@ -189,7 +190,8 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
      * Anime con numero de episodios conocido igual o inferior al limite.
      */
     @Query("""
-            SELECT a FROM Anime a
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
             WHERE a.episodes IS NOT NULL AND a.episodes <= :maxEpisodes
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)

@@ -150,11 +150,9 @@ const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? 'pk_test
     const params = new URLSearchParams(window.location.search);
     if (params.get('success') === '1') {
       try {
-        localStorage.setItem('dondeanime-premium', 'true');
-        localStorage.setItem('dondeanime-premium-tier', 'Premium');
         localStorage.removeItem('dondeanime-premium-source-list');
       } catch (error) {}
-      setStatus('Premium activo en este navegador.', 'success');
+      setStatus('Pago completado. Activaremos Premium cuando el webhook confirme la suscripción.', 'success');
     } else if (params.get('canceled') === '1') {
       setStatus('Checkout cancelado. No se ha cambiado tu plan.');
     } else if (params.get('manage') === '1') {

@@ -68,7 +68,6 @@ export const buildTVSeriesSchema = (
     ratingValue: ratingValue(anime.averageScore),
     bestRating: '10',
     worstRating: '0',
-    ratingCount: anime.popularity ?? 1,
   } : undefined,
   ...(providers.length > 0 && {
     offers: providers.map((p) => ({

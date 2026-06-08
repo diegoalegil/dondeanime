@@ -129,6 +129,36 @@ public class AffiliateLinkService {
         return ProviderDto.from(provider, affiliateUrl);
     }
 
+    @Transactional(readOnly = true)
+    public List<ProviderDto> toProviderDtos(List<WatchProvider> providers) {
+        if (providers == null || providers.isEmpty()) {
+            return List.of();
+        }
+
+        Set<String> providerSlugs = providers.stream()
+                .map(provider -> ProviderSummaryDto.slugify(provider.getProviderName()))
+                .collect(java.util.stream.Collectors.toSet());
+        Set<String> countryCodes = providers.stream()
+                .map(WatchProvider::getCountryCode)
+                .collect(java.util.stream.Collectors.toSet());
+        Map<String, String> affiliateUrlByProviderCountry = linkRepository
+                .findByProviderSlugInAndCountryCodeInAndActiveTrue(providerSlugs, countryCodes)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        link -> providerCountryKey(link.getProviderSlug(), link.getCountryCode()),
+                        AffiliateLink::getAffiliateUrl,
+                        (first, second) -> first));
+
+        return providers.stream()
+                .map(provider -> {
+                    String providerSlug = ProviderSummaryDto.slugify(provider.getProviderName());
+                    String affiliateUrl = affiliateUrlByProviderCountry.get(
+                            providerCountryKey(providerSlug, provider.getCountryCode()));
+                    return ProviderDto.from(provider, affiliateUrl);
+                })
+                .toList();
+    }
+
     @Transactional
     public void trackClick(AffiliateTrackRequest request) {
         String providerSlug = normalizeProviderSlug(request.providerSlug());
@@ -249,6 +279,10 @@ public class AffiliateLinkService {
             return 0.0;
         }
         return clicks.doubleValue() / detailViews.doubleValue();
+    }
+
+    private static String providerCountryKey(String providerSlug, String countryCode) {
+        return providerSlug + "|" + countryCode;
     }
 
     static String normalizeProviderSlug(String value) {

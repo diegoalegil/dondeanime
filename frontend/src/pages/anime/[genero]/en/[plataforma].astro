@@ -15,10 +15,9 @@ setLocale('es');
 
 interface Props {
   genreName: string;
+  genreSlug: string;
   provider: ProviderSummary;
 }
-
-const slugifyGenre = (genre: string): string => genre.toLowerCase().replace(/\s+/g, '-');
 
 export async function getStaticPaths() {
   const topGenreLimit = 7;
@@ -41,6 +40,7 @@ export async function getStaticPaths() {
       },
       props: {
         genreName: genre.name,
+        genreSlug: genre.slug,
         provider,
       },
     }))
@@ -48,7 +48,7 @@ export async function getStaticPaths() {
 }
 
 const { genero, plataforma } = Astro.params;
-const { genreName, provider } = Astro.props as Props;
+const { genreName, genreSlug, provider } = Astro.props as Props;
 const platformName = getPlatform(provider.slug)?.name ?? provider.providerName;
 
 const animeByCountry = await Promise.all(
@@ -60,7 +60,7 @@ const providerAnime = Array.from(
 );
 
 const anime = providerAnime
-  .filter((item) => item.genres.some((genre) => slugifyGenre(genre) === genero))
+  .filter((item) => item.genres.some((genre) => genre === genreName || genre === genreSlug))
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
 const autoText = new AutoTextGenerator().generateGenrePlatform({
   animeCount: anime.length,

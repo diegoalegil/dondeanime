@@ -1,6 +1,7 @@
 package com.dondeanime.backend.affiliate;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,10 @@ public interface AffiliateLinkRepository extends JpaRepository<AffiliateLink, Lo
     Optional<AffiliateLink> findByProviderSlugAndCountryCode(String providerSlug, String countryCode);
 
     Optional<AffiliateLink> findByProviderSlugAndCountryCodeAndActiveTrue(String providerSlug, String countryCode);
+
+    List<AffiliateLink> findByProviderSlugInAndCountryCodeInAndActiveTrue(
+            Collection<String> providerSlugs,
+            Collection<String> countryCodes);
 
     List<AffiliateLink> findAllByOrderByProviderSlugAscCountryCodeAsc();
 

@@ -30,11 +30,11 @@ const seoDescription = t('countryPage.seo.description', {
   platforms: providers.slice(0, 5).map((p) => p.providerName).join(', '),
 });
 
-const pageUrl = absoluteUrl(`/pais/${countrySlug}`);
+const pageUrl = absoluteUrl(localizedPath(`/pais/${countrySlug}`));
 const itemListSchema = buildItemListSchema(
   providers.map((p) => ({
     name: p.providerName,
-    url: absoluteUrl(`/plataforma/${p.slug}/${countrySlug}`),
+    url: absoluteUrl(localizedPath(`/plataforma/${p.slug}/${countrySlug}`)),
   })),
   pageUrl,
   t('countryPage.schema.name', { country: countryName }),
@@ -49,8 +49,8 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: countryName, url: `/pais/${countrySlug}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: countryName, url: localizedPath(`/pais/${countrySlug}`) },
     ]}
   />
 

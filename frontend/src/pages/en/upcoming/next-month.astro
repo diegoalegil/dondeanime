@@ -6,16 +6,17 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getUpcomingAnime } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
 const anime = await getUpcomingAnime(30);
 
-const pageUrl = absoluteUrl('/estrenos/proximo-mes');
+const pageUrl = absoluteUrl('/en/upcoming/next-month');
 const itemListSchema = buildItemListSchema(
   anime.map((item) => ({
     name: item.titleEnglish || item.titleRomaji,
-    url: absoluteUrl(`/anime/${item.slug}`),
+    url: absoluteUrl(`/en/anime/${item.slug}`),
   })),
   pageUrl,
   t('premieres.month.schema.name'),
@@ -29,9 +30,9 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.premieres'), url: '/estrenos/proxima-semana' },
-      { name: t('breadcrumbs.nextMonth'), url: '/estrenos/proximo-mes' },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.premieres'), url: localizedPath('/estrenos/proxima-semana') },
+      { name: t('breadcrumbs.nextMonth'), url: localizedPath('/estrenos/proximo-mes') },
     ]}
   />
 

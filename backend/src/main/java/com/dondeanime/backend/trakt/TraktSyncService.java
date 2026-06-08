@@ -45,7 +45,6 @@ public class TraktSyncService {
         this.clock = clock;
     }
 
-    @Transactional
     public TraktSyncResponse sync(TraktSyncRequest request) {
         String externalUserId = requireTrimmed(request.externalUserId(), "externalUserId");
         String accessToken = requireTrimmed(request.accessToken(), "accessToken");

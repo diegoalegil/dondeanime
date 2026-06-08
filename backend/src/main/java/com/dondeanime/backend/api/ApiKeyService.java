@@ -72,7 +72,7 @@ public class ApiKeyService {
 
     @Transactional
     public ApiKeyUsage recordUsage(String rawKey, String endpoint) {
-        ApiKey apiKey = repository.findByKey(normalizeKey(rawKey))
+        ApiKey apiKey = repository.findByKeyForUpdate(normalizeKey(rawKey))
                 .orElseThrow(ApiKeyNotFoundException::new);
         Instant now = Instant.now(clock);
         boolean reset = resetMonthlyUsageIfNeeded(apiKey, now);

@@ -123,10 +123,11 @@ public class StripeService {
     public String handleWebhook(String payload, String signature) {
         StripeWebhookEvent event = verifyWebhookSignature(payload, signature);
         String eventId = event.eventId();
-        // Idempotencia: Stripe reentrega eventos. Si ya lo procesamos, no
-        // volvemos a tocar BD ni a reenviar emails.
-        if (eventId != null && !eventId.isBlank() && processedEventRepository.existsById(eventId)) {
-            return event.type();
+        if (eventId != null && !eventId.isBlank()) {
+            int claimed = processedEventRepository.claimProcessing(eventId, Instant.now());
+            if (claimed == 0) {
+                return event.type();
+            }
         }
         Instant eventTime = event.eventTime() == null ? Instant.now() : event.eventTime();
         switch (event.type()) {
@@ -163,9 +164,6 @@ public class StripeService {
             }
             default -> {
             }
-        }
-        if (eventId != null && !eventId.isBlank()) {
-            processedEventRepository.save(new StripeProcessedEvent(eventId, Instant.now()));
         }
         return event.type();
     }

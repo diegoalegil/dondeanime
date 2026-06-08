@@ -80,6 +80,28 @@ class RateLimitFilterTest {
         assertThat(result.rejected().getHeader(HttpHeaders.RETRY_AFTER)).isNotBlank();
     }
 
+    @Test
+    void cloudflareConnectingIpTakesPrecedenceOverForwardedFor() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+        AtomicInteger passed = new AtomicInteger();
+        FilterChain chain = (request, response) -> passed.incrementAndGet();
+
+        for (int i = 0; i < 30; i++) {
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            MockHttpServletRequest request = request("/api/search", "198.51.100." + i);
+            request.addHeader("CF-Connecting-IP", "203.0.113.77");
+            filter.doFilter(request, response, chain);
+            assertThat(response.getStatus()).isEqualTo(200);
+        }
+
+        MockHttpServletResponse rejected = new MockHttpServletResponse();
+        MockHttpServletRequest request = request("/api/search", "198.51.100.200");
+        request.addHeader("CF-Connecting-IP", "203.0.113.77");
+        filter.doFilter(request, rejected, chain);
+
+        assertThat(rejected.getStatus()).isEqualTo(429);
+    }
+
     private static RateLimitResult exhaust(
             RateLimitFilter filter,
             String path,

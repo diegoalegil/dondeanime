@@ -153,12 +153,6 @@ const schema = list.schema ?? buildItemListSchema(
       if (!root) return;
       const apiUrl = root.getAttribute('data-api-url') || '';
       const listSlug = root.getAttribute('data-list-slug') || '';
-      const escapeHtml = (value) => String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
       const post = (path, payload) => {
         if (!apiUrl || !listSlug) return;
         fetch(`${apiUrl}${path}`, {
@@ -189,71 +183,6 @@ const schema = list.schema ?? buildItemListSchema(
           post('/api/track/lists/premium-click', { listSlug });
         }
       });
-
-      const premiumEmail = () => {
-        try {
-          const active = localStorage.getItem('dondeanime-premium') === 'true';
-          const email = localStorage.getItem('dondeanime-premium-email') || '';
-          return active ? email : '';
-        } catch (error) {
-          return '';
-        }
-      };
-
-      const itemHtml = (item) => {
-        const anime = item.anime;
-        const title = anime?.titleEnglish || anime?.titleRomaji || item.animeSlug;
-        const cover = anime?.coverImage
-          ? `<a href="/anime/${escapeHtml(anime.slug)}" class="block w-24 sm:w-full">
-              <img src="${escapeHtml(anime.coverImage)}" alt="${escapeHtml(title)}" loading="${item.position <= 3 ? 'eager' : 'lazy'}" width="240" height="360" class="block aspect-[2/3] w-full overflow-hidden rounded-lg bg-surface-2 object-cover ring-1 ring-surface-2" />
-            </a>`
-          : '<div class="aspect-[2/3] w-24 rounded-lg bg-surface-2 sm:w-full"></div>';
-        const meta = anime
-          ? `<p class="mt-2 text-sm text-fg-muted">${escapeHtml(anime.year ?? '---')} &middot; ${escapeHtml(anime.format ?? '')} &middot; ${escapeHtml(anime.averageScore ?? 'sin nota')}</p>`
-          : '';
-        const genres = anime?.genres?.length
-          ? `<div class="mt-4 flex flex-wrap gap-2">${anime.genres.slice(0, 4).map((genre) => (
-              `<span class="rounded-md bg-surface-2 px-2 py-1 text-xs text-fg-secondary">${escapeHtml(genre)}</span>`
-            )).join('')}</div>`
-          : '';
-
-        return `<li class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-4 sm:grid-cols-[3.5rem_6rem_1fr] sm:items-start">
-          <div class="flex h-10 w-14 items-center justify-center rounded-md bg-surface-2 text-sm font-semibold text-accent-violet">#${escapeHtml(item.position)}</div>
-          ${cover}
-          <div class="min-w-0">
-            <a href="/anime/${escapeHtml(item.animeSlug)}" class="text-xl font-semibold text-fg-primary transition-colors hover:text-accent-violet" data-list-anime-click data-anime-slug="${escapeHtml(item.animeSlug)}">${escapeHtml(title)}</a>
-            ${meta}
-            ${item.note ? `<p class="mt-3 text-sm text-fg-secondary">${escapeHtml(item.note)}</p>` : ''}
-            ${genres}
-          </div>
-        </li>`;
-      };
-
-      const renderItems = (items) => {
-        if (!items?.length) {
-          return `<p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">Esta lista aún no tiene anime publicados.</p>`;
-        }
-        return `<ol class="grid gap-4">${items.map(itemHtml).join('')}</ol>`;
-      };
-
-      const unlockPremiumList = async () => {
-        const email = premiumEmail();
-        if (!email || !apiUrl || !listSlug) return;
-        const response = await fetch(`${apiUrl}/api/lists/${encodeURIComponent(listSlug)}`, {
-          headers: { 'X-User-Email': email },
-        });
-        if (!response.ok) return;
-        const body = await response.json();
-        if (body.premiumPreview || !Array.isArray(body.items)) return;
-
-        document.querySelector('[data-premium-preview]')?.remove();
-        const count = document.querySelector('[data-list-item-count]');
-        if (count) count.textContent = `${body.itemCount ?? body.items.length} anime`;
-        const region = document.querySelector('[data-list-items-region]');
-        if (region) region.innerHTML = renderItems(body.items.toSorted((a, b) => a.position - b.position));
-      };
-
-      unlockPremiumList().catch(() => {});
     })();
   </script>
 </BaseLayout>

@@ -94,10 +94,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private static String clientIp(HttpServletRequest request) {
-        // Detrás de un único proxy de confianza (Caddy), la IP real del
-        // cliente es la ÚLTIMA entrada de X-Forwarded-For: Caddy la añade
-        // al final. Tomar la primera permitiría a un cliente spoofear el
-        // header y crear un bucket nuevo por request (bypass del límite).
+        String cloudflareIp = request.getHeader("CF-Connecting-IP");
+        if (cloudflareIp != null && !cloudflareIp.isBlank()) {
+            return cloudflareIp.trim();
+        }
+
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
             String[] hops = forwardedFor.split(",");

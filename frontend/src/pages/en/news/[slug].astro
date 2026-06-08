@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getNews, getNewsBySlug } from '@/lib/api';
 import { absoluteUrl, buildNewsArticleSchema } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -19,7 +20,7 @@ if (!item) {
   return Astro.redirect('/en/news');
 }
 
-const pageUrl = absoluteUrl(`/noticias/${item.slug}`);
+const pageUrl = absoluteUrl(`/en/news/${item.slug}`);
 const activeLocale = getLocale();
 const date = new Intl.DateTimeFormat(activeLocale === 'en' ? 'en-US' : 'es-ES', {
   day: 'numeric',
@@ -41,9 +42,9 @@ const metaDescription = item.metaDescription ?? item.summary ?? item.title;
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.news'), url: '/noticias' },
-      { name: item.title, url: `/noticias/${item.slug}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.news'), url: localizedPath('/noticias') },
+      { name: item.title, url: localizedPath(`/noticias/${item.slug}`) },
     ]}
   />
 

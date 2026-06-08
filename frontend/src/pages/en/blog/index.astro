@@ -20,12 +20,12 @@ const formatDate = new Intl.DateTimeFormat(getLocale() === 'en' ? 'en-US' : 'es-
 <BaseLayout
   title={t('blog.index.title')}
   description={t('blog.index.description')}
-  canonical={absoluteUrl('/blog')}
+  canonical={absoluteUrl('/en/blog')}
 >
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.blog'), url: '/blog' },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.blog'), url: localizedPath('/blog') },
     ]}
   />
 

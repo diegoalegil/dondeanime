@@ -61,9 +61,9 @@ const faqSchema = buildFAQPageSchema(homeFaqs);
 const itemListSchema = buildItemListSchema(
   anime.slice(0, 20).map((a) => ({
     name: a.titleEnglish || a.titleRomaji,
-    url: absoluteUrl(`/anime/${a.slug}`),
+    url: absoluteUrl(`/en/anime/${a.slug}`),
   })),
-  absoluteUrl('/'),
+  absoluteUrl('/en'),
   t('home.itemListName'),
 );
 ---

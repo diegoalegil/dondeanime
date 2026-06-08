@@ -20,6 +20,7 @@ import com.dondeanime.backend.anime.RecommendationEventRepository;
 import com.dondeanime.backend.curated.CuratedListMetricRepository;
 import com.dondeanime.backend.curated.CuratedListMetricType;
 import com.dondeanime.backend.provider.AvailabilityChangeEventRepository;
+import com.dondeanime.backend.provider.WatchProvider;
 import com.dondeanime.backend.provider.WatchProviderRepository;
 import com.dondeanime.backend.trakt.TraktDashboardMetricsDto;
 import com.dondeanime.backend.trakt.TraktDashboardMetricsService;
@@ -102,6 +103,26 @@ class AffiliateLinkServiceTest {
 
         verify(linkRepository, never()).incrementClickCount(any(), any(), any());
         verify(clickEventRepository, never()).save(any());
+    }
+
+    @Test
+    void providerDtosResolveAffiliateLinksInOneRepositoryCall() {
+        WatchProvider crunchyroll = watchProvider("Crunchyroll", "ES");
+        WatchProvider netflix = watchProvider("Netflix", "MX");
+        AffiliateLink link = link();
+        when(linkRepository.findByProviderSlugInAndCountryCodeInAndActiveTrue(
+                java.util.Set.of("crunchyroll", "netflix"),
+                java.util.Set.of("ES", "MX")))
+                .thenReturn(List.of(link));
+
+        List<com.dondeanime.backend.provider.ProviderDto> result =
+                service.toProviderDtos(List.of(crunchyroll, netflix));
+
+        assertThat(result).hasSize(2);
+        assertThat(result.getFirst().providerSlug()).isEqualTo("crunchyroll");
+        assertThat(result.getFirst().affiliateUrl()).isEqualTo("https://example.com/cr");
+        assertThat(result.get(1).providerSlug()).isEqualTo("netflix");
+        assertThat(result.get(1).affiliateUrl()).isNull();
     }
 
     @Test
@@ -202,6 +223,18 @@ class AffiliateLinkServiceTest {
         link.setCreatedAt(Instant.now());
         link.setUpdatedAt(Instant.now());
         return link;
+    }
+
+    private static com.dondeanime.backend.provider.WatchProvider watchProvider(String providerName, String countryCode) {
+        com.dondeanime.backend.provider.WatchProvider provider =
+                new com.dondeanime.backend.provider.WatchProvider();
+        provider.setAnimeId(1L);
+        provider.setCountryCode(countryCode);
+        provider.setProviderName(providerName);
+        provider.setProviderType("FLATRATE");
+        provider.setLogoUrl("https://example.com/logo.png");
+        provider.setUpdatedAt(Instant.now());
+        return provider;
     }
 
     private static WatchProviderRepository.ProviderCountryAggregation providerCountry(String providerName, String countryCode) {

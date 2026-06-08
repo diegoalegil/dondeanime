@@ -1,9 +1,11 @@
-import { FALLBACK_TOP_STUDIOS, formatStudioName, studioSlug } from './programmaticSeo';
+import { formatStudioName, studioSlug } from './programmaticSeo';
 
 const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
 const JSON_CACHE = new Map<string, Promise<unknown>>();
 const FETCH_ATTEMPTS = 3;
 const FETCH_TIMEOUT_MS = 15_000;
+const DETAIL_BUILD_CONCURRENCY = 12;
+let BUILDABLE_ANIME_DETAILS: Promise<AnimeBuildDetail[]> | null = null;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -109,6 +111,11 @@ export interface AnimeDetail {
   watchProvidersByCountry: Record<string, WatchProvider[]>;
 }
 
+export interface AnimeBuildDetail {
+  summary: AnimeSummary;
+  detail: AnimeDetail;
+}
+
 export interface ProviderSummary {
   slug: string;
   providerName: string;
@@ -211,13 +218,29 @@ async function fetchJsonAllowing404<T>(path: string, fallback: () => Promise<T> 
  * puede abortar la generación de 13k páginas.
  */
 async function fetchJsonSafe<T>(path: string, fallback: T): Promise<T> {
-  try {
-    const res = await fetchWithRetry(path);
-    if (!res.ok) {
+  const cached = JSON_CACHE.get(path);
+  if (cached) {
+    try {
+      return (await cached) as T;
+    } catch {
       return fallback;
     }
-    return (await res.json()) as T;
+  }
+
+  const request = (async () => {
+    const res = await fetchWithRetry(path);
+    if (!res.ok) {
+      throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json() as Promise<T>;
+  })();
+
+  JSON_CACHE.set(path, request);
+
+  try {
+    return await request;
   } catch {
+    JSON_CACHE.delete(path);
     return fallback;
   }
 }
@@ -230,6 +253,44 @@ export const getUpcomingAnime = async (days: number) => {
 
 export const getAnimeBySlug = (slug: string) =>
   fetchJson<AnimeDetail>(`/api/anime/${slug}`);
+
+export const getAnimeBySlugOrNull = (slug: string) =>
+  fetchJsonAllowing404<AnimeDetail | null>(`/api/anime/${slug}`, () => null);
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(items[index], index);
+    }
+  });
+
+  await Promise.all(workers);
+  return results;
+}
+
+export const getBuildableAnimeDetails = async (): Promise<AnimeBuildDetail[]> => {
+  if (!BUILDABLE_ANIME_DETAILS) {
+    BUILDABLE_ANIME_DETAILS = (async () => {
+      const allAnime = await getAllAnime();
+      const entries = await mapWithConcurrency(allAnime, DETAIL_BUILD_CONCURRENCY, async (summary) => {
+        const detail = await getAnimeBySlugOrNull(summary.slug);
+        return detail ? { summary, detail } : null;
+      });
+      return entries.filter((entry): entry is AnimeBuildDetail => entry !== null);
+    })();
+  }
+
+  return BUILDABLE_ANIME_DETAILS;
+};
 
 export const getSimilarAnime = async (slug: string, watchedSlugs: string[] = []) => {
   const params = new URLSearchParams();
@@ -317,13 +378,7 @@ const summarizeStudiosFromAnime = (anime: AnimeSummary[]): StudioSummary[] => {
     .map(([slug, value]) => ({ slug, animationStudio: false, ...value }))
     .sort((a, b) => b.animeCount - a.animeCount || a.name.localeCompare(b.name, 'es'));
 
-  if (summaries.length > 0) return summaries;
-
-  return FALLBACK_TOP_STUDIOS.map((studio) => ({
-    ...studio,
-    animationStudio: false,
-    animeCount: 0,
-  }));
+  return summaries;
 };
 
 export const getStudios = async (): Promise<StudioSummary[]> => {

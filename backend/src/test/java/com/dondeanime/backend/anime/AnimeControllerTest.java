@@ -174,7 +174,8 @@ class AnimeControllerTest {
         when(providerRepository
                 .findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(any()))
                 .thenReturn(List.of(provider));
-        when(affiliateLinkService.toProviderDto(provider)).thenReturn(ProviderDto.from(provider, "https://example.com"));
+        when(affiliateLinkService.toProviderDtos(List.of(provider)))
+                .thenReturn(List.of(ProviderDto.from(provider, "https://example.com")));
         when(overrideService.findSpanishOverrides(anime)).thenReturn(List.of());
 
         mvc.perform(get("/api/v1/anime/attack-on-titan"))

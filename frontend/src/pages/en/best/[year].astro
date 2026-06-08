@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import type { AnimeDetail, AnimeSummary, WatchProvider } from '@/lib/api';
-import { getAllAnime, getAnimeBySlug } from '@/lib/api';
+import { getBuildableAnimeDetails } from '@/lib/api';
 import { BEST_ANIME_YEARS } from '@/lib/bestYears';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders, getPlatform } from '@/lib/platforms';
@@ -14,7 +14,10 @@ import { localizedPath } from '@/lib/localizedRoutes';
 setLocale('en');
 
 interface Props {
-  topAnime: AnimeSummary[];
+  topEntries: {
+    anime: AnimeSummary;
+    detail: AnimeDetail;
+  }[];
   totalInYear: number;
 }
 
@@ -26,26 +29,27 @@ interface ProviderSummary {
 }
 
 export async function getStaticPaths() {
-  const allAnime = await getAllAnime();
+  const entries = await getBuildableAnimeDetails();
 
   return BEST_ANIME_YEARS.map((year) => {
-    const animeInYear = allAnime
-      .filter((anime) => anime.year === year)
-      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
+    const entriesInYear = entries
+      .filter(({ summary }) => summary.year === year)
+      .sort((a, b) => (b.summary.popularity ?? 0) - (a.summary.popularity ?? 0));
 
     return {
       params: { year: String(year) },
       props: {
-        topAnime: animeInYear.slice(0, 30),
-        totalInYear: animeInYear.length,
+        topEntries: entriesInYear.slice(0, 30).map(({ summary, detail }) => ({ anime: summary, detail })),
+        totalInYear: entriesInYear.length,
       },
     };
   });
 }
 
 const { year } = Astro.params;
-const { topAnime, totalInYear } = Astro.props as Props;
+const { topEntries, totalInYear } = Astro.props as Props;
 const yearNum = Number(year);
+const topAnime = topEntries.map(({ anime }) => anime);
 
 const summarizeProviders = (detail: AnimeDetail): ProviderSummary[] => {
   const providerMap = new Map<string, { provider: WatchProvider; countryCodes: Set<string> }>();
@@ -75,12 +79,9 @@ const summarizeProviders = (detail: AnimeDetail): ProviderSummary[] => {
     .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 };
 
-const details = await Promise.all(topAnime.map((anime) => getAnimeBySlug(anime.slug)));
-const detailBySlug = new Map(details.map((detail) => [detail.anime.slug, detail]));
-
-const rankedAnime = topAnime.map((anime) => ({
+const rankedAnime = topEntries.map(({ anime, detail }) => ({
   anime,
-  providers: summarizeProviders(detailBySlug.get(anime.slug)!),
+  providers: summarizeProviders(detail),
 }));
 
 const seoTitle = t('bestYear.seo.title', { year: yearNum, count: topAnime.length });
@@ -91,11 +92,11 @@ const seoDescription = topAnime.length > 0
     })
   : t('bestYear.seo.description.empty', { year: yearNum });
 
-const pageUrl = absoluteUrl(`/mejores/${year}`);
+const pageUrl = absoluteUrl(`/en/best/${year}`);
 const itemListSchema = buildItemListSchema(
   topAnime.map((anime) => ({
     name: anime.titleEnglish || anime.titleRomaji,
-    url: absoluteUrl(`/anime/${anime.slug}`),
+    url: absoluteUrl(`/en/anime/${anime.slug}`),
   })),
   pageUrl,
   t('bestYear.schema.name', { year: yearNum }),
@@ -106,9 +107,9 @@ const itemListSchema = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.bestAnime'), url: '/' },
-      { name: String(year), url: `/mejores/${year}` },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.bestAnime'), url: localizedPath('/') },
+      { name: String(year), url: localizedPath(`/best/${year}`) },
     ]}
   />
 

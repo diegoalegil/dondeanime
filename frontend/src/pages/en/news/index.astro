@@ -6,14 +6,15 @@ import NewsList from '@/components/news/NewsList.astro';
 import { getNews } from '@/lib/api';
 import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
 const news = await getNews(50);
-const pageUrl = absoluteUrl('/noticias');
+const pageUrl = absoluteUrl('/en/news');
 const rssHref = `${import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '')}/en/news/rss.xml`;
 const itemList = buildItemListSchema(
-  news.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  news.map((n) => ({ name: n.title, url: absoluteUrl(`/en/news/${n.slug}`) })),
   pageUrl,
   t('news.index.heading'),
 );
@@ -24,8 +25,8 @@ const itemList = buildItemListSchema(
 
   <Breadcrumbs
     items={[
-      { name: t('breadcrumbs.home'), url: '/' },
-      { name: t('breadcrumbs.news'), url: '/noticias' },
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('breadcrumbs.news'), url: localizedPath('/noticias') },
     ]}
   />
 

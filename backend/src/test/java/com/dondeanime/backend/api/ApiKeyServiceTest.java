@@ -45,7 +45,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageIncrementsUsageAndUpdatesLastUsedAt() {
         ApiKey apiKey = apiKey(999, 1_000, Instant.parse("2026-05-01T00:00:00Z"));
-        when(repository.findByKey("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
 
         ApiKeyUsage usage = service.recordUsage(" da_free_test ");
 
@@ -57,7 +57,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageStoresEndpointUsage() {
         ApiKey apiKey = apiKey(1, 1_000, Instant.parse("2026-05-01T00:00:00Z"));
-        when(repository.findByKey("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
         when(endpointUsageRepository.findByApiKey_IdAndEndpoint(null, "/api/v1/anime"))
                 .thenReturn(Optional.empty());
 
@@ -76,7 +76,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageResetsCounterWhenMonthChanges() {
         ApiKey apiKey = apiKey(900, 1_000, Instant.parse("2026-04-30T23:59:00Z"));
-        when(repository.findByKey("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
 
         ApiKeyUsage usage = service.recordUsage("da_free_test");
 
@@ -88,7 +88,7 @@ class ApiKeyServiceTest {
     void recordUsageResetsEndpointUsageWhenMonthChanges() {
         ApiKey apiKey = apiKey(900, 1_000, Instant.parse("2026-04-30T23:59:00Z"));
         ReflectionTestUtils.setField(apiKey, "id", 42L);
-        when(repository.findByKey("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
         when(endpointUsageRepository.findByApiKey_IdAndEndpoint(42L, "/api/v1/anime"))
                 .thenReturn(Optional.empty());
 
@@ -100,7 +100,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageRejectsExhaustedQuota() {
         ApiKey apiKey = apiKey(1_000, 1_000, NOW);
-        when(repository.findByKey("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
 
         assertThatThrownBy(() -> service.recordUsage("da_free_test"))
                 .isInstanceOf(ApiQuotaExceededException.class);
