@@ -33,15 +33,26 @@ public class SubscriberService {
 
     @Transactional(readOnly = true)
     public boolean isPremium(String email) {
+        return findActiveEntitlement(email).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<PremiumEntitlement> findActiveEntitlement(String email) {
         String normalizedEmail = normalizeEmail(email);
         if (normalizedEmail.isBlank()) {
-            return false;
+            return Optional.empty();
         }
 
         Instant now = Instant.now(clock);
         return subscriberRepository.findByEmail(normalizedEmail)
                 .filter(subscriber -> isActive(subscriber, now))
-                .isPresent();
+                .map(subscriber -> {
+                    String tier = normalizeTier(subscriber.getPlanTier());
+                    return new PremiumEntitlement(
+                            normalizedEmail,
+                            tier.isBlank() ? "PREMIUM" : tier,
+                            subscriber.getExpiresAt());
+                });
     }
 
     @Transactional(readOnly = true)

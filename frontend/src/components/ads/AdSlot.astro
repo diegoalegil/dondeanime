@@ -16,6 +16,7 @@ const slotByPosition = {
 };
 const adSlot = slot ?? slotByPosition[position];
 const shouldRender = enabled && clientId && adSlot;
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
 {shouldRender && (
   <aside
@@ -23,29 +24,45 @@ const shouldRender = enabled && clientId && adSlot;
     data-ad-position={position}
     data-ad-client={clientId}
     data-ad-slot={adSlot}
+    data-api-url={apiUrl}
   >
     <script is:inline>
-      (() => {
+      (async () => {
         const script = document.currentScript;
         const container = script?.closest('[data-ad-position]');
         if (!container) return;
 
+        const mountAd = () => {
+          const ad = document.createElement('ins');
+          ad.className = 'adsbygoogle';
+          ad.style.display = 'block';
+          ad.setAttribute('data-ad-client', container.getAttribute('data-ad-client') || '');
+          ad.setAttribute('data-ad-slot', container.getAttribute('data-ad-slot') || '');
+          ad.setAttribute('data-ad-format', 'auto');
+          ad.setAttribute('data-full-width-responsive', 'true');
+          container.insertBefore(ad, script);
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        };
+
         try {
-          if (localStorage.getItem('dondeanime-premium') === 'true') {
-            container.remove();
-            return;
+          const apiUrl = container.getAttribute('data-api-url') || '';
+          const token = localStorage.getItem('dondeanime-premium-token') || '';
+          if (apiUrl && token) {
+            const response = await fetch(`${apiUrl}/api/premium/status`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const status = response.ok ? await response.json() : null;
+            if (status?.premium === true) {
+              container.remove();
+              return;
+            }
+            localStorage.removeItem('dondeanime-premium-token');
+            localStorage.removeItem('dondeanime-premium-tier');
+            localStorage.removeItem('dondeanime-premium-expires-at');
           }
         } catch (error) {}
 
-        const ad = document.createElement('ins');
-        ad.className = 'adsbygoogle';
-        ad.style.display = 'block';
-        ad.setAttribute('data-ad-client', container.getAttribute('data-ad-client') || '');
-        ad.setAttribute('data-ad-slot', container.getAttribute('data-ad-slot') || '');
-        ad.setAttribute('data-ad-format', 'auto');
-        ad.setAttribute('data-full-width-responsive', 'true');
-        container.insertBefore(ad, script);
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        mountAd();
       })();
     </script>
   </aside>

@@ -580,19 +580,60 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
       body: JSON.stringify({ status: 'sent' }),
     });
   });
+  await page.route('**/api/premium/access-link', async (route) => {
+    const corsHeaders = {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'POST, OPTIONS',
+      'access-control-allow-headers': 'content-type',
+    };
+
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
+
+    const payload = route.request().postDataJSON();
+    expect(payload).toEqual({ email: 'premium@dondeanime.test' });
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: corsHeaders,
+      body: JSON.stringify({ status: 'email_sent' }),
+    });
+  });
+  await page.route('**/api/premium/status', async (route) => {
+    const corsHeaders = {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, OPTIONS',
+      'access-control-allow-headers': 'authorization, content-type',
+    };
+
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
+
+    expect(route.request().headers().authorization).toBe('Bearer premium-token');
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: corsHeaders,
+      body: JSON.stringify({ premium: true, planTier: 'PREMIUM', expiresAt: '2026-06-30T00:00:00Z' }),
+    });
+  });
 
   await page.goto('/premium');
 
-  // Si el build no trae la clave publicable de Stripe (pk_test_), Premium no esta
-  // configurado en este entorno: omitimos el flujo de checkout en vez de fallar el CI.
   const stripeKey = await page.locator('[data-premium-page]').getAttribute('data-stripe-key');
   test.skip(
-    !stripeKey?.startsWith('pk_test_'),
-    'Stripe no configurado en el build (sin clave publicable pk_test_).',
+    Boolean(stripeKey) && !stripeKey?.startsWith('pk_test_') && !stripeKey?.startsWith('pk_live_'),
+    'Stripe trae una clave publicable con formato no valido.',
   );
 
   await expect(page.getByRole('heading', { name: 'Premium DondeAnime' })).toBeVisible();
-  await expect(page.locator('[data-premium-page]')).toHaveAttribute('data-stripe-key', /^pk_test_/);
+  await expect(page.locator('[data-premium-page]')).toHaveAttribute('data-stripe-key', /^$|^pk_(test|live)_/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://dondeanime.com/premium',
@@ -607,6 +648,30 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
   await page.getByRole('button', { name: 'Gestionar suscripción' }).click();
   await expect(page.locator('[data-premium-status]')).toContainText('te hemos enviado un enlace a tu email');
+
+  await page.getByLabel('Email').fill('premium@dondeanime.test');
+  await page.getByRole('button', { name: 'Activar en este navegador' }).click();
+  await expect(page.locator('[data-premium-status]')).toContainText('enlace de acceso a tu email');
+
+  await page.goto('/premium?access_token=premium-token');
+  await expect(page.locator('[data-premium-status]')).toContainText('Premium activo');
+  expect(await page.evaluate(() => localStorage.getItem('dondeanime-premium-token'))).toBe('premium-token');
+});
+
+test('premium page has a real English route for browser language redirect', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'en-US' });
+  const page = await context.newPage();
+
+  await page.goto('/premium');
+
+  await expect(page).toHaveURL(/\/en\/premium$/);
+  await expect(page.getByRole('heading', { name: 'DondeAnime Premium' })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/en/premium',
+  );
+
+  await context.close();
 });
 
 test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {

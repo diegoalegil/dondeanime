@@ -198,6 +198,28 @@ public class ResendEmailService implements EmailService {
         send(email, subject, html, text);
     }
 
+    @Override
+    public void sendPremiumAccessEmail(String email, String planTier, String accessUrl) {
+        String safePlanTier = escapeHtml(planTier);
+        String safeAccessUrl = escapeHtml(accessUrl);
+        String subject = "Activa Premium en DondeAnime";
+        String html = """
+                <p>Hola.</p>
+                <p>Has pedido activar tu plan <strong>%s</strong> en este navegador.</p>
+                <p>Abre <a href="%s">este enlace seguro</a> para activar la sesion Premium. Caduca automaticamente.</p>
+                <p>Si no has solicitado esto, ignora este correo.</p>
+                """.formatted(safePlanTier, safeAccessUrl);
+        String text = """
+                Has pedido activar tu plan %s en este navegador.
+
+                Enlace seguro: %s
+
+                Si no has solicitado esto, ignora este correo.
+                """.formatted(planTier, accessUrl).trim();
+
+        send(email, subject, html, text);
+    }
+
     private void send(String email, String subject, String html, String text) {
         if (!enabled) {
             log.info("Resend desactivado: email a '{}' con asunto '{}' no enviado", email, subject);
