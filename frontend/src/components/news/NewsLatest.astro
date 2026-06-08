@@ -7,10 +7,11 @@ import { t } from '@/i18n';
 interface Props {
   items: NewsSummary[];
   heading?: string;
+  viewAllHref?: string;
 }
 
-const { items, heading } = Astro.props;
-const viewAll = localizedPath('/noticias');
+const { items, heading, viewAllHref } = Astro.props;
+const viewAll = localizedPath(viewAllHref ?? '/noticias');
 ---
 {items.length > 0 && (
   <section class="mx-auto max-w-6xl px-4 pb-12">

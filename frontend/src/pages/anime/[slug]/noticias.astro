@@ -1,0 +1,68 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import NewsList from '@/components/news/NewsList.astro';
+import { getAnimeNews, getBuildableAnimeDetails, getNews } from '@/lib/api';
+import type { AnimeDetail } from '@/lib/api';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+interface Props {
+  detail: AnimeDetail;
+}
+
+export async function getStaticPaths() {
+  const publishedNews = await getNews(100);
+  const animeSlugsWithNews = new Set(
+    publishedNews.map((item) => item.animeSlug).filter((slug): slug is string => Boolean(slug)),
+  );
+  if (animeSlugsWithNews.size === 0) {
+    return [];
+  }
+  const entries = await getBuildableAnimeDetails();
+  return entries
+    .filter(({ detail }) => animeSlugsWithNews.has(detail.anime.slug))
+    .map(({ detail }) => ({ params: { slug: detail.anime.slug }, props: { detail } }));
+}
+
+const { slug } = Astro.params;
+const { detail } = Astro.props as Props;
+const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
+const news = await getAnimeNews(slug!);
+const pageUrl = absoluteUrl(`/anime/${slug}/noticias`);
+const description = t('news.anime.description', { title });
+const itemList = buildItemListSchema(
+  news.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  pageUrl,
+  t('news.anime.title', { title }),
+);
+---
+<BaseLayout title={t('news.anime.title', { title })} description={description} canonical={pageUrl}>
+  {news.length > 0 && <JsonLd slot="head" data={itemList} />}
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.anime'), url: `/anime/${slug}` },
+      { name: t('breadcrumbs.news'), url: `/anime/${slug}/noticias` },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-20">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{t('news.anime.title', { title })}</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">{description}</p>
+
+    <div class="mt-10">
+      {news.length === 0 ? (
+        <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
+          {t('news.anime.empty')}
+        </p>
+      ) : (
+        <NewsList items={news} />
+      )}
+    </div>
+  </section>
+</BaseLayout>

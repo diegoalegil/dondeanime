@@ -347,7 +347,9 @@
   "news.latest.title": "Latest news",
   "news.latest.viewAll": "View all",
   "news.anime.title": "{title} news",
+  "news.anime.description": "News, premieres and announcements related to {title}.",
   "news.anime.heading": "Related news",
+  "news.anime.empty": "No news published for this anime yet.",
   "news.card.readMore": "Read more",
   "news.rss.title": "DondeAnime — News",
   "news.rss.description": "Latest anime news."

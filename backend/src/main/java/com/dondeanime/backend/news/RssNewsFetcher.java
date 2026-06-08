@@ -40,7 +40,7 @@ public class RssNewsFetcher {
 
     private static final Logger log = LoggerFactory.getLogger(RssNewsFetcher.class);
 
-    /** Recorte defensivo del texto original; el LLM resume después. */
+    /** Recorte defensivo del texto original; el paso editorial resume después. */
     private static final int MAX_EXCERPT_LENGTH = 2000;
 
     /** Tope del cuerpo: corta feeds gigantes o redirects hostiles. */

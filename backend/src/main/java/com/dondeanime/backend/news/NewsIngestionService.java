@@ -16,8 +16,8 @@ import io.github.diegoalegil.animefeed.text.UrlNormalizer;
 
 /**
  * Lee los feeds de las fuentes activas y guarda cada entrada nueva como
- * {@link NewsStatus#DRAFT}, en su idioma original. La traducción/resumen al
- * español y el match con un anime los hace el LLM en una fase posterior (S2).
+ * {@link NewsStatus#DRAFT}, en su idioma original. El enriquecimiento editorial
+ * y el match con un anime corren después, con flags independientes.
  *
  * Deliberadamente NO es {@code @Transactional} a nivel de clase: cada
  * {@code save} corre en su propia transacción implícita, así el fallo de una

@@ -1,12 +1,17 @@
 package com.dondeanime.backend.news;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 
 @Service
@@ -25,11 +30,9 @@ public class NewsService {
     @Transactional(readOnly = true)
     public List<NewsSummaryDto> latestPublished(int limit) {
         int safeLimit = Math.min(Math.max(limit, 1), MAX_LIMIT);
-        return newsItemRepository
-                .findByStatusOrderByPublishedAtDesc(NewsStatus.PUBLISHED, PageRequest.of(0, safeLimit))
-                .stream()
-                .map(NewsSummaryDto::from)
-                .toList();
+        List<NewsItem> items = newsItemRepository
+                .findByStatusOrderByPublishedAtDesc(NewsStatus.PUBLISHED, PageRequest.of(0, safeLimit));
+        return toSummaries(items);
     }
 
     @Transactional(readOnly = true)
@@ -39,11 +42,8 @@ public class NewsService {
 
     @Transactional(readOnly = true)
     public List<NewsSummaryDto> publishedForAnime(Long animeId) {
-        return newsItemRepository
-                .findByAnimeIdAndStatusOrderByPublishedAtDesc(animeId, NewsStatus.PUBLISHED)
-                .stream()
-                .map(NewsSummaryDto::from)
-                .toList();
+        return toSummaries(newsItemRepository
+                .findByAnimeIdAndStatusOrderByPublishedAtDesc(animeId, NewsStatus.PUBLISHED));
     }
 
     /**
@@ -58,5 +58,28 @@ public class NewsService {
         return animeRepository.findBySlug(slug)
                 .map(anime -> publishedForAnime(anime.getId()))
                 .orElseGet(List::of);
+    }
+
+    private List<NewsSummaryDto> toSummaries(List<NewsItem> items) {
+        Map<Long, Anime> animeById = animeById(items);
+        return items.stream()
+                .map(item -> NewsSummaryDto.from(item,
+                        Optional.ofNullable(item.getAnimeId())
+                                .map(animeById::get)
+                                .map(Anime::getSlug)
+                                .orElse(null)))
+                .toList();
+    }
+
+    private Map<Long, Anime> animeById(List<NewsItem> items) {
+        Set<Long> animeIds = items.stream()
+                .map(NewsItem::getAnimeId)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (animeIds.isEmpty()) {
+            return Map.of();
+        }
+        return animeRepository.findAllById(animeIds).stream()
+                .collect(Collectors.toMap(Anime::getId, Function.identity()));
     }
 }

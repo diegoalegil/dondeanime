@@ -77,6 +77,7 @@ export const spanishPathFromLocalized = (path: string): string => {
   }
 
   if (section === 'anime' && first) {
+    if (second === 'news') return `/anime/${first}/noticias`;
     if (second === 'on' && third) return `/anime/${first}/en/${third}`;
     const country = canonicalCountrySlug(second);
     return country ? `/anime/${first}/${country}` : `/anime/${first}`;
@@ -131,6 +132,7 @@ const localizedEnPath = (spanishPath: string): string | null => {
   if (section === 'anime' && first) {
     // /anime/duracion/* y /anime/episodios/* son solo-español.
     if (first === 'duracion' || first === 'episodios') return null;
+    if (second === 'noticias') return `/en/anime/${first}/news`;
     if (second === 'en' && third) return `/en/anime/${first}/on/${third}`;
     const country = canonicalCountrySlug(second);
     return country

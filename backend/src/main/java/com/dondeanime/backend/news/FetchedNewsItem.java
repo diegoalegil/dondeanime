@@ -4,8 +4,8 @@ import java.time.Instant;
 
 /**
  * Una entrada cruda leída de un feed RSS/Atom, antes de persistirla.
- * Todo en su idioma original (normalmente inglés); la traducción/resumen al
- * español la hace el LLM en una fase posterior (S2).
+ * Todo en su idioma original (normalmente inglés); el paso editorial posterior
+ * decide resumen, cuerpo público y publicación.
  */
 public record FetchedNewsItem(
         String title,

@@ -10,9 +10,10 @@ public record NewsSummaryDto(
         String imageUrl,
         String sourceName,
         Long animeId,
+        String animeSlug,
         Instant publishedAt) {
 
-    public static NewsSummaryDto from(NewsItem item) {
+    public static NewsSummaryDto from(NewsItem item, String animeSlug) {
         return new NewsSummaryDto(
                 item.getSlug(),
                 item.getTitle(),
@@ -20,6 +21,7 @@ public record NewsSummaryDto(
                 item.getImageUrl(),
                 item.getSourceName(),
                 item.getAnimeId(),
+                animeSlug,
                 item.getPublishedAt());
     }
 }
