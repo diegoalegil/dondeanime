@@ -83,6 +83,20 @@ class ProviderControllerTest {
         verify(animeRepository).findByProviderSlugAndCountry("amazon-prime-video", "MX");
     }
 
+    @Test
+    void animesByCountryReturnsSummaries() throws Exception {
+        Anime anime = anime("one-piece", "One Piece");
+        when(animeRepository.findByCountryWithGenres("ES")).thenReturn(List.of(anime));
+
+        mvc.perform(get("/api/providers/country/es/anime"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].slug").value("one-piece"))
+                .andExpect(jsonPath("$[0].titleEnglish").value("One Piece"));
+
+        verify(animeRepository).findByCountryWithGenres("ES");
+    }
+
     private static WatchProviderRepository.ProviderAggregation provider(
             String providerName,
             String logoUrl,

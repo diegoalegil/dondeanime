@@ -302,10 +302,36 @@ export const getSimilarAnime = async (slug: string, watchedSlugs: string[] = [])
 export const getProviders = () => fetchJson<ProviderSummary[]>('/api/providers');
 
 export const getProvidersByCountry = (countryIso: string) =>
-  fetchJson<ProviderSummary[]>(`/api/providers?country=${countryIso}`);
+  fetchJsonSafe<ProviderSummary[]>(`/api/providers?country=${countryIso}`, []);
 
 export const getAnimeByProvider = (providerSlug: string, countryIso: string) =>
-  fetchJson<AnimeSummary[]>(`/api/providers/${providerSlug}/${countryIso}`);
+  fetchJsonSafe<AnimeSummary[]>(`/api/providers/${providerSlug}/${countryIso}`, []);
+
+export const getAnimeByCountry = async (countryIso: string) => {
+  try {
+    return await fetchJson<AnimeSummary[]>(`/api/providers/country/${countryIso}/anime`);
+  } catch {
+    const providers = await getProvidersByCountry(countryIso);
+    const results = await Promise.allSettled(
+      providers.map((provider) => getAnimeByProvider(provider.slug, countryIso)),
+    );
+    const animeBySlug = new Map<string, AnimeSummary>();
+
+    for (const result of results) {
+      if (result.status !== 'fulfilled') continue;
+      for (const item of result.value) {
+        animeBySlug.set(item.slug, item);
+      }
+    }
+
+    return [...animeBySlug.values()].sort((a, b) => {
+      const popularityA = a.popularity ?? 0;
+      const popularityB = b.popularity ?? 0;
+      if (popularityA !== popularityB) return popularityB - popularityA;
+      return (a.titleEnglish || a.titleRomaji).localeCompare(b.titleEnglish || b.titleRomaji, 'es');
+    });
+  }
+};
 
 export const getCuratedLists = async () => {
   return fetchJsonAllowing404('/api/lists', () => [] as CuratedListSummary[]);
@@ -326,10 +352,10 @@ export interface SeasonSummary {
   animeCount: number;
 }
 
-export const getGenres = () => fetchJson<GenreSummary[]>('/api/genres');
+export const getGenres = () => fetchJsonSafe<GenreSummary[]>('/api/genres', []);
 
 export const getAnimeByGenre = (genreSlug: string) =>
-  fetchJson<AnimeSummary[]>(`/api/genres/${genreSlug}`);
+  fetchJsonSafe<AnimeSummary[]>(`/api/genres/${genreSlug}`, []);
 
 export const getBeginnerAnimeByGenre = async (genreSlug: string) => {
   return fetchJsonAllowing404(`/api/genres/${genreSlug}/beginner`, async () => {
@@ -341,10 +367,10 @@ export const getBeginnerAnimeByGenre = async (genreSlug: string) => {
   });
 };
 
-export const getSeasons = () => fetchJson<SeasonSummary[]>('/api/seasons');
+export const getSeasons = () => fetchJsonSafe<SeasonSummary[]>('/api/seasons', []);
 
 export const getAnimeBySeason = (year: number, season: string) =>
-  fetchJson<AnimeSummary[]>(`/api/seasons/${year}/${season}`);
+  fetchJsonSafe<AnimeSummary[]>(`/api/seasons/${year}/${season}`, []);
 
 export const getAnimeByDuration = async (minutes: number) => {
   return fetchJsonAllowing404(`/api/anime/duration/${minutes}`, async () => {

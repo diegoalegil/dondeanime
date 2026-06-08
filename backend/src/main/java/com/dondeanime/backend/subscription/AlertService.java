@@ -23,16 +23,19 @@ public class AlertService {
     private final EmailTokenService emailTokenService;
     private final SubscriptionService subscriptionService;
     private final EmailService emailService;
+    private final SubscriptionNotificationMarker notificationMarker;
 
     public AlertService(
             SubscriptionRepository subscriptionRepository,
             EmailTokenService emailTokenService,
             SubscriptionService subscriptionService,
-            EmailService emailService) {
+            EmailService emailService,
+            SubscriptionNotificationMarker notificationMarker) {
         this.subscriptionRepository = subscriptionRepository;
         this.emailTokenService = emailTokenService;
         this.subscriptionService = subscriptionService;
         this.emailService = emailService;
+        this.notificationMarker = notificationMarker;
     }
 
     @Transactional(readOnly = true)
@@ -41,7 +44,6 @@ public class AlertService {
         return subscriptionRepository.countPendingAlerts(animeId, normalizedCountry) > 0;
     }
 
-    @Transactional
     public int notifyNewProviders(Anime anime, Map<String, List<WatchProvider>> providersByCountry) {
         if (providersByCountry == null || providersByCountry.isEmpty()) {
             return 0;
@@ -68,6 +70,9 @@ public class AlertService {
                             user,
                             anime,
                             countryCode);
+                    if (!notificationMarker.markNotifiedIfPending(subscription.getId(), Instant.now())) {
+                        continue;
+                    }
                     emailService.sendAlertEmail(
                             user.getEmail(),
                             animeTitle(anime),
@@ -76,7 +81,6 @@ public class AlertService {
                             subscriptionService.unsubscribeUrl(token.rawToken()),
                             subscriptionService.eraseUrl(user.getEmail(), token.rawToken()));
                     subscription.setNotifiedAt(Instant.now());
-                    subscriptionRepository.save(subscription);
                     sent++;
                 } catch (Exception e) {
                     log.error("No se pudo enviar alerta anime={} country={}: {}",

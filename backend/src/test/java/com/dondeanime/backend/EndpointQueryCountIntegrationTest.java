@@ -109,6 +109,16 @@ class EndpointQueryCountIntegrationTest {
     }
 
     @Test
+    void countryAnimeEndpointDoesNotLoadGenresWithNPlusOne() throws Exception {
+        assertEndpointQueryCount("/api/providers/country/ES/anime", 2);
+    }
+
+    @Test
+    void searchEndpointDoesNotLoadGenresWithNPlusOne() throws Exception {
+        assertEndpointQueryCount("/api/search?q=Anime&limit=6", 2);
+    }
+
+    @Test
     void animeListEndpointDoesNotLoadGenresWithNPlusOne() throws Exception {
         assertEndpointQueryCount("/api/anime", 2);
     }

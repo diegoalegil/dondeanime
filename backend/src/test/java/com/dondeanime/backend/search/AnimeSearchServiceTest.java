@@ -20,12 +20,15 @@ class AnimeSearchServiceTest {
         Anime first = anime("attack-on-titan", "Attack on Titan", 999);
         Anime second = anime("attack-on-titan-season-2", "Attack on Titan Season 2", 500);
         AnimeRepository repository = mock(AnimeRepository.class);
-        when(repository.findBySearchVectorMatching("ataque")).thenReturn(List.of(first, second));
+        first.setId(1L);
+        second.setId(2L);
+        when(repository.findIdsBySearchVectorMatching("ataque", 1)).thenReturn(List.of(1L));
+        when(repository.findByIdInWithGenres(List.of(1L))).thenReturn(List.of(first));
 
         List<?> result = new AnimeSearchService(repository).search("  ataque  ", 1);
 
         assertThat(result).hasSize(1);
-        verify(repository).findBySearchVectorMatching("ataque");
+        verify(repository).findIdsBySearchVectorMatching("ataque", 1);
     }
 
     @Test
@@ -35,19 +38,23 @@ class AnimeSearchServiceTest {
         List<?> result = new AnimeSearchService(repository).search("   ", 10);
 
         assertThat(result).isEmpty();
-        verify(repository, never()).findBySearchVectorMatching(org.mockito.ArgumentMatchers.any());
+        verify(repository, never()).findIdsBySearchVectorMatching(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyInt());
     }
 
     @Test
     void slugQueryIsNormalizedForFullTextSearch() {
         Anime anime = anime("attack-on-titan", "Attack on Titan", 999);
         AnimeRepository repository = mock(AnimeRepository.class);
-        when(repository.findBySearchVectorMatching("attack on titan")).thenReturn(List.of(anime));
+        anime.setId(1L);
+        when(repository.findIdsBySearchVectorMatching("attack on titan", 10)).thenReturn(List.of(1L));
+        when(repository.findByIdInWithGenres(List.of(1L))).thenReturn(List.of(anime));
 
         List<?> result = new AnimeSearchService(repository).search("attack-on-titan", 10);
 
         assertThat(result).hasSize(1);
-        verify(repository).findBySearchVectorMatching("attack on titan");
+        verify(repository).findIdsBySearchVectorMatching("attack on titan", 10);
     }
 
     private static Anime anime(String slug, String title, int popularity) {

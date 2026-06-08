@@ -4,8 +4,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import AnimeFilterGrid from '@/components/anime/AnimeFilterGrid.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import FilterRobotsNoindex from '@/components/seo/FilterRobotsNoindex.astro';
-import { getAnimeByProvider, getProvidersByCountry } from '@/lib/api';
-import type { AnimeSummary } from '@/lib/api';
+import { getAnimeByCountry, getProvidersByCountry } from '@/lib/api';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
@@ -27,21 +26,7 @@ const countryName = localizedCountryName(countrySlug);
 
 const rawProviders = await getProvidersByCountry(country.iso);
 const providers = rawProviders.filter((p) => !isHiddenVariant(p.slug));
-const animeBySlug = new Map<string, AnimeSummary>();
-
-for (const provider of providers) {
-  const providerAnime = await getAnimeByProvider(provider.slug, country.iso);
-  for (const item of providerAnime) {
-    animeBySlug.set(item.slug, item);
-  }
-}
-
-const anime = [...animeBySlug.values()].sort((a, b) => {
-  const popularityA = a.popularity ?? 0;
-  const popularityB = b.popularity ?? 0;
-  if (popularityA !== popularityB) return popularityB - popularityA;
-  return (a.titleEnglish || a.titleRomaji).localeCompare(b.titleEnglish || b.titleRomaji, 'es');
-});
+const anime = await getAnimeByCountry(country.iso);
 
 const seoTitle = t('countryPage.seo.title', { country: countryName });
 const seoDescription = t('countryPage.seo.description', {

@@ -1,9 +1,14 @@
 package com.dondeanime.backend.search;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 import com.dondeanime.backend.anime.AnimeSummaryDto;
 
@@ -25,9 +30,17 @@ public class AnimeSearchService {
             return List.of();
         }
 
-        int safeLimit = safeLimit(limit);
-        return repository.findBySearchVectorMatching(normalizedQuery).stream()
-                .limit(safeLimit)
+        List<Long> ids = repository.findIdsBySearchVectorMatching(normalizedQuery, safeLimit(limit));
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, Anime> animeById = repository.findByIdInWithGenres(ids).stream()
+                .collect(Collectors.toMap(Anime::getId, Function.identity()));
+
+        return ids.stream()
+                .map(animeById::get)
+                .filter(Objects::nonNull)
                 .map(AnimeSummaryDto::from)
                 .toList();
     }
