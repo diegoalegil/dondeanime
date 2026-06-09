@@ -46,7 +46,7 @@ class StudioControllerTest {
         Studio studio = studio();
         when(studioRepository.aggregateStudios()).thenReturn(List.of(aggregation(studio, 12L)));
 
-        mvc.perform(get("/api/studios"))
+        mvc.perform(get("/api/v1/studios"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].slug").value("wit-studio"))
                 .andExpect(jsonPath("$[0].name").value("WIT Studio"))
@@ -59,7 +59,7 @@ class StudioControllerTest {
         Anime anime = anime();
         when(animeRepository.findByStudioSlug("wit-studio")).thenReturn(List.of(anime));
 
-        mvc.perform(get("/api/studios/wit-studio"))
+        mvc.perform(get("/api/v1/studios/wit-studio"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].titleEnglish").value("Attack on Titan"))
@@ -72,7 +72,7 @@ class StudioControllerTest {
         Anime anime = anime();
         when(animeRepository.findByStudioSlug("wit-studio")).thenReturn(List.of(anime));
 
-        mvc.perform(get("/api/studios/wit-studio/best"))
+        mvc.perform(get("/api/v1/studios/wit-studio/best"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].slug").value("attack-on-titan"))
                 .andExpect(jsonPath("$[0].id").doesNotExist())

@@ -29,7 +29,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("DondeAnime Public API")
                         .version("v1")
-                        .description("Catalogo publico de anime, plataformas, generos, temporadas y sitemap.")
+                        .description("Catalogo publico de anime, plataformas, generos, temporadas, noticias, listas, estudios y sitemap.")
                         .contact(new Contact()
                                 .name("DondeAnime")
                                 .url("https://dondeanime.com"))
