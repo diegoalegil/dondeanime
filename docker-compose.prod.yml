@@ -62,12 +62,14 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       TMDB_API_KEY: ${TMDB_API_KEY}
-      # --- Trakt.tv OAuth (Sprint 22, opcional) ---
+      # --- Trakt.tv OAuth (opcional) ---
+      TRAKT_ENABLED: ${TRAKT_ENABLED:-false}
       TRAKT_API_BASE: ${TRAKT_API_BASE:-https://api.trakt.tv}
       TRAKT_OAUTH_BASE: ${TRAKT_OAUTH_BASE:-https://trakt.tv}
       TRAKT_CLIENT_ID: ${TRAKT_CLIENT_ID:-}
       TRAKT_CLIENT_SECRET: ${TRAKT_CLIENT_SECRET:-}
       TRAKT_REDIRECT_URI: ${TRAKT_REDIRECT_URI:-https://api.dondeanime.com/api/trakt/oauth/callback}
+      TRAKT_TOKEN_ENCRYPTION_SECRET: ${TRAKT_TOKEN_ENCRYPTION_SECRET:-}
       # Vacío si no usamos webhook. Se rellena cuando configuremos
       # el Deploy Hook de Vercel.
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
