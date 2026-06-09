@@ -14,6 +14,13 @@ on:
       - 'frontend/**'
       - '.github/workflows/e2e.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   playwright:
     runs-on: ubuntu-latest
@@ -35,7 +42,7 @@ jobs:
       TMDB_API_KEY: ci_dummy_token
       PUBLIC_API_URL: http://127.0.0.1:8080
       PUBLIC_DATA_API_URL: https://api.dondeanime.com
-      PUBLIC_SITE_URL: https://dondeanime.com
+      PUBLIC_SITE_URL: https://www.dondeanime.com
       RESEND_ENABLED: 'false'
       SPRING_FLYWAY_ENABLED: 'true'
     steps:
@@ -52,7 +59,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22.12.0
+          node-version: 22.19.0
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -69,7 +76,6 @@ jobs:
         working-directory: backend
         run: |
           ./mvnw spring-boot:run > ../backend-e2e.log 2>&1 &
-          echo $! > ../backend-e2e.pid
           for i in {1..90}; do
             if curl -fsS http://127.0.0.1:8080/api/anime >/dev/null; then
               exit 0
@@ -81,7 +87,7 @@ jobs:
 
       - name: Seed backend anime from public API
         run: |
-          curl -fsSL https://api.dondeanime.com/api/anime -o /tmp/anime.json
+          curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors https://api.dondeanime.com/api/anime -o /tmp/anime.json
           node <<'NODE' > /tmp/seed-anime.sql
           const fs = require('node:fs');
           const anime = JSON.parse(fs.readFileSync('/tmp/anime.json', 'utf8'));

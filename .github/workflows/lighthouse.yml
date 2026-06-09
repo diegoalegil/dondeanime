@@ -12,6 +12,13 @@ on:
       - 'frontend/**'
       - '.github/workflows/lighthouse.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
@@ -21,7 +28,7 @@ jobs:
         working-directory: frontend
     env:
       PUBLIC_API_URL: https://api.dondeanime.com
-      PUBLIC_SITE_URL: https://dondeanime.com
+      PUBLIC_SITE_URL: https://www.dondeanime.com
       LIGHTHOUSE_MIN_PERFORMANCE_SCORE: 80
       LIGHTHOUSE_MIN_ACCESSIBILITY_SCORE: 90
       LIGHTHOUSE_MIN_BEST_PRACTICES_SCORE: 80

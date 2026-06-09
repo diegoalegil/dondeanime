@@ -223,13 +223,18 @@ npm install
 npm run dev
 ```
 
-Primera ingesta de datos:
+Primera ingesta de datos (los endpoints de sync requieren JWT admin;
+en local las credenciales por defecto son `admin`/`admin`):
 
 ```bash
-curl -X POST http://localhost:8080/api/anime/sync?count=100
-curl -X POST http://localhost:8080/api/anime/match
-curl -X POST http://localhost:8080/api/anime/sync-providers
-curl -X POST http://localhost:8080/api/anime/sync-trailers
+ADMIN_TOKEN=$(curl -s -X POST http://localhost:8080/api/admin/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"admin"}' | jq -r '.token')
+
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" "http://localhost:8080/api/anime/sync?count=100"
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" http://localhost:8080/api/anime/match
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" http://localhost:8080/api/anime/sync-providers
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" http://localhost:8080/api/anime/sync-trailers
 ```
 
 Tarda unos minutos. Al terminar tienes el catálogo con providers reales y trailers cuando TMDb los expone.
@@ -278,11 +283,11 @@ ssh deploy@<ip-vps>
 # Logs
 docker compose -f docker-compose.prod.yml logs -f backend
 
-# Sync manual
-curl -X POST https://api.dondeanime.com/api/anime/sync
+# Sync manual (requiere JWT admin, ver DEPLOY.md "Disparar sync manual")
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/sync
 
-# Backup manual (cron diario a las 3:00 UTC ya configurado)
-/opt/dondeanime/scripts/backup-postgres.sh
+# Backup manual (cron cada 6 horas ya configurado)
+/opt/dondeanime/scripts/backup-postgres-r2.sh
 ```
 
 ---

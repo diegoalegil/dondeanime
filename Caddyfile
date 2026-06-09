@@ -17,8 +17,13 @@
 
 api.dondeanime.com {
 	# Actuator queda disponible solo dentro de la red Docker llamando
-	# directamente al backend. Desde internet no se proxea.
-	@actuator path /actuator /actuator/*
+	# directamente al backend. Desde internet no se proxea, con UNA
+	# excepción: /actuator/health, que necesitan UptimeRobot y los
+	# runbooks para monitorizar el servicio desde fuera.
+	@actuator {
+		path /actuator /actuator/*
+		not path /actuator/health
+	}
 	handle @actuator {
 		respond 404
 	}

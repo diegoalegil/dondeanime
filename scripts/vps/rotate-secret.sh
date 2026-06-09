@@ -109,8 +109,14 @@ update_env_file() {
     tmp="$(mktemp "${ENV_FILE}.XXXXXX")"
     chmod 600 "$tmp"
 
-    awk -v key="$SECRET_NAME" -v value="$new_value" '
-        BEGIN { found = 0 }
+    # El valor entra por variable de entorno (ENVIRON), NUNCA por
+    # awk -v: -v interpreta secuencias de escape (\n, \t, \\ ...) y
+    # corrompería en silencio secretos que contengan backslashes.
+    ROTATE_SECRET_VALUE="$new_value" awk -v key="$SECRET_NAME" '
+        BEGIN {
+            found = 0
+            value = ENVIRON["ROTATE_SECRET_VALUE"]
+        }
         $0 ~ "^" key "=" {
             print key "=" value
             found = 1

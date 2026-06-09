@@ -9,7 +9,7 @@ un backup R2 validado.
 
 | Métrica | Objetivo |
 |---|---|
-| RPO | 24h máximo si se restaura desde el último backup diario verificado. |
+| RPO | 6h máximo si se restaura desde el último backup del cron (cada 6h); la verificación de backups corre semanalmente. |
 | RTO backend/API | 2-4h si Hetzner y Cloudflare están operativos. |
 | RTO frontend | 30-60 min si Vercel está operativo. |
 | Prioridad | Restaurar lectura pública antes que panel admin, métricas o newsletters. |
@@ -82,7 +82,14 @@ docker compose -f docker-compose.prod.yml ps
 
 1. Localizar en R2 el último backup que pasó `verify-backup`.
 2. Descargarlo al VPS nuevo.
-3. Restaurarlo sobre el Postgres nuevo, todavía sin tráfico público:
+3. Parar el backend antes de restaurar. Si el backend escribe durante el
+   restore puede provocar locks y dejar la BD inconsistente:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod stop backend
+```
+
+4. Restaurarlo sobre el Postgres nuevo, todavía sin tráfico público:
 
 ```bash
 gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
@@ -90,7 +97,7 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```
 
-4. Verificar conteos:
+5. Verificar conteos:
 
 ```bash
 scripts/vps/verify-backup.sh --check-config
@@ -100,6 +107,12 @@ docker exec dondeanime_postgres_prod psql -At -U dondeanime_user -d dondeanime \
   -c "select count(*) from watch_provider;"
 docker exec dondeanime_postgres_prod psql -At -U dondeanime_user -d dondeanime \
   -c "select count(*) from affiliate_link;"
+```
+
+6. Levantar el backend de nuevo:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 ```
 
 ### 5. Cambiar tráfico

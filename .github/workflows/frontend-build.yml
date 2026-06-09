@@ -12,6 +12,13 @@ on:
       - 'frontend/**'
       - '.github/workflows/frontend-build.yml'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +27,7 @@ jobs:
         working-directory: frontend
     env:
       PUBLIC_API_URL: https://api.dondeanime.com
-      PUBLIC_SITE_URL: https://dondeanime.com
+      PUBLIC_SITE_URL: https://www.dondeanime.com
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,7 +35,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22.12.0
+          node-version: 22.19.0
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 

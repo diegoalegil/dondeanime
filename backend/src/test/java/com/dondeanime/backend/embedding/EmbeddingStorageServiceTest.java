@@ -30,15 +30,15 @@ class EmbeddingStorageServiceTest {
 
     @Test
     void upsertCreatesSerializedEmbedding() {
-        when(repository.findByAnimeIdAndModel(1L, "text-embedding-3-small")).thenReturn(Optional.empty());
+        when(repository.findByAnimeIdAndModel(1L, "test-embedding-model")).thenReturn(Optional.empty());
 
-        service.upsert(1L, " text-embedding-3-small ", HASH.toUpperCase(), List.of(0.1, -0.2, 0.3));
+        service.upsert(1L, " test-embedding-model ", HASH.toUpperCase(), List.of(0.1, -0.2, 0.3));
 
         ArgumentCaptor<AnimeEmbedding> captor = ArgumentCaptor.forClass(AnimeEmbedding.class);
         verify(repository).save(captor.capture());
         AnimeEmbedding saved = captor.getValue();
         assertThat(saved.getAnimeId()).isEqualTo(1L);
-        assertThat(saved.getModel()).isEqualTo("text-embedding-3-small");
+        assertThat(saved.getModel()).isEqualTo("test-embedding-model");
         assertThat(saved.getContentHash()).isEqualTo(HASH);
         assertThat(saved.getEmbedding()).isEqualTo("[0.1,-0.2,0.3]");
         assertThat(saved.getUpdatedAt()).isEqualTo(NOW);
@@ -53,12 +53,12 @@ class EmbeddingStorageServiceTest {
         existing.setContentHash(HASH);
         existing.setEmbedding("[0.0]");
         existing.setUpdatedAt(NOW.minusSeconds(60));
-        when(repository.findByAnimeIdAndModel(1L, "text-embedding-3-small")).thenReturn(Optional.of(existing));
+        when(repository.findByAnimeIdAndModel(1L, "test-embedding-model")).thenReturn(Optional.of(existing));
 
-        service.upsert(1L, "text-embedding-3-small", HASH, List.of(0.4));
+        service.upsert(1L, "test-embedding-model", HASH, List.of(0.4));
 
         assertThat(existing.getId()).isEqualTo(10L);
-        assertThat(existing.getModel()).isEqualTo("text-embedding-3-small");
+        assertThat(existing.getModel()).isEqualTo("test-embedding-model");
         assertThat(existing.getEmbedding()).isEqualTo("[0.4]");
         assertThat(existing.getUpdatedAt()).isEqualTo(NOW);
         verify(repository).save(existing);
@@ -68,13 +68,13 @@ class EmbeddingStorageServiceTest {
     void findByModelDeserializesStoredVectors() {
         AnimeEmbedding stored = new AnimeEmbedding();
         stored.setAnimeId(7L);
-        stored.setModel("text-embedding-3-small");
+        stored.setModel("test-embedding-model");
         stored.setContentHash(HASH);
         stored.setEmbedding("[0.5,-0.25]");
         stored.setUpdatedAt(NOW);
-        when(repository.findByModelOrderByUpdatedAtDesc("text-embedding-3-small")).thenReturn(List.of(stored));
+        when(repository.findByModelOrderByUpdatedAtDesc("test-embedding-model")).thenReturn(List.of(stored));
 
-        List<StoredAnimeEmbedding> result = service.findByModel(" text-embedding-3-small ");
+        List<StoredAnimeEmbedding> result = service.findByModel(" test-embedding-model ");
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().animeId()).isEqualTo(7L);

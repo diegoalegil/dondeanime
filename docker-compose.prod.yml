@@ -25,6 +25,16 @@ services:
     image: postgres:16-alpine
     container_name: dondeanime_postgres_prod
     restart: unless-stopped
+    # Límite de memoria: evita que un proceso desbocado tumbe el VPS
+    # entero (CX22 = 4 GB). Suma de los tres servicios < 3 GB.
+    mem_limit: 768m
+    # Rotación de logs: sin esto, json-file crece sin límite y puede
+    # llenar el disco del VPS. Máximo 100 MB por servicio (20m x 5).
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -47,6 +57,12 @@ services:
       dockerfile: Dockerfile
     container_name: dondeanime_backend
     restart: unless-stopped
+    mem_limit: 1536m
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
     depends_on:
       postgres:
         condition: service_healthy
@@ -73,12 +89,16 @@ services:
       # Vacío si no usamos webhook. Se rellena cuando configuremos
       # el Deploy Hook de Vercel.
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
-      # Activamos el scheduler en producción (en local está OFF).
-      SCHEDULING_ENABLED: "true"
+      # Scheduler activo en producción por defecto (en local está OFF).
+      # Configurable desde .env.prod para pausarlo sin tocar el repo.
+      SCHEDULING_ENABLED: ${SCHEDULING_ENABLED:-true}
       # News Engine: ingesta RSS (ANN + Crunchyroll -> DRAFT) cada 6h.
       # OFF por defecto; pon NEWS_INGESTION_ENABLED=true en .env.prod
       # para encenderla. El scheduler debe estar activo (arriba).
       NEWS_INGESTION_ENABLED: ${NEWS_INGESTION_ENABLED:-false}
+      # News Engine: procesado editorial de borradores RSS (resumen,
+      # meta, match de anime). OFF por defecto; requiere scheduler activo.
+      NEWS_PROCESSING_ENABLED: ${NEWS_PROCESSING_ENABLED:-false}
       # --- Admin (Sprint 1) ---
       # Usuario único del panel admin. La contraseña vive en .env.prod.
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
@@ -88,6 +108,9 @@ services:
       PUBLIC_API_URL: ${PUBLIC_API_URL:-https://api.dondeanime.com}
       PUBLIC_CORS_ALLOWED_ORIGINS: ${PUBLIC_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
       JWT_SECRET: ${JWT_SECRET}
+      # Secreto propio para los access tokens premium. Si queda vacío,
+      # el backend usa JWT_SECRET como fallback (application.properties).
+      PREMIUM_ACCESS_TOKEN_SECRET: ${PREMIUM_ACCESS_TOKEN_SECRET:-}
       RESEND_ENABLED: ${RESEND_ENABLED:-true}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-alertas@dondeanime.com}
@@ -123,6 +146,12 @@ services:
     image: caddy:2-alpine
     container_name: dondeanime_caddy
     restart: unless-stopped
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
     ports:
       - "80:80"
       - "443:443"
