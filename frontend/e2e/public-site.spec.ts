@@ -459,7 +459,12 @@ test('offline page and service worker are generated', async ({ request }) => {
   expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
   expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
   expect(serviceWorkerText).toContain('const MAX_CACHED_ANIME_PAGES = 12');
+  expect(serviceWorkerText).toContain("const ASSET_CACHE = 'dondeanime-assets-v1'");
+  expect(serviceWorkerText).toContain("const IMAGE_CACHE = 'dondeanime-images-v1'");
+  expect(serviceWorkerText).toContain('const MAX_CACHED_IMAGES = 120');
   expect(serviceWorkerText).toContain('const ANIME_PAGE_PATTERN');
+  expect(serviceWorkerText).toContain("request.destination === 'image'");
+  expect(serviceWorkerText).toContain('allowOpaque: true');
   expect(serviceWorkerText).toContain("request.mode === 'navigate'");
 });
 
@@ -473,6 +478,7 @@ test('alert background sync is generated in the service worker', async ({ reques
   expect(serviceWorkerText).toContain("self.addEventListener('sync'");
   expect(serviceWorkerText).toContain("fetch(alert.endpoint");
   expect(serviceWorkerText).toContain("self.registration.showNotification('Alerta enviada'");
+  expect(serviceWorkerText).toContain("badge: '/pwa/icons/maskable-icon.svg'");
 });
 
 test('install promotion banner is generated with visit gate and tracking', async ({ request }) => {

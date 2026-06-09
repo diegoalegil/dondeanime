@@ -1,8 +1,13 @@
 const PAGE_CACHE = 'dondeanime-pages-v1';
 const STATIC_CACHE = 'dondeanime-static-v1';
+const ASSET_CACHE = 'dondeanime-assets-v1';
+const IMAGE_CACHE = 'dondeanime-images-v1';
 const OFFLINE_URL = '/offline';
 const MAX_CACHED_ANIME_PAGES = 12;
+const MAX_CACHED_ASSETS = 80;
+const MAX_CACHED_IMAGES = 120;
 const ANIME_PAGE_PATTERN = /^\/(?:en\/)?anime\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
+const STATIC_PATH_PATTERN = /^\/(?:_astro\/|pwa\/|favicon\.svg$|manifest\.json$)/;
 const ALERT_SYNC_TAG = 'dondeanime-alerts-sync';
 const ALERT_DB_NAME = 'dondeanime-alerts';
 const ALERT_STORE = 'alerts';
@@ -21,7 +26,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  const keep = new Set([PAGE_CACHE, STATIC_CACHE]);
+  const keep = new Set([PAGE_CACHE, STATIC_CACHE, ASSET_CACHE, IMAGE_CACHE]);
 
   event.waitUntil(
     caches.keys()
@@ -50,6 +55,33 @@ const cachePage = async (request, response) => {
   await Promise.all(cachedPages.slice(0, overflow).map((cachedRequest) => cache.delete(cachedRequest)));
 };
 
+const trimCache = async (cache, maxEntries) => {
+  const keys = await cache.keys();
+  const overflow = keys.length - maxEntries;
+  if (overflow <= 0) return;
+
+  await Promise.all(keys.slice(0, overflow).map((cachedRequest) => cache.delete(cachedRequest)));
+};
+
+const putRuntimeResponse = async (cacheName, request, response, maxEntries, { allowOpaque = false } = {}) => {
+  if (!response || (!response.ok && !(allowOpaque && response.type === 'opaque'))) return;
+
+  const cache = await caches.open(cacheName);
+  await cache.delete(request);
+  await cache.put(request, response.clone());
+  await trimCache(cache, maxEntries);
+};
+
+const cacheFirst = async (cacheName, request, maxEntries, options) => {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+
+  const response = await fetch(request);
+  await putRuntimeResponse(cacheName, request, response, maxEntries, options);
+  return response;
+};
+
 const navigationResponse = async (request) => {
   try {
     const response = await fetch(request);
@@ -60,6 +92,20 @@ const navigationResponse = async (request) => {
     return cached ?? caches.match(OFFLINE_URL);
   }
 };
+
+const isAdminOrApiPath = (url) => (
+  url.origin === self.location.origin
+    && (url.pathname === '/api'
+      || url.pathname.startsWith('/api/')
+      || url.pathname === '/admin'
+      || url.pathname.startsWith('/admin/'))
+);
+
+const isStaticAssetRequest = (request, url) => (
+  url.origin === self.location.origin
+    && (STATIC_PATH_PATTERN.test(url.pathname)
+      || ['font', 'script', 'style', 'manifest'].includes(request.destination))
+);
 
 const openAlertDb = () => new Promise((resolve, reject) => {
   const request = indexedDB.open(ALERT_DB_NAME, 1);
@@ -108,7 +154,7 @@ const notifyAlertSynced = async () => {
   await self.registration.showNotification('Alerta enviada', {
     body: 'La alerta pendiente se ha enviado. Revisa el correo de confirmacion.',
     icon: '/pwa/icons/icon-192.svg',
-    badge: '/pwa/icons/icon-192-maskable.svg',
+    badge: '/pwa/icons/maskable-icon.svg',
     tag: 'dondeanime-alert-sync',
   });
 };
@@ -136,16 +182,28 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (request.method !== 'GET' || isAdminOrApiPath(url)) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(navigationResponse(request));
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cached) => cached ?? fetch(request)),
-  );
+  if (request.destination === 'image') {
+    event.respondWith(cacheFirst(IMAGE_CACHE, request, MAX_CACHED_IMAGES, { allowOpaque: true }));
+    return;
+  }
+
+  if (isStaticAssetRequest(request, url)) {
+    event.respondWith(cacheFirst(ASSET_CACHE, request, MAX_CACHED_ASSETS));
+    return;
+  }
+
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      caches.match(request).then((cached) => cached ?? fetch(request)),
+    );
+  }
 });
 
 self.addEventListener('sync', (event) => {
