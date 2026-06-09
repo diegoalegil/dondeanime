@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -51,12 +53,33 @@ class AnimeMaintenanceControllerTest {
     @MockitoBean
     private TrailerSyncService trailerSyncService;
 
+    @Autowired
+    private AdminJwtService adminJwtService;
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/api/anime/sync",
+            "/api/anime/match",
+            "/api/anime/sync-providers",
+            "/api/anime/sync-trailers"
+    })
+    void maintenanceEndpointsRequireBearerToken(String path) throws Exception {
+        mvc.perform(post(path))
+                .andExpect(status().isUnauthorized());
+
+        verify(syncService, never()).syncPopular(anyInt());
+        verify(matchingService, never()).matchAll();
+        verify(providerSyncService, never()).syncAll();
+        verify(trailerSyncService, never()).syncAll();
+    }
+
     @Test
     void matchAlsoEnrichesSpanishDescriptions() throws Exception {
         when(matchingService.matchAll()).thenReturn(3);
         when(descriptionEnricher.enrichMissingSpanishDescriptions()).thenReturn(2);
 
-        mvc.perform(post("/api/anime/match"))
+        mvc.perform(post("/api/anime/match")
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.matched").value(3))
                 .andExpect(jsonPath("$.descriptionsEnriched").value(2));
@@ -66,7 +89,9 @@ class AnimeMaintenanceControllerTest {
     void syncAcceptsFiveHundredAnime() throws Exception {
         when(syncService.syncPopular(500)).thenReturn(500);
 
-        mvc.perform(post("/api/anime/sync").param("count", "500"))
+        mvc.perform(post("/api/anime/sync")
+                        .param("count", "500")
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.synced").value(500));
 
@@ -76,18 +101,34 @@ class AnimeMaintenanceControllerTest {
     @Test
     void syncRejectsCountsAboveSprintLimit() throws Exception {
         mvc.perform(post("/api/anime/sync")
-                        .param("count", String.valueOf(AnimeSyncService.MAX_POPULAR_SYNC_COUNT + 1)))
+                        .param("count", String.valueOf(AnimeSyncService.MAX_POPULAR_SYNC_COUNT + 1))
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isBadRequest());
 
         verify(syncService, never()).syncPopular(anyInt());
     }
 
     @Test
+    void syncProvidersReturnsProcessedCount() throws Exception {
+        when(providerSyncService.syncAll()).thenReturn(7);
+
+        mvc.perform(post("/api/anime/sync-providers")
+                        .header("Authorization", bearerToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.processed").value(7));
+    }
+
+    @Test
     void syncTrailersReturnsProcessedCount() throws Exception {
         when(trailerSyncService.syncAll()).thenReturn(42);
 
-        mvc.perform(post("/api/anime/sync-trailers"))
+        mvc.perform(post("/api/anime/sync-trailers")
+                        .header("Authorization", bearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.processed").value(42));
+    }
+
+    private String bearerToken() {
+        return "Bearer " + adminJwtService.createAdminSession().token();
     }
 }

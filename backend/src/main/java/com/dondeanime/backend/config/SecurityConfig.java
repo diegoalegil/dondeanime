@@ -43,6 +43,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/login").permitAll()
                         .requestMatchers("/api/admin/**").authenticated()
+                        // Endpoints de mantenimiento del catálogo: disparan syncs masivos
+                        // contra AniList/TMDb, así que exigen el mismo JWT admin. Las URLs
+                        // se mantienen estables porque docs y scripts las referencian.
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/anime/sync",
+                                "/api/anime/match",
+                                "/api/anime/sync-providers",
+                                "/api/anime/sync-trailers").authenticated()
                         .anyRequest().permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

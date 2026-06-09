@@ -93,12 +93,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return rule.path() + "|" + clientIp(request);
     }
 
+    /**
+     * IP real del cliente detrás de Caddy. Solo se confía en el ÚLTIMO salto
+     * de X-Forwarded-For (lo escribe Caddy, no el cliente). No se mira
+     * CF-Connecting-IP: no hay Cloudflare delante y cualquier cliente podría
+     * mandar un valor aleatorio por petición para esquivar el rate limit.
+     */
     private static String clientIp(HttpServletRequest request) {
-        String cloudflareIp = request.getHeader("CF-Connecting-IP");
-        if (cloudflareIp != null && !cloudflareIp.isBlank()) {
-            return cloudflareIp.trim();
-        }
-
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
             String[] hops = forwardedFor.split(",");
