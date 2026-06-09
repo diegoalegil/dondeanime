@@ -7,6 +7,7 @@ PROJECT_DIR="${PROJECT_DIR:-/opt/dondeanime}"
 ENV_FILE="${ENV_FILE:-$PROJECT_DIR/.env.prod}"
 SECRET_NAME=""
 RESTART_BACKEND=0
+DRY_RUN=0
 
 usage() {
     cat <<'USAGE'
@@ -14,12 +15,24 @@ Usage:
   bash scripts/vps/rotate-secret.sh --secret ADMIN_PASSWORD
   bash scripts/vps/rotate-secret.sh --secret JWT_SECRET --restart-backend
   bash scripts/vps/rotate-secret.sh --env-file /opt/dondeanime/.env.prod --secret RESEND_API_KEY
+  bash scripts/vps/rotate-secret.sh --secret ADMIN_PASSWORD --dry-run
 
 Allowed secrets:
   ADMIN_PASSWORD
+  EMBEDDING_API_KEY
   JWT_SECRET
+  PLAUSIBLE_API_KEY
+  PREMIUM_ACCESS_TOKEN_SECRET
   RESEND_API_KEY
   R2_SECRET_ACCESS_KEY
+  STRIPE_SECRET_KEY
+  STRIPE_WEBHOOK_SECRET
+  TELEGRAM_BOT_TOKEN
+  TMDB_API_KEY
+  TRAKT_CLIENT_SECRET
+  TRAKT_TOKEN_ENCRYPTION_SECRET
+  VAPID_PRIVATE_KEY
+  VERCEL_DEPLOY_HOOK
 USAGE
 }
 
@@ -35,6 +48,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --restart-backend)
             RESTART_BACKEND=1
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=1
             shift
             ;;
         --help|-h)
@@ -60,7 +77,7 @@ fail() {
 
 is_allowed_secret() {
     case "$1" in
-        ADMIN_PASSWORD|JWT_SECRET|RESEND_API_KEY|R2_SECRET_ACCESS_KEY)
+        ADMIN_PASSWORD|EMBEDDING_API_KEY|JWT_SECRET|PLAUSIBLE_API_KEY|PREMIUM_ACCESS_TOKEN_SECRET|RESEND_API_KEY|R2_SECRET_ACCESS_KEY|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|TELEGRAM_BOT_TOKEN|TMDB_API_KEY|TRAKT_CLIENT_SECRET|TRAKT_TOKEN_ENCRYPTION_SECRET|VAPID_PRIVATE_KEY|VERCEL_DEPLOY_HOOK)
             return 0
             ;;
         *)
@@ -122,6 +139,16 @@ main() {
         exit 2
     }
     is_allowed_secret "$SECRET_NAME" || fail "Secret is not allowed: $SECRET_NAME"
+    [[ -f "$ENV_FILE" ]] || fail "ENV_FILE not found: $ENV_FILE"
+    [[ -w "$ENV_FILE" ]] || fail "ENV_FILE is not writable: $ENV_FILE"
+
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+        log "DRY RUN: would update $SECRET_NAME in $ENV_FILE"
+        if [[ "$RESTART_BACKEND" -eq 1 ]]; then
+            log "DRY RUN: would restart backend"
+        fi
+        return 0
+    fi
 
     local new_value
     new_value="$(read_secret_twice)"

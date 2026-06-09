@@ -27,14 +27,29 @@ Opciones:
 ```bash
 bash scripts/vps/rotate-secret.sh --secret ADMIN_PASSWORD --restart-backend
 bash scripts/vps/rotate-secret.sh --env-file /opt/dondeanime/.env.prod --secret JWT_SECRET
+bash scripts/vps/rotate-secret.sh --secret ADMIN_PASSWORD --dry-run
 ```
 
 Secretos permitidos por el script:
 
 - `ADMIN_PASSWORD`
+- `EMBEDDING_API_KEY`
 - `JWT_SECRET`
+- `PLAUSIBLE_API_KEY`
+- `PREMIUM_ACCESS_TOKEN_SECRET`
 - `RESEND_API_KEY`
 - `R2_SECRET_ACCESS_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `TELEGRAM_BOT_TOKEN`
+- `TMDB_API_KEY`
+- `TRAKT_CLIENT_SECRET`
+- `TRAKT_TOKEN_ENCRYPTION_SECRET`
+- `VAPID_PRIVATE_KEY`
+- `VERCEL_DEPLOY_HOOK`
+
+`--dry-run` valida el secreto, el archivo destino y si habría reinicio, pero no
+pide valor nuevo ni escribe en `.env.prod`.
 
 ## ADMIN_PASSWORD
 
@@ -141,6 +156,68 @@ scripts/vps/verify-backup.sh
 
 Impacto: no requiere reiniciar backend porque los scripts leen `.env.prod` en
 cada ejecución.
+
+## Secretos Con Rotacion Simple
+
+Estos secretos se pueden rotar con `scripts/vps/rotate-secret.sh` y después
+verificar el servicio asociado. Mantener flags opcionales apagados si no hay
+cuenta o clave real.
+
+| Secreto | Reinicio | Verificacion |
+|---|---|---|
+| `TMDB_API_KEY` | backend | `curl -i https://api.dondeanime.com/api/anime` |
+| `TRAKT_CLIENT_SECRET` | backend | login Trakt devuelve URL o `503` controlado si falta otra credencial |
+| `TRAKT_TOKEN_ENCRYPTION_SECRET` | backend | solo rotar antes de activar Trakt o tras desconectar cuentas |
+| `STRIPE_SECRET_KEY` | backend | Checkout sigue `503` si Premium no está configurado completo |
+| `STRIPE_WEBHOOK_SECRET` | backend | webhook rechaza firmas inválidas y acepta prueba de Stripe CLI |
+| `TELEGRAM_BOT_TOKEN` | backend | fallo simulado de scheduler o mensaje de prueba desde UptimeRobot |
+| `EMBEDDING_API_KEY` | backend | cliente sigue desactivado si `EMBEDDINGS_ENABLED=false` |
+| `VAPID_PRIVATE_KEY` | backend + frontend env | generar par nuevo y actualizar también `VAPID_PUBLIC_KEY`/`PUBLIC_VAPID_PUBLIC_KEY` |
+| `PLAUSIBLE_API_KEY` | backend | dashboard admin no rompe si Plausible está apagado |
+| `PREMIUM_ACCESS_TOKEN_SECRET` | backend | invalida enlaces premium firmados anteriores |
+| `VERCEL_DEPLOY_HOOK` | ninguno | disparar solo si hay hook real y aprobado |
+
+Ejemplo:
+
+```bash
+cd /opt/dondeanime
+bash scripts/vps/rotate-secret.sh --secret STRIPE_WEBHOOK_SECRET --dry-run
+bash scripts/vps/rotate-secret.sh --secret STRIPE_WEBHOOK_SECRET --restart-backend
+```
+
+## POSTGRES_PASSWORD
+
+No está permitido en `rotate-secret.sh`: cambiar solo `.env.prod` rompería la
+conexión porque la contraseña también vive dentro del rol de Postgres.
+
+Rotarlo solo en ventana de mantenimiento:
+
+1. Abrir y mantener una sesión SSH como `deploy`.
+2. Parar backend para cortar escrituras:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod stop backend
+```
+
+3. Cambiar la contraseña dentro de Postgres sin dejarla en shell history:
+
+```bash
+docker exec -it dondeanime_postgres_prod psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+\password dondeanime_user
+\q
+```
+
+4. Actualizar `POSTGRES_PASSWORD` en `/opt/dondeanime/.env.prod`, `chmod 600 .env.prod`.
+5. Levantar backend y verificar:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+curl -i https://api.dondeanime.com/actuator/health
+scripts/backup-postgres-r2.sh --check-config
+scripts/vps/verify-backup.sh --check-config
+```
+
+6. Revocar/eliminar el valor anterior del password manager.
 
 ## Incidente De Fuga
 

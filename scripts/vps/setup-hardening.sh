@@ -8,18 +8,31 @@
 set -euo pipefail
 
 CHECK_ONLY=0
+DRY_RUN=0
 if [[ "${1:-}" == "--check" ]]; then
     CHECK_ONLY=1
+elif [[ "${1:-}" == "--dry-run" ]]; then
+    DRY_RUN=1
 elif [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     cat <<'USAGE'
 Usage:
   sudo bash scripts/vps/setup-hardening.sh
   sudo bash scripts/vps/setup-hardening.sh --check
+  bash scripts/vps/setup-hardening.sh --dry-run
 
 Run without arguments to apply hardening.
 Run with --check to verify current fail2ban, sshd and unattended-upgrades state.
+Run with --dry-run to print the planned changes without requiring root.
 USAGE
     exit 0
+elif [[ -n "${1:-}" ]]; then
+    printf 'Unknown argument: %s\n' "$1" >&2
+    exit 2
+fi
+
+if [[ "$#" -gt 1 ]]; then
+    printf 'Only one argument is supported\n' >&2
+    exit 2
 fi
 
 log() {
@@ -89,6 +102,22 @@ check_state() {
     grep -E 'APT::Periodic::(Update-Package-Lists|Unattended-Upgrade)' /etc/apt/apt.conf.d/20auto-upgrades
 }
 
+dry_run_plan() {
+    cat <<'PLAN'
+Dry run: no files will be changed and no services will be restarted.
+Planned VPS hardening:
+- install fail2ban and unattended-upgrades
+- enable fail2ban sshd jail with maxretry=3, findtime=10m, bantime=1h
+- back up /etc/ssh/sshd_config before editing it
+- set PasswordAuthentication no
+- set PermitRootLogin no
+- set MaxAuthTries 3
+- set PubkeyAuthentication yes
+- validate sshd config before restarting SSH
+- enable daily unattended security upgrades
+PLAN
+}
+
 apply_hardening() {
     require_root
     require_cmd apt-get
@@ -143,7 +172,9 @@ APT
     check_state
 }
 
-if [[ "$CHECK_ONLY" -eq 1 ]]; then
+if [[ "$DRY_RUN" -eq 1 ]]; then
+    dry_run_plan
+elif [[ "$CHECK_ONLY" -eq 1 ]]; then
     require_root
     check_state
 else

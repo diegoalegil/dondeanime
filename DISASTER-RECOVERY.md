@@ -1,8 +1,9 @@
 # Disaster Recovery - DondeAnime
 
 Runbook operativo para recuperar DondeAnime ante caídas graves. No sustituye a
-los backups verificados: asume que `scripts/vps/verify-backup.sh` se ejecuta
-cada semana y que existe al menos un backup R2 validado.
+los backups verificados: asume que `scripts/vps/verify-backup.sh --check-config`
+y `scripts/vps/verify-backup.sh` se ejecutan cada semana y que existe al menos
+un backup R2 validado.
 
 ## Objetivos
 
@@ -92,6 +93,7 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
 4. Verificar conteos:
 
 ```bash
+scripts/vps/verify-backup.sh --check-config
 docker exec dondeanime_postgres_prod psql -At -U dondeanime_user -d dondeanime \
   -c "select count(*) from anime;"
 docker exec dondeanime_postgres_prod psql -At -U dondeanime_user -d dondeanime \
@@ -146,6 +148,7 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
 5. Validar conteos y endpoints:
 
 ```bash
+scripts/vps/verify-backup.sh --check-config
 scripts/vps/verify-backup.sh
 curl -i https://api.dondeanime.com/api/anime
 curl -i https://api.dondeanime.com/api/providers
@@ -227,10 +230,11 @@ Checklist del drill:
 1. Provisionar VPS de prueba.
 2. Restaurar `.env.prod` con valores de prueba o secretos rotados para staging.
 3. Descargar un backup R2 verificado.
-4. Restaurarlo en el Postgres temporal.
-5. Levantar backend y validar `/api/anime`.
-6. Medir tiempos reales de RTO/RPO.
-7. Destruir el VPS de prueba.
-8. Actualizar este documento con lo que haya fallado.
+4. Ejecutar `scripts/vps/verify-backup.sh --check-config`.
+5. Restaurarlo en el Postgres temporal aislado (`127.0.0.1:5444`).
+6. Levantar backend y validar `/api/anime`.
+7. Medir tiempos reales de RTO/RPO.
+8. Destruir el VPS de prueba.
+9. Actualizar este documento con lo que haya fallado.
 
 No hacer drills destructivos en producción.

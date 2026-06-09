@@ -106,6 +106,13 @@ ensure_success() {
     fi
 }
 
+validate_timing() {
+    [[ "$INTERVAL_SECONDS" =~ ^[0-9]+$ ]] || fail "UPTIMEROBOT_INTERVAL_SECONDS must be numeric"
+    [[ "$TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] || fail "UPTIMEROBOT_TIMEOUT_SECONDS must be numeric"
+    [[ "$INTERVAL_SECONDS" -ge 60 ]] || fail "UPTIMEROBOT_INTERVAL_SECONDS must be at least 60"
+    [[ "$TIMEOUT_SECONDS" -ge 1 && "$TIMEOUT_SECONDS" -le 60 ]] || fail "UPTIMEROBOT_TIMEOUT_SECONDS must be 1..60"
+}
+
 list_contacts() {
     require_api_key
     require_cmd curl
@@ -149,8 +156,7 @@ main() {
         return 0
     fi
 
-    [[ "$INTERVAL_SECONDS" =~ ^[0-9]+$ ]] || fail "UPTIMEROBOT_INTERVAL_SECONDS must be numeric"
-    [[ "$TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] || fail "UPTIMEROBOT_TIMEOUT_SECONDS must be numeric"
+    validate_timing
 
     local alert_contacts
     alert_contacts="$(format_alert_contacts)"
