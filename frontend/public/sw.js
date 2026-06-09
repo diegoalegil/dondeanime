@@ -1,7 +1,9 @@
-const PAGE_CACHE = 'dondeanime-pages-v1';
-const STATIC_CACHE = 'dondeanime-static-v1';
-const ASSET_CACHE = 'dondeanime-assets-v1';
-const IMAGE_CACHE = 'dondeanime-images-v1';
+// v2: SW unificado (offline + push). Subir la versión invalida las caches
+// antiguas y fuerza la actualización en los clientes.
+const PAGE_CACHE = 'dondeanime-pages-v2';
+const STATIC_CACHE = 'dondeanime-static-v2';
+const ASSET_CACHE = 'dondeanime-assets-v2';
+const IMAGE_CACHE = 'dondeanime-images-v2';
 const OFFLINE_URL = '/offline';
 const MAX_CACHED_ANIME_PAGES = 12;
 const MAX_CACHED_ASSETS = 80;
@@ -200,6 +202,16 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (url.origin === self.location.origin) {
+    // Las navegaciones suaves del ClientRouter piden HTML sin mode=navigate:
+    // si se sirviera cache-first, los usuarios verían páginas viejas para
+    // siempre tras cada deploy. HTML = network-first, igual que las
+    // navegaciones normales.
+    const accept = request.headers.get('accept') ?? '';
+    if (accept.includes('text/html')) {
+      event.respondWith(navigationResponse(request));
+      return;
+    }
+
     event.respondWith(
       caches.match(request).then((cached) => cached ?? fetch(request)),
     );
@@ -214,4 +226,54 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type !== 'SYNC_ALERTS') return;
   event.waitUntil(flushQueuedAlerts());
+});
+
+// Push de disponibilidad (antes vivia en push-worker.js; registrar dos SW en
+// el mismo scope hacia que cada registro matara al otro: la suscripcion push
+// rompia el offline y la siguiente navegacion rompia el push).
+self.addEventListener('push', (event) => {
+  const fallback = {
+    title: 'Nueva disponibilidad',
+    body: 'Un anime de tus alertas ya tiene plataforma.',
+    url: '/',
+    tag: 'dondeanime-provider-added',
+  };
+  let data = fallback;
+
+  if (event.data) {
+    try {
+      data = { ...fallback, ...event.data.json() };
+    } catch {
+      data = { ...fallback, body: event.data.text() };
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/pwa/icons/icon-192.svg',
+      badge: '/pwa/icons/maskable-icon.svg',
+      tag: data.tag,
+      data: {
+        url: data.url,
+      },
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const rawUrl = event.notification.data?.url || '/';
+  const targetUrl = new URL(rawUrl, self.location.origin).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('navigate' in client && 'focus' in client) {
+          return client.navigate(targetUrl).then(() => client.focus());
+        }
+      }
+      return self.clients.openWindow(targetUrl);
+    }),
+  );
 });

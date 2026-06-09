@@ -1,4 +1,6 @@
 ---
+import { t } from '@/i18n';
+
 interface Props {
   countryIso: string;
 }
@@ -13,10 +15,17 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
   data-api-url={apiUrl}
   data-country={countryIso}
   data-vapid-key={vapidPublicKey}
+  data-status-not-configured={t('push.status.notConfigured')}
+  data-status-email-required={t('push.status.emailRequired')}
+  data-status-unsupported={t('push.status.unsupported')}
+  data-status-requesting={t('push.status.requesting')}
+  data-status-permission-denied={t('push.status.permissionDenied')}
+  data-status-success={t('push.status.success')}
+  data-status-error={t('push.status.error')}
 >
   <div class="grid gap-3 md:grid-cols-[1fr_auto]">
     <label class="block">
-      <span class="mb-1 block text-sm font-medium text-fg-secondary">Email para push</span>
+      <span class="mb-1 block text-sm font-medium text-fg-secondary">{t('push.emailLabel')}</span>
       <input
         data-push-email
         type="email"
@@ -29,7 +38,7 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
       class="self-end rounded-md border border-surface-2 px-4 py-2 text-sm font-semibold text-fg-primary transition-colors hover:border-accent-violet hover:text-accent-violet disabled:cursor-not-allowed disabled:opacity-50"
       data-push-button
     >
-      Activar push
+      {t('push.activate')}
     </button>
   </div>
   <p class="mt-2 min-h-5 text-sm text-fg-muted" data-push-status></p>
@@ -47,6 +56,15 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
     const apiUrl = root.getAttribute('data-api-url') ?? '';
     const countryIso = root.getAttribute('data-country') ?? '';
     const vapidKey = root.getAttribute('data-vapid-key') ?? '';
+    const messages = {
+      notConfigured: root.getAttribute('data-status-not-configured') ?? '',
+      emailRequired: root.getAttribute('data-status-email-required') ?? '',
+      unsupported: root.getAttribute('data-status-unsupported') ?? '',
+      requesting: root.getAttribute('data-status-requesting') ?? '',
+      permissionDenied: root.getAttribute('data-status-permission-denied') ?? '',
+      success: root.getAttribute('data-status-success') ?? '',
+      error: root.getAttribute('data-status-error') ?? '',
+    };
     const emailInput = root.querySelector('[data-push-email]');
     const button = root.querySelector('[data-push-button]');
     const status = root.querySelector('[data-push-status]');
@@ -62,30 +80,32 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
     if (!button) return;
     if (!vapidKey) {
       button.setAttribute('disabled', 'true');
-      setStatus('Las notificaciones push todavia no estan configuradas.');
+      setStatus(messages.notConfigured);
       return;
     }
 
     button.addEventListener('click', async () => {
       const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : '';
       if (!email) {
-        setStatus('Introduce un email antes de activar push.', 'danger');
+        setStatus(messages.emailRequired, 'danger');
         return;
       }
       if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-        setStatus('Este navegador no soporta notificaciones push.', 'danger');
+        setStatus(messages.unsupported, 'danger');
         return;
       }
 
-      setStatus('Solicitando permiso...');
+      setStatus(messages.requesting);
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-          setStatus('Permiso de notificaciones rechazado.', 'danger');
+          setStatus(messages.permissionDenied, 'danger');
           return;
         }
 
-        const registration = await navigator.serviceWorker.register('/push-worker.js');
+        // El SW unico (/sw.js, registrado en BaseLayout) tambien gestiona el
+        // push: registrar un segundo worker en el mismo scope mataba al otro.
+        const registration = await navigator.serviceWorker.ready;
         const existing = await registration.pushManager.getSubscription();
         const subscription = existing ?? await registration.pushManager.subscribe({
           userVisibleOnly: true,
@@ -108,9 +128,9 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
           throw new Error(`HTTP ${response.status}`);
         }
 
-        setStatus('Notificaciones push activadas.', 'success');
+        setStatus(messages.success, 'success');
       } catch {
-        setStatus('No se pudo activar push. Intentalo de nuevo.', 'danger');
+        setStatus(messages.error, 'danger');
       }
     });
   });
