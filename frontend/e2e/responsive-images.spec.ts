@@ -3,8 +3,10 @@ import { expect, test } from '@playwright/test';
 test('anime covers use responsive picture markup and first mobile row is eager', async ({ page }) => {
   await page.goto('/');
 
+  // La home muestra un teaser del catálogo (60 cards) más las secciones
+  // de tendencia/temporada/género; el catálogo completo vive en /buscar.
   const cards = page.locator('article a[href^="/anime/"]');
-  expect(await cards.count()).toBeGreaterThanOrEqual(100);
+  expect(await cards.count()).toBeGreaterThanOrEqual(60);
 
   const firstHref = await cards.first().getAttribute('href');
   expect(firstHref).toMatch(/^\/anime\/[^/]+$/);

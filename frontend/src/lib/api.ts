@@ -249,6 +249,22 @@ async function fetchJsonSafe<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
+/**
+ * Guard de build para datos ESTRUCTURALES (géneros, temporadas, providers):
+ * con ~1000 anime en catálogo nunca pueden estar legítimamente vacíos. Si la
+ * API responde vacío durante el build (degradada, 5xx convertido en fallback),
+ * generar 0 páginas desindexaría miles de URLs en silencio: mejor abortar.
+ * Las noticias NO usan este guard: vacías es un estado válido.
+ */
+export const requireNonEmpty = <T>(name: string, items: T[]): T[] => {
+  if (items.length === 0) {
+    throw new Error(
+      `Build abortado: la API devolvió 0 ${name}. Con el catálogo poblado esto solo ocurre con la API degradada; generar 0 páginas desindexaría esas URLs.`,
+    );
+  }
+  return items;
+};
+
 export const getAllAnime = () => fetchJson<AnimeSummary[]>('/api/anime');
 
 export const getUpcomingAnime = async (days: number) => {

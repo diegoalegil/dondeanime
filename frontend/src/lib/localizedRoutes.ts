@@ -96,7 +96,7 @@ export const spanishPathFromLocalized = (path: string): string => {
  * anime/duracion, anime/episodios, índices sin traducir...). Usar null en
  * lugar de inventar una /en/... que daría 404.
  */
-const localizedEnPath = (spanishPath: string): string | null => {
+export const localizedEnPath = (spanishPath: string): string | null => {
   const segments = segmentsOf(spanishPath);
   const [section, first, second, third] = segments;
   if (!section) return '/en';

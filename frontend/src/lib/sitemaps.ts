@@ -1,5 +1,6 @@
 import {
   getAllAnime,
+  getBuildableAnimeDetails,
   getCuratedLists,
   getGenres,
   getProviders,
@@ -10,8 +11,8 @@ import {
 import { getCollection } from 'astro:content';
 import { BEST_ANIME_YEARS } from './bestYears';
 import { COUNTRIES, COUNTRY_SLUGS } from './countries';
-import { localizedPath } from './localizedRoutes';
-import { isHiddenVariant } from './platforms';
+import { localizedEnPath } from './localizedRoutes';
+import { filterVisibleProviders, isHiddenVariant } from './platforms';
 import { t } from '@/i18n';
 import {
   DURATION_MINUTES,
@@ -38,6 +39,7 @@ export const PARTITION_SITEMAP_ENTRIES = [
   { name: t('sitemap.best'), path: '/sitemap-mejores.xml' },
   { name: t('sitemap.combinations'), path: '/sitemap-combinatoria.xml' },
   { name: 'Listas', path: '/sitemap-listas.xml' },
+  { name: 'Noticias', path: '/sitemap-noticias.xml' },
 ] as const;
 
 export const SITEMAP_ENTRIES = [
@@ -108,6 +110,7 @@ export const staticSitemapPaths = async (): Promise<string[]> => {
     '/',
     '/blog',
     ...posts.map((post) => `/blog/${blogSlug(post)}`),
+    '/noticias',
     '/contacto',
     '/legal/privacidad',
     '/legal/cookies',
@@ -117,10 +120,19 @@ export const staticSitemapPaths = async (): Promise<string[]> => {
 };
 
 export const countrySitemapPaths = async (): Promise<string[]> => {
-  const anime = await getAllAnime();
+  const entries = await getBuildableAnimeDetails();
   const countryHubs = COUNTRY_SLUGS.map((countrySlug) => `/pais/${countrySlug}`);
-  const animeCountryPages = anime.flatMap((item) =>
-    COUNTRY_SLUGS.map((countrySlug) => `/anime/${item.slug}/${countrySlug}`),
+  // Solo emitimos combos anime×país con providers visibles en ese país: las
+  // páginas sin streaming canonicalizan a la ficha base, y enviar miles de
+  // URLs no canónicas en el sitemap desperdicia crawl budget y ensucia
+  // Search Console.
+  const animeCountryPages = entries.flatMap(({ detail }) =>
+    COUNTRY_SLUGS
+      .filter((countrySlug) => {
+        const providers = detail.watchProvidersByCountry[COUNTRIES[countrySlug].iso] ?? [];
+        return filterVisibleProviders(providers).length > 0;
+      })
+      .map((countrySlug) => `/anime/${detail.anime.slug}/${countrySlug}`),
   );
 
   return [...countryHubs, ...animeCountryPages];
@@ -233,4 +245,14 @@ export const spanishSitemapPaths = async (): Promise<string[]> => {
 };
 
 export const englishSitemapPaths = async (): Promise<string[]> =>
-  (await spanishSitemapPaths()).map((path) => localizedPath(path, 'en'));
+  (await spanishSitemapPaths())
+    // Mapeo ESTRICTO: localizedEnPath devuelve null cuando la página inglesa
+    // no existe (/listas, /empezar/*, /estudio/*, /anime/duracion/*...). El
+    // fallback de localizedPath inventaba /en/... que daban 404 en el sitemap.
+    .map((path) => localizedEnPath(path))
+    .filter((path): path is string =>
+      path !== null
+      // /en/news/* existe pero canonicaliza a /noticias/* (contenido aún sin
+      // traducir): no se envían URLs no canónicas en el sitemap.
+      && path !== '/en/news'
+      && !path.startsWith('/en/news/'));

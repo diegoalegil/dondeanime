@@ -11,15 +11,24 @@ import { localizedPath } from '@/lib/localizedRoutes';
 setLocale('en');
 
 const news = await getNews(50);
-const pageUrl = absoluteUrl('/en/news');
-const rssHref = `${import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '')}/en/news/rss.xml`;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
+// Las noticias aún se publican solo en español: este índice sirve el MISMO
+// contenido bajo lang=en, así que canonicaliza a /noticias y no emite
+// hreflang propio (mismo patrón que anime/[slug]/[pais] sin providers).
+const canonicalUrl = `${siteUrl}/noticias`;
+const rssHref = `${siteUrl}/en/news/rss.xml`;
 const itemList = buildItemListSchema(
   news.map((n) => ({ name: n.title, url: absoluteUrl(`/en/news/${n.slug}`) })),
-  pageUrl,
+  canonicalUrl,
   t('news.index.heading'),
 );
 ---
-<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl}>
+<BaseLayout
+  title={t('news.index.title')}
+  description={t('news.index.description')}
+  canonical={canonicalUrl}
+  suppressAlternates
+>
   <link slot="head" rel="alternate" type="application/rss+xml" title={t('news.rss.title')} href={rssHref} />
   {news.length > 0 && <JsonLd slot="head" data={itemList} />}
 

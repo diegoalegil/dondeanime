@@ -17,7 +17,8 @@ const itemList = buildItemListSchema(
   t('news.index.heading'),
 );
 ---
-<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl}>
+{/* suppressAlternates: /en/news canonicaliza aquí (contenido sin traducir). */}
+<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl} suppressAlternates>
   <link
     slot="head"
     rel="alternate"

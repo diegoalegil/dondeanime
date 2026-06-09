@@ -1,4 +1,6 @@
 ---
+import { t } from '@/i18n';
+
 interface Props {
   youtubeId?: string | null;
   title: string;
@@ -10,11 +12,11 @@ const embedUrl = safeYoutubeId ? `https://www.youtube-nocookie.com/embed/${safeY
 ---
 {embedUrl && (
   <section class="mx-auto max-w-6xl px-4 py-8">
-    <h2 class="mb-4 text-lg font-semibold text-fg-primary">Trailer</h2>
+    <h2 class="mb-4 text-lg font-semibold text-fg-primary">{t('anime.trailer.heading')}</h2>
     <div class="aspect-video overflow-hidden rounded-lg border border-surface-2 bg-surface-1">
       <iframe
         src={embedUrl}
-        title={`Trailer de ${title}`}
+        title={t('anime.trailer.iframeTitle', { title })}
         class="h-full w-full"
         loading="lazy"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

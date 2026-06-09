@@ -10,6 +10,8 @@ interface Props {
   // base) no debe emitir hreflang propio: un clúster hreflang con una URL no
   // canónica hace que Google lo descarte. true = no emitir alternates.
   suppressAlternates?: boolean;
+  // Páginas utilitarias (offline, etc.) que no deben indexarse.
+  noindex?: boolean;
 }
 
 import { localeFromPath, setLocale, t } from '@/i18n';
@@ -23,6 +25,7 @@ const {
   type = 'website',
   locale,
   suppressAlternates = false,
+  noindex = false,
 } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL;
@@ -39,6 +42,7 @@ const alternates = localeAlternates(cleanPathname || '/');
 ---
 <title>{title}</title>
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
 <link rel="canonical" href={canonicalUrl} />
 
 <meta property="og:title" content={title} />

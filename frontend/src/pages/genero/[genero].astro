@@ -3,14 +3,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { getGenres, getAnimeByGenre } from '@/lib/api';
+import { getGenres, getAnimeByGenre, requireNonEmpty } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
 
 setLocale('es');
 
 export async function getStaticPaths() {
-  const genres = await getGenres();
+  const genres = requireNonEmpty('géneros', await getGenres());
   return genres.map((g) => ({
     params: { genero: g.slug },
     props: { genreName: g.name, total: g.animeCount },

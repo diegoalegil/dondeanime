@@ -16,13 +16,13 @@ test('English routes render translated UI under /en with locale alternates', asy
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { name: /Find where to watch/i })).toBeVisible();
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://dondeanime.com/en');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.dondeanime.com/en');
   await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'en_US');
   await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute('content', 'es_ES');
   await expectLocaleAlternates(page, {
-    es: 'https://dondeanime.com/',
-    en: 'https://dondeanime.com/en',
-    default: 'https://dondeanime.com/',
+    es: 'https://www.dondeanime.com/',
+    en: 'https://www.dondeanime.com/en',
+    default: 'https://www.dondeanime.com/',
   });
 
   await expect(page.locator('main a[href="/en/country/spain"]')).toBeVisible();
@@ -35,12 +35,12 @@ test('English country, platform and combo routes map back to Spanish canonicals'
   await expect(page.getByRole('heading', { name: /Anime streaming in Spain/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/en/country/spain',
+    'https://www.dondeanime.com/en/country/spain',
   );
   await expectLocaleAlternates(page, {
-    es: 'https://dondeanime.com/pais/espana',
-    en: 'https://dondeanime.com/en/country/spain',
-    default: 'https://dondeanime.com/pais/espana',
+    es: 'https://www.dondeanime.com/pais/espana',
+    en: 'https://www.dondeanime.com/en/country/spain',
+    default: 'https://www.dondeanime.com/pais/espana',
   });
 
   await page.goto('/en/platform/crunchyroll');
@@ -51,12 +51,12 @@ test('English country, platform and combo routes map back to Spanish canonicals'
   await expect(page.getByRole('heading', { name: /Anime in Action on Crunchyroll/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/en/anime/action/on/crunchyroll',
+    'https://www.dondeanime.com/en/anime/action/on/crunchyroll',
   );
   await expectLocaleAlternates(page, {
-    es: 'https://dondeanime.com/anime/action/en/crunchyroll',
-    en: 'https://dondeanime.com/en/anime/action/on/crunchyroll',
-    default: 'https://dondeanime.com/anime/action/en/crunchyroll',
+    es: 'https://www.dondeanime.com/anime/action/en/crunchyroll',
+    en: 'https://www.dondeanime.com/en/anime/action/on/crunchyroll',
+    default: 'https://www.dondeanime.com/anime/action/en/crunchyroll',
   });
 });
 
@@ -80,13 +80,15 @@ test('language switcher stores a manual preference cookie', async ({ page, conte
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 });
 
-test('English browser locale redirects first public visit to /en', async ({ browser }) => {
+test('browser locale alone does not redirect (Googlebot renders with en-US)', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'en-US' });
   const page = await context.newPage();
 
+  // Sin cookie de preferencia explícita NO hay redirección automática: la
+  // home ES se queda en ES aunque el navegador anuncie inglés.
   await page.goto(`${testBaseURL}/`);
-  await page.waitForURL(`${testBaseURL}/en`);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page).toHaveURL(`${testBaseURL}/`);
 
   await context.close();
 });

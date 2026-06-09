@@ -2,10 +2,16 @@
 import { localizedPath } from '@/lib/localizedRoutes';
 import AnimeChatSearchIsland from './AnimeChatSearch.svelte';
 
+// Apagado por defecto: /api/chat está deshabilitado en prod, así que sin el
+// flag el buscador conversacional solo produciría errores (mismo patrón de
+// flag que AdSense/Plausible).
+const chatEnabled = import.meta.env.PUBLIC_CHAT_ENABLED === 'true';
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
-<AnimeChatSearchIsland
-  apiUrl={apiUrl}
-  animePathPrefix={localizedPath('/anime')}
-  client:load
-/>
+{chatEnabled && (
+  <AnimeChatSearchIsland
+    apiUrl={apiUrl}
+    animePathPrefix={localizedPath('/anime')}
+    client:load
+  />
+)}

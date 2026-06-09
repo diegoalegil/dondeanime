@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getNews, getNewsBySlug } from '@/lib/api';
-import { absoluteUrl, buildNewsArticleSchema } from '@/lib/seo';
+import { buildNewsArticleSchema } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 
@@ -20,7 +20,10 @@ if (!item) {
   return Astro.redirect('/en/news');
 }
 
-const pageUrl = absoluteUrl(`/en/news/${item.slug}`);
+// Las noticias aún se publican solo en español: esta ruta sirve el MISMO body
+// bajo lang=en, así que canonicaliza a /noticias/{slug} y no emite hreflang
+// propio (mismo patrón que anime/[slug]/[pais] sin providers).
+const canonicalUrl = `${import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '')}/noticias/${item.slug}`;
 const activeLocale = getLocale();
 const date = new Intl.DateTimeFormat(activeLocale === 'en' ? 'en-US' : 'es-ES', {
   day: 'numeric',
@@ -28,13 +31,14 @@ const date = new Intl.DateTimeFormat(activeLocale === 'en' ? 'en-US' : 'es-ES', 
   year: 'numeric',
 }).format(new Date(item.publishedAt));
 
-const articleSchema = buildNewsArticleSchema(item, pageUrl);
+const articleSchema = buildNewsArticleSchema(item, canonicalUrl);
 const metaDescription = item.metaDescription ?? item.summary ?? item.title;
 ---
 <BaseLayout
   title={item.metaTitle ?? t('news.detail.title', { title: item.title })}
   description={metaDescription}
-  canonical={pageUrl}
+  canonical={canonicalUrl}
+  suppressAlternates
   image={item.imageUrl ?? undefined}
   type="article"
 >

@@ -39,8 +39,6 @@ const isoDate = (year: number | null, month: number | null, day: number | null):
 
 const titleFor = (anime: AnimeDetail['anime']): string => anime.titleEnglish || anime.titleRomaji;
 
-const ratingValue = (averageScore: number): string => (averageScore / 10).toFixed(1);
-
 const organizationSameAs = (): string[] => {
   const raw = import.meta.env.PUBLIC_ORGANIZATION_SAME_AS ?? DEFAULT_ORGANIZATION_SAME_AS;
   const urls = raw.split(',').map((url) => url.trim()).filter(Boolean);
@@ -63,12 +61,9 @@ export const buildTVSeriesSchema = (
   datePublished: isoDate(anime.startYear, anime.startMonth, anime.startDay),
   numberOfEpisodes: anime.episodes ?? undefined,
   genre: anime.genres.length > 0 ? anime.genres : undefined,
-  aggregateRating: anime.averageScore !== null ? {
-    '@type': 'AggregateRating',
-    ratingValue: ratingValue(anime.averageScore),
-    bestRating: '10',
-    worstRating: '0',
-  } : undefined,
+  // Sin aggregateRating: Google exige ratingCount y la API solo expone la
+  // media de AniList (puntuaciones de terceros, sin recuento). Emitirlo sin
+  // recuento real es structured data inválido/spam.
   ...(providers.length > 0 && {
     offers: providers.map((p) => ({
       '@type': 'Offer',
@@ -78,44 +73,6 @@ export const buildTVSeriesSchema = (
     })),
   }),
 });
-
-export const buildAnimeReviewSchema = (
-  anime: AnimeDetail['anime'],
-  pageUrl: string,
-) => {
-  if (anime.averageScore === null) return undefined;
-
-  const name = titleFor(anime);
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Review',
-    name: t('seo.review.name', { name }),
-    itemReviewed: {
-      '@type': 'TVSeries',
-      name,
-      url: pageUrl,
-      image: anime.coverImage,
-    },
-    author: {
-      '@type': 'Organization',
-      name: 'AniList',
-      url: 'https://anilist.co',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: t('brand.name'),
-      url: SITE_URL,
-    },
-    reviewBody: t('seo.review.body', { name }),
-    reviewRating: {
-      '@type': 'Rating',
-      ratingValue: ratingValue(anime.averageScore),
-      bestRating: '10',
-      worstRating: '0',
-    },
-  };
-};
 
 export const buildNewsArticleSchema = (news: NewsDetail, pageUrl: string) => ({
   '@context': 'https://schema.org',

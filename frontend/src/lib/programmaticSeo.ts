@@ -7,6 +7,12 @@ export const episodeLimitPath = (maxEpisodes: number): string => `/anime/episodi
 export const beginnerGenrePath = (genreSlug: string): string => `/empezar/${genreSlug}`;
 export const studioPath = (studioSlug: string): string => `/estudio/${studioSlug}/mejores`;
 
+// Mismo algoritmo que el backend (GenreSummaryDto.slugify): minúsculas y
+// espacios a guiones ("Slice of Life" → "slice-of-life", "Sci-Fi" → "sci-fi").
+// Centralizado para que los enlaces internos no puedan divergir del slug real.
+export const genreSlug = (name: string): string =>
+  name.toLowerCase().replace(/\s+/g, '-');
+
 export const studioSlug = (value: string): string =>
   value
     .normalize('NFD')
