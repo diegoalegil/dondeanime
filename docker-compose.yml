@@ -27,10 +27,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambiar_en_local}
       POSTGRES_DB: ${POSTGRES_DB:-dondeanime}
     ports:
-      # Expone el puerto 5432 del contenedor en el 5432 de tu Mac.
-      # Si ya tienes algo escuchando en el 5432, cambia el de la
-      # izquierda (ej. "5433:5432") y ajusta POSTGRES_PORT en .env.
-      - "${POSTGRES_PORT:-5432}:5432"
+      # Expone el puerto 5432 del contenedor SOLO en localhost
+      # (127.0.0.1): así Postgres no queda accesible desde la red
+      # local. Si ya tienes algo escuchando en el 5432, ajusta
+      # POSTGRES_PORT en .env (ej. 5433).
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

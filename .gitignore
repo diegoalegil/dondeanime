@@ -1,9 +1,9 @@
 # ===== Variables de entorno y secretos =====
-.env
-.env.local
-.env.production
-.env.development
-.env.prod
+# Patrón robusto: ignora cualquier variante .env* en cualquier
+# directorio, salvo las plantillas .example que sí van al repo.
+.env*
+!.env.example
+!.env.prod.example
 *.pem
 *.key
 secrets/
@@ -42,10 +42,14 @@ out/
 *.sqlite
 *.db
 *.sql.gz
+# Dumps sueltos en la raíz (las migraciones Flyway de backend/ no se ven
+# afectadas: /*.sql solo aplica al directorio raíz).
+/*.sql
+*.dump
 data/postgres/
 pgdata/
 
-# ===== IDEs y agentes =====
+# ===== IDEs =====
 .idea/
 *.iml
 .vscode/

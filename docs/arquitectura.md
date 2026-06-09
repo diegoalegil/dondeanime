@@ -195,7 +195,7 @@
 | Docker para backend | Solo si en mes 3 el deploy manual es coñazo |
 | Sistema de comentarios | Mes 6 mínimo (modera distrae) |
 | Cuentas de usuario | Mes 4-5, ligado a sistema de alertas premium |
-| App móvil | NUNCA hasta que la web facture >€500/mes |
+| App móvil | El wrapper Capacitor ya existe en `mobile/`; la publicación en stores queda pendiente de decisión |
 | Internacionalización fuera de español | Mes 12 mínimo |
 
 ---

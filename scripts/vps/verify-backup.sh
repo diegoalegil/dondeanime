@@ -245,6 +245,15 @@ table_count() {
         -c "select count(*) from ${table};"
 }
 
+cleanup_old_verification_dumps() {
+    # Los dumps descargados para verificar se acumulan en VERIFY_DIR.
+    # Borra los de más de 14 días para no llenar el disco del VPS.
+    [[ -d "$VERIFY_DIR" ]] || return 0
+    find "$VERIFY_DIR" -maxdepth 1 -type f \
+        \( -name 'dondeanime-postgres-*.sql.gz' -o -name 'dondeanime-postgres-*.sql.gz.sha256' \) \
+        -mtime +14 -delete || true
+}
+
 compare_table() {
     local table="$1"
     local prod_count restored_count min_required
@@ -282,6 +291,8 @@ verify_backup() {
     compare_table "anime"
     compare_table "watch_provider"
     compare_table "affiliate_link"
+
+    cleanup_old_verification_dumps
 
     log "Backup verification completed successfully"
 }

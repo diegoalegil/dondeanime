@@ -1,0 +1,48 @@
+name: Deploy Config
+
+on:
+  pull_request:
+    paths:
+      - 'Caddyfile'
+      - 'docker-compose.yml'
+      - 'docker-compose.prod.yml'
+      - 'backend/Dockerfile'
+      - '.env.prod.example'
+      - '.github/workflows/deploy-config.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'Caddyfile'
+      - 'docker-compose.yml'
+      - 'docker-compose.prod.yml'
+      - 'backend/Dockerfile'
+      - '.env.prod.example'
+      - '.github/workflows/deploy-config.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate Caddyfile
+        run: |
+          docker run --rm \
+            -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2-alpine \
+            caddy validate --config /etc/caddy/Caddyfile
+
+      - name: Validate production compose file
+        run: docker compose -f docker-compose.prod.yml --env-file .env.prod.example config -q
+
+      - name: Validate local compose file
+        run: docker compose -f docker-compose.yml config -q

@@ -136,29 +136,42 @@ Solo cuando Caddy esté listo (ver logs):
 
 ### 5. Primer sync de datos
 
+Los endpoints de sync son de administración y requieren un JWT admin.
+Obtener el token con el login del panel (si el 2FA está activo, añadir
+`"totpCode":"123456"` al body):
+
 ```bash
 ssh deploy@IP_VPS
 cd /opt/dondeanime
 
-# Disparar sync inicial (los 100 anime + matching + providers).
+ADMIN_TOKEN=$(curl -s -X POST https://api.dondeanime.com/api/admin/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"TU_ADMIN_PASSWORD"}' | jq -r '.token')
+
+# Disparar sync inicial (catálogo + matching + providers).
 # El scheduler también lo haría en su próximo cron, pero queremos
 # datos YA para que Vercel pueda hacer build.
-curl -X POST https://api.dondeanime.com/api/anime/sync
-curl -X POST https://api.dondeanime.com/api/anime/match
-curl -X POST https://api.dondeanime.com/api/anime/sync-providers
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/sync
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/match
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/sync-providers
 
-# Verificar:
-curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
+# Verificar (el catálogo actual ronda los ~929 anime):
+curl https://api.dondeanime.com/api/anime | jq 'length'   # ~929
 ```
 
 ### 6. Configurar Vercel
+
+> **Host canónico:** el sitio canónico es `https://www.dondeanime.com`
+> (con `www`). `PUBLIC_SITE_URL` en Vercel DEBE ser
+> `https://www.dondeanime.com`; si no, canonicals, sitemap y JSON-LD
+> apuntan al host equivocado y Google reparte autoridad entre dos hosts.
 
 - Vercel → Add New → Project → Import `dondeanime` de GitHub.
 - Framework Preset: Astro (autodetectado).
 - Root Directory: `frontend` (donde está el proyecto Astro).
 - Environment Variables:
   - `PUBLIC_API_URL` = `https://api.dondeanime.com`
-  - `PUBLIC_SITE_URL` = `https://dondeanime.com`
+  - `PUBLIC_SITE_URL` = `https://www.dondeanime.com`
   - `PUBLIC_PLAUSIBLE_ENABLED` = `false` al principio
   - `PUBLIC_PLAUSIBLE_DOMAIN` = `dondeanime.com`
   - `ADSENSE_ENABLED` = `false`
@@ -177,6 +190,13 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # 100
   - Proxy status: **DNS only** (nube gris) ← Vercel maneja su SSL
 - Esperar 1-2 min.
 - Verificar `https://dondeanime.com` carga.
+- En Vercel → Settings → Domains: marcar `www.dondeanime.com` como
+  dominio principal y configurar la redirección apex → www como
+  **permanente (308)**, no temporal (307). Un 307 no transfiere señal
+  SEO al host canónico. Verificar:
+  ```bash
+  curl -sI https://dondeanime.com | head -3   # debe devolver 308 → www
+  ```
 
 ### 8. (Opcional) Webhook auto-rebuild
 
@@ -492,10 +512,17 @@ Notas:
 
 ### Disparar sync manual
 
+Requiere JWT admin (ver "Primer sync de datos"; con 2FA activo, añadir
+`"totpCode"` al body del login):
+
 ```bash
-curl -X POST https://api.dondeanime.com/api/anime/sync
-curl -X POST https://api.dondeanime.com/api/anime/match
-curl -X POST https://api.dondeanime.com/api/anime/sync-providers
+ADMIN_TOKEN=$(curl -s -X POST https://api.dondeanime.com/api/admin/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"TU_ADMIN_PASSWORD"}' | jq -r '.token')
+
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/sync
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/match
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://api.dondeanime.com/api/anime/sync-providers
 ```
 
 ### Parar todo (mantenimiento)
