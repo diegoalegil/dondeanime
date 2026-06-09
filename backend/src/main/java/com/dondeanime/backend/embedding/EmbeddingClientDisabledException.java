@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class EmbeddingClientDisabledException extends IllegalStateException {
 
     public EmbeddingClientDisabledException() {
-        super("Embeddings desactivados. Configura EMBEDDINGS_ENABLED=true y OPENAI_API_KEY.");
+        super("Embeddings desactivados. Configura EMBEDDINGS_ENABLED=true y EMBEDDING_API_KEY.");
     }
 }

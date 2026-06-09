@@ -6,20 +6,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
-class OpenAiEmbeddingClient implements EmbeddingClient {
+class HttpEmbeddingClient implements EmbeddingClient {
 
     private final RestClient restClient;
     private final String model;
 
-    OpenAiEmbeddingClient(
+    HttpEmbeddingClient(
             RestClient.Builder builder,
             String apiBase,
             String apiKey,
             String model) {
         this.model = required(model, "embeddings.model");
         this.restClient = builder
-                .baseUrl(required(apiBase, "embeddings.openai.api-base"))
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + required(apiKey, "embeddings.openai.api-key"))
+                .baseUrl(required(apiBase, "embeddings.api-base"))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + required(apiKey, "embeddings.api-key"))
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
@@ -32,20 +32,20 @@ class OpenAiEmbeddingClient implements EmbeddingClient {
     @Override
     public EmbeddingVector embed(String input) {
         String safeInput = required(input, "input");
-        OpenAiEmbeddingResponse response = restClient.post()
+        EmbeddingApiResponse response = restClient.post()
                 .uri("/v1/embeddings")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new OpenAiEmbeddingRequest(model, safeInput))
+                .body(new EmbeddingApiRequest(model, safeInput))
                 .retrieve()
-                .body(OpenAiEmbeddingResponse.class);
+                .body(EmbeddingApiResponse.class);
 
         if (response == null || response.data() == null || response.data().isEmpty()) {
-            throw new IllegalStateException("OpenAI no devolvio embedding");
+            throw new IllegalStateException("El proveedor de embeddings no devolvio datos");
         }
 
         List<Double> embedding = response.data().getFirst().embedding();
         if (embedding == null || embedding.isEmpty()) {
-            throw new IllegalStateException("OpenAI devolvio embedding vacio");
+            throw new IllegalStateException("El proveedor de embeddings devolvio un vector vacio");
         }
 
         String responseModel = response.model() == null || response.model().isBlank()
