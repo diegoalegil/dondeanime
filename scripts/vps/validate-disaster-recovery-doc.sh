@@ -30,6 +30,16 @@ grep -Fq "scripts/vps/verify-backup.sh" "$DOC" || {
     exit 1
 }
 
+grep -Fq "scripts/vps/verify-backup.sh --check-config" "$DOC" || {
+    printf 'Missing backup verification preflight reference\n' >&2
+    exit 1
+}
+
+grep -Fq "127.0.0.1:5444" "$DOC" || {
+    printf 'Missing isolated restore port reference\n' >&2
+    exit 1
+}
+
 grep -Fq ".env.prod" "$DOC" || {
     printf 'Missing env restoration reference\n' >&2
     exit 1

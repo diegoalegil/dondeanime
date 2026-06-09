@@ -313,12 +313,14 @@ migraciones posteriores, empezando por `V2__add_indexes.sql`.
 
 ```bash
 # Dentro del VPS, desde /opt/dondeanime
+scripts/backup-postgres-r2.sh --check-config
 scripts/backup-postgres-r2.sh
 ```
 
 El script:
 
 - Lee `/opt/dondeanime/.env.prod`.
+- `--check-config` valida variables y R2 sin tocar Docker ni subir nada.
 - Crea `/opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz`.
 - Crea checksum `.sha256`.
 - Sube a Cloudflare R2 si `R2_*` está configurado.
@@ -365,6 +367,7 @@ Verificación semanal de backups:
 ```bash
 # Ejecutar manualmente
 cd /opt/dondeanime
+scripts/vps/verify-backup.sh --check-config
 scripts/vps/verify-backup.sh
 
 # Instalar cron semanal, domingos a las 04:00 UTC
@@ -386,10 +389,24 @@ BACKUP_VERIFY_MIN_RATIO_PERCENT=95
 Si `TELEGRAM_ENABLED=true`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` están
 configurados, un fallo en la verificación manda alerta al mismo bot operativo.
 
+### Rotación de secretos
+
+La rotación operativa vive en `SECRETS-ROTATION.md`. Antes de cambiar nada en
+producción, probar que el script apunta al archivo correcto:
+
+```bash
+cd /opt/dondeanime
+bash scripts/vps/rotate-secret.sh --dry-run --secret ADMIN_PASSWORD
+```
+
+El script solo acepta secretos en lista blanca y no imprime valores. Secretos
+especiales como `POSTGRES_PASSWORD` tienen procedimiento manual propio porque
+requieren tocar la credencial dentro de Postgres, no solo `.env.prod`.
+
 ### Hardening SSH y fail2ban
 
 El hardening queda preparado en repo, pero se aplica manualmente desde el VPS
-despuÃ©s de revisar el PR. No lo ejecuta CI y no se ejecuta desde una sesiÃ³n
+después de revisar el PR. No lo ejecuta CI y no se ejecuta desde una sesión
 local.
 
 Aplica:
@@ -398,6 +415,7 @@ Aplica:
 ssh deploy@IP_VPS
 cd /opt/dondeanime
 git pull
+bash scripts/vps/setup-hardening.sh --dry-run
 sudo bash scripts/vps/setup-hardening.sh
 ```
 
@@ -405,9 +423,9 @@ El script hace tres cambios:
 
 - Instala y activa `fail2ban` con jail `sshd`, `maxretry=3`, `findtime=10m` y `bantime=1h`.
 - Ajusta `/etc/ssh/sshd_config`: `PasswordAuthentication no`, `PermitRootLogin no`, `MaxAuthTries 3`, `PubkeyAuthentication yes`.
-- Activa `unattended-upgrades` para parches automÃ¡ticos de seguridad.
+- Activa `unattended-upgrades` para parches automáticos de seguridad.
 
-Antes de cerrar la sesiÃ³n SSH actual, abre otra terminal y verifica que el
+Antes de cerrar la sesión SSH actual, abre otra terminal y verifica que el
 login como `deploy` sigue funcionando:
 
 ```bash
@@ -424,7 +442,7 @@ sudo sshd -T | grep -E '^(passwordauthentication|permitrootlogin|maxauthtries)'
 systemctl status unattended-upgrades --no-pager
 ```
 
-Si `sshd -t` falla, el script no reinicia SSH. Deja backup automÃ¡tico en
+Si `sshd -t` falla, el script no reinicia SSH. Deja backup automático en
 `/etc/ssh/sshd_config.dondeanime.<timestamp>.bak`.
 
 ### Monitoreo externo UptimeRobot

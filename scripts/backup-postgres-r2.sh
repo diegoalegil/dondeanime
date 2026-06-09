@@ -5,6 +5,7 @@
 # Uso en el VPS:
 #   cd /opt/dondeanime
 #   scripts/backup-postgres-r2.sh
+#   scripts/backup-postgres-r2.sh --check-config
 #
 # Lee .env.prod por defecto. No imprime secretos.
 # ============================================================
@@ -24,6 +25,33 @@ require_cmd() {
     command -v "$1" >/dev/null 2>&1 || fail "Comando requerido no encontrado: $1"
 }
 
+CHECK_CONFIG=0
+case "${1:-}" in
+    --check-config)
+        CHECK_CONFIG=1
+        ;;
+    --help|-h)
+        cat <<'USAGE'
+Uso:
+  scripts/backup-postgres-r2.sh
+  scripts/backup-postgres-r2.sh --check-config
+
+--check-config valida .env.prod y la configuracion R2 sin tocar Docker,
+sin crear dumps y sin subir nada.
+USAGE
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        fail "Argumento desconocido: $1"
+        ;;
+esac
+
+if [[ "$#" -gt 1 ]]; then
+    fail "Solo se admite un argumento"
+fi
+
 PROJECT_DIR="${PROJECT_DIR:-/opt/dondeanime}"
 ENV_FILE="${ENV_FILE:-$PROJECT_DIR/.env.prod}"
 
@@ -36,18 +64,39 @@ else
     fail "No existe ENV_FILE=$ENV_FILE"
 fi
 
-require_cmd docker
-require_cmd gzip
-require_cmd find
-
 POSTGRES_CONTAINER="${POSTGRES_CONTAINER:-dondeanime_postgres_prod}"
 BACKUP_DIR="${BACKUP_DIR:-$PROJECT_DIR/backups}"
 BACKUP_RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 AWS_CLI_IMAGE="${AWS_CLI_IMAGE:-amazon/aws-cli:2}"
 R2_PREFIX="${R2_PREFIX:-postgres}"
 
-[[ -n "${POSTGRES_USER:-}" ]] || fail "POSTGRES_USER no está definido"
-[[ -n "${POSTGRES_DB:-}" ]] || fail "POSTGRES_DB no está definido"
+r2_config_present() {
+    [[ -n "${R2_BUCKET:-}" || -n "${R2_ACCOUNT_ID:-}" || -n "${R2_ACCESS_KEY_ID:-}" || -n "${R2_SECRET_ACCESS_KEY:-}" ]]
+}
+
+validate_config() {
+    [[ -n "${POSTGRES_USER:-}" ]] || fail "POSTGRES_USER no esta definido"
+    [[ -n "${POSTGRES_DB:-}" ]] || fail "POSTGRES_DB no esta definido"
+    [[ "$BACKUP_RETENTION_DAYS" =~ ^[0-9]+$ ]] || fail "BACKUP_RETENTION_DAYS debe ser numerico"
+
+    if r2_config_present; then
+        [[ -n "${R2_BUCKET:-}" ]] || fail "R2_BUCKET no esta definido"
+        [[ -n "${R2_ACCOUNT_ID:-}" ]] || fail "R2_ACCOUNT_ID no esta definido"
+        [[ -n "${R2_ACCESS_KEY_ID:-}" ]] || fail "R2_ACCESS_KEY_ID no esta definido"
+        [[ -n "${R2_SECRET_ACCESS_KEY:-}" ]] || fail "R2_SECRET_ACCESS_KEY no esta definido"
+    fi
+}
+
+validate_config
+
+if [[ "$CHECK_CONFIG" -eq 1 ]]; then
+    log "Configuracion de backup OK para ENV_FILE=$ENV_FILE"
+    exit 0
+fi
+
+require_cmd docker
+require_cmd gzip
+require_cmd find
 
 container_running="$(docker inspect -f '{{.State.Running}}' "$POSTGRES_CONTAINER" 2>/dev/null || true)"
 [[ "$container_running" == "true" ]] || fail "El contenedor $POSTGRES_CONTAINER no está corriendo"
@@ -88,17 +137,7 @@ fi
 
 log "Backup creado: $(du -h "$backup_path" | awk '{print $1}')"
 
-r2_configured=0
-if [[ -n "${R2_BUCKET:-}" || -n "${R2_ACCOUNT_ID:-}" || -n "${R2_ACCESS_KEY_ID:-}" || -n "${R2_SECRET_ACCESS_KEY:-}" ]]; then
-    r2_configured=1
-fi
-
-if [[ "$r2_configured" -eq 1 ]]; then
-    [[ -n "${R2_BUCKET:-}" ]] || fail "R2_BUCKET no está definido"
-    [[ -n "${R2_ACCOUNT_ID:-}" ]] || fail "R2_ACCOUNT_ID no está definido"
-    [[ -n "${R2_ACCESS_KEY_ID:-}" ]] || fail "R2_ACCESS_KEY_ID no está definido"
-    [[ -n "${R2_SECRET_ACCESS_KEY:-}" ]] || fail "R2_SECRET_ACCESS_KEY no está definido"
-
+if r2_config_present; then
     r2_endpoint="${R2_ENDPOINT:-https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com}"
     r2_prefix_clean="${R2_PREFIX#/}"
     r2_prefix_clean="${r2_prefix_clean%/}"

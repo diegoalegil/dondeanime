@@ -22,18 +22,31 @@ CRON_FILE="/etc/cron.d/dondeanime-backup-verify"
 ERROR_MESSAGE="Backup verification failed"
 
 INSTALL_CRON=0
+CHECK_CONFIG=0
 if [[ "${1:-}" == "--install-cron" ]]; then
     INSTALL_CRON=1
+elif [[ "${1:-}" == "--check-config" ]]; then
+    CHECK_CONFIG=1
 elif [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     cat <<'USAGE'
 Usage:
   bash scripts/vps/verify-backup.sh
+  bash scripts/vps/verify-backup.sh --check-config
   sudo bash scripts/vps/verify-backup.sh --install-cron
 
 The default run verifies the latest R2 backup.
+--check-config validates required env without touching Docker or R2.
 --install-cron installs a weekly Sunday 04:00 UTC cron entry.
 USAGE
     exit 0
+elif [[ -n "${1:-}" ]]; then
+    printf 'Unknown argument: %s\n' "$1" >&2
+    exit 2
+fi
+
+if [[ "$#" -gt 1 ]]; then
+    printf 'Only one argument is supported\n' >&2
+    exit 2
 fi
 
 log() {
@@ -72,8 +85,10 @@ telegram_alert() {
 
 cleanup() {
     local status=$?
-    docker rm -f "$VERIFY_CONTAINER" >/dev/null 2>&1 || true
-    if [[ "$status" -ne 0 ]]; then
+    if command -v docker >/dev/null 2>&1; then
+        docker rm -f "$VERIFY_CONTAINER" >/dev/null 2>&1 || true
+    fi
+    if [[ "$status" -ne 0 && "$CHECK_CONFIG" -eq 0 && "$INSTALL_CRON" -eq 0 ]]; then
         telegram_alert "DondeAnime backup verification FAILED: ${ERROR_MESSAGE}"
     fi
 }
@@ -97,6 +112,21 @@ require_r2_env() {
     [[ -n "${R2_ACCOUNT_ID:-}" ]] || fail "R2_ACCOUNT_ID is required"
     [[ -n "${R2_ACCESS_KEY_ID:-}" ]] || fail "R2_ACCESS_KEY_ID is required"
     [[ -n "${R2_SECRET_ACCESS_KEY:-}" ]] || fail "R2_SECRET_ACCESS_KEY is required"
+}
+
+validate_common_config() {
+    [[ "$MIN_RATIO_PERCENT" =~ ^[0-9]+$ ]] || fail "BACKUP_VERIFY_MIN_RATIO_PERCENT must be numeric"
+    [[ "$MIN_RATIO_PERCENT" -ge 1 && "$MIN_RATIO_PERCENT" -le 100 ]] || fail "BACKUP_VERIFY_MIN_RATIO_PERCENT must be 1..100"
+    [[ "$VERIFY_PORT" =~ ^[0-9]+$ ]] || fail "BACKUP_VERIFY_POSTGRES_PORT must be numeric"
+    [[ -n "${POSTGRES_DB:-}" ]] || fail "POSTGRES_DB is required"
+    [[ -n "${POSTGRES_USER:-}" ]] || fail "POSTGRES_USER is required"
+}
+
+check_config() {
+    load_env
+    require_r2_env
+    validate_common_config
+    log "Backup verification config OK for ENV_FILE=$ENV_FILE"
 }
 
 r2_endpoint() {
@@ -239,11 +269,7 @@ verify_backup() {
     require_cmd curl
     load_env
     require_r2_env
-
-    [[ "$MIN_RATIO_PERCENT" =~ ^[0-9]+$ ]] || fail "BACKUP_VERIFY_MIN_RATIO_PERCENT must be numeric"
-    [[ "$MIN_RATIO_PERCENT" -ge 1 && "$MIN_RATIO_PERCENT" -le 100 ]] || fail "BACKUP_VERIFY_MIN_RATIO_PERCENT must be 1..100"
-    [[ -n "${POSTGRES_DB:-}" ]] || fail "POSTGRES_DB is required"
-    [[ -n "${POSTGRES_USER:-}" ]] || fail "POSTGRES_USER is required"
+    validate_common_config
 
     local prod_running
     prod_running="$(docker inspect -f '{{.State.Running}}' "$POSTGRES_CONTAINER" 2>/dev/null || true)"
@@ -262,6 +288,8 @@ verify_backup() {
 
 if [[ "$INSTALL_CRON" -eq 1 ]]; then
     install_cron
+elif [[ "$CHECK_CONFIG" -eq 1 ]]; then
+    check_config
 else
     verify_backup
 fi

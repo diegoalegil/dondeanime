@@ -3,12 +3,14 @@ name: VPS Scripts
 on:
   pull_request:
     paths:
+      - 'scripts/*.sh'
       - 'scripts/**/*.sh'
       - '.github/workflows/vps-scripts.yml'
   push:
     branches:
       - main
     paths:
+      - 'scripts/*.sh'
       - 'scripts/**/*.sh'
       - '.github/workflows/vps-scripts.yml'
 
@@ -21,4 +23,7 @@ jobs:
 
       - name: Validate shell scripts parse
         run: |
-          find scripts/vps -name '*.sh' -print0 | xargs -0 -n1 bash -n
+          find scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: Run safe mode smoke tests
+        run: bash scripts/vps/smoke-test-safe-modes.sh
