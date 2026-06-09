@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class StripeService {
     private final CuratedListTrackingService curatedListTrackingService;
     private final EmailService emailService;
     private final StripeProcessedEventRepository processedEventRepository;
+    private final ApplicationEventPublisher eventPublisher;
     private final String apiKey;
     private final String priceId;
     private final String webhookSecret;
@@ -36,6 +38,7 @@ public class StripeService {
             CuratedListTrackingService curatedListTrackingService,
             EmailService emailService,
             StripeProcessedEventRepository processedEventRepository,
+            ApplicationEventPublisher eventPublisher,
             @Value("${STRIPE_SECRET_KEY:}") String apiKey,
             @Value("${STRIPE_PRICE_ID:}") String priceId,
             @Value("${STRIPE_WEBHOOK_SECRET:}") String webhookSecret,
@@ -47,6 +50,7 @@ public class StripeService {
         this.curatedListTrackingService = curatedListTrackingService;
         this.emailService = emailService;
         this.processedEventRepository = processedEventRepository;
+        this.eventPublisher = eventPublisher;
         this.apiKey = apiKey;
         this.priceId = priceId;
         this.webhookSecret = webhookSecret;
@@ -168,17 +172,22 @@ public class StripeService {
         return event.type();
     }
 
+    /**
+     * Los emails no se envían aquí: se publica un evento que se consume tras
+     * el commit (PremiumEmailEventListener). Si Resend cayera dentro de la tx,
+     * el rollback desharía el alta Premium de un cliente que YA pagó.
+     */
     private void sendWelcomeEmail(StripeWebhookEvent event) {
         String email = resolveEmail(event);
         if (!email.isBlank()) {
-            emailService.sendPremiumWelcomeEmail(email, "PREMIUM", portalReturnUrl);
+            eventPublisher.publishEvent(PremiumEmailEvent.welcome(email, "PREMIUM", portalReturnUrl));
         }
     }
 
     private void sendReceiptEmail(StripeWebhookEvent event, Instant paidAt) {
         String email = resolveEmail(event);
         if (!email.isBlank()) {
-            emailService.sendPremiumReceiptEmail(email, "PREMIUM", paidAt.toString(), portalReturnUrl);
+            eventPublisher.publishEvent(PremiumEmailEvent.receipt(email, "PREMIUM", paidAt.toString(), portalReturnUrl));
         }
     }
 

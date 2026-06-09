@@ -13,6 +13,7 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,12 +31,14 @@ class StripeServiceTest {
     private final EmailService emailService = mock(EmailService.class);
     private final StripeProcessedEventRepository processedEventRepository =
             mock(StripeProcessedEventRepository.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final StripeService service = new StripeService(
             stripeGateway,
             subscriberService,
             curatedListTrackingService,
             emailService,
             processedEventRepository,
+            eventPublisher,
             "sk_test_123",
             "price_test_123",
             "whsec_test_123",
@@ -65,6 +68,7 @@ class StripeServiceTest {
                 curatedListTrackingService,
                 emailService,
                 processedEventRepository,
+                eventPublisher,
                 "",
                 "price_test_123",
                 "whsec_test_123",
@@ -140,10 +144,13 @@ class StripeServiceTest {
                 NOW,
                 NOW.plusSeconds(2_592_000),
                 null);
-        verify(emailService).sendPremiumWelcomeEmail(
+        // El email NO se envía dentro de la tx: se publica un evento que el
+        // listener consume tras el commit.
+        verify(eventPublisher).publishEvent(PremiumEmailEvent.welcome(
                 "diego@example.com",
                 "PREMIUM",
-                "https://dondeanime.com/premium");
+                "https://dondeanime.com/premium"));
+        verify(emailService, never()).sendPremiumWelcomeEmail(any(), any(), any());
         verify(curatedListTrackingService).trackConversion("anime-para-empezar");
         verify(processedEventRepository).claimProcessing(eq("evt_created_1"), any(Instant.class));
     }
@@ -165,7 +172,7 @@ class StripeServiceTest {
 
         assertThat(received).isEqualTo("invoice.payment_succeeded");
         verify(subscriberService, never()).recordPaymentSucceeded(any(), any(), any());
-        verify(emailService, never()).sendPremiumReceiptEmail(any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -185,11 +192,12 @@ class StripeServiceTest {
 
         assertThat(received).isEqualTo("invoice.payment_succeeded");
         verify(subscriberService).recordPaymentSucceeded("diego@example.com", "cus_test_123", NOW);
-        verify(emailService).sendPremiumReceiptEmail(
+        verify(eventPublisher).publishEvent(PremiumEmailEvent.receipt(
                 "diego@example.com",
                 "PREMIUM",
                 NOW.toString(),
-                "https://dondeanime.com/premium");
+                "https://dondeanime.com/premium"));
+        verify(emailService, never()).sendPremiumReceiptEmail(any(), any(), any(), any());
     }
 
     @Test
