@@ -92,7 +92,8 @@ class AnimeControllerTest {
         Anime past = makeAnime("past", "Past");
         startsOn(past, today.minusDays(1));
 
-        when(animeRepository.findAll()).thenReturn(List.of(later, outside, partialDate, early, past));
+        when(animeRepository.findWithFullStartDateInYears(today.getYear(), today.plusDays(7).getYear()))
+                .thenReturn(List.of(later, outside, partialDate, early, past));
 
         mvc.perform(get("/api/v1/anime/upcoming?days=7"))
                 .andExpect(status().isOk())

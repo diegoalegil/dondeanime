@@ -73,6 +73,23 @@ class TrailerSyncServiceTest {
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void skipsMovieFormatAnime() {
+        // getTrailers pega a /tv/{id}/videos: con un tmdbId de película
+        // devolvería los vídeos de una serie sin relación.
+        Anime anime = anime(1L, 100L);
+        anime.setFormat("MOVIE");
+        AnimeRepository repository = mock(AnimeRepository.class);
+        when(repository.findAll()).thenReturn(List.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+
+        int processed = new TrailerSyncService(client, repository).syncAll();
+
+        assertThat(processed).isZero();
+        verify(client, never()).getTrailers(any(), any());
+        verify(repository, never()).save(any());
+    }
+
     private static Anime anime(Long id, Long tmdbId) {
         Anime anime = new Anime();
         anime.setId(id);

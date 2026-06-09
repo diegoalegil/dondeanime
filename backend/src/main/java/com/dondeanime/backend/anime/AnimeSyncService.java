@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import io.github.diegoalegil.tsunagi.anilist.AniListClient;
@@ -58,16 +59,19 @@ public class AnimeSyncService {
     private final AnimeRepository repository;
     private final StudioRepository studioRepository;
     private final AnimeCharacterRepository characterRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AnimeSyncService(
             AniListClient client,
             AnimeRepository repository,
             StudioRepository studioRepository,
-            AnimeCharacterRepository characterRepository) {
+            AnimeCharacterRepository characterRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.client = client;
         this.repository = repository;
         this.studioRepository = studioRepository;
         this.characterRepository = characterRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public int syncPopular(int count) {
@@ -95,6 +99,11 @@ public class AnimeSyncService {
             }
         }
         log.info("Sync completado: {} guardados, {} fallos", ok, failed);
+        if (ok > 0) {
+            // Avisa a quien cachee datos del catálogo (ej. RecommendationService)
+            // de que hay datos frescos.
+            eventPublisher.publishEvent(new CatalogSyncCompletedEvent(ok));
+        }
         return ok;
     }
 
@@ -117,7 +126,12 @@ public class AnimeSyncService {
         anime.setStatus(media.status());
         anime.setEpisodes(media.episodes());
         anime.setEpisodeDuration(media.duration());
-        anime.setStudio(mainStudioName(media.studios()));
+        // Mismo studio principal en ambos campos: 'studio' alimenta listados y
+        // agregados; 'primaryStudio' lo consume RecommendationService
+        // (findSimilarByPrimaryStudio).
+        String mainStudio = mainStudioName(media.studios());
+        anime.setStudio(mainStudio);
+        anime.setPrimaryStudio(mainStudio);
         anime.setAverageScore(media.averageScore());
         anime.setPopularity(media.popularity());
 
@@ -170,13 +184,17 @@ public class AnimeSyncService {
 
         // studios (anime_studio) y characterRoles (anime_character_role) tienen
         // un unique constraint en su tabla join. Solo se asignan al CREAR el
-        // anime; en un re-sync NO se reconstruyen, porque reasignar la colección
-        // entera chocaba con uk_anime_studio / uk_anime_character_role (Hibernate
-        // reinsertaba antes de borrar las filas previas). Son datos estables; lo
-        // que el re-sync sí refresca —escalares, genres, tags, native y
-        // synonyms— ya se ha aplicado arriba.
-        if (anime.getId() == null) {
+        // anime o cuando la colección cargada está VACÍA (backfill de anime
+        // antiguos sincronizados sin estos datos); en un re-sync con datos NO se
+        // reconstruyen, porque reasignar la colección entera chocaba con
+        // uk_anime_studio / uk_anime_character_role (Hibernate reinsertaba antes
+        // de borrar las filas previas). Son datos estables; lo que el re-sync sí
+        // refresca —escalares, genres, tags, native y synonyms— ya se ha
+        // aplicado arriba.
+        if (anime.getId() == null || anime.getStudios().isEmpty()) {
             anime.setStudios(mapStudios(media.studios()));
+        }
+        if (anime.getId() == null || anime.getCharacterRoles().isEmpty()) {
             anime.replaceCharacterRoles(mapCharacters(media.characters()));
         }
 

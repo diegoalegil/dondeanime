@@ -85,6 +85,14 @@ public class ProviderSyncService {
                 skipped++;
                 continue;
             }
+            // El matcher puede asignar ids de PELÍCULA de TMDb, pero este cliente
+            // solo consulta endpoints /tv/{id}/...: para una película ese id
+            // apuntaría a una serie sin relación. Las saltamos.
+            if ("MOVIE".equalsIgnoreCase(a.getFormat())) {
+                log.debug("Sync providers: skip slug={} (formato MOVIE, cliente TMDb solo TV)", a.getSlug());
+                skipped++;
+                continue;
+            }
             try {
                 Map<String, List<WatchProvider>> newProviders = syncOne(a);
                 publishProviderAddedEvents(a, newProviders);

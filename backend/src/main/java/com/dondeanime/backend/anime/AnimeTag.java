@@ -30,15 +30,18 @@ public class AnimeTag {
         return rank;
     }
 
+    // rank entra en equals/hashCode: Hibernate compara los elementos del
+    // @ElementCollection con equals al hacer dirty-check, y sin rank un cambio
+    // de rank en AniList nunca se persistía en re-syncs.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AnimeTag animeTag)) return false;
-        return Objects.equals(name, animeTag.name);
+        return Objects.equals(name, animeTag.name) && Objects.equals(rank, animeTag.rank);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, rank);
     }
 }

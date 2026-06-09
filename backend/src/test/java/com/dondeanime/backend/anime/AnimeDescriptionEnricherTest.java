@@ -62,6 +62,22 @@ class AnimeDescriptionEnricherTest {
     }
 
     @Test
+    void skipsMovieFormatAnime() {
+        // getTvDetails pega a /tv/{id}: con un tmdbId de película traería
+        // la sinopsis de una serie sin relación.
+        Anime anime = anime();
+        anime.setFormat("MOVIE");
+        AnimeRepository repository = mock(AnimeRepository.class);
+        TmdbClient client = mock(TmdbClient.class);
+
+        boolean enriched = new AnimeDescriptionEnricher(repository, client).enrichOne(anime);
+
+        assertThat(enriched).isFalse();
+        verify(client, never()).getTvDetails(any(), any());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
     void batchUsesRepositoryQueryAndCountsSavedDescriptions() {
         Anime first = anime();
         Anime second = anime();

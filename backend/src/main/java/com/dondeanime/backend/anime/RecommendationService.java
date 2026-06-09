@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,15 @@ public class RecommendationService {
         this.animeRepository = animeRepository;
         this.watchProviderRepository = watchProviderRepository;
         this.cache = cache;
+    }
+
+    /**
+     * Tras un sync de catálogo los scores/genres/tags pueden haber cambiado:
+     * se invalida toda la caché en vez de esperar a que expire (24h).
+     */
+    @EventListener
+    public void onCatalogSyncCompleted(CatalogSyncCompletedEvent event) {
+        cache.invalidateAll();
     }
 
     public List<Anime> findSimilar(Long animeId, int limit) {

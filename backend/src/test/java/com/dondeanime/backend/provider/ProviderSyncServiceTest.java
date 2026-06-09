@@ -94,6 +94,33 @@ class ProviderSyncServiceTest {
         verify(eventPublisher, never()).publishEvent(any());
     }
 
+    @Test
+    void skipsMovieFormatAnime() {
+        // getWatchProviders pega a /tv/{id}/watch/providers: con un tmdbId de
+        // película traería las plataformas de una serie sin relación.
+        Anime anime = anime();
+        anime.setFormat("MOVIE");
+        TmdbClient client = mock(TmdbClient.class);
+        AnimeRepository animeRepository = mock(AnimeRepository.class);
+        WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
+        ProviderSyncService service = new ProviderSyncService(
+                client,
+                animeRepository,
+                providerRepository,
+                mock(AlertService.class),
+                mock(ApplicationEventPublisher.class),
+                mock(AvailabilityChangeService.class),
+                transactionManager());
+
+        when(animeRepository.findAll()).thenReturn(List.of(anime));
+
+        int processed = service.syncAll();
+
+        assertThat(processed).isZero();
+        verify(client, never()).getWatchProviders(any());
+        verify(providerRepository, never()).save(any());
+    }
+
     private static Anime anime() {
         Anime anime = new Anime();
         anime.setId(1L);

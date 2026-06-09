@@ -35,10 +35,11 @@ import io.github.diegoalegil.tsunagi.anilist.AniListTitle;
  * unique constraints de las tablas join (uk_anime_studio,
  * uk_anime_character_role), de modo que el segundo sync devolvía {@code 0}.
  *
- * <p>El fix carga las colecciones en el loader y, en updates, las vacía con
- * {@code saveAndFlush} (DELETE) antes de reinsertarlas (INSERT). Este test
- * necesita una BD real porque el fallo está en el orden de operaciones del
- * flush de Hibernate, que un mock no ejercita.
+ * <p>El fix NO reasigna studios/characterRoles en updates: solo se asignan al
+ * crear el anime o cuando la colección cargada está vacía (backfill de anime
+ * sincronizados antes de guardar estos datos). Este test necesita una BD real
+ * porque el fallo está en el orden de operaciones del flush de Hibernate, que
+ * un mock no ejercita.
  */
 @SpringBootTest
 class AnimeSyncServiceResyncIntegrationTest extends AbstractIntegrationTest {
@@ -83,6 +84,30 @@ class AnimeSyncServiceResyncIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void resyncBackfillsEmptyStudioAndCharacterCollections() {
+        // Primer sync sin studios/personajes (anime antiguo o respuesta pobre
+        // de AniList); el re-sync con datos completos debe rellenarlos en vez
+        // de saltárselos por ser un update.
+        when(aniListClient.fetchPopular(1)).thenReturn(List.of(mediaWithoutStudiosNorCharacters()));
+        assertThat(service.syncPopular(1)).isEqualTo(1);
+
+        Anime bare = animeRepository.findBySlugWithCharacters("attack-on-titan").orElseThrow();
+        assertThat(bare.getStudios()).isEmpty();
+        assertThat(bare.getCharacterRoles()).isEmpty();
+
+        when(aniListClient.fetchPopular(1)).thenReturn(List.of(media()));
+        assertThat(service.syncPopular(1)).isEqualTo(1);
+
+        Anime backfilled = animeRepository.findBySlugWithCharacters("attack-on-titan").orElseThrow();
+        assertThat(backfilled.getStudios())
+                .extracting(Studio::getName)
+                .containsExactly("WIT Studio");
+        assertThat(backfilled.getCharacterRoles())
+                .extracting(role -> role.getCharacter().getName())
+                .containsExactlyInAnyOrder("Eren Yeager", "Mikasa Ackerman");
+    }
+
+    @Test
     void syncingAnimeWithDuplicateStudioAndCharacterDoesNotViolateJoinConstraints() {
         when(aniListClient.fetchPopular(1)).thenReturn(List.of(mediaWithDuplicates()));
 
@@ -99,6 +124,31 @@ class AnimeSyncServiceResyncIntegrationTest extends AbstractIntegrationTest {
         assertThat(anime.getCharacterRoles())
                 .extracting(role -> role.getCharacter().getName())
                 .containsExactlyInAnyOrder("Eren Yeager", "Mikasa Ackerman");
+    }
+
+    /** Misma media que {@link #media()} pero sin studios ni personajes. */
+    private static AniListMedia mediaWithoutStudiosNorCharacters() {
+        return new AniListMedia(
+                16498L,
+                new AniListTitle("Shingeki no Kyojin", "Attack on Titan", "進撃の巨人"),
+                new AniListFuzzyDate(2013, 4, 7),
+                null,
+                25,
+                24,
+                "TV",
+                "FINISHED",
+                85,
+                500000,
+                "Descripcion",
+                new AniListCoverImage("https://example.com/cover.jpg"),
+                null,
+                List.of("Action"),
+                List.of("AoT", "Ataque a los Titanes"),
+                new AniListStudioConnection(List.of()),
+                "SPRING",
+                2013,
+                new AniListCharacterConnection(List.of()),
+                List.of(new AniListTag("Time Travel", 94)));
     }
 
     /** Misma media que {@link #media()} pero con un studio y un personaje repetidos. */

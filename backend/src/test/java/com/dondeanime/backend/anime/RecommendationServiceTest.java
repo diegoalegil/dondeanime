@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -166,6 +167,25 @@ class RecommendationServiceTest {
 
         verify(animeRepository).findByIdWithGenres(1L);
         verify(animeRepository, never()).findBySlugInWithGenres(any());
+    }
+
+    @Test
+    void catalogSyncCompletedInvalidatesCache() {
+        Anime source = anime(1L, "source", 85, null, "Action");
+        Anime first = anime(2L, "first", 91, null, "Action");
+
+        when(animeRepository.findByIdWithGenres(1L)).thenReturn(Optional.of(source));
+        when(animeRepository.findSimilarByPrimaryGenre(eq(1L), eq("Action"), eq(70), any(Pageable.class)))
+                .thenReturn(List.of(first));
+        when(animeRepository.findSimilarBySharedHighRankTags(eq(1L), eq(70), eq(70), any(Pageable.class)))
+                .thenReturn(List.of());
+
+        recommendationService.findSimilar(1L, 10);
+        recommendationService.onCatalogSyncCompleted(new CatalogSyncCompletedEvent(929));
+        recommendationService.findSimilar(1L, 10);
+
+        // Tras el sync la caché se vacía: la segunda petición vuelve a la BD.
+        verify(animeRepository, times(2)).findByIdWithGenres(1L);
     }
 
     @Test

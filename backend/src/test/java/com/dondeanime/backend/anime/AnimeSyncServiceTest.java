@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import io.github.diegoalegil.tsunagi.anilist.AniListCharacter;
 import io.github.diegoalegil.tsunagi.anilist.AniListCharacterConnection;
@@ -36,6 +37,8 @@ import com.dondeanime.backend.studio.StudioRepository;
 
 class AnimeSyncServiceTest {
 
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
     @Test
     void syncPopularAcceptsFiveHundredAnime() {
         AniListClient client = mock(AniListClient.class);
@@ -44,7 +47,7 @@ class AnimeSyncServiceTest {
         AnimeCharacterRepository characterRepository = mock(AnimeCharacterRepository.class);
         when(client.fetchPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT)).thenReturn(List.of());
 
-        int synced = new AnimeSyncService(client, repository, studioRepository, characterRepository)
+        int synced = new AnimeSyncService(client, repository, studioRepository, characterRepository, eventPublisher)
                 .syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT);
 
         assertThat(synced).isZero();
@@ -57,7 +60,7 @@ class AnimeSyncServiceTest {
         AnimeRepository repository = mock(AnimeRepository.class);
         StudioRepository studioRepository = mock(StudioRepository.class);
         AnimeCharacterRepository characterRepository = mock(AnimeCharacterRepository.class);
-        AnimeSyncService service = new AnimeSyncService(client, repository, studioRepository, characterRepository);
+        AnimeSyncService service = new AnimeSyncService(client, repository, studioRepository, characterRepository, eventPublisher);
 
         assertThatThrownBy(() -> service.syncPopular(AnimeSyncService.MAX_POPULAR_SYNC_COUNT + 1))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -81,7 +84,7 @@ class AnimeSyncServiceTest {
         when(studioRepository.findBySlug("wit-studio")).thenReturn(Optional.empty());
         when(studioRepository.save(any(Studio.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        int synced = new AnimeSyncService(client, animeRepository, studioRepository, characterRepository).syncPopular(1);
+        int synced = new AnimeSyncService(client, animeRepository, studioRepository, characterRepository, eventPublisher).syncPopular(1);
 
         assertThat(synced).isEqualTo(1);
 
@@ -94,6 +97,8 @@ class AnimeSyncServiceTest {
         ArgumentCaptor<Anime> animeCaptor = ArgumentCaptor.forClass(Anime.class);
         verify(animeRepository).save(animeCaptor.capture());
         assertThat(animeCaptor.getValue().getStudio()).isEqualTo("WIT Studio");
+        // primaryStudio alimenta findSimilarByPrimaryStudio (recomendaciones).
+        assertThat(animeCaptor.getValue().getPrimaryStudio()).isEqualTo("WIT Studio");
         assertThat(animeCaptor.getValue().getStudios())
                 .extracting(Studio::getName)
                 .containsExactly("WIT Studio");
@@ -116,7 +121,7 @@ class AnimeSyncServiceTest {
         when(characterRepository.findByAnilistId(any())).thenReturn(Optional.empty());
         when(characterRepository.save(any(AnimeCharacter.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        int synced = new AnimeSyncService(client, repository, studioRepository, characterRepository).syncPopular(1);
+        int synced = new AnimeSyncService(client, repository, studioRepository, characterRepository, eventPublisher).syncPopular(1);
 
         ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
         verify(repository).save(captor.capture());
@@ -152,7 +157,7 @@ class AnimeSyncServiceTest {
         when(characterRepository.findByAnilistId(any())).thenReturn(Optional.empty());
         when(characterRepository.save(any(AnimeCharacter.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        new AnimeSyncService(client, repository, studioRepository, characterRepository).syncPopular(1);
+        new AnimeSyncService(client, repository, studioRepository, characterRepository, eventPublisher).syncPopular(1);
 
         ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
         verify(repository).save(captor.capture());
@@ -175,7 +180,7 @@ class AnimeSyncServiceTest {
         when(repository.findBySlug("attack-on-titan")).thenReturn(Optional.empty());
         when(repository.save(any(Anime.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        int saved = new AnimeSyncService(client, repository, studioRepository, characterRepository).syncPopular(1);
+        int saved = new AnimeSyncService(client, repository, studioRepository, characterRepository, eventPublisher).syncPopular(1);
 
         ArgumentCaptor<Anime> animeCaptor = ArgumentCaptor.forClass(Anime.class);
         verify(repository).save(animeCaptor.capture());
