@@ -13,17 +13,29 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.web.server.ResponseStatusException;
 
 class TraktOAuthServiceTest {
 
+    private static final Clock CLOCK = Clock.fixed(
+            Instant.parse("2026-05-27T10:00:00Z"),
+            ZoneOffset.UTC);
+
     private final TraktClient traktClient = mock(TraktClient.class);
     private final TraktOAuthStateService stateService = new TraktOAuthStateService(
-            Clock.fixed(Instant.parse("2026-05-27T10:00:00Z"), ZoneOffset.UTC),
+            CLOCK,
             "client-secret");
+    private final ExternalAccountService externalAccountService = mock(ExternalAccountService.class);
+    private final TraktTokenCipherService tokenCipherService =
+            new TraktTokenCipherService("test-secret-with-enough-entropy");
     private final TraktOAuthService service = new TraktOAuthService(
             traktClient,
             stateService,
+            externalAccountService,
+            tokenCipherService,
+            CLOCK,
+            true,
             "https://trakt.tv",
             "client-id",
             "client-secret",
@@ -41,7 +53,7 @@ class TraktOAuthServiceTest {
     }
 
     @Test
-    void completesCallbackWithoutPersistingTokens() {
+    void completesCallbackAndStoresEncryptedTokens() {
         String state = stateService.createState();
         when(traktClient.exchangeAuthorizationCode("oauth-code"))
                 .thenReturn(new TraktOAuthTokenResponse(
@@ -51,15 +63,32 @@ class TraktOAuthServiceTest {
                         7200L,
                         "public",
                         1780000000L));
+        when(traktClient.fetchCurrentUser("access-token"))
+                .thenReturn(new TraktUserSettingsResponse(
+                        new TraktUser("Diego", new TraktUserIds("diego"))));
 
         TraktOAuthCallbackResponse response = service.completeCallback(" oauth-code ", state, null);
 
         assertThat(response.connected()).isTrue();
         assertThat(response.provider()).isEqualTo("trakt");
-        assertThat(response.accessTokenStored()).isFalse();
-        assertThat(response.refreshTokenStored()).isFalse();
+        assertThat(response.externalUserId()).isEqualTo("diego");
+        assertThat(response.accessTokenStored()).isTrue();
+        assertThat(response.refreshTokenStored()).isTrue();
         assertThat(response.expiresInSeconds()).isEqualTo(7200);
         verify(traktClient).exchangeAuthorizationCode("oauth-code");
+        verify(traktClient).fetchCurrentUser("access-token");
+
+        ArgumentCaptor<ExternalAccountUpsertCommand> commandCaptor =
+                ArgumentCaptor.forClass(ExternalAccountUpsertCommand.class);
+        verify(externalAccountService).upsert(commandCaptor.capture());
+        ExternalAccountUpsertCommand command = commandCaptor.getValue();
+        assertThat(command.provider()).isEqualTo("trakt");
+        assertThat(command.externalUserId()).isEqualTo("diego");
+        assertThat(command.accessTokenCiphertext()).doesNotContain("access-token");
+        assertThat(command.refreshTokenCiphertext()).doesNotContain("refresh-token");
+        assertThat(tokenCipherService.decrypt(command.accessTokenCiphertext())).isEqualTo("access-token");
+        assertThat(tokenCipherService.decrypt(command.refreshTokenCiphertext())).isEqualTo("refresh-token");
+        assertThat(command.tokenExpiresAt()).isEqualTo("2026-05-28T22:26:40Z");
     }
 
     @Test
@@ -68,6 +97,28 @@ class TraktOAuthServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
                 .isEqualTo(400);
+
+        verify(traktClient, never()).exchangeAuthorizationCode("oauth-code");
+    }
+
+    @Test
+    void disabledFeatureRejectsBeforeCallingTrakt() {
+        TraktOAuthService disabled = new TraktOAuthService(
+                traktClient,
+                stateService,
+                externalAccountService,
+                tokenCipherService,
+                CLOCK,
+                false,
+                "https://trakt.tv",
+                "client-id",
+                "client-secret",
+                "https://api.dondeanime.com/api/trakt/oauth/callback");
+
+        assertThatThrownBy(disabled::authorizationUri)
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
+                .isEqualTo(503);
 
         verify(traktClient, never()).exchangeAuthorizationCode("oauth-code");
     }

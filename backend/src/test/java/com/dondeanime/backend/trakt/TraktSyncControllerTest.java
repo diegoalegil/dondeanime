@@ -25,7 +25,7 @@ class TraktSyncControllerTest {
 
     @Test
     void syncReturnsImportSummaryWithoutTokens() throws Exception {
-        when(traktSyncService.sync(new TraktSyncRequest("user-123", "access-token")))
+        when(traktSyncService.sync(new TraktSyncRequest("user-123")))
                 .thenReturn(new TraktSyncResponse(
                         1,
                         1,
@@ -39,7 +39,7 @@ class TraktSyncControllerTest {
         mvc.perform(post("/api/trakt/sync")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"externalUserId":"user-123","accessToken":"access-token"}
+                                {"externalUserId":"user-123"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.watchedImported").value(1))

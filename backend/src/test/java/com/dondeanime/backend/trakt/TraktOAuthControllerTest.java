@@ -39,11 +39,12 @@ class TraktOAuthControllerTest {
                 .thenReturn(new TraktOAuthCallbackResponse(
                         true,
                         "trakt",
-                        false,
-                        false,
+                        "user-123",
+                        true,
+                        true,
                         7200L,
                         "public",
-                        "Cuenta Trakt conectada temporalmente."));
+                        "Cuenta Trakt conectada."));
 
         mvc.perform(get("/api/trakt/oauth/callback")
                         .queryParam("code", "code")
@@ -51,7 +52,8 @@ class TraktOAuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.connected").value(true))
                 .andExpect(jsonPath("$.provider").value("trakt"))
-                .andExpect(jsonPath("$.accessTokenStored").value(false))
-                .andExpect(jsonPath("$.refreshTokenStored").value(false));
+                .andExpect(jsonPath("$.externalUserId").value("user-123"))
+                .andExpect(jsonPath("$.accessTokenStored").value(true))
+                .andExpect(jsonPath("$.refreshTokenStored").value(true));
     }
 }

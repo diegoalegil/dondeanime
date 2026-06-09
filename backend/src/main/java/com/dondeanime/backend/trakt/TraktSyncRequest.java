@@ -1,6 +1,4 @@
 package com.dondeanime.backend.trakt;
 
-public record TraktSyncRequest(
-        String externalUserId,
-        String accessToken) {
+public record TraktSyncRequest(String externalUserId) {
 }
