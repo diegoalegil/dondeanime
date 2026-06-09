@@ -81,22 +81,24 @@ class RateLimitFilterTest {
     }
 
     @Test
-    void cloudflareConnectingIpTakesPrecedenceOverForwardedFor() throws Exception {
+    void spoofedCloudflareHeaderDoesNotBypassRateLimit() throws Exception {
+        // Sin Cloudflare delante, CF-Connecting-IP lo controla el cliente:
+        // un valor distinto por petición NO debe abrir un bucket nuevo.
         RateLimitFilter filter = new RateLimitFilter();
         AtomicInteger passed = new AtomicInteger();
         FilterChain chain = (request, response) -> passed.incrementAndGet();
 
         for (int i = 0; i < 30; i++) {
             MockHttpServletResponse response = new MockHttpServletResponse();
-            MockHttpServletRequest request = request("/api/search", "198.51.100." + i);
-            request.addHeader("CF-Connecting-IP", "203.0.113.77");
+            MockHttpServletRequest request = request("/api/search", "203.0.113.77");
+            request.addHeader("CF-Connecting-IP", "198.51.100." + i);
             filter.doFilter(request, response, chain);
             assertThat(response.getStatus()).isEqualTo(200);
         }
 
         MockHttpServletResponse rejected = new MockHttpServletResponse();
-        MockHttpServletRequest request = request("/api/search", "198.51.100.200");
-        request.addHeader("CF-Connecting-IP", "203.0.113.77");
+        MockHttpServletRequest request = request("/api/search", "203.0.113.77");
+        request.addHeader("CF-Connecting-IP", "198.51.100.200");
         filter.doFilter(request, rejected, chain);
 
         assertThat(rejected.getStatus()).isEqualTo(429);
