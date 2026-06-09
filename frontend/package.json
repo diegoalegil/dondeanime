@@ -19,19 +19,19 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.6",
-    "@astrojs/svelte": "^8.1.1",
+    "@astrojs/svelte": "^8.1.2",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.3.7",
+    "astro": "^6.4.5",
     "chart.js": "^4.5.1",
     "flag-icons": "^7.5.0",
-    "svelte": "^5.55.9",
+    "svelte": "^5.56.3",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.60.0",
-    "lighthouse": "^13.3.0"
+    "lighthouse": "^13.4.0"
   }
 }
