@@ -14,6 +14,7 @@ const blog = defineCollection({
     updatedDate: z.coerce.date().optional(),
     author: z.string().default('DondeAnime'),
     tags: z.array(z.string()).default([]),
+    locale: z.enum(['es', 'en']).default('es'),
     draft: z.boolean().default(false),
   }),
 });

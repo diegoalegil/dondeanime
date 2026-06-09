@@ -23,6 +23,13 @@ const featuredGenres = [
   { slug: 'adventure', name: t('footer.genre.adventure') },
   { slug: 'romance', name: t('footer.genre.romance') },
 ];
+const legalLinks = [
+  { href: localizedPath('/contacto'), label: t('footer.contact') },
+  { href: localizedPath('/legal/privacidad'), label: t('footer.privacy') },
+  { href: localizedPath('/legal/cookies'), label: t('footer.cookies') },
+  { href: localizedPath('/legal/terminos'), label: t('footer.terms') },
+  { href: localizedPath('/legal/afiliados'), label: t('breadcrumbs.affiliates') },
+];
 ---
 <footer class="mt-16 border-t border-surface-2 bg-surface-1">
   <div class="mx-auto max-w-6xl px-4 py-12">
@@ -78,18 +85,21 @@ const featuredGenres = [
       </div>
     </div>
 
-    <div class="mt-10 flex flex-col gap-3 border-t border-surface-2 pt-6 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between">
+    <div class="mt-10 flex flex-col gap-4 border-t border-surface-2 pt-6 text-xs text-fg-muted sm:flex-row sm:items-start sm:justify-between">
       <p>&copy; {year} {t('brand.name')}. {t('footer.dataAttribution')}</p>
-      <p class="sm:text-right">
-        <a href="/api" class="transition-colors hover:text-fg-primary">{t('nav.api')}</a>
-        <span class="mx-2">&middot;</span>
-        <a href={localizedPath('/legal/privacidad')} class="transition-colors hover:text-fg-primary">{t('footer.privacy')}</a>
-        <span class="mx-2">&middot;</span>
-        {t('footer.affiliateDisclosure')}
-        <a href={localizedPath('/legal/afiliados')} class="transition-colors hover:text-fg-primary">{t('footer.moreInfo')}</a>
-        <span class="mx-2">&middot;</span>
-        {t('footer.noHosting')}
-      </p>
+      <div class="space-y-2 sm:max-w-xl sm:text-right">
+        <nav class="flex flex-wrap gap-x-4 gap-y-2 sm:justify-end" aria-label="Legal">
+          <a href="/api" class="transition-colors hover:text-fg-primary">{t('nav.api')}</a>
+          {legalLinks.map((link) => (
+            <a href={link.href} class="transition-colors hover:text-fg-primary">{link.label}</a>
+          ))}
+        </nav>
+        <p>
+          {t('footer.affiliateDisclosure')} <a href={localizedPath('/legal/afiliados')} class="transition-colors hover:text-fg-primary">{t('footer.moreInfo')}</a>
+          <span class="mx-2">&middot;</span>
+          {t('footer.noHosting')}
+        </p>
+      </div>
     </div>
   </div>
   <JsonLd data={organizationSchema} />

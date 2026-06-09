@@ -380,8 +380,11 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   const spanishSitemapText = await spanishSitemap.text();
   expect(spanishSitemap.ok()).toBe(true);
   expect(spanishSitemapText).toContain('https://dondeanime.com/');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/blog/placeholder-guia-editorial');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/blog/guia-estrenos-anime-streaming');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/contacto');
   expect(spanishSitemapText).toContain('https://dondeanime.com/legal/privacidad');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/cookies');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/terminos');
 
   const englishSitemap = await request.get('/sitemap-en.xml');
   const englishSitemapText = await englishSitemap.text();
@@ -389,7 +392,10 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   expect(englishSitemapText).toContain('https://dondeanime.com/en');
   expect(englishSitemapText).toContain('https://dondeanime.com/en/country/spain');
   expect(englishSitemapText).toContain('https://dondeanime.com/en/upcoming/next-week');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/blog/placeholder-guia-editorial');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/blog/guia-estrenos-anime-streaming');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/contact');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/cookies');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/terms');
   expect(englishSitemapText).not.toContain('https://dondeanime.com/en/pais/espana');
 
   const animeSitemap = await request.get('/sitemap-anime.xml');
@@ -507,14 +513,15 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   await expect(articleLinks).toHaveCount(2);
 
   const firstHref = await articleLinks.first().getAttribute('href');
-  expect(firstHref).toBe('/blog/placeholder-guia-editorial');
+  expect(firstHref).toBe('/blog/guia-estrenos-anime-streaming');
 
   await articleLinks.first().click();
-  await expect(page.getByRole('heading', { name: 'Placeholder editorial 1' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Guía para seguir estrenos de anime en streaming' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/blog/placeholder-guia-editorial',
+    'https://dondeanime.com/blog/guia-estrenos-anime-streaming',
   );
+  await expect(page.getByText('Lorem ipsum')).toHaveCount(0);
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
   const blogPosting = jsonLdBlocks
@@ -522,10 +529,10 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
     .find((schema) => schema['@type'] === 'BlogPosting');
 
   expect(blogPosting).toEqual(expect.objectContaining({
-    headline: 'Placeholder editorial 1',
+    headline: 'Guía para seguir estrenos de anime en streaming',
     inLanguage: 'es',
     mainEntityOfPage: expect.objectContaining({
-      '@id': 'https://dondeanime.com/blog/placeholder-guia-editorial',
+      '@id': 'https://dondeanime.com/blog/guia-estrenos-anime-streaming',
     }),
   }));
 
@@ -534,8 +541,90 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   expect(rss.headers()['content-type']).toMatch(/application\/rss\+xml|application\/xml|text\/xml/);
   const rssText = await rss.text();
   expect(rssText).toContain('<rss version="2.0">');
-  expect(rssText).toContain('https://dondeanime.com/blog/placeholder-guia-editorial');
-  expect(rssText).toContain('https://dondeanime.com/blog/placeholder-lista-editorial');
+  expect(rssText).toContain('https://dondeanime.com/blog/guia-estrenos-anime-streaming');
+  expect(rssText).toContain('https://dondeanime.com/blog/como-elegir-plataforma-anime');
+  expect(rssText).not.toContain('placeholder');
+
+  await page.goto('/en/blog');
+  await expect(page.getByRole('heading', { name: /Blog DondeAnime/i })).toBeVisible();
+
+  const englishArticleLinks = page.locator('article h2 a[href^="/en/blog/"]');
+  await expect(englishArticleLinks).toHaveCount(2);
+  expect(await englishArticleLinks.first().getAttribute('href')).toBe('/en/blog/guia-estrenos-anime-streaming');
+
+  await englishArticleLinks.first().click();
+  await expect(page.getByRole('heading', { name: 'How to track new anime premieres on streaming' })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/en/blog/guia-estrenos-anime-streaming',
+  );
+
+  const englishJsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const englishBlogPosting = englishJsonLdBlocks
+    .map((block) => JSON.parse(block))
+    .find((schema) => schema['@type'] === 'BlogPosting');
+
+  expect(englishBlogPosting).toEqual(expect.objectContaining({
+    headline: 'How to track new anime premieres on streaming',
+    inLanguage: 'en',
+    mainEntityOfPage: expect.objectContaining({
+      '@id': 'https://dondeanime.com/en/blog/guia-estrenos-anime-streaming',
+    }),
+  }));
+
+  const englishRss = await request.get('/en/blog/rss.xml');
+  expect(englishRss.ok()).toBe(true);
+  const englishRssText = await englishRss.text();
+  expect(englishRssText).toContain('https://dondeanime.com/en/blog/guia-estrenos-anime-streaming');
+  expect(englishRssText).toContain('How to track new anime premieres on streaming');
+});
+
+test('contact and legal pages render with localized alternates and sitemap entries', async ({ page, request }) => {
+  const pages = [
+    {
+      path: '/contacto',
+      heading: /Contacto/i,
+      canonical: 'https://dondeanime.com/contacto',
+      alternate: 'https://dondeanime.com/en/contact',
+    },
+    {
+      path: '/legal/cookies',
+      heading: /Cookies/i,
+      canonical: 'https://dondeanime.com/legal/cookies',
+      alternate: 'https://dondeanime.com/en/legal/cookies',
+    },
+    {
+      path: '/legal/terminos',
+      heading: /Términos de uso/i,
+      canonical: 'https://dondeanime.com/legal/terminos',
+      alternate: 'https://dondeanime.com/en/legal/terms',
+    },
+  ];
+
+  for (const item of pages) {
+    await page.goto(item.path);
+    await expect(page.getByRole('heading', { name: item.heading })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', item.canonical);
+    await expect(page.locator('link[hreflang="en"]')).toHaveAttribute('href', item.alternate);
+  }
+
+  await page.goto('/en/contact');
+  await expect(page.getByRole('heading', { name: /Contact/i })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://dondeanime.com/en/contact',
+  );
+  await expect(page.locator('link[hreflang="es"]')).toHaveAttribute('href', 'https://dondeanime.com/contacto');
+
+  const spanishSitemapText = await (await request.get('/sitemap-es.xml')).text();
+  expect(spanishSitemapText).toContain('https://dondeanime.com/contacto');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/cookies');
+  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/terminos');
+
+  const englishSitemapText = await (await request.get('/sitemap-en.xml')).text();
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/contact');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/cookies');
+  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/terms');
 });
 
 test('premium page creates Stripe checkout and customer portal sessions in test mode', async ({ page }) => {
