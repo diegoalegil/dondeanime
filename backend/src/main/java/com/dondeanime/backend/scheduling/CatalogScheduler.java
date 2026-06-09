@@ -15,6 +15,8 @@ import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.news.NewsIngestionResult;
 import com.dondeanime.backend.news.NewsIngestionService;
+import com.dondeanime.backend.news.NewsProcessingResult;
+import com.dondeanime.backend.news.NewsProcessingService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -43,6 +45,8 @@ public class CatalogScheduler {
     private final String vercelDeployHook;
     private final NewsIngestionService newsIngestionService;
     private final boolean newsIngestionEnabled;
+    private final NewsProcessingService newsProcessingService;
+    private final boolean newsProcessingEnabled;
 
     public CatalogScheduler(
             AnimeSyncService syncService,
@@ -54,8 +58,10 @@ public class CatalogScheduler {
             MeterRegistry meterRegistry,
             ApplicationEventPublisher eventPublisher,
             NewsIngestionService newsIngestionService,
+            NewsProcessingService newsProcessingService,
             @Value("${vercel.deploy-hook:}") String vercelDeployHook,
-            @Value("${news.ingestion.enabled:false}") boolean newsIngestionEnabled) {
+            @Value("${news.ingestion.enabled:false}") boolean newsIngestionEnabled,
+            @Value("${news.processing.enabled:false}") boolean newsProcessingEnabled) {
         this.syncService = syncService;
         this.matchingService = matchingService;
         this.descriptionEnricher = descriptionEnricher;
@@ -65,8 +71,10 @@ public class CatalogScheduler {
         this.meterRegistry = meterRegistry;
         this.eventPublisher = eventPublisher;
         this.newsIngestionService = newsIngestionService;
+        this.newsProcessingService = newsProcessingService;
         this.vercelDeployHook = vercelDeployHook;
         this.newsIngestionEnabled = newsIngestionEnabled;
+        this.newsProcessingEnabled = newsProcessingEnabled;
     }
 
     @Scheduled(cron = "${dondeanime.cron.sync-anilist:0 0 3,15 * * *}")
@@ -157,6 +165,33 @@ public class CatalogScheduler {
             log.error("[scheduler] ingestNews: ERROR", e);
             recordError("news", sample);
             publishJobFailure("news", e);
+        }
+    }
+
+    /**
+     * Procesa los borradores que dejó la ingesta (resumen, meta, match de anime
+     * y publicación si news.processing.publish=true). Corre media hora después
+     * de cada ingesta para no dejar borradores acumulados hasta el siguiente
+     * ciclo. Mismo patrón que ingestNews: flag propio, solo corre si
+     * news.processing.enabled=true.
+     */
+    @Scheduled(cron = "${dondeanime.cron.process-news:0 0 1/6 * * *}")
+    public void processNews() {
+        if (!newsProcessingEnabled) {
+            log.debug("[scheduler] processNews: desactivado (news.processing.enabled=false)");
+            return;
+        }
+        log.info("[scheduler] processNews: iniciando");
+        Timer.Sample sample = Timer.start(meterRegistry);
+        try {
+            NewsProcessingResult result = newsProcessingService.processDrafts();
+            log.info("[scheduler] processNews: completado, {} procesadas, {} publicadas, {} con anime de {} borradores",
+                    result.itemsProcessed(), result.itemsPublished(), result.animeMatched(), result.draftsSeen());
+            recordSuccess("news-processing", sample);
+        } catch (Exception e) {
+            log.error("[scheduler] processNews: ERROR", e);
+            recordError("news-processing", sample);
+            publishJobFailure("news-processing", e);
         }
     }
 

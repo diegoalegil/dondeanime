@@ -1,6 +1,7 @@
 package com.dondeanime.backend.scheduling;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -18,6 +19,8 @@ import com.dondeanime.backend.anime.AnimeMatchingService;
 import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.news.NewsIngestionService;
+import com.dondeanime.backend.news.NewsProcessingResult;
+import com.dondeanime.backend.news.NewsProcessingService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -49,7 +52,9 @@ class CatalogSchedulerTest {
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),
                 mock(NewsIngestionService.class),
+                mock(NewsProcessingService.class),
                 "https://vercel.example/deploy",
+                false,
                 false);
 
         scheduler.syncAniList();
@@ -75,12 +80,55 @@ class CatalogSchedulerTest {
                 new SimpleMeterRegistry(),
                 mock(ApplicationEventPublisher.class),
                 mock(NewsIngestionService.class),
+                mock(NewsProcessingService.class),
                 "",
+                false,
                 false);
 
         scheduler.matchTmdb();
 
         verify(matchingService).matchAll();
         verify(descriptionEnricher).enrichMissingSpanishDescriptions();
+    }
+
+    @Test
+    void processNewsDoesNothingWhenFlagDisabled() {
+        NewsProcessingService newsProcessingService = mock(NewsProcessingService.class);
+        CatalogScheduler scheduler = scheduler(newsProcessingService, false);
+
+        scheduler.processNews();
+
+        verify(newsProcessingService, never()).processDrafts();
+    }
+
+    @Test
+    void processNewsRunsWhenFlagEnabled() {
+        NewsProcessingService newsProcessingService = mock(NewsProcessingService.class);
+        when(newsProcessingService.processDrafts())
+                .thenReturn(new NewsProcessingResult(true, 3, 3, 1, 2, 0));
+        CatalogScheduler scheduler = scheduler(newsProcessingService, true);
+
+        scheduler.processNews();
+
+        verify(newsProcessingService).processDrafts();
+    }
+
+    private static CatalogScheduler scheduler(
+            NewsProcessingService newsProcessingService,
+            boolean newsProcessingEnabled) {
+        return new CatalogScheduler(
+                mock(AnimeSyncService.class),
+                mock(AnimeMatchingService.class),
+                mock(AnimeDescriptionEnricher.class),
+                mock(ProviderSyncService.class),
+                mock(TrailerSyncService.class),
+                RestClient.builder(),
+                new SimpleMeterRegistry(),
+                mock(ApplicationEventPublisher.class),
+                mock(NewsIngestionService.class),
+                newsProcessingService,
+                "",
+                false,
+                newsProcessingEnabled);
     }
 }

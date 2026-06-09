@@ -19,6 +19,7 @@ import com.dondeanime.backend.anime.AnimeSyncService;
 import com.dondeanime.backend.anime.TrailerSyncService;
 import com.dondeanime.backend.news.NewsIngestionResult;
 import com.dondeanime.backend.news.NewsIngestionService;
+import com.dondeanime.backend.news.NewsProcessingService;
 import com.dondeanime.backend.provider.ProviderSyncService;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -109,8 +110,10 @@ class CatalogSchedulerMetricsTest {
                 registry,
                 mock(ApplicationEventPublisher.class),
                 newsService,
+                mock(NewsProcessingService.class),
                 "",
-                true);
+                true,
+                false);
     }
 
     private static CatalogScheduler scheduler(
@@ -128,7 +131,9 @@ class CatalogSchedulerMetricsTest {
                 registry,
                 mock(ApplicationEventPublisher.class),
                 mock(NewsIngestionService.class),
+                mock(NewsProcessingService.class),
                 "",
+                false,
                 false);
     }
 
@@ -148,7 +153,9 @@ class CatalogSchedulerMetricsTest {
                 registry,
                 eventPublisher,
                 mock(NewsIngestionService.class),
+                mock(NewsProcessingService.class),
                 "",
+                false,
                 false);
     }
 
