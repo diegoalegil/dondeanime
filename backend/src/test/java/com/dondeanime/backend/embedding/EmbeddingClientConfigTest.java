@@ -13,11 +13,11 @@ class EmbeddingClientConfigTest {
         EmbeddingClient client = new EmbeddingClientConfig().embeddingClient(
                 RestClient.builder(),
                 false,
-                "text-embedding-3-small",
-                "https://api.openai.com",
+                "",
+                "",
                 "");
 
-        assertThat(client.model()).isEqualTo("text-embedding-3-small");
+        assertThat(client.model()).isEqualTo("disabled");
         assertThatThrownBy(() -> client.embed("hola"))
                 .isInstanceOf(EmbeddingClientDisabledException.class);
     }
@@ -27,10 +27,22 @@ class EmbeddingClientConfigTest {
         assertThatThrownBy(() -> new EmbeddingClientConfig().embeddingClient(
                 RestClient.builder(),
                 true,
-                "text-embedding-3-small",
-                "https://api.openai.com",
+                "embedding-model-small",
+                "https://embeddings.example.com",
                 " "))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("api-key");
+    }
+
+    @Test
+    void enabledConfigRequiresApiBase() {
+        assertThatThrownBy(() -> new EmbeddingClientConfig().embeddingClient(
+                RestClient.builder(),
+                true,
+                "embedding-model-small",
+                " ",
+                "secret"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("api-base");
     }
 }

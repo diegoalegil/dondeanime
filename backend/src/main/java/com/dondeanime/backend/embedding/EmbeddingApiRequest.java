@@ -1,6 +1,6 @@
 package com.dondeanime.backend.embedding;
 
-record OpenAiEmbeddingRequest(
+record EmbeddingApiRequest(
         String model,
         String input) {
 }

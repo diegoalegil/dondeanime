@@ -36,18 +36,20 @@ rebuild actualiza la fila.
 
 ## Cliente de embeddings
 
-El cliente real usa `RestClient` contra la API compatible con OpenAI:
+El cliente real usa `RestClient` contra un endpoint HTTP compatible con
+`/v1/embeddings`:
 
 ```text
-POST {OPENAI_API_BASE}/v1/embeddings
+POST {EMBEDDING_API_BASE}/v1/embeddings
 ```
 
 Variables:
 
 - `EMBEDDINGS_ENABLED=false` por defecto.
-- `EMBEDDING_MODEL=text-embedding-3-small`.
-- `OPENAI_API_BASE=https://api.openai.com`.
-- `OPENAI_API_KEY` vacia por defecto.
+- `EMBEDDING_MODEL` vacia por defecto.
+- `EMBEDDING_API_BASE` vacia por defecto.
+- `EMBEDDING_API_KEY` vacia por defecto.
 
 Con `EMBEDDINGS_ENABLED=false`, el bean existe pero rechaza llamadas. Asi CI y
-desarrollo local no hacen peticiones pagadas por accidente.
+desarrollo local no hacen peticiones externas por accidente. Si se activa sin
+modelo, endpoint o clave, el backend falla temprano al construir el cliente.

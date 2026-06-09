@@ -15,35 +15,35 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
-class OpenAiEmbeddingClientTest {
+class HttpEmbeddingClientTest {
 
     @Test
-    void embedsInputThroughOpenAiApi() {
+    void embedsInputThroughConfiguredApi() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        OpenAiEmbeddingClient client = new OpenAiEmbeddingClient(
+        HttpEmbeddingClient client = new HttpEmbeddingClient(
                 builder,
-                "https://api.openai.com",
-                "sk_test",
-                "text-embedding-3-small");
+                "https://embeddings.example.com",
+                "secret",
+                "embedding-model-small");
 
-        server.expect(once(), requestTo("https://api.openai.com/v1/embeddings"))
+        server.expect(once(), requestTo("https://embeddings.example.com/v1/embeddings"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(header("Authorization", "Bearer sk_test"))
-                .andExpect(jsonPath("$.model").value("text-embedding-3-small"))
+                .andExpect(header("Authorization", "Bearer secret"))
+                .andExpect(jsonPath("$.model").value("embedding-model-small"))
                 .andExpect(jsonPath("$.input").value("quiero anime oscuro"))
                 .andRespond(withSuccess("""
                         {
                           "data": [
                             {"index": 0, "embedding": [0.1, -0.2, 0.3]}
                           ],
-                          "model": "text-embedding-3-small"
+                          "model": "embedding-model-small"
                         }
                         """, MediaType.APPLICATION_JSON));
 
         EmbeddingVector vector = client.embed("quiero anime oscuro");
 
-        assertThat(vector.model()).isEqualTo("text-embedding-3-small");
+        assertThat(vector.model()).isEqualTo("embedding-model-small");
         assertThat(vector.values()).containsExactly(0.1, -0.2, 0.3);
         server.verify();
     }
@@ -52,11 +52,11 @@ class OpenAiEmbeddingClientTest {
     void blankInputIsRejectedBeforeHttpCall() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        OpenAiEmbeddingClient client = new OpenAiEmbeddingClient(
+        HttpEmbeddingClient client = new HttpEmbeddingClient(
                 builder,
-                "https://api.openai.com",
-                "sk_test",
-                "text-embedding-3-small");
+                "https://embeddings.example.com",
+                "secret",
+                "embedding-model-small");
 
         assertThatThrownBy(() -> client.embed(" "))
                 .isInstanceOf(IllegalArgumentException.class)
