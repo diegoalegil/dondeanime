@@ -10,6 +10,8 @@ Sprint 23.4 prepara el wrapper movil para abrir fichas recientes sin red.
   al principio de la lista.
 - Si una ruta no esta cacheada, la app cae en `/offline`, la misma pantalla que
   la PWA web.
+- Assets de app e imagenes se cachean en runtime con limites separados, para
+  acelerar revisitadas sin guardar rutas privadas.
 - No se cachean rutas `/admin`, `/api`, busqueda, tokens, emails, passwords,
   device tokens ni credenciales de terceros.
 

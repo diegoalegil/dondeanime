@@ -200,14 +200,18 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 async function fetchJsonAllowing404<T>(path: string, fallback: () => Promise<T> | T): Promise<T> {
-  const res = await fetchWithRetry(path);
-  if (res.status === 404) {
+  try {
+    const res = await fetchWithRetry(path);
+    if (res.status === 404) {
+      return fallback();
+    }
+    if (!res.ok) {
+      throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json() as Promise<T>;
+  } catch {
     return fallback();
   }
-  if (!res.ok) {
-    throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
-  }
-  return res.json() as Promise<T>;
 }
 
 /**
