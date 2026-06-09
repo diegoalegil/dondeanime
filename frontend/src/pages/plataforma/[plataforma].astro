@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
-import { getProvidersByCountry, type ProviderSummary } from '@/lib/api';
+import { getProvidersByCountry, requireNonEmpty, type ProviderSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
@@ -22,7 +22,7 @@ export async function getStaticPaths() {
       if (!isHiddenVariant(p.slug)) unique.add(p.slug);
     }
   }
-  return Array.from(unique).map((slug) => ({ params: { plataforma: slug } }));
+  return requireNonEmpty('providers', Array.from(unique)).map((slug) => ({ params: { plataforma: slug } }));
 }
 
 const { plataforma } = Astro.params;

@@ -219,11 +219,21 @@ const itemListSchema = buildItemListSchema(
     </div>
   </section>
 
+  {/* Solo un teaser del catálogo: renderizar ~1000 cards inflaba la home a
+      ~1.4MB de HTML y 30k nodos DOM. El catálogo completo vive en /buscar. */}
   <section class="mx-auto max-w-6xl px-4 pb-20">
     <div class="mb-5 flex items-baseline justify-between">
       <h2 class="text-2xl font-semibold">{t('home.fullCatalog')}</h2>
       <span class="text-sm text-fg-muted">{t('home.animeCount', { count: anime.length })}</span>
     </div>
-    <AnimeGrid anime={anime} />
+    <AnimeGrid anime={anime.slice(0, 60)} />
+    <div class="mt-8 text-center">
+      <a
+        href={localizedPath('/buscar')}
+        class="inline-flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-5 py-2.5 text-sm font-semibold text-fg-primary transition-colors hover:border-accent-violet hover:text-accent-violet"
+      >
+        {t('home.viewFullCatalog')} →
+      </a>
+    </div>
   </section>
 </BaseLayout>

@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://dondeanime.com',
+  site: 'https://www.dondeanime.com',
   trailingSlash: 'never',
   build: {
     format: 'file',

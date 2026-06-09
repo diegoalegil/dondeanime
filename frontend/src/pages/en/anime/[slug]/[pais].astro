@@ -14,7 +14,7 @@ import { getBuildableAnimeDetails } from '@/lib/api';
 import type { AnimeDetail } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
-import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
 import { canonicalCountrySlug, countryParamForLocale, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
 
@@ -63,7 +63,6 @@ const seoDescription = hasProviders
 
 const pageUrl = absoluteUrl(localizedPath(`/anime/${slug}/${countrySlug}`));
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
-const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 
 // Canonical: las páginas país SIN providers son thin content (todas dicen "no
 // disponible"), así que canonicalizan a la ficha base para no diluir SEO ni gastar
@@ -81,7 +80,6 @@ const canonicalOverride = hasProviders ? undefined : absoluteUrl(localizedPath(`
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={tvSchema} />
-  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
 
   <Breadcrumbs
     items={[

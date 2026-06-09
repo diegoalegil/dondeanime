@@ -9,6 +9,7 @@ const expectedPartitionSitemaps = [
   '/sitemap-mejores.xml',
   '/sitemap-combinatoria.xml',
   '/sitemap-listas.xml',
+  '/sitemap-noticias.xml',
 ];
 
 const expectedLanguageSitemaps = [
@@ -38,7 +39,7 @@ const currentSeasonPath = (date: Date) => {
 const expectedHomeSeasonPath = async (request: APIRequestContext) => {
   const sitemap = await request.get('/sitemap-temporadas.xml');
   expect(sitemap.ok()).toBe(true);
-  const paths = [...(await sitemap.text()).matchAll(/https:\/\/dondeanime\.com(\/temporada\/(\d{4})\/(winter|spring|summer|fall))/g)]
+  const paths = [...(await sitemap.text()).matchAll(/https:\/\/www\.dondeanime\.com(\/temporada\/(\d{4})\/(winter|spring|summer|fall))/g)]
     .map((match) => ({
       path: match[1],
       year: Number(match[2]),
@@ -61,10 +62,10 @@ const sitemapPathsFromIndex = async (request: APIRequestContext, path = '/sitema
 
   expect(sitemapIndexText).toContain('<sitemapindex');
   expect(expectedSitemapIndexPaths.every((sitemapPath) =>
-    sitemapIndexText.includes(`https://dondeanime.com${sitemapPath}`),
+    sitemapIndexText.includes(`https://www.dondeanime.com${sitemapPath}`),
   )).toBe(true);
 
-  return [...sitemapIndexText.matchAll(/https:\/\/dondeanime\.com(\/sitemap-[^<]+\.xml)/g)]
+  return [...sitemapIndexText.matchAll(/https:\/\/www\.dondeanime\.com(\/sitemap-[^<]+\.xml)/g)]
     .map((m) => m[1]);
 };
 
@@ -90,10 +91,12 @@ test('home renders the static catalog and links to an anime detail page', async 
 
   await expect(page).toHaveTitle(/DondeAnime/);
   await expect(page.getByRole('heading', { name: /Encuentra dónde ver/i })).toBeVisible();
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://dondeanime.com/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.dondeanime.com/');
 
+  // La home ya no vuelca el catálogo entero (DOM gigante): muestra un teaser
+  // de 60 cards más las secciones de tendencia/temporada/género.
   const animeCards = page.locator('article a[href^="/anime/"]');
-  expect(await animeCards.count()).toBeGreaterThanOrEqual(100);
+  expect(await animeCards.count()).toBeGreaterThanOrEqual(60);
 
   const firstHref = await animeCards.first().getAttribute('href');
   expect(firstHref).toMatch(/^\/anime\/[^/]+$/);
@@ -105,7 +108,7 @@ test('home renders the static catalog and links to an anime detail page', async 
   await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    /https:\/\/dondeanime\.com\/anime\/[^/]+$/,
+    /https:\/\/www\.dondeanime\.com\/anime\/[^/]+$/,
   );
 });
 
@@ -154,7 +157,7 @@ test('upcoming release pages render and are indexed', async ({ page, request }) 
   await expect(page.getByRole('heading', { name: /Estrenos de anime de la próxima semana/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/estrenos/proxima-semana',
+    'https://www.dondeanime.com/estrenos/proxima-semana',
   );
   await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
 
@@ -162,12 +165,12 @@ test('upcoming release pages render and are indexed', async ({ page, request }) 
   await expect(page.getByRole('heading', { name: /Estrenos de anime del próximo mes/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/estrenos/proximo-mes',
+    'https://www.dondeanime.com/estrenos/proximo-mes',
   );
 
   const sitemapText = await allPartitionedSitemapText(request);
-  expect(sitemapText).toContain('https://dondeanime.com/estrenos/proxima-semana');
-  expect(sitemapText).toContain('https://dondeanime.com/estrenos/proximo-mes');
+  expect(sitemapText).toContain('https://www.dondeanime.com/estrenos/proxima-semana');
+  expect(sitemapText).toContain('https://www.dondeanime.com/estrenos/proximo-mes');
 });
 
 test('genre and platform combination pages filter anime and are indexed', async ({ page, request }) => {
@@ -176,7 +179,7 @@ test('genre and platform combination pages filter anime and are indexed', async 
   await expect(page.getByRole('heading', { name: /Anime de Action en Crunchyroll/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/anime/action/en/crunchyroll',
+    'https://www.dondeanime.com/anime/action/en/crunchyroll',
   );
 
   const animeCards = page.locator('article a[href^="/anime/"]');
@@ -200,11 +203,11 @@ test('genre and platform combination pages filter anime and are indexed', async 
   const allSitemapText = await allPartitionedSitemapText(request);
 
   const comboUrls = new Set(
-    [...allSitemapText.matchAll(/https:\/\/dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
+    [...allSitemapText.matchAll(/https:\/\/www\.dondeanime\.com\/anime\/[^/]+\/en\/[^<]+/g)].map((match) => match[0]),
   );
 
   expect(comboUrls.size).toBe(35);
-  expect(comboUrls).toContain('https://dondeanime.com/anime/action/en/crunchyroll');
+  expect(comboUrls).toContain('https://www.dondeanime.com/anime/action/en/crunchyroll');
 });
 
 test('duration pages render and are indexed', async ({ page, request }) => {
@@ -213,7 +216,7 @@ test('duration pages render and are indexed', async ({ page, request }) => {
   await expect(page.getByRole('heading', { name: /Anime de 24 minutos/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/anime/duracion/24',
+    'https://www.dondeanime.com/anime/duracion/24',
   );
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -228,7 +231,7 @@ test('duration pages render and are indexed', async ({ page, request }) => {
 
   const allSitemapText = await allPartitionedSitemapText(request);
   for (const minutes of [12, 22, 24, 25, 45, 60]) {
-    expect(allSitemapText).toContain(`https://dondeanime.com/anime/duracion/${minutes}`);
+    expect(allSitemapText).toContain(`https://www.dondeanime.com/anime/duracion/${minutes}`);
   }
 });
 
@@ -238,7 +241,7 @@ test('episode count pages render and are indexed', async ({ page, request }) => 
   await expect(page.getByRole('heading', { name: /Anime con 12 episodios o menos/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/anime/episodios/menos-de-12',
+    'https://www.dondeanime.com/anime/episodios/menos-de-12',
   );
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -253,7 +256,7 @@ test('episode count pages render and are indexed', async ({ page, request }) => 
 
   const allSitemapText = await allPartitionedSitemapText(request);
   for (const maxEpisodes of [12, 24, 50, 100, 200]) {
-    expect(allSitemapText).toContain(`https://dondeanime.com/anime/episodios/menos-de-${maxEpisodes}`);
+    expect(allSitemapText).toContain(`https://www.dondeanime.com/anime/episodios/menos-de-${maxEpisodes}`);
   }
 });
 
@@ -263,7 +266,7 @@ test('beginner genre pages render curated recommendations and are indexed', asyn
   await expect(page.getByRole('heading', { name: /Anime para principiantes en Action/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/empezar/action',
+    'https://www.dondeanime.com/empezar/action',
   );
 
   const resultCount = await page.locator('[data-beginner-result]').count();
@@ -283,7 +286,7 @@ test('beginner genre pages render curated recommendations and are indexed', asyn
   expect(itemList.itemListElement).toHaveLength(resultCount);
 
   const allSitemapText = await allPartitionedSitemapText(request);
-  expect(allSitemapText).toContain('https://dondeanime.com/empezar/action');
+  expect(allSitemapText).toContain('https://www.dondeanime.com/empezar/action');
 });
 
 test('studio ranking pages render schema and are indexed', async ({ page, request }) => {
@@ -292,7 +295,7 @@ test('studio ranking pages render schema and are indexed', async ({ page, reques
   await expect(page.getByRole('heading', { name: /Mejor anime de Madhouse/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/estudio/madhouse/mejores',
+    'https://www.dondeanime.com/estudio/madhouse/mejores',
   );
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -314,7 +317,7 @@ test('studio ranking pages render schema and are indexed', async ({ page, reques
   }));
 
   const allSitemapText = await allPartitionedSitemapText(request);
-  expect(allSitemapText).toContain('https://dondeanime.com/estudio/madhouse/mejores');
+  expect(allSitemapText).toContain('https://www.dondeanime.com/estudio/madhouse/mejores');
 });
 
 test('best anime by year pages render ranking, providers and schema', async ({ page, request }) => {
@@ -327,7 +330,7 @@ test('best anime by year pages render ranking, providers and schema', async ({ p
   await expect(page.locator('[data-provider-chip]').first()).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/mejores/2024',
+    'https://www.dondeanime.com/mejores/2024',
   );
 
   const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -344,7 +347,7 @@ test('best anime by year pages render ranking, providers and schema', async ({ p
   const allSitemapText = await allPartitionedSitemapText(request);
 
   for (let year = 2010; year <= 2026; year += 1) {
-    expect(allSitemapText).toContain(`https://dondeanime.com/mejores/${year}`);
+    expect(allSitemapText).toContain(`https://www.dondeanime.com/mejores/${year}`);
   }
 });
 
@@ -363,9 +366,9 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   const robots = await request.get('/robots.txt');
   expect(robots.ok()).toBe(true);
   const robotsText = await robots.text();
-  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-index.xml');
-  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-es.xml');
-  expect(robotsText).toContain('Sitemap: https://dondeanime.com/sitemap-en.xml');
+  expect(robotsText).toContain('Sitemap: https://www.dondeanime.com/sitemap-index.xml');
+  expect(robotsText).toContain('Sitemap: https://www.dondeanime.com/sitemap-es.xml');
+  expect(robotsText).toContain('Sitemap: https://www.dondeanime.com/sitemap-en.xml');
 
   const sitemapPaths = await sitemapPathsFromIndex(request);
   // Comparamos como conjunto (orden indiferente): el orden en el indice no es
@@ -379,40 +382,40 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
   const spanishSitemap = await request.get('/sitemap-es.xml');
   const spanishSitemapText = await spanishSitemap.text();
   expect(spanishSitemap.ok()).toBe(true);
-  expect(spanishSitemapText).toContain('https://dondeanime.com/');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/blog/guia-estrenos-anime-streaming');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/contacto');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/privacidad');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/cookies');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/terminos');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/blog/guia-estrenos-anime-streaming');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/contacto');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/legal/privacidad');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/legal/cookies');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/legal/terminos');
 
   const englishSitemap = await request.get('/sitemap-en.xml');
   const englishSitemapText = await englishSitemap.text();
   expect(englishSitemap.ok()).toBe(true);
-  expect(englishSitemapText).toContain('https://dondeanime.com/en');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/country/spain');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/upcoming/next-week');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/blog/guia-estrenos-anime-streaming');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/contact');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/cookies');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/terms');
-  expect(englishSitemapText).not.toContain('https://dondeanime.com/en/pais/espana');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/country/spain');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/upcoming/next-week');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/blog/guia-estrenos-anime-streaming');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/contact');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/legal/cookies');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/legal/terms');
+  expect(englishSitemapText).not.toContain('https://www.dondeanime.com/en/pais/espana');
 
   const animeSitemap = await request.get('/sitemap-anime.xml');
   const animeUrls = [...(await animeSitemap.text()).matchAll(/<url>/g)];
   expect(animeUrls.length).toBeGreaterThanOrEqual(100);
 
   const countrySitemap = await request.get('/sitemap-paises.xml');
-  expect(await countrySitemap.text()).toContain('https://dondeanime.com/pais/espana');
+  expect(await countrySitemap.text()).toContain('https://www.dondeanime.com/pais/espana');
 
   const platformSitemap = await request.get('/sitemap-plataformas.xml');
-  expect(await platformSitemap.text()).toContain('https://dondeanime.com/plataforma/crunchyroll');
+  expect(await platformSitemap.text()).toContain('https://www.dondeanime.com/plataforma/crunchyroll');
 
   const genreSitemap = await request.get('/sitemap-generos.xml');
-  expect(await genreSitemap.text()).toContain('https://dondeanime.com/genero/action');
+  expect(await genreSitemap.text()).toContain('https://www.dondeanime.com/genero/action');
 
   const seasonSitemap = await request.get('/sitemap-temporadas.xml');
-  expect(await seasonSitemap.text()).toMatch(/https:\/\/dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
+  expect(await seasonSitemap.text()).toMatch(/https:\/\/www\.dondeanime\.com\/temporada\/\d{4}\/[a-z]+/);
 });
 
 test('PWA manifest links icons, screenshots and shortcuts', async ({ page, request }) => {
@@ -462,16 +465,21 @@ test('offline page and service worker are generated', async ({ request }) => {
   const serviceWorker = await request.get('/sw.js');
   expect(serviceWorker.ok()).toBe(true);
   const serviceWorkerText = await serviceWorker.text();
-  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v1'");
+  expect(serviceWorkerText).toContain("const PAGE_CACHE = 'dondeanime-pages-v2'");
   expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
   expect(serviceWorkerText).toContain('const MAX_CACHED_ANIME_PAGES = 12');
-  expect(serviceWorkerText).toContain("const ASSET_CACHE = 'dondeanime-assets-v1'");
-  expect(serviceWorkerText).toContain("const IMAGE_CACHE = 'dondeanime-images-v1'");
+  expect(serviceWorkerText).toContain("const ASSET_CACHE = 'dondeanime-assets-v2'");
+  expect(serviceWorkerText).toContain("const IMAGE_CACHE = 'dondeanime-images-v2'");
   expect(serviceWorkerText).toContain('const MAX_CACHED_IMAGES = 120');
   expect(serviceWorkerText).toContain('const ANIME_PAGE_PATTERN');
   expect(serviceWorkerText).toContain("request.destination === 'image'");
   expect(serviceWorkerText).toContain('allowOpaque: true');
   expect(serviceWorkerText).toContain("request.mode === 'navigate'");
+  // HTML en navegación suave (ClientRouter) = network-first, no cache-first.
+  expect(serviceWorkerText).toContain("accept.includes('text/html')");
+  // El SW unificado también gestiona push (antes vivía en push-worker.js).
+  expect(serviceWorkerText).toContain("self.addEventListener('push'");
+  expect(serviceWorkerText).toContain("self.addEventListener('notificationclick'");
 });
 
 test('alert background sync is generated in the service worker', async ({ request }) => {
@@ -506,7 +514,7 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   await expect(page.getByRole('heading', { name: /Blog DondeAnime/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/blog',
+    'https://www.dondeanime.com/blog',
   );
 
   const articleLinks = page.locator('article h2 a[href^="/blog/"]');
@@ -519,7 +527,7 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   await expect(page.getByRole('heading', { name: 'Guía para seguir estrenos de anime en streaming' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/blog/guia-estrenos-anime-streaming',
+    'https://www.dondeanime.com/blog/guia-estrenos-anime-streaming',
   );
   await expect(page.getByText('Lorem ipsum')).toHaveCount(0);
 
@@ -532,7 +540,7 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
     headline: 'Guía para seguir estrenos de anime en streaming',
     inLanguage: 'es',
     mainEntityOfPage: expect.objectContaining({
-      '@id': 'https://dondeanime.com/blog/guia-estrenos-anime-streaming',
+      '@id': 'https://www.dondeanime.com/blog/guia-estrenos-anime-streaming',
     }),
   }));
 
@@ -541,8 +549,8 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   expect(rss.headers()['content-type']).toMatch(/application\/rss\+xml|application\/xml|text\/xml/);
   const rssText = await rss.text();
   expect(rssText).toContain('<rss version="2.0">');
-  expect(rssText).toContain('https://dondeanime.com/blog/guia-estrenos-anime-streaming');
-  expect(rssText).toContain('https://dondeanime.com/blog/como-elegir-plataforma-anime');
+  expect(rssText).toContain('https://www.dondeanime.com/blog/guia-estrenos-anime-streaming');
+  expect(rssText).toContain('https://www.dondeanime.com/blog/como-elegir-plataforma-anime');
   expect(rssText).not.toContain('placeholder');
 
   await page.goto('/en/blog');
@@ -556,7 +564,7 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   await expect(page.getByRole('heading', { name: 'How to track new anime premieres on streaming' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/en/blog/guia-estrenos-anime-streaming',
+    'https://www.dondeanime.com/en/blog/guia-estrenos-anime-streaming',
   );
 
   const englishJsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -568,14 +576,14 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
     headline: 'How to track new anime premieres on streaming',
     inLanguage: 'en',
     mainEntityOfPage: expect.objectContaining({
-      '@id': 'https://dondeanime.com/en/blog/guia-estrenos-anime-streaming',
+      '@id': 'https://www.dondeanime.com/en/blog/guia-estrenos-anime-streaming',
     }),
   }));
 
   const englishRss = await request.get('/en/blog/rss.xml');
   expect(englishRss.ok()).toBe(true);
   const englishRssText = await englishRss.text();
-  expect(englishRssText).toContain('https://dondeanime.com/en/blog/guia-estrenos-anime-streaming');
+  expect(englishRssText).toContain('https://www.dondeanime.com/en/blog/guia-estrenos-anime-streaming');
   expect(englishRssText).toContain('How to track new anime premieres on streaming');
 });
 
@@ -584,20 +592,20 @@ test('contact and legal pages render with localized alternates and sitemap entri
     {
       path: '/contacto',
       heading: /Contacto/i,
-      canonical: 'https://dondeanime.com/contacto',
-      alternate: 'https://dondeanime.com/en/contact',
+      canonical: 'https://www.dondeanime.com/contacto',
+      alternate: 'https://www.dondeanime.com/en/contact',
     },
     {
       path: '/legal/cookies',
       heading: /Cookies/i,
-      canonical: 'https://dondeanime.com/legal/cookies',
-      alternate: 'https://dondeanime.com/en/legal/cookies',
+      canonical: 'https://www.dondeanime.com/legal/cookies',
+      alternate: 'https://www.dondeanime.com/en/legal/cookies',
     },
     {
       path: '/legal/terminos',
       heading: /Términos de uso/i,
-      canonical: 'https://dondeanime.com/legal/terminos',
-      alternate: 'https://dondeanime.com/en/legal/terms',
+      canonical: 'https://www.dondeanime.com/legal/terminos',
+      alternate: 'https://www.dondeanime.com/en/legal/terms',
     },
   ];
 
@@ -612,19 +620,19 @@ test('contact and legal pages render with localized alternates and sitemap entri
   await expect(page.getByRole('heading', { name: /Contact/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/en/contact',
+    'https://www.dondeanime.com/en/contact',
   );
-  await expect(page.locator('link[hreflang="es"]')).toHaveAttribute('href', 'https://dondeanime.com/contacto');
+  await expect(page.locator('link[hreflang="es"]')).toHaveAttribute('href', 'https://www.dondeanime.com/contacto');
 
   const spanishSitemapText = await (await request.get('/sitemap-es.xml')).text();
-  expect(spanishSitemapText).toContain('https://dondeanime.com/contacto');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/cookies');
-  expect(spanishSitemapText).toContain('https://dondeanime.com/legal/terminos');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/contacto');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/legal/cookies');
+  expect(spanishSitemapText).toContain('https://www.dondeanime.com/legal/terminos');
 
   const englishSitemapText = await (await request.get('/sitemap-en.xml')).text();
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/contact');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/cookies');
-  expect(englishSitemapText).toContain('https://dondeanime.com/en/legal/terms');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/contact');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/legal/cookies');
+  expect(englishSitemapText).toContain('https://www.dondeanime.com/en/legal/terms');
 });
 
 test('premium page creates Stripe checkout and customer portal sessions in test mode', async ({ page }) => {
@@ -731,7 +739,7 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
   await expect(page.locator('[data-premium-page]')).toHaveAttribute('data-stripe-key', /^$|^pk_(test|live)_/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/premium',
+    'https://www.dondeanime.com/premium',
   );
 
   await page.getByLabel('Email').fill('premium@dondeanime.test');
@@ -753,23 +761,25 @@ test('premium page creates Stripe checkout and customer portal sessions in test 
   expect(await page.evaluate(() => localStorage.getItem('dondeanime-premium-token'))).toBe('premium-token');
 });
 
-test('premium page has a real English route for browser language redirect', async ({ browser }) => {
+test('premium page has a real English route', async ({ browser }) => {
   const context = await browser.newContext({ locale: 'en-US' });
   const page = await context.newPage();
 
-  await page.goto('/premium');
+  // Ya no hay redirección automática por navigator.language; la ruta inglesa
+  // existe y se llega a ella por el selector de idioma o enlace directo.
+  await page.goto('/en/premium');
 
   await expect(page).toHaveURL(/\/en\/premium$/);
   await expect(page.getByRole('heading', { name: 'DondeAnime Premium' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://dondeanime.com/en/premium',
+    'https://www.dondeanime.com/en/premium',
   );
 
   await context.close();
 });
 
-test('structured data includes FAQ, organization and anime review schemas', async ({ page }) => {
+test('structured data includes FAQ, organization and TVSeries schemas', async ({ page }) => {
   await page.goto('/');
 
   const homeSchemas = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -785,7 +795,7 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
 
   const organization = homeJson.find((schema) => schema['@type'] === 'Organization');
   expect(organization.availableLanguage).toEqual(['es', 'en']);
-  expect(organization.logo.url).toBe('https://dondeanime.com/og-default.png');
+  expect(organization.logo.url).toBe('https://www.dondeanime.com/og-default.png');
   expect(organization.sameAs.length).toBeGreaterThan(0);
 
   await page.locator('article a[href^="/anime/"]').first().click();
@@ -797,11 +807,12 @@ test('structured data includes FAQ, organization and anime review schemas', asyn
   const detailJson = detailSchemas.map((schema) => JSON.parse(schema));
   const detailTypes = detailJson.map((schema) => schema['@type']);
   expect(detailTypes).toContain('TVSeries');
-  expect(detailTypes).toContain('Review');
+  // Sin Review templated de "AniList" (spam de datos estructurados) ni
+  // aggregateRating sin ratingCount real: Google los penaliza.
+  expect(detailTypes).not.toContain('Review');
 
-  const review = detailJson.find((schema) => schema['@type'] === 'Review');
-  expect(Number(review.reviewRating.ratingValue)).toBeGreaterThan(0);
-  expect(review.author.name).toBe('AniList');
+  const tvSeries = detailJson.find((schema) => schema['@type'] === 'TVSeries');
+  expect(tvSeries.aggregateRating).toBeUndefined();
 });
 
 test('search results load lazily from the search API when the user searches', async ({ page }) => {

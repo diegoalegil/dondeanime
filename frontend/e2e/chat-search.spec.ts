@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+// El chatbot está detrás de PUBLIC_CHAT_ENABLED (apagado por defecto porque
+// /api/chat está deshabilitado en prod). Estos tests solo aplican con el flag.
+test.skip(
+  process.env.PUBLIC_CHAT_ENABLED !== 'true',
+  'PUBLIC_CHAT_ENABLED no está activo: el chatbot no se renderiza.',
+);
+
 const chatResponse = {
   answer: 'He encontrado una recomendacion que encaja con tu busqueda.',
   recommendations: [
@@ -22,7 +29,7 @@ const chatResponse = {
         season: 'SPRING',
         seasonYear: 2013,
       },
-      canonicalUrl: 'https://dondeanime.com/anime/attack-on-titan',
+      canonicalUrl: 'https://www.dondeanime.com/anime/attack-on-titan',
       explanation: 'Coincide por tono oscuro, ritmo alto y disponibilidad filtrada.',
     },
   ],

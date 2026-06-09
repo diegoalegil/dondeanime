@@ -7,7 +7,7 @@ import SEOHead from '@/components/seo/SEOHead.astro';
 import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScript.astro';
 import SkeletonRow from '@/components/ui/SkeletonRow.astro';
 import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
-import { localeFromPath, setLocale } from '@/i18n';
+import { localeFromPath, setLocale, t } from '@/i18n';
 import { localizedPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
 import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 
@@ -19,6 +19,7 @@ interface Props {
   type?: 'website' | 'article';
   locale?: string;
   suppressAlternates?: boolean;
+  noindex?: boolean;
 }
 
 const props = Astro.props;
@@ -66,6 +67,11 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     </script>
     {publicLanguageRoute && (
       <script is:inline define:vars={{ languageRoutes }}>
+        // Solo respetamos la preferencia EXPLÍCITA del usuario (cookie del
+        // selector de idioma). Nada de redirigir por navigator.language:
+        // Googlebot renderiza con en-US y almacenamiento vacío, así que las
+        // páginas ES parecían redirecciones (y las solo-ES acababan en /en/*
+        // inventadas que daban 404).
         try {
           const normalizePath = (path) => path.replace(/\/+$/, '') || '/';
           const withLocationSuffix = (path) => `${path}${window.location.search}${window.location.hash}`;
@@ -76,14 +82,6 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
 
           if (preferredLocale && targetForPreference && currentPath !== targetForPreference) {
             window.location.replace(withLocationSuffix(languageRoutes[preferredLocale]));
-          } else if (!preferredLocale && !localStorage.getItem('dondeanime-locale-auto-checked')) {
-            localStorage.setItem('dondeanime-locale-auto-checked', '1');
-            const browserLocale = navigator.language || navigator.languages?.[0] || '';
-            const shouldUseEnglish = browserLocale.toLowerCase().startsWith('en');
-
-            if (shouldUseEnglish && !currentPath.startsWith('/en')) {
-              window.location.replace(withLocationSuffix(languageRoutes.en));
-            }
           }
         } catch (e) {}
       </script>
@@ -148,6 +146,12 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <slot name="head" />
   </head>
   <body class="bg-surface-0 text-fg-primary font-sans">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:border focus:border-surface-2 focus:bg-surface-1 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-fg-primary focus:outline-none"
+    >
+      {t('layout.skipToContent')}
+    </a>
     <Header />
     <div
       data-navigation-skeleton
@@ -156,7 +160,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     >
       <SkeletonRow count={6} />
     </div>
-    <main class="min-h-[calc(100vh-8rem)]" transition:animate="fade">
+    <main id="main" tabindex="-1" class="min-h-[calc(100vh-8rem)]" transition:animate="fade">
       <slot />
     </main>
     <Footer />

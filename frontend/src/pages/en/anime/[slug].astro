@@ -10,7 +10,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import NewsLatest from '@/components/news/NewsLatest.astro';
 import { getBuildableAnimeDetails, getAnimeNews } from '@/lib/api';
 import type { AnimeDetail } from '@/lib/api';
-import { buildAnimeReviewSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
@@ -42,7 +42,6 @@ const seoDescription = detail.anime.description
 
 const pageUrl = absoluteUrl(`/en/anime/${slug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
-const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 ---
 <BaseLayout
   title={t('anime.seo.title', { title })}
@@ -51,7 +50,6 @@ const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
   type="article"
 >
   <JsonLd slot="head" data={tvSchema} />
-  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
 
   <Breadcrumbs
     items={[

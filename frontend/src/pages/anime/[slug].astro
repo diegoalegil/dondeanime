@@ -13,7 +13,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getBuildableAnimeDetails, getSimilarAnime, getAnimeNews } from '@/lib/api';
 import type { AnimeDetail } from '@/lib/api';
-import { buildAnimeReviewSchema, buildRelatedAnimeSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildRelatedAnimeSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
 
@@ -45,7 +45,6 @@ const seoDescription = detail.anime.description
 
 const pageUrl = absoluteUrl(`/anime/${slug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
-const reviewSchema = buildAnimeReviewSchema(detail.anime, pageUrl);
 const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUrl);
 ---
 <BaseLayout
@@ -55,7 +54,6 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
   type="article"
 >
   <JsonLd slot="head" data={tvSchema} />
-  {reviewSchema && <JsonLd slot="head" data={reviewSchema} />}
   {relatedSchema && <JsonLd slot="head" data={relatedSchema} />}
 
   <Breadcrumbs

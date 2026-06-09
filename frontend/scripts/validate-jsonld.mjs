@@ -11,8 +11,8 @@ const knownTypes = new Set([
   'CreativeWorkSeries',
   'FAQPage',
   'ItemList',
+  'NewsArticle',
   'Organization',
-  'Review',
   'Service',
   'TVSeries',
   'WebSite',
@@ -66,19 +66,6 @@ function requireArray(node, key, file, type, { allowEmpty = false } = {}) {
   }
 }
 
-function requireRating(node, key, file, type) {
-  const rating = node[key];
-  if (!isRecord(rating)) {
-    errors.push(`${rel(file)}: ${type}.${key} debe existir`);
-    return;
-  }
-
-  const value = Number(rating.ratingValue);
-  if (!Number.isFinite(value) || value < 0 || value > 10) {
-    errors.push(`${rel(file)}: ${type}.${key}.ratingValue debe estar entre 0 y 10`);
-  }
-}
-
 function validateNode(node, file) {
   if (!isRecord(node)) {
     errors.push(`${rel(file)}: cada bloque JSON-LD debe ser un objeto`);
@@ -122,12 +109,17 @@ function validateNode(node, file) {
     if (type === 'TVSeries') {
       requireString(node, 'name', file, type);
       requireString(node, 'url', file, type);
-      if (node.aggregateRating !== undefined) requireRating(node, 'aggregateRating', file, type);
+      // aggregateRating sin ratingCount real es structured data inválido para
+      // Google: no debe emitirse (la media de AniList no trae recuento).
+      if (node.aggregateRating !== undefined) {
+        errors.push(`${rel(file)}: TVSeries.aggregateRating no debe emitirse sin ratingCount real`);
+      }
     }
-    if (type === 'Review') {
-      if (!isRecord(node.itemReviewed)) errors.push(`${rel(file)}: Review.itemReviewed debe existir`);
-      if (!isRecord(node.author)) errors.push(`${rel(file)}: Review.author debe existir`);
-      requireRating(node, 'reviewRating', file, type);
+    if (type === 'NewsArticle') {
+      requireString(node, 'headline', file, type);
+      requireString(node, 'datePublished', file, type);
+      if (!isRecord(node.mainEntityOfPage)) errors.push(`${rel(file)}: NewsArticle.mainEntityOfPage debe existir`);
+      if (!isRecord(node.publisher)) errors.push(`${rel(file)}: NewsArticle.publisher debe existir`);
     }
     if (type === 'Service') {
       requireString(node, 'name', file, type);
@@ -197,14 +189,6 @@ for (const file of htmlFiles) {
   }
 
   for (const block of blocks) validateNode(block, file);
-
-  const hasRatedTvSeries = blocks.some((block) =>
-    typesFor(block).includes('TVSeries') && block.aggregateRating !== undefined
-  );
-  const hasReview = blocks.some((block) => typesFor(block).includes('Review'));
-  if (hasRatedTvSeries && !hasReview) {
-    errors.push(`${rel(file)}: TVSeries con rating necesita Review asociado`);
-  }
 }
 
 const homeFile = path.join(distDir, 'index.html');

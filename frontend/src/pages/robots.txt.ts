@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = ({ site }) => {
-  const base = site?.toString() ?? 'https://dondeanime.com/';
+  const base = site?.toString() ?? 'https://www.dondeanime.com/';
   const sitemapUrl = new URL('sitemap-index.xml', base).toString();
   const spanishSitemapUrl = new URL('sitemap-es.xml', base).toString();
   const englishSitemapUrl = new URL('sitemap-en.xml', base).toString();

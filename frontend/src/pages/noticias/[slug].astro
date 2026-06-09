@@ -30,10 +30,13 @@ const date = new Intl.DateTimeFormat(activeLocale === 'en' ? 'en-US' : 'es-ES', 
 const articleSchema = buildNewsArticleSchema(item, pageUrl);
 const metaDescription = item.metaDescription ?? item.summary ?? item.title;
 ---
+{/* suppressAlternates: /en/news/{slug} canonicaliza aquí (contenido sin
+    traducir), y un hreflang apuntando a una URL no canónica rompe el clúster. */}
 <BaseLayout
   title={item.metaTitle ?? t('news.detail.title', { title: item.title })}
   description={metaDescription}
   canonical={pageUrl}
+  suppressAlternates
   image={item.imageUrl ?? undefined}
   type="article"
 >

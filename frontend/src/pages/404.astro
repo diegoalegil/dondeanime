@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
+// Solo rutas que existen de verdad en el build: no hay índices /genero,
+// /plataforma, /temporada ni /estrenos (daban 404 dentro del propio 404).
 const popularLinks = [
   { href: '/', label: 'Inicio' },
-  { href: '/genero', label: 'Géneros' },
-  { href: '/plataforma', label: 'Plataformas' },
-  { href: '/temporada', label: 'Temporadas' },
-  { href: '/estrenos', label: 'Próximos estrenos' },
+  { href: '/buscar', label: 'Buscar anime' },
+  { href: '/genero/action', label: 'Anime de acción' },
+  { href: '/plataforma/crunchyroll', label: 'Anime en Crunchyroll' },
+  { href: '/estrenos/proxima-semana', label: 'Próximos estrenos' },
 ];
 ---
 <BaseLayout

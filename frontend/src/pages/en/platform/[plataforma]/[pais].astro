@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { getProvidersByCountry, getAnimeByProvider } from '@/lib/api';
+import { getProvidersByCountry, getAnimeByProvider, requireNonEmpty } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { isHiddenVariant, getPlatform } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
@@ -22,7 +22,7 @@ export async function getStaticPaths() {
       }
     }
   }
-  return paths;
+  return requireNonEmpty('providers por país', paths);
 }
 
 const { plataforma, pais } = Astro.params;

@@ -35,7 +35,7 @@ export const getLocale = (): Locale => localeStore.getStore() ?? activeLocale;
 export const t = (
   key: I18nKey,
   values: Record<string, string | number> = {},
-  locale: Locale = activeLocale,
+  locale: Locale = getLocale(),
 ): string => {
   const dictionary = dictionaries[locale] ?? dictionaries.es;
   const template = dictionary[key] ?? dictionaries.es[key] ?? key;
