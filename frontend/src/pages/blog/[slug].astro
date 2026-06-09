@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { absoluteUrl } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
+import { blogSlug, isPublishedBlogPost } from '@/lib/blog';
 
 setLocale('es');
 
@@ -13,17 +14,18 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getCollection('blog', (post) => isPublishedBlogPost(post, 'es'));
 
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: blogSlug(post) },
     props: { post },
   }));
 }
 
 const { post } = Astro.props as Props;
 const { Content } = await render(post);
-const pageUrl = absoluteUrl(`/blog/${post.id}`);
+const slug = blogSlug(post);
+const pageUrl = absoluteUrl(`/blog/${slug}`);
 const published = post.data.pubDate.toISOString();
 const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 const activeLocale = getLocale();
@@ -66,7 +68,7 @@ const blogPostingSchema = {
     items={[
       { name: t('breadcrumbs.home'), url: '/' },
       { name: t('breadcrumbs.blog'), url: '/blog' },
-      { name: post.data.title, url: `/blog/${post.id}` },
+      { name: post.data.title, url: `/blog/${slug}` },
     ]}
   />
 

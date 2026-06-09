@@ -7,23 +7,23 @@ import { localizedPath } from '@/lib/localizedRoutes';
 setLocale('en');
 ---
 <BaseLayout
-  title={t('legal.privacy.title')}
-  description={t('legal.privacy.description')}
+  title={t('legal.cookies.title')}
+  description={t('legal.cookies.description')}
 >
   <Breadcrumbs
     items={[
       { name: t('breadcrumbs.home'), url: localizedPath('/') },
-      { name: t('legal.privacy.heading'), url: localizedPath('/legal/privacidad') },
+      { name: t('breadcrumbs.cookies'), url: localizedPath('/legal/cookies') },
     ]}
   />
 
   <section class="mx-auto max-w-3xl px-4 py-10">
-    <h1 class="text-3xl font-semibold text-fg-primary">{t('legal.privacy.heading')}</h1>
+    <h1 class="text-3xl font-semibold text-fg-primary">{t('legal.cookies.heading')}</h1>
     <div class="mt-6 space-y-5 text-sm leading-7 text-fg-secondary">
-      <p>{t('legal.privacy.paragraph1')}</p>
-      <p>{t('legal.privacy.paragraph2')}</p>
-      <p>{t('legal.privacy.paragraph3')}</p>
-      <p>{t('legal.privacy.paragraph4')}</p>
+      <p>{t('legal.cookies.paragraph1')}</p>
+      <p>{t('legal.cookies.paragraph2')}</p>
+      <p>{t('legal.cookies.paragraph3')}</p>
+      <p>{t('legal.cookies.paragraph4')}</p>
     </div>
   </section>
 </BaseLayout>

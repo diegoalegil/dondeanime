@@ -22,6 +22,7 @@ import {
   episodeLimitPath,
   studioPath,
 } from './programmaticSeo';
+import { blogSlug, isPublishedBlogPost } from './blog';
 
 export const LANGUAGE_SITEMAP_ENTRIES = [
   { name: 'Spanish', path: '/sitemap-es.xml' },
@@ -101,13 +102,16 @@ export const animeSitemapPaths = async (): Promise<string[]> => {
 };
 
 export const staticSitemapPaths = async (): Promise<string[]> => {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getCollection('blog', (post) => isPublishedBlogPost(post, 'es'));
 
   return [
     '/',
     '/blog',
-    ...posts.map((post) => `/blog/${post.id}`),
+    ...posts.map((post) => `/blog/${blogSlug(post)}`),
+    '/contacto',
     '/legal/privacidad',
+    '/legal/cookies',
+    '/legal/terminos',
     '/legal/afiliados',
   ];
 };

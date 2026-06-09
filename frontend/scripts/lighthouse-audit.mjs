@@ -43,8 +43,11 @@ const templatePatterns = [
   ['release-month', /^\/estrenos\/proximo-mes$/],
   ['blog-index', /^\/blog$/],
   ['blog-article', /^\/blog\/[^/]+$/],
+  ['contact', /^\/contacto$/],
   ['legal-affiliates', /^\/legal\/afiliados$/],
+  ['legal-cookies', /^\/legal\/cookies$/],
   ['legal-privacy', /^\/legal\/privacidad$/],
+  ['legal-terms', /^\/legal\/terminos$/],
 ];
 
 const commandName = (name) => process.platform === 'win32' ? `${name}.cmd` : name;
