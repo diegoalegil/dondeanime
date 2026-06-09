@@ -55,6 +55,13 @@ public class AnimeDescriptionEnricher {
         if (anime == null || anime.getTmdbId() == null || !isBlank(anime.getDescriptionEs())) {
             return false;
         }
+        // El matcher puede asignar ids de PELÍCULA de TMDb, pero getTvDetails
+        // pega a /tv/{id}: para una película traería la sinopsis de una serie
+        // sin relación. Las saltamos.
+        if ("MOVIE".equalsIgnoreCase(anime.getFormat())) {
+            log.debug("Enriquecimiento: skip slug={} (formato MOVIE, cliente TMDb solo TV)", anime.getSlug());
+            return false;
+        }
 
         TmdbTvDetailsResponse response = client.getTvDetails(anime.getTmdbId(), SPANISH_LOCALE);
         if (response == null || isBlank(response.overview())) {

@@ -24,7 +24,12 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     @Query("SELECT a FROM Anime a WHERE a.slug = :slug")
     Optional<Anime> findBySlugWithStudios(String slug);
 
-    @EntityGraph(attributePaths = {"characterRoles", "characterRoles.character"})
+    /**
+     * Loader del sync: studios va en el grafo porque AnimeSyncService comprueba
+     * si la colección está vacía (backfill) y sin fetch sería un proxy LAZY
+     * fuera de sesión (LazyInitializationException, no hay @Transactional).
+     */
+    @EntityGraph(attributePaths = {"characterRoles", "characterRoles.character", "studios"})
     @Query("SELECT a FROM Anime a WHERE a.anilistId = :anilistId")
     Optional<Anime> findByAnilistIdWithCharacters(Long anilistId);
 
@@ -115,15 +120,33 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     List<Anime> findByGenreSlug(String genreSlug);
 
     /**
-     * Anime producidos por un estudio concreto.
+     * Anime producidos por un estudio concreto. Trae genres en la misma query
+     * (son EAGER: sin el fetch, Hibernate lanzaba una query por anime).
      */
     @Query("""
             SELECT DISTINCT a FROM Anime a
             JOIN a.studios s
+            LEFT JOIN FETCH a.genres
             WHERE s.slug = :studioSlug
             ORDER BY a.popularity DESC NULLS LAST, a.titleEnglish ASC
             """)
     List<Anime> findByStudioSlug(String studioSlug);
+
+    /**
+     * Anime con fecha de estreno completa (año+mes+día) dentro del rango de
+     * años indicado. Las fechas de AniList son "fuzzy" (tres ints sueltos, a
+     * veces inválidos tipo 30 de febrero), así que el filtro fino día a día se
+     * queda en Java: aquí solo acotamos por año para no cargar el catálogo
+     * entero, y traemos genres en la misma query.
+     */
+    @Query("""
+            SELECT DISTINCT a FROM Anime a
+            LEFT JOIN FETCH a.genres
+            WHERE a.startYear BETWEEN :yearFrom AND :yearTo
+            AND a.startMonth IS NOT NULL
+            AND a.startDay IS NOT NULL
+            """)
+    List<Anime> findWithFullStartDateInYears(int yearFrom, int yearTo);
 
     /**
      * Anime de una temporada concreta (ej. WINTER 2024).

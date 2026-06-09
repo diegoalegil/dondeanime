@@ -45,6 +45,14 @@ public class TrailerSyncService {
                 skipped++;
                 continue;
             }
+            // El matcher puede asignar ids de PELÍCULA de TMDb, pero getTrailers
+            // pega a /tv/{id}/videos: para una película ese id apuntaría a una
+            // serie sin relación. Las saltamos.
+            if ("MOVIE".equalsIgnoreCase(anime.getFormat())) {
+                log.debug("Sync trailers: skip slug={} (formato MOVIE, cliente TMDb solo TV)", anime.getSlug());
+                skipped++;
+                continue;
+            }
             try {
                 String trailerYoutubeId = findFirstYoutubeTrailerId(anime.getTmdbId());
                 if (!Objects.equals(anime.getTrailerYoutubeId(), trailerYoutubeId)) {

@@ -65,7 +65,10 @@ public class AnimeController {
         LocalDate today = LocalDate.now(ZoneOffset.UTC);
         LocalDate until = today.plusDays(days);
 
-        List<UpcomingAnimeDto> upcoming = repository.findAll().stream()
+        // La query acota por año (las fechas fuzzy no se pueden comparar bien
+        // en JPQL); el filtro exacto por día sigue aquí abajo.
+        List<UpcomingAnimeDto> upcoming = repository
+                .findWithFullStartDateInYears(today.getYear(), until.getYear()).stream()
                 .map(AnimeController::withStartDate)
                 .flatMap(Optional::stream)
                 .filter(item -> !item.startDate().isBefore(today) && !item.startDate().isAfter(until))
