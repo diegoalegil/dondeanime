@@ -203,8 +203,7 @@ verify_checksum() {
 }
 
 wait_for_verify_postgres() {
-    local attempt
-    for attempt in $(seq 1 30); do
+    for _ in $(seq 1 30); do
         if docker exec "$VERIFY_CONTAINER" pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
             return 0
         fi
@@ -215,7 +214,8 @@ wait_for_verify_postgres() {
 
 restore_backup() {
     local backup_path="$1"
-    local verify_password="verify-$(date -u +%s)"
+    local verify_password
+    verify_password="verify-$(date -u +%s)"
 
     log "Starting temporary Postgres container $VERIFY_CONTAINER on 127.0.0.1:$VERIFY_PORT"
     docker rm -f "$VERIFY_CONTAINER" >/dev/null 2>&1 || true
