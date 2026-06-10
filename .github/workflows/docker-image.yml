@@ -1,0 +1,42 @@
+name: Docker Image
+
+# La imagen del backend solo se construía al desplegar en el VPS: un Dockerfile
+# roto se descubría en producción. Este job la construye en CI cuando cambia
+# algo que la afecta, sin publicarla.
+on:
+  pull_request:
+    paths:
+      - 'backend/Dockerfile'
+      - 'backend/pom.xml'
+      - 'backend/.mvn/**'
+      - '.github/workflows/docker-image.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/Dockerfile'
+      - 'backend/pom.xml'
+      - 'backend/.mvn/**'
+      - '.github/workflows/docker-image.yml'
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule' || github.repository == 'diegoalegil/dondeanime'
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Build backend image
+        run: docker build -t dondeanime-backend:ci backend

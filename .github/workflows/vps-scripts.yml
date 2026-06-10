@@ -26,11 +26,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Validate shell scripts parse
         run: |
           find scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: Shellcheck
+        run: |
+          find scripts -name '*.sh' -print0 | xargs -0 shellcheck --severity=warning
 
       - name: Run safe mode smoke tests
         run: bash scripts/vps/smoke-test-safe-modes.sh
