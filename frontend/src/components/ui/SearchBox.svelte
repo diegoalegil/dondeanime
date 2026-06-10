@@ -29,10 +29,12 @@
   let loading = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let requestId = 0;
+  let activeIndex = -1;
 
   const searchUrl = (value: string) =>
     `${apiUrl}/api/search?q=${encodeURIComponent(value)}&limit=5`;
   const animeHref = (slug: string) => `${animePathPrefix.replace(/\/$/, '')}/${slug}`;
+  const optionId = (index: number) => `${listId}-option-${index}`;
 
   const isEditable = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
@@ -47,6 +49,25 @@
     results = [];
     open = false;
     loading = false;
+    activeIndex = -1;
+  };
+
+  const onInputKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!open || results.length === 0) {
+        if (query.trim().length >= 2) open = true;
+        return;
+      }
+      const delta = event.key === 'ArrowDown' ? 1 : -1;
+      activeIndex = (activeIndex + delta + results.length) % results.length;
+      return;
+    }
+
+    if (event.key === 'Enter' && open && activeIndex >= 0 && results[activeIndex]) {
+      event.preventDefault();
+      window.location.href = animeHref(results[activeIndex].slug);
+    }
   };
 
   const runSearch = async () => {
@@ -72,6 +93,7 @@
       if (currentRequest === requestId) {
         results = data;
         open = true;
+        activeIndex = -1;
       }
     } catch {
       if (currentRequest === requestId) clearResults();
@@ -151,7 +173,9 @@
       aria-haspopup="listbox"
       aria-controls={open ? listId : undefined}
       aria-expanded={open}
+      aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
       on:input={scheduleSearch}
+      on:keydown={onInputKeydown}
       on:focus={() => query.trim().length >= 2 && (open = true)}
     />
   </div>
@@ -168,11 +192,14 @@
       {:else if results.length === 0}
         <p class="px-4 py-3 text-sm text-fg-muted">{noResultsLabel}</p>
       {:else}
-        {#each results as anime}
+        {#each results as anime, index}
           <a
             href={animeHref(anime.slug)}
+            id={optionId(index)}
             class="flex items-center gap-3 border-b border-surface-2/50 px-3 py-2 last:border-b-0 transition-colors hover:bg-surface-2 focus:bg-surface-2 focus:outline-none"
+            class:bg-surface-2={index === activeIndex}
             role="option"
+            aria-selected={index === activeIndex}
           >
             <img
               src={anime.coverImage}
