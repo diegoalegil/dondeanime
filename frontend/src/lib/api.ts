@@ -515,6 +515,17 @@ export interface NewsDetail {
 export const getNews = (limit = 30) =>
   fetchJsonSafe<NewsSummary[]>(`/api/news?limit=${limit}`, []);
 
+// TODOS los slugs publicados, para getStaticPaths: /api/news capa a 100 y
+// dejaría artículos antiguos indexados en 404 cuando el catálogo crezca.
+// Fallback a getNews(100) mientras la API desplegada no exponga /slugs.
+export const getNewsSlugs = async (): Promise<string[]> => {
+  const slugs = await fetchJsonSafe<string[] | null>('/api/news/slugs', null);
+  if (Array.isArray(slugs)) {
+    return slugs;
+  }
+  return (await getNews(100)).map((item) => item.slug);
+};
+
 export const getNewsBySlug = (slug: string) =>
   fetchJsonSafe<NewsDetail | null>(`/api/news/${slug}`, null);
 

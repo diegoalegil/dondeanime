@@ -5,10 +5,15 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
 
     List<NewsItem> findByStatusOrderByPublishedAtDesc(NewsStatus status, Pageable pageable);
+
+    @Query("select n.slug from NewsItem n where n.status = :status order by n.publishedAt desc")
+    List<String> findSlugsByStatus(@Param("status") NewsStatus status);
 
     List<NewsItem> findByStatusOrderByFetchedAtAsc(NewsStatus status, Pageable pageable);
 
