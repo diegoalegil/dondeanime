@@ -1,5 +1,6 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
+import { t } from '@/i18n';
 import AnimeCard from './AnimeCard.astro';
 
 interface Props {
@@ -7,7 +8,10 @@ interface Props {
   emptyText?: string;
 }
 
-const { anime, emptyText = 'No hay anime con esos filtros.' } = Astro.props;
+const { anime, emptyText = t('filterGrid.empty') } = Astro.props;
+const resultsText = t(anime.length === 1 ? 'filterGrid.resultOne' : 'filterGrid.resultMany', {
+  count: anime.length,
+});
 
 const slugify = (value: string) =>
   value
@@ -30,40 +34,44 @@ const years = [...new Set(
     .filter((year): year is number => year !== null),
 )].sort((a, b) => b - a);
 ---
-<div data-filter-root>
+<div
+  data-filter-root
+  data-filter-result-one={t('filterGrid.resultOne')}
+  data-filter-result-many={t('filterGrid.resultMany')}
+>
   <div class="mb-5 grid gap-3 rounded-lg border border-surface-2 bg-surface-1 p-4 md:grid-cols-[1fr_1fr_1fr_auto]">
     <label class="block text-sm font-medium text-fg-secondary">
-      Género
+      {t('filterGrid.genre')}
       <select
         class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
         name="genero"
         data-filter-genre
       >
-        <option value="">Todos</option>
+        <option value="">{t('filterGrid.all')}</option>
         {genres.map(([slug, label]) => <option value={slug}>{label}</option>)}
       </select>
     </label>
 
     <label class="block text-sm font-medium text-fg-secondary">
-      Año
+      {t('filterGrid.year')}
       <select
         class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
         name="year"
         data-filter-year
       >
-        <option value="">Todos</option>
+        <option value="">{t('filterGrid.all')}</option>
         {years.map((year) => <option value={String(year)}>{year}</option>)}
       </select>
     </label>
 
     <label class="block text-sm font-medium text-fg-secondary">
-      Score mínimo
+      {t('filterGrid.minScore')}
       <select
         class="mt-2 w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary focus:outline-none focus:ring-2 focus:ring-accent-violet"
         name="score"
         data-filter-score
       >
-        <option value="">Cualquiera</option>
+        <option value="">{t('filterGrid.any')}</option>
         <option value="60">60+</option>
         <option value="70">70+</option>
         <option value="80">80+</option>
@@ -75,12 +83,12 @@ const years = [...new Set(
       class="flex h-10 items-center justify-center self-end rounded-md border border-surface-2 px-4 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-violet/40 hover:text-fg-primary"
       data-filter-reset
     >
-      Limpiar
+      {t('filterGrid.reset')}
     </a>
   </div>
 
   <p class="mb-5 text-sm text-fg-muted" data-filter-count>
-    {anime.length} resultado{anime.length === 1 ? '' : 's'}
+    {resultsText}
   </p>
 
   <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
@@ -140,7 +148,12 @@ const years = [...new Set(
 
     const count = root.querySelector('[data-filter-count]');
     const total = visibleCount(root);
-    if (count) count.textContent = `${total} resultado${total === 1 ? '' : 's'}`;
+    if (count) {
+      const template = total === 1
+        ? root.dataset.filterResultOne ?? '{count} resultado'
+        : root.dataset.filterResultMany ?? '{count} resultados';
+      count.textContent = template.replace('{count}', String(total));
+    }
 
     const empty = root.querySelector('[data-filter-empty]');
     empty?.classList.toggle('hidden', total !== 0);

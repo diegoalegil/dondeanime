@@ -1,4 +1,6 @@
 ---
+import { getLocale, t } from '@/i18n';
+import { COUNTRIES } from '@/lib/countries';
 import { localizedPath } from '@/lib/localizedRoutes';
 import AnimeChatSearchIsland from './AnimeChatSearch.svelte';
 
@@ -7,11 +9,35 @@ import AnimeChatSearchIsland from './AnimeChatSearch.svelte';
 // flag que AdSense/Plausible).
 const chatEnabled = import.meta.env.PUBLIC_CHAT_ENABLED === 'true';
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+
+// La isla Svelte no puede usar t() (AsyncLocalStorage no existe en cliente):
+// los textos viajan como props, igual que PushSubscribeButton vía data-*.
+const locale = getLocale();
+const countries = [
+  { code: '', label: t('chatSearch.countryAny') },
+  ...Object.values(COUNTRIES).map((country) => ({
+    code: country.iso,
+    label: locale === 'en' ? country.nameEn : country.name,
+  })),
+];
+const labels = {
+  eyebrow: t('chatSearch.eyebrow'),
+  title: t('chatSearch.title'),
+  example: t('chatSearch.example'),
+  questionLabel: t('chatSearch.questionLabel'),
+  placeholder: t('chatSearch.placeholder'),
+  countryLabel: t('chatSearch.countryLabel'),
+  submit: t('chatSearch.submit'),
+  loading: t('chatSearch.loading'),
+  error: t('chatSearch.error'),
+};
 ---
 {chatEnabled && (
   <AnimeChatSearchIsland
     apiUrl={apiUrl}
     animePathPrefix={localizedPath('/anime')}
+    labels={labels}
+    countries={countries}
     client:load
   />
 )}

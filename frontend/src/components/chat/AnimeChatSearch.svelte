@@ -3,17 +3,29 @@
 
   export let apiUrl = '';
   export let animePathPrefix = '/anime';
-
-  type RequestState = 'idle' | 'loading' | 'success' | 'error';
-
-  const countries = [
+  // Textos resueltos en el .astro con t(): el cliente no tiene i18n.
+  // Los defaults en español cubren usos sin props (y los specs actuales).
+  export let labels = {
+    eyebrow: 'Buscador semantico',
+    title: 'Pide una recomendacion concreta',
+    example: 'Ejemplo: algo corto, oscuro y disponible en Crunchyroll.',
+    questionLabel: 'Pregunta para el buscador de anime',
+    placeholder: 'Quiero un anime corto, oscuro y con buen ritmo',
+    countryLabel: 'Pais preferido',
+    submit: 'Buscar recomendaciones',
+    loading: 'Buscando...',
+    error: 'No se pudo buscar ahora. Prueba otra consulta en unos segundos.',
+  };
+  export let countries = [
     { code: '', label: 'Cualquier pais' },
-    { code: 'ES', label: 'Espana' },
-    { code: 'MX', label: 'Mexico' },
+    { code: 'ES', label: 'España' },
+    { code: 'MX', label: 'México' },
     { code: 'AR', label: 'Argentina' },
     { code: 'CO', label: 'Colombia' },
     { code: 'CL', label: 'Chile' },
   ];
+
+  type RequestState = 'idle' | 'loading' | 'success' | 'error';
 
   const inputId = 'anime-chat-question';
   const countryId = 'anime-chat-country';
@@ -57,7 +69,7 @@
       state = 'success';
     } catch {
       response = null;
-      errorMessage = 'No se pudo buscar ahora. Prueba otra consulta en unos segundos.';
+      errorMessage = labels.error;
       state = 'error';
     }
   };
@@ -67,29 +79,29 @@
   <div class="rounded-lg border border-surface-2 bg-surface-1 p-4 md:p-5">
     <div class="grid gap-4 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-accent-violet">Buscador semantico</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-accent-violet">{labels.eyebrow}</p>
         <h2 id="anime-chat-title" class="mt-2 text-2xl font-semibold text-fg-primary">
-          Pide una recomendacion concreta
+          {labels.title}
         </h2>
         <p class="mt-2 max-w-xl text-sm leading-6 text-fg-secondary">
-          Ejemplo: algo corto, oscuro y disponible en Crunchyroll.
+          {labels.example}
         </p>
       </div>
 
       <form class="grid gap-3" on:submit|preventDefault={search}>
-        <label class="sr-only" for={inputId}>Pregunta para el buscador de anime</label>
+        <label class="sr-only" for={inputId}>{labels.questionLabel}</label>
         <textarea
           id={inputId}
           bind:value={question}
           rows="3"
           maxlength="500"
-          placeholder="Quiero un anime corto, oscuro y con buen ritmo"
+          placeholder={labels.placeholder}
           class="min-h-24 w-full resize-none rounded-md border border-surface-2 bg-surface-0 px-4 py-3 text-sm leading-6 text-fg-primary placeholder:text-fg-muted outline-none transition-colors focus:border-accent-violet"
           data-chat-question
         />
 
         <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-          <label class="sr-only" for={countryId}>Pais preferido</label>
+          <label class="sr-only" for={countryId}>{labels.countryLabel}</label>
           <select
             id={countryId}
             bind:value={countryCode}
@@ -120,7 +132,7 @@
               <path d="m22 2-7 20-4-9-9-4Z" />
               <path d="M22 2 11 13" />
             </svg>
-            {state === 'loading' ? 'Buscando...' : 'Buscar recomendaciones'}
+            {state === 'loading' ? labels.loading : labels.submit}
           </button>
         </div>
       </form>
