@@ -2,6 +2,7 @@ package com.dondeanime.backend.premium;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,8 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.Invoice;
 import com.stripe.model.StripeObject;
+import com.stripe.model.Subscription;
+import com.stripe.model.SubscriptionItem;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.net.Webhook;
@@ -72,7 +75,7 @@ public class StripeGateway {
     }
 
     private static StripeWebhookEvent toWebhookEvent(Event event, StripeObject object) {
-        if (object instanceof com.stripe.model.Subscription subscription) {
+        if (object instanceof Subscription subscription) {
             Map<String, String> metadata = subscription.getMetadata();
             String email = metadata == null ? null : metadata.get("email");
             String sourceListSlug = metadata == null ? null : metadata.get("sourceListSlug");
@@ -82,7 +85,7 @@ public class StripeGateway {
                     subscription.getCustomer(),
                     sourceListSlug,
                     toInstant(event.getCreated()),
-                    toInstant(subscription.getCurrentPeriodEnd()),
+                    subscriptionPeriodEnd(subscription),
                     event.getId());
         }
         if (object instanceof Invoice invoice) {
@@ -101,5 +104,19 @@ public class StripeGateway {
 
     private static Instant toInstant(Long epochSeconds) {
         return epochSeconds == null ? null : Instant.ofEpochSecond(epochSeconds);
+    }
+
+    // En la API actual de Stripe el fin de periodo vive en cada item de la
+    // suscripcion, no en la suscripcion: tomamos el mas tardio.
+    private static Instant subscriptionPeriodEnd(Subscription subscription) {
+        if (subscription.getItems() == null || subscription.getItems().getData() == null) {
+            return null;
+        }
+        return subscription.getItems().getData().stream()
+                .map(SubscriptionItem::getCurrentPeriodEnd)
+                .filter(Objects::nonNull)
+                .max(Long::compare)
+                .map(Instant::ofEpochSecond)
+                .orElse(null);
     }
 }
