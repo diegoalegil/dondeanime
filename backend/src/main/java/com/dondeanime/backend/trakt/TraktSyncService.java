@@ -59,9 +59,9 @@ public class TraktSyncService {
         this.enabled = enabled;
     }
 
-    public TraktSyncResponse sync(TraktSyncRequest request) {
+    public TraktSyncResponse sync(String requestedExternalUserId) {
         ensureEnabled();
-        String externalUserId = requireTrimmed(request.externalUserId(), "externalUserId");
+        String externalUserId = requireTrimmed(requestedExternalUserId, "externalUserId");
 
         ExternalAccount account = accountRepository
                 .findByProviderAndExternalUserId(PROVIDER, externalUserId)

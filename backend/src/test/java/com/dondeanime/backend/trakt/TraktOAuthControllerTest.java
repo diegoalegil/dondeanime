@@ -40,6 +40,7 @@ class TraktOAuthControllerTest {
                         true,
                         "trakt",
                         "user-123",
+                        "signed-api-token",
                         true,
                         true,
                         7200L,
@@ -53,6 +54,7 @@ class TraktOAuthControllerTest {
                 .andExpect(jsonPath("$.connected").value(true))
                 .andExpect(jsonPath("$.provider").value("trakt"))
                 .andExpect(jsonPath("$.externalUserId").value("user-123"))
+                .andExpect(jsonPath("$.apiAccessToken").value("signed-api-token"))
                 .andExpect(jsonPath("$.accessTokenStored").value(true))
                 .andExpect(jsonPath("$.refreshTokenStored").value(true));
     }

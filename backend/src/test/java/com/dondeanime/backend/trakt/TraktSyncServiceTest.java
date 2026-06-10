@@ -59,7 +59,7 @@ class TraktSyncServiceTest {
         when(traktHistoryClient.fetchRatedShows("access-token")).thenReturn(List.of(
                 rated("Attack on Titan", 2013, 9, "2026-05-22T19:00:00Z")));
 
-        TraktSyncResponse response = service.sync(new TraktSyncRequest(" user-123 "));
+        TraktSyncResponse response = service.sync(" user-123 ");
 
         assertThat(response.watchedImported()).isEqualTo(1);
         assertThat(response.ratingsImported()).isEqualTo(1);
@@ -99,7 +99,7 @@ class TraktSyncServiceTest {
                 watched("Shingeki no Kyojin", 2013, "2026-05-20T19:00:00Z")));
         when(traktHistoryClient.fetchRatedShows("access-token")).thenReturn(List.of());
 
-        TraktSyncResponse response = service.sync(new TraktSyncRequest("user-123"));
+        TraktSyncResponse response = service.sync("user-123");
 
         assertThat(response.watchedImported()).isEqualTo(1);
         assertThat(response.unmatchedCount()).isZero();
@@ -125,7 +125,7 @@ class TraktSyncServiceTest {
         when(traktHistoryClient.fetchWatchedShows("new-access-token")).thenReturn(List.of());
         when(traktHistoryClient.fetchRatedShows("new-access-token")).thenReturn(List.of());
 
-        service.sync(new TraktSyncRequest("user-123"));
+        service.sync("user-123");
 
         ArgumentCaptor<ExternalAccountUpsertCommand> commandCaptor =
                 ArgumentCaptor.forClass(ExternalAccountUpsertCommand.class);
@@ -152,7 +152,7 @@ class TraktSyncServiceTest {
                 rated("Attack on Titan", 2013, 9, "2026-05-22T19:00:00Z"),
                 rated("Attack on Titan", 2013, 10, "2026-05-23T19:00:00Z")));
 
-        TraktSyncResponse response = service.sync(new TraktSyncRequest("user-123"));
+        TraktSyncResponse response = service.sync("user-123");
 
         assertThat(response.watchedImported()).isEqualTo(1);
         assertThat(response.ratingsImported()).isEqualTo(1);
@@ -179,7 +179,7 @@ class TraktSyncServiceTest {
         when(traktHistoryClient.fetchWatchedShows("access-token"))
                 .thenThrow(new RestClientException("trakt down"));
 
-        assertThatThrownBy(() -> service.sync(new TraktSyncRequest("user-123")))
+        assertThatThrownBy(() -> service.sync("user-123"))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
                 .isEqualTo(502);
@@ -200,7 +200,7 @@ class TraktSyncServiceTest {
         when(traktHistoryClient.fetchRatedShows("access-token"))
                 .thenThrow(new RestClientException("trakt down"));
 
-        assertThatThrownBy(() -> service.sync(new TraktSyncRequest("user-123")))
+        assertThatThrownBy(() -> service.sync("user-123"))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
                 .isEqualTo(502);
@@ -222,7 +222,7 @@ class TraktSyncServiceTest {
         when(accountRepository.findByProviderAndExternalUserId("trakt", "user-123"))
                 .thenReturn(Optional.of(account));
 
-        assertThatThrownBy(() -> service.sync(new TraktSyncRequest("user-123")))
+        assertThatThrownBy(() -> service.sync("user-123"))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
                 .isEqualTo(409);
@@ -241,7 +241,7 @@ class TraktSyncServiceTest {
                 clock,
                 false);
 
-        assertThatThrownBy(() -> disabled.sync(new TraktSyncRequest("user-123")))
+        assertThatThrownBy(() -> disabled.sync("user-123"))
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting(exception -> ((ResponseStatusException) exception).getStatusCode().value())
                 .isEqualTo(503);

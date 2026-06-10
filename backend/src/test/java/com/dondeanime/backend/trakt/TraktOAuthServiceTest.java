@@ -29,11 +29,17 @@ class TraktOAuthServiceTest {
     private final ExternalAccountService externalAccountService = mock(ExternalAccountService.class);
     private final TraktTokenCipherService tokenCipherService =
             new TraktTokenCipherService("test-secret-with-enough-entropy");
+    private final TraktAccessTokenService accessTokenService = new TraktAccessTokenService(
+            "test-secret",
+            CLOCK,
+            new com.fasterxml.jackson.databind.ObjectMapper(),
+            java.time.Duration.ofDays(30));
     private final TraktOAuthService service = new TraktOAuthService(
             traktClient,
             stateService,
             externalAccountService,
             tokenCipherService,
+            accessTokenService,
             CLOCK,
             true,
             "https://trakt.tv",
@@ -72,6 +78,7 @@ class TraktOAuthServiceTest {
         assertThat(response.connected()).isTrue();
         assertThat(response.provider()).isEqualTo("trakt");
         assertThat(response.externalUserId()).isEqualTo("diego");
+        assertThat(accessTokenService.resolveExternalUserId(response.apiAccessToken())).contains("diego");
         assertThat(response.accessTokenStored()).isTrue();
         assertThat(response.refreshTokenStored()).isTrue();
         assertThat(response.expiresInSeconds()).isEqualTo(7200);
@@ -108,6 +115,7 @@ class TraktOAuthServiceTest {
                 stateService,
                 externalAccountService,
                 tokenCipherService,
+                accessTokenService,
                 CLOCK,
                 false,
                 "https://trakt.tv",
