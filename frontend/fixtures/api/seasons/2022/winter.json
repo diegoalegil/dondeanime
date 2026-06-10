@@ -1,0 +1,72 @@
+[
+ {
+  "anilistId": 142329,
+  "slug": "demon-slayer-kimetsu-no-yaiba-entertainment-district-arc",
+  "titleEnglish": "Demon Slayer: Kimetsu no Yaiba Entertainment District Arc",
+  "titleRomaji": "Kimetsu no Yaiba: Yuukaku-hen",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "episodeDuration": 24,
+  "studio": "ufotable",
+  "year": 2021,
+  "averageScore": 86,
+  "popularity": 461197,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx142329-kET1PIXJv2eW.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Fantasy",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2022
+ },
+ {
+  "anilistId": 131681,
+  "slug": "attack-on-titan-final-season-part-2",
+  "titleEnglish": "Attack on Titan Final Season Part 2",
+  "titleRomaji": "Shingeki no Kyojin: The Final Season Part 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "MAPPA",
+  "year": 2022,
+  "averageScore": 86,
+  "popularity": 419131,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx131681-5ooUqvqNtee1.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2022
+ },
+ {
+  "anilistId": 132405,
+  "slug": "my-dress-up-darling",
+  "titleEnglish": "My Dress-Up Darling",
+  "titleRomaji": "Sono Bisque Doll wa Koi wo Suru",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "CloverWorks",
+  "year": 2022,
+  "averageScore": 80,
+  "popularity": 400547,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx132405-qP7FQYGmNI3d.jpg",
+  "genres": [
+   "Slice of Life",
+   "Romance",
+   "Comedy",
+   "Ecchi"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2022
+ }
+]

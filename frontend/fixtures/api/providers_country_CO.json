@@ -1,0 +1,68 @@
+[
+ {
+  "slug": "crunchyroll-amazon-channel",
+  "providerName": "Crunchyroll Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+  "animeCount": 516
+ },
+ {
+  "slug": "crunchyroll",
+  "providerName": "Crunchyroll",
+  "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+  "animeCount": 511
+ },
+ {
+  "slug": "netflix",
+  "providerName": "Netflix",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+  "animeCount": 150
+ },
+ {
+  "slug": "hbo-max",
+  "providerName": "HBO Max",
+  "logoUrl": "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+  "animeCount": 27
+ },
+ {
+  "slug": "hbo-max-amazon-channel",
+  "providerName": "HBO Max Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/embS4GPK7c8pjbuY2O2irV5rYch.jpg",
+  "animeCount": 26
+ },
+ {
+  "slug": "movistartv",
+  "providerName": "MovistarTV",
+  "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+  "animeCount": 23
+ },
+ {
+  "slug": "amazon-prime-video",
+  "providerName": "Amazon Prime Video",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+  "animeCount": 20
+ },
+ {
+  "slug": "disney-plus",
+  "providerName": "Disney Plus",
+  "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+  "animeCount": 10
+ },
+ {
+  "slug": "claro-video",
+  "providerName": "Claro video",
+  "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+  "animeCount": 8
+ },
+ {
+  "slug": "plex",
+  "providerName": "Plex",
+  "logoUrl": "https://image.tmdb.org/t/p/original/vLZKlXUNDcZR7ilvfY9Wr9k80FZ.jpg",
+  "animeCount": 3
+ },
+ {
+  "slug": "universal+-amazon-channel",
+  "providerName": "Universal+ Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/4ABGBjAMtRrYUrr0w3QfanuiaoB.jpg",
+  "animeCount": 1
+ }
+]

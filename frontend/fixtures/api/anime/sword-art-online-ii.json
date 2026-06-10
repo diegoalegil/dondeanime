@@ -1,0 +1,204 @@
+{
+ "anime": {
+  "anilistId": 20594,
+  "slug": "sword-art-online-ii",
+  "titleEnglish": "Sword Art Online II",
+  "titleRomaji": "Sword Art Online II",
+  "trailerYoutubeId": null,
+  "description": "En \"Sword Art Online\", 10,000 jugadores quedan atrapados en un MMORPG donde morir en el juego significa morir en la vida real. Kirito, un jugador solitario, se asocia con la guerrera Asuna para intentar escapar del mundo virtual y completar el juego.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 66,
+  "popularity": 437150,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx20594-FhRgZ1H9Istt.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20594-BZOLwqidcS1G.jpg",
+  "startYear": 2014,
+  "startMonth": 7,
+  "startDay": 5,
+  "endYear": 2014,
+  "endMonth": 12,
+  "endDay": 20,
+  "genres": [
+   "Sci-Fi",
+   "Fantasy",
+   "Action",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "ascii-media-works",
+    "name": "ASCII Media Works",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex-of-america",
+    "name": "Aniplex of America",
+    "animationStudio": false
+   },
+   {
+    "slug": "dax-production",
+    "name": "DAX Production",
+    "animationStudio": false
+   },
+   {
+    "slug": "genco",
+    "name": "Genco",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 36828,
+    "name": "Asuna Yuuki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b36828-j5ib0adAzGMx.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 36765,
+    "name": "Kazuto Kirigaya",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b36765-BnLbXg0Tzzh9.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 36830,
+    "name": "Ryoutarou Tsuboi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b36830-41SWIDvhqOo4.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 55147,
+    "name": "Shino Asada",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b55147-1fCU8lONEuZQ.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 64523,
+    "name": "Yuuki Konno",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b64523-LPeAiw8Yx517.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

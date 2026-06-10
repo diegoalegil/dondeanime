@@ -1,0 +1,175 @@
+{
+ "anime": {
+  "anilistId": 21202,
+  "slug": "konosuba-gods-blessing-on-this-wonderful-world",
+  "titleEnglish": "KONOSUBA -God's blessing on this wonderful world!",
+  "titleRomaji": "Kono Subarashii Sekai ni Shukufuku wo!",
+  "trailerYoutubeId": "N1AO7k2o78g",
+  "description": "Kazuma, un hikkikomori obsesionado con los videojuegos, muere y es enviado a un mundo alternativo junto a una diosa. En lugar de convertirse en un gran héroe, debe luchar por sobrevivir mientras enfrenta los problemas que ella y el ejército del rey demonio le causan.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "averageScore": 79,
+  "popularity": 497237,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-mPOr80AEjUcZ.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21202-UWijdV7RMnXo.jpg",
+  "startYear": 2016,
+  "startMonth": 1,
+  "startDay": 14,
+  "endYear": 2016,
+  "endMonth": 3,
+  "endDay": 17,
+  "genres": [
+   "Comedy",
+   "Fantasy",
+   "Ecchi",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "half-hp-studio",
+    "name": "Half H.P Studio",
+    "animationStudio": false
+   },
+   {
+    "slug": "nippon-columbia",
+    "name": "Nippon Columbia",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-deen",
+    "name": "Studio DEEN",
+    "animationStudio": true
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016,
+  "characters": [
+   {
+    "anilistId": 89362,
+    "name": "Aqua",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89362-ibkc0eoECaW1.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89363,
+    "name": "Darkness",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89363-mm21Ll4NegUD.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89364,
+    "name": "Kazuma Satou",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89364-7Th8Tv1XKJtt.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89361,
+    "name": "Megumin",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89361-tq8PQQ4MmF0M.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

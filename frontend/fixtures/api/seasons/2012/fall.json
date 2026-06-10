@@ -1,0 +1,70 @@
+[
+ {
+  "anilistId": 14719,
+  "slug": "jojos-bizarre-adventure-tv",
+  "titleEnglish": "JoJo's Bizarre Adventure (TV)",
+  "titleRomaji": "JoJo no Kimyou na Bouken (TV)",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "episodeDuration": 24,
+  "studio": "david production",
+  "year": 2012,
+  "averageScore": 77,
+  "popularity": 459438,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14719-VT5dRzTBSZ0w.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2012
+ },
+ {
+  "anilistId": 13601,
+  "slug": "psycho-pass",
+  "titleEnglish": "PSYCHO-PASS",
+  "titleRomaji": "PSYCHO-PASS",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 22,
+  "episodeDuration": 23,
+  "studio": "Production I.G",
+  "year": 2012,
+  "averageScore": 81,
+  "popularity": 345488,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx13601-i42VFuHpqEOJ.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Sci-Fi",
+   "Thriller"
+  ],
+  "season": "FALL",
+  "seasonYear": 2012
+ },
+ {
+  "anilistId": 14741,
+  "slug": "love-chunibyo-other-delusions",
+  "titleEnglish": "Love, Chunibyo & Other Delusions",
+  "titleRomaji": "Chuunibyou demo Koi ga Shitai!",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "Kyoto Animation",
+  "year": 2012,
+  "averageScore": 76,
+  "popularity": 339117,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14741-CGXEIeUe2roA.jpg",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "FALL",
+  "seasonYear": 2012
+ }
+]

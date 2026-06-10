@@ -1,0 +1,193 @@
+{
+ "anime": {
+  "anilistId": 101291,
+  "slug": "rascal-does-not-dream-of-bunny-girl-senpai",
+  "titleEnglish": "Rascal Does Not Dream of Bunny Girl Senpai",
+  "titleRomaji": "Seishun Buta Yarou wa Bunny Girl Senpai no Yume wo Minai",
+  "trailerYoutubeId": "RZlg33IbZQQ",
+  "description": "Existe un rumor sobre un fenómeno misterioso llamado \"síndrome de pubertad\". Por ejemplo, Sakuta Azusagawa es una estudiante de secundaria que de repente ve a una conejita aparecer frente a él. La niña es Mai Sakurajima, la chica de clase superior de Sakuta y también una actriz famosa que se ha apartado de la industria del entretenimiento. Por alguna razón, la gente alrededor de Mai no puede ver su figura de conejita. Sakuta se propone resolver este misterio y, a medida que pasa tiempo con Mai, aprende sus sentimientos secretos. Otras heroínas que tienen \"síndrome de pubertad\" comienzan a aparecer frente a Sakuta.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 81,
+  "popularity": 554754,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101291-wfEdgPqtfU0l.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n101291-fqIUvQ6apEtD.jpg",
+  "startYear": 2018,
+  "startMonth": 10,
+  "startDay": 4,
+  "endYear": 2018,
+  "endMonth": 12,
+  "endDay": 27,
+  "genres": [
+   "Comedy",
+   "Psychological",
+   "Mystery",
+   "Romance",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "abc-animation",
+    "name": "ABC Animation",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "bs11",
+    "name": "BS11",
+    "animationStudio": false
+   },
+   {
+    "slug": "cloverworks",
+    "name": "CloverWorks",
+    "animationStudio": true
+   },
+   {
+    "slug": "hakuhodo-dy-music-pictures",
+    "name": "Hakuhodo DY Music & Pictures",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa",
+    "name": "KADOKAWA",
+    "animationStudio": false
+   },
+   {
+    "slug": "tokyo-mx",
+    "name": "TOKYO MX",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 127613,
+    "name": "Kaede Azusagawa",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127613-LBtFkMJfUWpg.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127222,
+    "name": "Mai Sakurajima",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127222-Jh5hhP7vZ7s1.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127841,
+    "name": "Nodoka Toyohama",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127841-UY9wQq6dW9SY.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127633,
+    "name": "Rio Futaba",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127633-FcCwWK5sQRhK.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127221,
+    "name": "Sakuta Azusagawa",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n127221-Wxg4xFtW4kaJ.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127840,
+    "name": "Tomoe Koga",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127840-z2LUox2R2Ivg.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

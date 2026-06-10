@@ -20,6 +20,7 @@ public class TraktOAuthService {
     private final TraktOAuthStateService stateService;
     private final ExternalAccountService externalAccountService;
     private final TraktTokenCipherService tokenCipherService;
+    private final TraktAccessTokenService accessTokenService;
     private final Clock clock;
     private final boolean enabled;
     private final String oauthBase;
@@ -32,6 +33,7 @@ public class TraktOAuthService {
             TraktOAuthStateService stateService,
             ExternalAccountService externalAccountService,
             TraktTokenCipherService tokenCipherService,
+            TraktAccessTokenService accessTokenService,
             Clock clock,
             @Value("${trakt.enabled:false}") boolean enabled,
             @Value("${trakt.oauth-base:https://trakt.tv}") String oauthBase,
@@ -42,6 +44,7 @@ public class TraktOAuthService {
         this.stateService = stateService;
         this.externalAccountService = externalAccountService;
         this.tokenCipherService = tokenCipherService;
+        this.accessTokenService = accessTokenService;
         this.clock = clock;
         this.enabled = enabled;
         this.oauthBase = oauthBase;
@@ -103,6 +106,7 @@ public class TraktOAuthService {
                 true,
                 PROVIDER,
                 externalUserId,
+                accessTokenService.createToken(externalUserId),
                 true,
                 true,
                 token.expiresIn(),

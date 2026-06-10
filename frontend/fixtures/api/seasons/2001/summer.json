@@ -1,0 +1,25 @@
+[
+ {
+  "anilistId": 199,
+  "slug": "spirited-away",
+  "titleEnglish": "Spirited Away",
+  "titleRomaji": "Sen to Chihiro no Kamikakushi",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 125,
+  "studio": "Studio Ghibli",
+  "year": 2001,
+  "averageScore": 86,
+  "popularity": 463012,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx199-sWefXJvXkDOb.jpg",
+  "genres": [
+   "Adventure",
+   "Drama",
+   "Fantasy",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2001
+ }
+]

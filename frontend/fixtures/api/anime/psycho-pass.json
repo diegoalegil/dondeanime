@@ -1,0 +1,274 @@
+{
+ "anime": {
+  "anilistId": 13601,
+  "slug": "psycho-pass",
+  "titleEnglish": "PSYCHO-PASS",
+  "titleRomaji": "PSYCHO-PASS",
+  "trailerYoutubeId": null,
+  "description": "En un futuro próximo, es posible medir de forma instantánea el estado mental de una persona, la personalidad y la probabilidad de que dicha persona vaya a cometer delitos gracias a un escáner psico-somático que realiza un escaneo de las funciones del cerebro y de las demás funciones biológicas y químicas del cuerpo, determinando el Psycho-Pass, un número asociado a un color en cada persona. Cuando esta probabilidad, medida como el índice de \"Coeficiente de Criminalidad\", es demasiado alta, es decir, posee un color muy oscuro y un número muy elevado, los individuos son perseguidos y detenidos con fuerza letal, si es necesario.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 22,
+  "averageScore": 81,
+  "popularity": 345488,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx13601-i42VFuHpqEOJ.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/13601-YrCmS1oY4uBZ.jpg",
+  "startYear": 2012,
+  "startMonth": 10,
+  "startDay": 12,
+  "endYear": 2013,
+  "endMonth": 3,
+  "endDay": 22,
+  "genres": [
+   "Psychological",
+   "Sci-Fi",
+   "Thriller",
+   "Action"
+  ],
+  "studios": [
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "fuji-tv",
+    "name": "Fuji TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kyoraku",
+    "name": "KYORAKU",
+    "animationStudio": false
+   },
+   {
+    "slug": "nitroplus",
+    "name": "Nitroplus",
+    "animationStudio": false
+   },
+   {
+    "slug": "production-ig",
+    "name": "Production I.G",
+    "animationStudio": true
+   },
+   {
+    "slug": "sony-music-entertainment",
+    "name": "Sony Music Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "toho",
+    "name": "Toho",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2012,
+  "characters": [
+   {
+    "anilistId": 68583,
+    "name": "Akane Tsunemori",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b68583-sEP2wyE2Tk7a.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 68315,
+    "name": "Shinya Kougami",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b68315-f9RBjyJCoj95.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 69725,
+    "name": "Shougo Makishima",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n69725-Seck1SZfwQiR.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "movistartv",
+    "providerName": "MovistarTV",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "movistartv",
+    "providerName": "MovistarTV",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

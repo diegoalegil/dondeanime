@@ -1,0 +1,158 @@
+{
+ "anime": {
+  "anilistId": 19815,
+  "slug": "no-game-no-life",
+  "titleEnglish": "No Game, No Life",
+  "titleRomaji": "No Game No Life",
+  "trailerYoutubeId": null,
+  "description": "Sora y Shiro, hermanos gamers y genios, reciben un misterioso desafío que los lleva a Disboard, un mundo donde todo se resuelve con juegos. Guiados por Tet, el dios único, deberán usar su ingenio para superar desafíos y cambiar el destino de la humanidad, la raza más débil en este mundo regido por reglas claras y estratégicas.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 77,
+  "popularity": 525146,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b19815-sEOQ9yQaPKlk.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/19815-BqbuD0wyBS3P.jpg",
+  "startYear": 2014,
+  "startMonth": 4,
+  "startDay": 9,
+  "endYear": 2014,
+  "endMonth": 6,
+  "endDay": 25,
+  "genres": [
+   "Comedy",
+   "Fantasy",
+   "Ecchi",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "at-x",
+    "name": "AT-X",
+    "animationStudio": false
+   },
+   {
+    "slug": "frontier-works",
+    "name": "Frontier Works",
+    "animationStudio": false
+   },
+   {
+    "slug": "madhouse",
+    "name": "MADHOUSE",
+    "animationStudio": true
+   },
+   {
+    "slug": "media-factory",
+    "name": "Media Factory",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 87887,
+    "name": "Jibril",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b87887-3QKmvQM5LTwY.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 82525,
+    "name": "Shiro",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b82525-sKk2FGRKN4aK.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 82523,
+    "name": "Sora",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b82523-JB9oevKyXWfc.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 82527,
+    "name": "Stephanie Dola",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b82527-uwdWwl1qhzqC.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

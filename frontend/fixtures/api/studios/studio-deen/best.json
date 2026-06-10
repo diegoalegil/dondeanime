@@ -1,0 +1,48 @@
+[
+ {
+  "anilistId": 21202,
+  "slug": "konosuba-gods-blessing-on-this-wonderful-world",
+  "titleEnglish": "KONOSUBA -God's blessing on this wonderful world!",
+  "titleRomaji": "Kono Subarashii Sekai ni Shukufuku wo!",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 23,
+  "studio": "Studio DEEN",
+  "year": 2016,
+  "averageScore": 79,
+  "popularity": 497237,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-mPOr80AEjUcZ.png",
+  "genres": [
+   "Adventure",
+   "Fantasy",
+   "Comedy",
+   "Ecchi"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 21699,
+  "slug": "konosuba-gods-blessing-on-this-wonderful-world-2",
+  "titleEnglish": "KONOSUBA -God's blessing on this wonderful world! 2",
+  "titleRomaji": "Kono Subarashii Sekai ni Shukufuku wo! 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 23,
+  "studio": "Studio DEEN",
+  "year": 2017,
+  "averageScore": 81,
+  "popularity": 363108,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21699-Fkbnkl9ZC6fW.png",
+  "genres": [
+   "Adventure",
+   "Fantasy",
+   "Comedy",
+   "Ecchi"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2017
+ }
+]

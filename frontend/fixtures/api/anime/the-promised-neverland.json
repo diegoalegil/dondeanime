@@ -1,0 +1,178 @@
+{
+ "anime": {
+  "anilistId": 101759,
+  "slug": "the-promised-neverland",
+  "titleEnglish": "The Promised Neverland",
+  "titleRomaji": "Yakusoku no Neverland",
+  "trailerYoutubeId": null,
+  "description": "Por mucho que los niños la quieran, ella no es su madre. Viven juntos, pero no son familiares de sangre. Grace Field es un hogar al que son enviados los niños que no tienen padres. Un hogar irreemplazable para los 38 niños que allí viven felices su día a día, como si fueran hermanos, aunque al inicio fueran completos desconocidos. Al menos así era hasta que cierto descubrimiento cambió sus vidas por completo...",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 84,
+  "popularity": 613725,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101759-8UR7r9MNVpz2.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101759-MhlCoeqnODso.jpg",
+  "startYear": 2019,
+  "startMonth": 1,
+  "startDay": 10,
+  "endYear": 2019,
+  "endMonth": 3,
+  "endDay": 29,
+  "genres": [
+   "Psychological",
+   "Mystery",
+   "Thriller",
+   "Drama",
+   "Fantasy",
+   "Horror"
+  ],
+  "studios": [
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex-of-america",
+    "name": "Aniplex of America",
+    "animationStudio": false
+   },
+   {
+    "slug": "cloverworks",
+    "name": "CloverWorks",
+    "animationStudio": true
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "fuji-tv",
+    "name": "Fuji TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "shueisha",
+    "name": "Shueisha",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 121725,
+    "name": "Emma",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121725-LQciVJOjnMVh.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121700,
+    "name": "Norman",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121700-CRwKIlcBcjbv.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121724,
+    "name": "Ray",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121724-SJTdODjeO7e6.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

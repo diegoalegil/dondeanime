@@ -1,0 +1,49 @@
+[
+ {
+  "anilistId": 145139,
+  "slug": "demon-slayer-kimetsu-no-yaiba-swordsmith-village-arc",
+  "titleEnglish": "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc",
+  "titleRomaji": "Kimetsu no Yaiba: Katanakaji no Sato-hen",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "episodeDuration": 24,
+  "studio": "ufotable",
+  "year": 2023,
+  "averageScore": 81,
+  "popularity": 352461,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx145139-rRimpHGWLhym.png",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Fantasy",
+   "Supernatural"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2023
+ },
+ {
+  "anilistId": 128893,
+  "slug": "hells-paradise",
+  "titleEnglish": "Hell’s Paradise",
+  "titleRomaji": "Jigokuraku",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "episodeDuration": 24,
+  "studio": "MAPPA",
+  "year": 2023,
+  "averageScore": 80,
+  "popularity": 338988,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128893-Gc2t8b8M0mVu.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Mystery",
+   "Supernatural"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2023
+ }
+]

@@ -5,7 +5,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import WatchedFilter from '@/components/trakt/WatchedFilter.astro';
 import { getAllAnime } from '@/lib/api';
 
+// Pre-renderizar el catálogo entero aquí pesaba ~1,5 MB de HTML. Servimos
+// solo los más populares y la búsqueda hidrata contra /search-index.json
+// (que ya se genera en cada build), cubriendo TODO el catálogo.
+const POPULAR_COUNT = 24;
 const anime = await getAllAnime();
+const popular = [...anime]
+  .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+  .slice(0, POPULAR_COUNT);
 ---
 <BaseLayout
   title="Buscar anime | DondeAnime"
@@ -36,51 +43,136 @@ const anime = await getAllAnime();
       <WatchedFilter />
     </div>
 
-    <p class="mb-5 text-sm text-fg-muted" data-search-page-count>
-      {anime.length} resultados
+    <p class="mb-5 text-sm text-fg-muted" data-search-page-count aria-live="polite">
+      Mostrando los {popular.length} mas populares. Escribe para buscar en todo el catalogo.
     </p>
 
-    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
-      {anime.map((item) => (
+    <div
+      class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6"
+      data-search-popular-grid
+    >
+      {popular.map((item) => (
         <div
           data-search-page-card
           data-anime-filter-item
           data-anime-slug={item.slug}
-          data-search-text={`${item.titleEnglish} ${item.titleRomaji} ${item.slug}`.toLowerCase()}
         >
           <AnimeCard anime={item} />
         </div>
       ))}
     </div>
+
+    <div
+      class="hidden grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6"
+      data-search-results-grid
+    ></div>
   </section>
 
   <script>
+    interface SearchIndexEntry {
+      slug: string;
+      en: string;
+      jp: string;
+      year: number | null;
+      format: string;
+      cover: string;
+    }
+
     const normalize = (value: string) =>
-      value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
     const input = document.querySelector('[data-search-page-input]') as HTMLInputElement | null;
-    const cards = [...document.querySelectorAll('[data-search-page-card]')] as HTMLElement[];
     const count = document.querySelector('[data-search-page-count]');
+    const popularGrid = document.querySelector('[data-search-popular-grid]') as HTMLElement | null;
+    const resultsGrid = document.querySelector('[data-search-results-grid]') as HTMLElement | null;
+    const defaultCountText = count?.textContent ?? '';
 
-    const applySearch = () => {
+    let index: Array<SearchIndexEntry & { haystack: string }> | null = null;
+    let indexPromise: Promise<void> | null = null;
+
+    const loadIndex = () => {
+      indexPromise ??= fetch('/search-index.json')
+        .then((response) => (response.ok ? response.json() : []))
+        .then((data: SearchIndexEntry[]) => {
+          index = data.map((entry) => ({
+            ...entry,
+            haystack: normalize(`${entry.en} ${entry.jp} ${entry.slug}`),
+          }));
+        })
+        .catch(() => {
+          index = [];
+        });
+      return indexPromise;
+    };
+
+    const renderCard = (entry: SearchIndexEntry) => {
+      const wrapper = document.createElement('div');
+      wrapper.setAttribute('data-search-page-card', '');
+      wrapper.setAttribute('data-anime-filter-item', '');
+      wrapper.setAttribute('data-anime-slug', entry.slug);
+
+      const article = document.createElement('article');
+      article.className = 'group';
+
+      const link = document.createElement('a');
+      link.href = `/anime/${entry.slug}`;
+      link.className = 'block';
+
+      const figure = document.createElement('div');
+      figure.className = 'relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2';
+      const img = document.createElement('img');
+      img.src = entry.cover;
+      img.alt = entry.en || entry.jp;
+      img.loading = 'lazy';
+      img.className =
+        'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105';
+      figure.appendChild(img);
+
+      const meta = document.createElement('div');
+      meta.className = 'mt-3';
+      const title = document.createElement('h3');
+      title.className =
+        'line-clamp-2 text-sm font-semibold text-fg-primary transition-colors group-hover:text-accent-violet';
+      title.textContent = entry.en || entry.jp;
+      const details = document.createElement('p');
+      details.className = 'mt-1 text-xs text-fg-muted';
+      details.textContent = `${entry.year ?? '---'} · ${entry.format}`;
+      meta.append(title, details);
+
+      link.append(figure, meta);
+      article.appendChild(link);
+      wrapper.appendChild(article);
+      return wrapper;
+    };
+
+    const applySearch = async () => {
       const query = normalize(input?.value ?? '').trim();
-      let visible = 0;
 
-      for (const card of cards) {
-        const text = normalize(card.dataset.searchText ?? '');
-        const matches = query.length === 0 || text.includes(query);
-        card.classList.toggle('hidden', !matches);
-        if (matches) visible += 1;
+      if (query.length === 0) {
+        popularGrid?.classList.remove('hidden');
+        resultsGrid?.classList.add('hidden');
+        if (resultsGrid) resultsGrid.replaceChildren();
+        if (count) count.textContent = defaultCountText;
+        return;
       }
 
-      if (count) count.textContent = `${visible} resultados`;
+      await loadIndex();
+      const matches = (index ?? []).filter((entry) => entry.haystack.includes(query));
+
+      popularGrid?.classList.add('hidden');
+      if (resultsGrid) {
+        resultsGrid.classList.remove('hidden');
+        resultsGrid.replaceChildren(...matches.map(renderCard));
+      }
+      if (count) count.textContent = `${matches.length} resultados`;
     };
 
     if (input) {
       const params = new URLSearchParams(window.location.search);
       input.value = params.get('q') ?? '';
-      input.addEventListener('input', applySearch);
-      applySearch();
+      input.addEventListener('input', () => void applySearch());
+      input.addEventListener('focus', () => void loadIndex(), { once: true });
+      void applySearch();
     }
   </script>
 </BaseLayout>

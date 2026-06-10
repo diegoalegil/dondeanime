@@ -1,0 +1,27 @@
+[
+ {
+  "anilistId": 2001,
+  "slug": "gurren-lagann",
+  "titleEnglish": "Gurren Lagann",
+  "titleRomaji": "Tengen Toppa Gurren Lagann",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 27,
+  "episodeDuration": 24,
+  "studio": "Gainax",
+  "year": 2007,
+  "averageScore": 85,
+  "popularity": 363159,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx2001-XwRnjzGeFWRQ.png",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Mecha",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2007
+ }
+]

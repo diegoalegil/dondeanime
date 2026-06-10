@@ -1,0 +1,169 @@
+{
+ "anime": {
+  "anilistId": 182300,
+  "slug": "wistoria-wand-and-sword-season-2",
+  "titleEnglish": "Wistoria: Wand and Sword Season 2",
+  "titleRomaji": "Tsue to Tsurugi no Wistoria Season 2",
+  "trailerYoutubeId": null,
+  "description": "En un mundo donde reina la magia, Will Serfort no puede lanzar un hechizo. Aunque es muy trabajador, sus compañeros de clase piensan menos de él por ello. Sin embargo, tiene una fuerza secreta: su espada. ¿Podrá Will desafiar las expectativas con fuerza sobre magia y espada sobre varita? ¡Descúbrelo en esta épica aventura de espada y brujería!",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": 12,
+  "averageScore": 82,
+  "popularity": 89215,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx182300-IYkq5KrkQq1V.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/182300-d1znfWKzn1bT.jpg",
+  "startYear": 2026,
+  "startMonth": 4,
+  "startDay": 12,
+  "endYear": 2026,
+  "endMonth": 6,
+  "endDay": 28,
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "actas",
+    "name": "Actas",
+    "animationStudio": true
+   },
+   {
+    "slug": "bandai-namco-filmworks",
+    "name": "Bandai Namco Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-music-live",
+    "name": "Bandai Namco Music Live",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-pictures",
+    "name": "Bandai Namco Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "crunchyroll",
+    "name": "Crunchyroll",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "tbs",
+    "name": "TBS",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2026,
+  "characters": [
+   {
+    "anilistId": 212394,
+    "name": "Will Serfort",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b212394-LBHoN071nIuu.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

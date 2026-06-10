@@ -1,0 +1,47 @@
+[
+ {
+  "anilistId": 105310,
+  "slug": "fire-force",
+  "titleEnglish": "Fire Force",
+  "titleRomaji": "Enen no Shouboutai",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 24,
+  "studio": "david production",
+  "year": 2019,
+  "averageScore": 76,
+  "popularity": 463965,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105310-2PKUvoaA6fTn.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 14719,
+  "slug": "jojos-bizarre-adventure-tv",
+  "titleEnglish": "JoJo's Bizarre Adventure (TV)",
+  "titleRomaji": "JoJo no Kimyou na Bouken (TV)",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "episodeDuration": 24,
+  "studio": "david production",
+  "year": 2012,
+  "averageScore": 77,
+  "popularity": 459438,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14719-VT5dRzTBSZ0w.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2012
+ }
+]

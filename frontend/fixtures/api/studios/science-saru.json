@@ -1,0 +1,51 @@
+[
+ {
+  "anilistId": 171018,
+  "slug": "dan-da-dan",
+  "titleEnglish": "DAN DA DAN",
+  "titleRomaji": "Dandadan",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "Science SARU",
+  "year": 2024,
+  "averageScore": 83,
+  "popularity": 357013,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Romance",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2024
+ },
+ {
+  "anilistId": 98460,
+  "slug": "devilman-crybaby",
+  "titleEnglish": "Devilman Crybaby",
+  "titleRomaji": "DEVILMAN crybaby",
+  "format": "ONA",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 25,
+  "studio": "Science SARU",
+  "year": 2018,
+  "averageScore": 76,
+  "popularity": 340555,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98460-bLtH2c3jd6sV.png",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Drama",
+   "Horror",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2018
+ }
+]

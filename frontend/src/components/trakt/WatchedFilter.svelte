@@ -4,20 +4,18 @@
 
   export let apiUrl = '';
 
-  const externalUserKey = 'dondeanime.trakt.externalUserId';
+  const apiTokenKey = 'dondeanime.trakt.apiToken';
+  const legacyExternalUserKey = 'dondeanime.trakt.externalUserId';
   const hideWatchedKey = 'dondeanime.trakt.hideWatched';
   const watchedSlugsKey = 'dondeanime.trakt.watchedSlugs';
-  const externalUserInputId = 'trakt-external-user-id';
+  const apiTokenInputId = 'trakt-api-token';
 
-  let externalUserId = '';
-  let connectedUserId = '';
+  let apiToken = '';
+  let connected = false;
   let hideWatched = false;
   let watchedSlugs = new Set<string>();
   let status = '';
   let loading = false;
-
-  const watchedUrl = (userId: string) =>
-    `${apiUrl}/api/trakt/watched?externalUserId=${encodeURIComponent(userId)}`;
 
   const readStoredSlugs = () => {
     try {
@@ -42,12 +40,12 @@
     });
   };
 
-  const loadWatched = async (userId: string) => {
+  const loadWatched = async (token: string) => {
     loading = true;
     status = '';
     try {
-      const response = await fetch(watchedUrl(userId), {
-        headers: { Accept: 'application/json' },
+      const response = await fetch(`${apiUrl}/api/trakt/watched`, {
+        headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error(`watched:${response.status}`);
       const data = await response.json() as TraktWatchedResponse;
@@ -63,20 +61,21 @@
   };
 
   const connect = async () => {
-    const userId = externalUserId.trim();
-    if (!userId) return;
-    connectedUserId = userId;
-    window.localStorage.setItem(externalUserKey, userId);
-    await loadWatched(userId);
+    const token = apiToken.trim();
+    if (!token) return;
+    connected = true;
+    window.localStorage.setItem(apiTokenKey, token);
+    await loadWatched(token);
   };
 
   const clear = () => {
-    connectedUserId = '';
-    externalUserId = '';
+    connected = false;
+    apiToken = '';
     hideWatched = false;
     watchedSlugs = new Set();
     status = '';
-    window.localStorage.removeItem(externalUserKey);
+    window.localStorage.removeItem(apiTokenKey);
+    window.localStorage.removeItem(legacyExternalUserKey);
     window.localStorage.removeItem(hideWatchedKey);
     window.localStorage.removeItem(watchedSlugsKey);
     applyFilter();
@@ -88,12 +87,13 @@
   }
 
   onMount(() => {
-    connectedUserId = window.localStorage.getItem(externalUserKey) ?? '';
-    externalUserId = connectedUserId;
+    const storedToken = window.localStorage.getItem(apiTokenKey) ?? '';
+    apiToken = storedToken;
+    connected = storedToken.length > 0;
     hideWatched = window.localStorage.getItem(hideWatchedKey) === 'true';
     readStoredSlugs();
     applyFilter();
-    if (connectedUserId) void loadWatched(connectedUserId);
+    if (storedToken) void loadWatched(storedToken);
   });
 </script>
 
@@ -108,19 +108,19 @@
       </div>
 
       <form class="grid gap-3 sm:grid-cols-[minmax(12rem,1fr)_auto_auto]" on:submit|preventDefault={connect}>
-        <label class="sr-only" for={externalUserInputId}>ID de Trakt</label>
+        <label class="sr-only" for={apiTokenInputId}>Token de Trakt</label>
         <input
-          id={externalUserInputId}
-          bind:value={externalUserId}
-          type="text"
+          id={apiTokenInputId}
+          bind:value={apiToken}
+          type="password"
           autocomplete="off"
-          placeholder="ID de Trakt"
+          placeholder="Token de conexión de Trakt"
           class="h-10 rounded-md border border-surface-2 bg-surface-0 px-3 text-sm text-fg-primary placeholder:text-fg-muted outline-none transition-colors focus:border-accent-violet"
-          data-trakt-user-input
+          data-trakt-token-input
         />
         <button
           type="submit"
-          disabled={loading || externalUserId.trim().length === 0}
+          disabled={loading || apiToken.trim().length === 0}
           class="inline-flex h-10 items-center justify-center rounded-md bg-accent-violet px-4 text-sm font-semibold text-surface-0 transition hover:bg-accent-pink disabled:cursor-not-allowed disabled:opacity-55"
         >
           {loading ? 'Conectando...' : 'Conectar'}
@@ -145,8 +145,8 @@
         />
         <span>Ocultar vistos</span>
       </label>
-      {#if connectedUserId}
-        <span class="text-xs text-fg-muted">Cuenta: {connectedUserId}</span>
+      {#if connected}
+        <span class="text-xs text-fg-muted">Cuenta conectada</span>
       {/if}
       {#if status}
         <span class="text-xs text-fg-muted" data-trakt-filter-status>{status}</span>

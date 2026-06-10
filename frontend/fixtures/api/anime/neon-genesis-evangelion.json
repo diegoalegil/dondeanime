@@ -1,0 +1,178 @@
+{
+ "anime": {
+  "anilistId": 30,
+  "slug": "neon-genesis-evangelion",
+  "titleEnglish": "Neon Genesis Evangelion",
+  "titleRomaji": "Shin Seiki Evangelion",
+  "trailerYoutubeId": null,
+  "description": "En 2015, tras el catastrófico \"Segundo Impacto\" que devastó la Tierra, los \"Ángeles\" regresan para atacar. La organización NERV crea los Evas, robots bio-mecánicos pilotados por jóvenes como Shinji, Rei y Asuka, los únicos capaces de enfrentarlos. Mientras luchan, descubren oscuros secretos sobre la humanidad y su destino.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "averageScore": 83,
+  "popularity": 472607,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx30-AI1zr74Dh4ye.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/30-gEMoHHIqxDgN.jpg",
+  "startYear": 1995,
+  "startMonth": 10,
+  "startDay": 3,
+  "endYear": 1996,
+  "endMonth": 3,
+  "endDay": 27,
+  "genres": [
+   "Psychological",
+   "Sci-Fi",
+   "Action",
+   "Mystery",
+   "Mecha",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "adv-films",
+    "name": "ADV Films",
+    "animationStudio": false
+   },
+   {
+    "slug": "gkids",
+    "name": "GKIDS",
+    "animationStudio": false
+   },
+   {
+    "slug": "gainax",
+    "name": "Gainax",
+    "animationStudio": true
+   },
+   {
+    "slug": "kadokawa-shoten",
+    "name": "Kadokawa Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "madman-entertainment",
+    "name": "Madman Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "nas",
+    "name": "NAS",
+    "animationStudio": false
+   },
+   {
+    "slug": "tv-tokyo",
+    "name": "TV Tokyo",
+    "animationStudio": false
+   },
+   {
+    "slug": "tatsunoko-production",
+    "name": "Tatsunoko Production",
+    "animationStudio": true
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 1995,
+  "characters": [
+   {
+    "anilistId": 94,
+    "name": "Asuka Langley Souryuu",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b94-d631a3Z2KPvd.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 1259,
+    "name": "Misato Katsuragi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b1259-afTQkZ5SVMOn.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 86,
+    "name": "Rei Ayanami",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/86-cA1zL7fyls8E.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89,
+    "name": "Shinji Ikari",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89-ZtZhXkh1rITn.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "3cat",
+    "providerName": "3Cat",
+    "providerType": "FREE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/lDvzuBuNVgpcdzDpPmmufKvrZPb.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

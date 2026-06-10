@@ -1,0 +1,175 @@
+{
+ "anime": {
+  "anilistId": 20447,
+  "slug": "noragami",
+  "titleEnglish": "Noragami",
+  "titleRomaji": "Noragami",
+  "trailerYoutubeId": null,
+  "description": "Yato es un dios menor de la guerra que sueña con tener una gran cantidad de seguidores que lo adoren y recen plegarias por él. Desafortunadamente, su sueño está lejos de hacerse realidad, ya que no tiene ni siquiera un solo santuario dedicado a él. Para empeorar las cosas, la única socia que tenía para ayudar a resolver los problemas de la gente acaba de renunciar. Su divina suerte sólo podría cambiar cuando se tropieza con Hiyori Iki, una estudiante de instituto. Tras verse involucrada en un accidente, Hiyori se convierte en una han'yō o semi-fantasma. Metida en un buen lío, la chica decide quedarse con Yato hasta que consiga recuperar su antiguo estado como humana. Junto a Hiyori y su nuevo shinki (tesoro sagrado o regalía) Yukine, Yato hará todo lo que pueda para ganar fama, reconocimiento y sólo tal vez, una capilla dedicada a él también.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 78,
+  "popularity": 523487,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20447-EoQXeygHaVCK.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20447-nlgQQzcgWbgw.jpg",
+  "startYear": 2014,
+  "startMonth": 1,
+  "startDay": 5,
+  "endYear": 2014,
+  "endMonth": 3,
+  "endDay": 23,
+  "genres": [
+   "Comedy",
+   "Action",
+   "Adventure",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "a-sketch",
+    "name": "A-Sketch",
+    "animationStudio": false
+   },
+   {
+    "slug": "ai-addiction",
+    "name": "Ai Addiction",
+    "animationStudio": false
+   },
+   {
+    "slug": "avex-entertainment",
+    "name": "Avex Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "lawson-entertainment",
+    "name": "Lawson Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "madman-entertainment",
+    "name": "Madman Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "shouchiku",
+    "name": "Shouchiku",
+    "animationStudio": false
+   },
+   {
+    "slug": "bones",
+    "name": "bones",
+    "animationStudio": true
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 84679,
+    "name": "Hiyori Iki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84679-GdMxvYy36M9H.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 84677,
+    "name": "Yato",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84677-PFmohzIXD1ud.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 84681,
+    "name": "Yukine",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84681-vFMPNxeDkoqt.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

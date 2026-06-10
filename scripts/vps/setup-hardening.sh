@@ -146,7 +146,8 @@ JAIL
     systemctl restart fail2ban
 
     log "Hardening SSH daemon config"
-    local backup="/etc/ssh/sshd_config.dondeanime.$(date -u +%Y%m%dT%H%M%SZ).bak"
+    local backup
+    backup="/etc/ssh/sshd_config.dondeanime.$(date -u +%Y%m%dT%H%M%SZ).bak"
     cp /etc/ssh/sshd_config "$backup"
     chmod 600 "$backup"
 

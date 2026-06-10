@@ -1,0 +1,88 @@
+{
+ "anime": {
+  "anilistId": 20931,
+  "slug": "death-parade",
+  "titleEnglish": "Death Parade",
+  "titleRomaji": "Death Parade",
+  "trailerYoutubeId": null,
+  "description": "Después de la muerte, los humanos van al cielo o al infierno. Pero para algunos, en el instante de su muerte, llegan a \"Queen Dekim\", un bar atendido por un misterioso personaje de pelo blanco, quien recibe a dos humanos. Él los desafía al Juego de la Muerte, en el que se apuestan sus vidas y revelan su verdadera naturaleza. \"Bienvenidos al Queen Dequim\". \"Ahora que están aquí, los dos empezarán una batalla donde sus vidas estarán en juego\", les dice Dekimu para presentar el DeathGame. Él es el juez y da el veredicto de quien pierde y quien gana, quien vive y quien muere.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 80,
+  "popularity": 453368,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx20931-bktYqOcxPERi.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20931-xDhiTPZmtS3u.jpg",
+  "startYear": 2015,
+  "startMonth": 1,
+  "startDay": 10,
+  "endYear": 2015,
+  "endMonth": 3,
+  "endDay": 28,
+  "genres": [
+   "Psychological",
+   "Mystery",
+   "Thriller",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "dax-production",
+    "name": "DAX Production",
+    "animationStudio": false
+   },
+   {
+    "slug": "madhouse",
+    "name": "MADHOUSE",
+    "animationStudio": true
+   },
+   {
+    "slug": "nippon-television-network",
+    "name": "Nippon Television Network",
+    "animationStudio": false
+   },
+   {
+    "slug": "vap",
+    "name": "VAP",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2015,
+  "characters": [
+   {
+    "anilistId": 81853,
+    "name": "Decim",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b81853-CY99xwoziDG4.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88683,
+    "name": "Ginti",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88683-S0xJzL8QY3gI.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 82037,
+    "name": "Kurokami no Onna",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b82037-xvKHWk4AE4df.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 122639,
+    "name": "Mayu Arita",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b122639-wLie2FSFb1Nf.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88681,
+    "name": "Nona",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88681-tTuJXN5ds3gy.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { getNews, getNewsBySlug } from '@/lib/api';
+import { getNewsBySlug, getNewsSlugs } from '@/lib/api';
 import { buildNewsArticleSchema } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
@@ -10,8 +10,8 @@ import { localizedPath } from '@/lib/localizedRoutes';
 setLocale('en');
 
 export async function getStaticPaths() {
-  const news = await getNews(100);
-  return news.map((n) => ({ params: { slug: n.slug } }));
+  const slugs = await getNewsSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
 }
 
 const { slug } = Astro.params;

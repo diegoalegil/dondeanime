@@ -1,0 +1,152 @@
+{
+ "anime": {
+  "anilistId": 101347,
+  "slug": "dororo",
+  "titleEnglish": "Dororo",
+  "titleRomaji": "Dororo",
+  "trailerYoutubeId": "DLat_-OyHIs",
+  "description": "Un señor samurai ha regalado los órganos de su hijo recién nacido a cuarenta y ocho demonios a cambio del dominio en el campo de batalla. Sin embargo, el niño abandonado sobrevive gracias a un curandero que lo equipa con prótesis primitivas, letales con las que el hijo maltratado usará para cazar a la multitud de demonios para reclamar su cuerpo pieza por pieza, antes de enfrentarse a su padre. En sus viajes, el joven héroe se encuentra con un huérfano que dice ser el ladrón más grande de Japón.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 81,
+  "popularity": 360965,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101347-TGaDwEYqLfm1.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n101347-tHurKfTlhtFl.jpg",
+  "startYear": 2019,
+  "startMonth": 1,
+  "startDay": 7,
+  "endYear": 2019,
+  "endMonth": 6,
+  "endDay": 24,
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "mappa",
+    "name": "MAPPA",
+    "animationStudio": true
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "tezuka-productions",
+    "name": "Tezuka Productions",
+    "animationStudio": true
+   },
+   {
+    "slug": "twin-engine",
+    "name": "Twin Engine",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 18130,
+    "name": "Dororo",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b18130-qD7dREeDAkLE.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 14864,
+    "name": "Hyakkimaru",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b14864-MMntDWi2EkyR.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "movistartv",
+    "providerName": "MovistarTV",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "movistartv",
+    "providerName": "MovistarTV",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

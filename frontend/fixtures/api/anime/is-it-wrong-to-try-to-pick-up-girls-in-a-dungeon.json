@@ -1,0 +1,189 @@
+{
+ "anime": {
+  "anilistId": 20920,
+  "slug": "is-it-wrong-to-try-to-pick-up-girls-in-a-dungeon",
+  "titleEnglish": "Is It Wrong to Try to Pick Up Girls in a Dungeon?",
+  "titleRomaji": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka",
+  "trailerYoutubeId": null,
+  "description": "La acción tiene lugar en Orario, una laberíntica ciudad conocida como “Dungeon”. Bell Cranel es un aventurero inexperto que le encantaría tener un encuentro trascendental con una persona del sexo opuesto. Un día, Bell es atacado por un minotauro. Antes de perecer a manos del monstruo es salvado por Ais Wallenstein, una aventurera de gran nivel. El pobre Bell queda enamorado de ella, por lo que se propone convertirse en un aventurero tan bueno como ella. Sin embargo, más tarde se topa con Hestia, “la diosa lolita” debido a su baja estatura, que inmediatamente se enamorará de él.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 73,
+  "popularity": 382222,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20920-MTREwZOG4BAD.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20920-QZeO1gVTQSUZ.jpg",
+  "startYear": 2015,
+  "startMonth": 4,
+  "startDay": 4,
+  "endYear": 2015,
+  "endMonth": 6,
+  "endDay": 27,
+  "genres": [
+   "Comedy",
+   "Romance",
+   "Fantasy",
+   "Action",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "genco",
+    "name": "Genco",
+    "animationStudio": false
+   },
+   {
+    "slug": "jcstaff",
+    "name": "J.C.STAFF",
+    "animationStudio": true
+   },
+   {
+    "slug": "mages",
+    "name": "MAGES.",
+    "animationStudio": false
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2015,
+  "characters": [
+   {
+    "anilistId": 88860,
+    "name": "Bell Cranel",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88860-catfcwlvUYst.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 87654,
+    "name": "Hestia",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b87654-UmmuLPwSK2Hd.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88897,
+    "name": "Liliruca Arde",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88897-2xey5UG7Qr2S.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 138250,
+    "name": "Welf Crozzo",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b138250-VOIbyr2PNsZS.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

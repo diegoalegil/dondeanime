@@ -1,0 +1,74 @@
+{
+ "anime": {
+  "anilistId": 431,
+  "slug": "howls-moving-castle",
+  "titleEnglish": "Howl‘s Moving Castle",
+  "titleRomaji": "Howl no Ugoku Shiro",
+  "trailerYoutubeId": null,
+  "description": "Sophie, a quiet girl working in a hat shop, finds her life thrown into turmoil when she is literally swept off her feet by a handsome but mysterious wizard named Howl. The vain and vengeful Witch of the Waste, jealous of their friendship, puts a spell on Sophie. In a life-changing adventure, Sophie climbs aboard Howl's magnificent flying castle and enters a magical world on a quest to break the spell. <br><br>\r\n(Source: Disney)",
+  "descriptionTranslationPending": true,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "averageScore": 85,
+  "popularity": 349141,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx431-o8Lj3XkjHm2k.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/431-fLBlvTgdqLCz.jpg",
+  "startYear": 2004,
+  "startMonth": 11,
+  "startDay": 20,
+  "endYear": 2004,
+  "endMonth": 11,
+  "endDay": 20,
+  "genres": [
+   "Adventure",
+   "Romance",
+   "Drama",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "gkids",
+    "name": "GKIDS",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-ghibli",
+    "name": "Studio Ghibli",
+    "animationStudio": true
+   },
+   {
+    "slug": "tokuma-shoten",
+    "name": "Tokuma Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "walt-disney-studios",
+    "name": "Walt Disney Studios",
+    "animationStudio": false
+   },
+   {
+    "slug": "d-rights",
+    "name": "d-rights",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2004,
+  "characters": [
+   {
+    "anilistId": 507,
+    "name": "Howl",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b507-g9yz1GTLtPla.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 508,
+    "name": "Sophie Hatter",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b508-ONXMgE281eHe.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

@@ -1,0 +1,25 @@
+[
+ {
+  "anilistId": 4224,
+  "slug": "toradora",
+  "titleEnglish": "Toradora!",
+  "titleRomaji": "Toradora!",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "Genco",
+  "year": 2008,
+  "averageScore": 78,
+  "popularity": 522386,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx4224-PXVMBLNwy2aF.jpg",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "FALL",
+  "seasonYear": 2008
+ }
+]

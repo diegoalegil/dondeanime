@@ -1,0 +1,139 @@
+[
+ {
+  "anilistId": 16498,
+  "slug": "attack-on-titan",
+  "titleEnglish": "Attack on Titan",
+  "titleRomaji": "Shingeki no Kyojin",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2013,
+  "averageScore": 85,
+  "popularity": 1008643,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2013
+ },
+ {
+  "anilistId": 20958,
+  "slug": "attack-on-titan-season-2",
+  "titleEnglish": "Attack on Titan Season 2",
+  "titleRomaji": "Shingeki no Kyojin Season 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 25,
+  "studio": "WIT STUDIO",
+  "year": 2017,
+  "averageScore": 85,
+  "popularity": 705720,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20958-HuFJyr54Mmir.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2017
+ },
+ {
+  "anilistId": 99147,
+  "slug": "attack-on-titan-season-3",
+  "titleEnglish": "Attack on Titan Season 3",
+  "titleRomaji": "Shingeki no Kyojin Season 3",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2018,
+  "averageScore": 86,
+  "popularity": 660222,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99147-AiPDD8cwlCfi.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2018
+ },
+ {
+  "anilistId": 104578,
+  "slug": "attack-on-titan-season-3-part-2",
+  "titleEnglish": "Attack on Titan Season 3 Part 2",
+  "titleRomaji": "Shingeki no Kyojin Season 3 Part 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2019,
+  "averageScore": 90,
+  "popularity": 587826,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx104578-k61nx3LPjvgd.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 140960,
+  "slug": "spy-x-family",
+  "titleEnglish": "SPY x FAMILY",
+  "titleRomaji": "SPY×FAMILY",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "CloverWorks",
+  "year": 2022,
+  "averageScore": 83,
+  "popularity": 543527,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-Kb6R5nYQfjmP.jpg",
+  "genres": [
+   "Action",
+   "Slice of Life",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2022
+ },
+ {
+  "anilistId": 101348,
+  "slug": "vinland-saga",
+  "titleEnglish": "Vinland Saga",
+  "titleRomaji": "VINLAND SAGA",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2019,
+  "averageScore": 87,
+  "popularity": 517682,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2019
+ }
+]

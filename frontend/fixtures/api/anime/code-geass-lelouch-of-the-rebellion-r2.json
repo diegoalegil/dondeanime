@@ -1,0 +1,186 @@
+{
+ "anime": {
+  "anilistId": 2904,
+  "slug": "code-geass-lelouch-of-the-rebellion-r2",
+  "titleEnglish": "Code Geass: Lelouch of the Rebellion R2",
+  "titleRomaji": "Code Geass: Hangyaku no Lelouch R2",
+  "trailerYoutubeId": null,
+  "description": "El 10 de agosto de 2010 a.t.b, el Sacro Imperio de Britannia sobrepasó a las fuerzas japonesas y conquistó el país en menos de un mes, haciendo uso de sus armas robóticas, los Knightmare Frames. Japón perdió su libertad y derechos, y pasó a ser llamada \"Area 11 (eleven)\". Sus habitantes, ahora llamados \"Elevens\" fueron obligados a sobrevivir en ghettos. Sin embargo aún persisten grupos que se resisten y luchan contra el Imperio por la independencia de Japón. Después de que su padre, el Emperador de Britannia, no hiciese nada para atrapar a los terroristas que asesinaron a su madre y lisiaron a su hermana, un niño llamado Lelouch juró destruir Britannia. Siete años más tarde en el Área 11 conoce a una misteriosa chica, con la que realiza un contrato a cambio de un poder llamado \"Geass\". Con él, Lelouch finalmente tiene el poder que necesita para derrotar a Britannia y realizar sus dos deseos: vengar a su madre y construir un mundo en el que su amada hermana pueda vivir feliz.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "averageScore": 87,
+  "popularity": 349079,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx2904-Fet9Q33suC7G.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2904-X71fcvE83n3s.jpg",
+  "startYear": 2008,
+  "startMonth": 4,
+  "startDay": 6,
+  "endYear": 2008,
+  "endMonth": 9,
+  "endDay": 28,
+  "genres": [
+   "Sci-Fi",
+   "Mecha",
+   "Thriller",
+   "Drama",
+   "Action"
+  ],
+  "studios": [
+   {
+    "slug": "bandai-entertainment",
+    "name": "Bandai Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-visual",
+    "name": "Bandai Visual",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "sunrise",
+    "name": "Sunrise",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2008,
+  "characters": [
+   {
+    "anilistId": 1111,
+    "name": "C.C.",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b1111-UhmlFtRFrnWa.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 558,
+    "name": "Kallen Stadtfeld",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b558-8tSMZ4a0LWrn.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 417,
+    "name": "Lelouch Lamperouge",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b417-gVLmIJu9phcK.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 559,
+    "name": "Suzaku Kururugi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b559-KRvTdc6zdCuU.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

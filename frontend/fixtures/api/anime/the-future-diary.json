@@ -1,0 +1,179 @@
+{
+ "anime": {
+  "anilistId": 10620,
+  "slug": "the-future-diary",
+  "titleEnglish": "The Future Diary",
+  "titleRomaji": "Mirai Nikki",
+  "trailerYoutubeId": null,
+  "description": "Yukiteru Amano, un solitario estudiante, obtiene un diario que predice el futuro tras un encuentro con el dios Deus Ex Machina. Ahora debe participar en un mortal juego de supervivencia contra otros poseedores de diarios para convertirse en dios. A su lado está Yuno Gasai, su obsesiva y peligrosa compañera, dispuesta a todo por protegerlo.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "averageScore": 69,
+  "popularity": 417148,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx10620-dUZeNej0W4QN.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/10620-CsZ2FFSbGpqV.jpg",
+  "startYear": 2011,
+  "startMonth": 10,
+  "startDay": 9,
+  "endYear": 2012,
+  "endMonth": 4,
+  "endDay": 15,
+  "genres": [
+   "Psychological",
+   "Mystery",
+   "Thriller",
+   "Action",
+   "Horror",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "12-diary-holders",
+    "name": "12 Diary Holders",
+    "animationStudio": false
+   },
+   {
+    "slug": "asread",
+    "name": "Asread",
+    "animationStudio": true
+   },
+   {
+    "slug": "dwango",
+    "name": "Dwango",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "klockworx",
+    "name": "KLOCKWORX",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-pictures-japan",
+    "name": "Kadokawa Pictures Japan",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-shoten",
+    "name": "Kadokawa Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "rakuonsha",
+    "name": "Rakuonsha",
+    "animationStudio": false
+   },
+   {
+    "slug": "sakura-create",
+    "name": "Sakura Create",
+    "animationStudio": true
+   },
+   {
+    "slug": "chara-anicom",
+    "name": "chara-ani.com",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2011,
+  "characters": [
+   {
+    "anilistId": 4962,
+    "name": "Yukiteru Amano",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b4962-CpqPBVJngbq2.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 4963,
+    "name": "Yuno Gasai",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b4963-7ZMcCtXW5hkY.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

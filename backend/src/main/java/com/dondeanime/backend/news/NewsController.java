@@ -24,6 +24,11 @@ public class NewsController {
         return newsService.latestPublished(limit);
     }
 
+    @GetMapping("/slugs")
+    public List<String> slugs() {
+        return newsService.publishedSlugs();
+    }
+
     @GetMapping("/anime/{slug}")
     public List<NewsSummaryDto> byAnimeSlug(@PathVariable String slug) {
         return newsService.publishedForAnimeSlug(slug);

@@ -1,0 +1,47 @@
+[
+ {
+  "anilistId": 21519,
+  "slug": "your-name",
+  "titleEnglish": "Your Name.",
+  "titleRomaji": "Kimi no Na wa.",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 107,
+  "studio": "CoMix Wave",
+  "year": 2016,
+  "averageScore": 86,
+  "popularity": 684804,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-SUo3ZQuCbYhJ.png",
+  "genres": [
+   "Drama",
+   "Romance",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 106286,
+  "slug": "weathering-with-you",
+  "titleEnglish": "Weathering With You",
+  "titleRomaji": "Tenki no Ko",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 115,
+  "studio": "CoMix Wave",
+  "year": 2019,
+  "averageScore": 81,
+  "popularity": 341412,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx106286-5COcpd0J9VbL.png",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2019
+ }
+]

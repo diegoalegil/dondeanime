@@ -1,0 +1,72 @@
+[
+ {
+  "anilistId": 21234,
+  "slug": "erased",
+  "titleEnglish": "ERASED",
+  "titleRomaji": "Boku dake ga Inai Machi",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 23,
+  "studio": "A-1 Pictures",
+  "year": 2016,
+  "averageScore": 81,
+  "popularity": 584108,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21234-XmqW39aQ9o7O.jpg",
+  "genres": [
+   "Psychological",
+   "Drama",
+   "Thriller",
+   "Mystery",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 21202,
+  "slug": "konosuba-gods-blessing-on-this-wonderful-world",
+  "titleEnglish": "KONOSUBA -God's blessing on this wonderful world!",
+  "titleRomaji": "Kono Subarashii Sekai ni Shukufuku wo!",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 23,
+  "studio": "Studio DEEN",
+  "year": 2016,
+  "averageScore": 79,
+  "popularity": 497237,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21202-mPOr80AEjUcZ.png",
+  "genres": [
+   "Adventure",
+   "Fantasy",
+   "Comedy",
+   "Ecchi"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 21170,
+  "slug": "assassination-classroom-second-season",
+  "titleEnglish": "Assassination Classroom Second Season",
+  "titleRomaji": "Ansatsu Kyoushitsu 2nd Season",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 23,
+  "studio": "Lerche",
+  "year": 2016,
+  "averageScore": 83,
+  "popularity": 357199,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21170-kbcfTTZGSaFt.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016
+ }
+]

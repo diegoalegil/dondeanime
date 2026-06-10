@@ -1,0 +1,92 @@
+[
+ {
+  "slug": "action",
+  "name": "Action",
+  "animeCount": 495
+ },
+ {
+  "slug": "comedy",
+  "name": "Comedy",
+  "animeCount": 472
+ },
+ {
+  "slug": "drama",
+  "name": "Drama",
+  "animeCount": 414
+ },
+ {
+  "slug": "fantasy",
+  "name": "Fantasy",
+  "animeCount": 376
+ },
+ {
+  "slug": "romance",
+  "name": "Romance",
+  "animeCount": 360
+ },
+ {
+  "slug": "adventure",
+  "name": "Adventure",
+  "animeCount": 287
+ },
+ {
+  "slug": "supernatural",
+  "name": "Supernatural",
+  "animeCount": 277
+ },
+ {
+  "slug": "slice-of-life",
+  "name": "Slice of Life",
+  "animeCount": 264
+ },
+ {
+  "slug": "sci-fi",
+  "name": "Sci-Fi",
+  "animeCount": 165
+ },
+ {
+  "slug": "mystery",
+  "name": "Mystery",
+  "animeCount": 162
+ },
+ {
+  "slug": "psychological",
+  "name": "Psychological",
+  "animeCount": 152
+ },
+ {
+  "slug": "ecchi",
+  "name": "Ecchi",
+  "animeCount": 130
+ },
+ {
+  "slug": "thriller",
+  "name": "Thriller",
+  "animeCount": 64
+ },
+ {
+  "slug": "horror",
+  "name": "Horror",
+  "animeCount": 56
+ },
+ {
+  "slug": "sports",
+  "name": "Sports",
+  "animeCount": 35
+ },
+ {
+  "slug": "mecha",
+  "name": "Mecha",
+  "animeCount": 31
+ },
+ {
+  "slug": "music",
+  "name": "Music",
+  "animeCount": 22
+ },
+ {
+  "slug": "mahou-shoujo",
+  "name": "Mahou Shoujo",
+  "animeCount": 6
+ }
+]

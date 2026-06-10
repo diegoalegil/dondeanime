@@ -1,0 +1,156 @@
+{
+ "anime": {
+  "anilistId": 147105,
+  "slug": "witch-hat-atelier",
+  "titleEnglish": "Witch Hat Atelier",
+  "titleRomaji": "Tongari Boushi no Atelier",
+  "trailerYoutubeId": null,
+  "description": "Coco es una niña que vive en un pequeño pueblo y que siempre ha soñado con convertirse en maga. Pero haber nacido sin aptitud mágica significaba que nunca podría convertirse en maga y nunca podría presenciar la chispa de la magia. Renunció a su sueño. Pero un día, un mago viajero llamado Qifrey llegó a su pueblo, y ella tuvo la oportunidad de verlo realizar magia.",
+  "descriptionTranslationPending": false,
+  "format": "ONA",
+  "status": "RELEASING",
+  "episodes": 13,
+  "averageScore": 86,
+  "popularity": 172369,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx147105-rwOX8qyUy8gV.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/147105-fTjmRrILFixZ.jpg",
+  "startYear": 2026,
+  "startMonth": 4,
+  "startDay": 6,
+  "endYear": 2026,
+  "endMonth": 6,
+  "endDay": 22,
+  "genres": [
+   "Adventure",
+   "Drama",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "avex-pictures",
+    "name": "Avex Pictures",
+    "animationStudio": false
+   },
+   {
+    "slug": "bug-films",
+    "name": "BUG FILMS",
+    "animationStudio": true
+   },
+   {
+    "slug": "crunchyroll",
+    "name": "Crunchyroll",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "twin-engine",
+    "name": "Twin Engine",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2026,
+  "characters": [
+   {
+    "anilistId": 129840,
+    "name": "Coco",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b129840-B2CVE0TIcKpT.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 129841,
+    "name": "Qifrey",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b129841-brgGFuOv1h0n.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

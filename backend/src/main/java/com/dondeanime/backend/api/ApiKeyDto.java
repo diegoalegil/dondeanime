@@ -12,10 +12,10 @@ public record ApiKeyDto(
         long monthlyQuota,
         long monthlyUsage
 ) {
-    public static ApiKeyDto from(ApiKey apiKey) {
+    public static ApiKeyDto from(ApiKey apiKey, String rawKey) {
         return new ApiKeyDto(
                 apiKey.getId(),
-                apiKey.getKey(),
+                rawKey,
                 apiKey.getOwnerEmail(),
                 apiKey.getTier(),
                 apiKey.getCreatedAt(),

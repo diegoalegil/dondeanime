@@ -1,0 +1,115 @@
+[
+ {
+  "anilistId": 4224,
+  "slug": "toradora",
+  "titleEnglish": "Toradora!",
+  "titleRomaji": "Toradora!",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "Genco",
+  "year": 2008,
+  "averageScore": 78,
+  "popularity": 522386,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx4224-PXVMBLNwy2aF.jpg",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "FALL",
+  "seasonYear": 2008
+ },
+ {
+  "anilistId": 97668,
+  "slug": "one-punch-man-season-2",
+  "titleEnglish": "One-Punch Man Season 2",
+  "titleRomaji": "One Punch Man 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "J.C.STAFF",
+  "year": 2019,
+  "averageScore": 74,
+  "popularity": 452105,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97668-nC8gQrXVxt7k.png",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 20923,
+  "slug": "food-wars",
+  "titleEnglish": "Food Wars!",
+  "titleRomaji": "Shokugeki no Souma",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 25,
+  "studio": "J.C.STAFF",
+  "year": 2015,
+  "averageScore": 78,
+  "popularity": 391495,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20923-pNT38pjW3RFH.jpg",
+  "genres": [
+   "Comedy",
+   "Ecchi"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2015
+ },
+ {
+  "anilistId": 20920,
+  "slug": "is-it-wrong-to-try-to-pick-up-girls-in-a-dungeon",
+  "titleEnglish": "Is It Wrong to Try to Pick Up Girls in a Dungeon?",
+  "titleRomaji": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "episodeDuration": 24,
+  "studio": "J.C.STAFF",
+  "year": 2015,
+  "averageScore": 73,
+  "popularity": 382222,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20920-MTREwZOG4BAD.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Fantasy",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2015
+ },
+ {
+  "anilistId": 21804,
+  "slug": "the-disastrous-life-of-saiki-k",
+  "titleEnglish": "The Disastrous Life of Saiki K.",
+  "titleRomaji": "Saiki Kusuo no Ψ-nan",
+  "format": "TV_SHORT",
+  "status": "FINISHED",
+  "episodes": 120,
+  "episodeDuration": 5,
+  "studio": "J.C.STAFF",
+  "year": 2016,
+  "averageScore": 83,
+  "popularity": 342712,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21804-As6tDLAvEvNY.jpg",
+  "genres": [
+   "Slice of Life",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ }
+]

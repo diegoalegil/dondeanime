@@ -1,0 +1,218 @@
+{
+ "anime": {
+  "anilistId": 120120,
+  "slug": "tokyo-revengers",
+  "titleEnglish": "Tokyo Revengers",
+  "titleRomaji": "Tokyo Revengers",
+  "trailerYoutubeId": "LJKOEZjBnsQ",
+  "description": "Takemichi Hanagaki es un trabajador que ha tocado fondo en la vida. Entonces descubre que la única novia que tuvo jamás, en sus años de secundaria, la joven Hinata Tachibana, ha muerto a manos de la pandilla Tokyo Manji. El día que descubre la noticia de su muerte, está en la estación de tren cuando alguien lo empuja a las vías. Cierra los ojos pensando que está a punto de morir, pero cuando los abre, sin saber cómo, ha retrocedido 12 años en el tiempo. Ahora podrá revivir aquellos días que él consideraba los mejores de su vida y Takemichi intentará vengarse de su vida.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 77,
+  "popularity": 430299,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120120-cWDmnmeEntSe.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/120120-UDYgoHA69peT.jpg",
+  "startYear": 2021,
+  "startMonth": 4,
+  "startDay": 11,
+  "endYear": 2021,
+  "endMonth": 9,
+  "endDay": 19,
+  "genres": [
+   "Romance",
+   "Drama",
+   "Action",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "lidenfilms",
+    "name": "LIDENFILMS",
+    "animationStudio": true
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "ultra-super-pictures",
+    "name": "Ultra Super Pictures",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2021,
+  "characters": [
+   {
+    "anilistId": 138453,
+    "name": "Hinata Tachibana",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b138453-MFISjDiAEfiM.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 145345,
+    "name": "Ken Ryuuguji",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b145345-zyirrSsKIDCb.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 145341,
+    "name": "Manjirou Sano",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b145341-CuPldCLZMvvf.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 167843,
+    "name": "Naoto Tachibana",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b167843-w9Lc6OWif5zy.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 145342,
+    "name": "Takemichi Hanagaki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b145342-GSUutL83jGgI.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "disney-plus",
+    "providerName": "Disney Plus",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "disney-plus",
+    "providerName": "Disney Plus",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "disney-plus",
+    "providerName": "Disney Plus",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "disney-plus",
+    "providerName": "Disney Plus",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "disney-plus",
+    "providerName": "Disney Plus",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

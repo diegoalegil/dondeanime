@@ -1,0 +1,276 @@
+[
+ {
+  "anime": {
+   "anilistId": 1535,
+   "slug": "death-note",
+   "titleEnglish": "Death Note",
+   "titleRomaji": "DEATH NOTE",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 37,
+   "episodeDuration": 23,
+   "studio": "MADHOUSE",
+   "year": 2006,
+   "averageScore": 84,
+   "popularity": 919246,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1535-kUgkcrfOrkUM.jpg",
+   "genres": [
+    "Psychological",
+    "Thriller",
+    "Mystery",
+    "Supernatural"
+   ],
+   "season": "FALL",
+   "seasonYear": 2006
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 101759,
+   "slug": "the-promised-neverland",
+   "titleEnglish": "The Promised Neverland",
+   "titleRomaji": "Yakusoku no Neverland",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 23,
+   "studio": "CloverWorks",
+   "year": 2019,
+   "averageScore": 84,
+   "popularity": 613725,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101759-8UR7r9MNVpz2.jpg",
+   "genres": [
+    "Psychological",
+    "Drama",
+    "Horror",
+    "Thriller",
+    "Fantasy",
+    "Mystery"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2019
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21355,
+   "slug": "rezero-starting-life-in-another-world",
+   "titleEnglish": "Re:ZERO -Starting Life in Another World-",
+   "titleRomaji": "Re:Zero kara Hajimeru Isekai Seikatsu",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 25,
+   "episodeDuration": 25,
+   "studio": "WHITE FOX",
+   "year": 2016,
+   "averageScore": 81,
+   "popularity": 589987,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21355-wRVUrGxpvIQQ.jpg",
+   "genres": [
+    "Psychological",
+    "Action",
+    "Adventure",
+    "Drama",
+    "Thriller",
+    "Fantasy",
+    "Romance"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2016
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21234,
+   "slug": "erased",
+   "titleEnglish": "ERASED",
+   "titleRomaji": "Boku dake ga Inai Machi",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 23,
+   "studio": "A-1 Pictures",
+   "year": 2016,
+   "averageScore": 81,
+   "popularity": 584108,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21234-XmqW39aQ9o7O.jpg",
+   "genres": [
+    "Psychological",
+    "Drama",
+    "Thriller",
+    "Mystery",
+    "Supernatural"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2016
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 9253,
+   "slug": "steinsgate",
+   "titleEnglish": "Steins;Gate",
+   "titleRomaji": "Steins;Gate",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 24,
+   "episodeDuration": 24,
+   "studio": "Frontier Works",
+   "year": 2011,
+   "averageScore": 89,
+   "popularity": 571577,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-tIUXF2gfU8Sg.jpg",
+   "genres": [
+    "Psychological",
+    "Sci-Fi",
+    "Drama",
+    "Thriller"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2011
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 20613,
+   "slug": "akame-ga-kill",
+   "titleEnglish": "Akame ga Kill!",
+   "titleRomaji": "Akame ga Kill!",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 24,
+   "episodeDuration": 24,
+   "studio": "WHITE FOX",
+   "year": 2014,
+   "averageScore": 73,
+   "popularity": 519465,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20613-HXHpec4bemk5.jpg",
+   "genres": [
+    "Psychological",
+    "Action",
+    "Adventure",
+    "Drama",
+    "Horror",
+    "Thriller",
+    "Fantasy"
+   ],
+   "season": "SUMMER",
+   "seasonYear": 2014
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 1575,
+   "slug": "code-geass-lelouch-of-the-rebellion",
+   "titleEnglish": "Code Geass: Lelouch of the Rebellion",
+   "titleRomaji": "Code Geass: Hangyaku no Lelouch",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 25,
+   "episodeDuration": 24,
+   "studio": "Sunrise",
+   "year": 2006,
+   "averageScore": 85,
+   "popularity": 477237,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1575-hsmWM2ydNm1m.jpg",
+   "genres": [
+    "Action",
+    "Sci-Fi",
+    "Drama",
+    "Thriller",
+    "Mecha"
+   ],
+   "season": "FALL",
+   "seasonYear": 2006
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 20931,
+   "slug": "death-parade",
+   "titleEnglish": "Death Parade",
+   "titleRomaji": "Death Parade",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 23,
+   "studio": "MADHOUSE",
+   "year": 2015,
+   "averageScore": 80,
+   "popularity": 453368,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx20931-bktYqOcxPERi.jpg",
+   "genres": [
+    "Psychological",
+    "Drama",
+    "Thriller",
+    "Mystery",
+    "Supernatural"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2015
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 10620,
+   "slug": "the-future-diary",
+   "titleEnglish": "The Future Diary",
+   "titleRomaji": "Mirai Nikki",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 26,
+   "episodeDuration": 23,
+   "studio": "Funimation",
+   "year": 2011,
+   "averageScore": 69,
+   "popularity": 417148,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx10620-dUZeNej0W4QN.png",
+   "genres": [
+    "Psychological",
+    "Action",
+    "Horror",
+    "Thriller",
+    "Mystery",
+    "Supernatural"
+   ],
+   "season": "FALL",
+   "seasonYear": 2011
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 11111,
+   "slug": "another",
+   "titleEnglish": "Another",
+   "titleRomaji": "Another",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 24,
+   "studio": "Lantis",
+   "year": 2012,
+   "averageScore": 71,
+   "popularity": 372458,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11111-gvvE5bBYsyFo.png",
+   "genres": [
+    "Psychological",
+    "Horror",
+    "Thriller",
+    "Mystery",
+    "Supernatural"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2012
+  },
+  "beginnerRecommendation": null
+ }
+]

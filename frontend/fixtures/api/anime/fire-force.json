@@ -1,0 +1,194 @@
+{
+ "anime": {
+  "anilistId": 105310,
+  "slug": "fire-force",
+  "titleEnglish": "Fire Force",
+  "titleRomaji": "Enen no Shouboutai",
+  "trailerYoutubeId": null,
+  "description": "Tokio se encuentra bajo un extraño fenómeno: ¡la gente entra, sin explicación alguna, en combustión espontánea! Aunque, afortunadamente, hay un equipo a cargo de mantener a raya este particular fenómeno… ¡El Cuerpo Especial de Bomberos! Quienes, además, ahora cuenta con un nuevo miembro: Shinra, un adolescente de sonrisa perturbadora, poder curioso y cuyo objetivo es convertirse en un héroe.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 76,
+  "popularity": 463965,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105310-2PKUvoaA6fTn.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/105310-ygGL9yweZM2Q.jpg",
+  "startYear": 2019,
+  "startMonth": 7,
+  "startDay": 6,
+  "endYear": 2019,
+  "endMonth": 12,
+  "endDay": 28,
+  "genres": [
+   "Sci-Fi",
+   "Drama",
+   "Action",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "dmm-pictures",
+    "name": "DMM pictures",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "bilibili",
+    "name": "bilibili",
+    "animationStudio": false
+   },
+   {
+    "slug": "david-production",
+    "name": "david production",
+    "animationStudio": true
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 130712,
+    "name": "Akitaru Oubi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b130712-N38fiCh2y0CX.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 130715,
+    "name": "Arthur Boyle",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n130715-IYNBAHBQa14y.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 130716,
+    "name": "Iris",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n130716-5564jUgQxK9a.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 130713,
+    "name": "Maki Oze",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b130713-TgLx8rgtGpXV.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 120462,
+    "name": "Shinra Kusakabe",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n120462-oSWdz2MhkbDE.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 130714,
+    "name": "Takehisa Hinawa",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n130714-pLzE3rXtP1C4.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

@@ -1,0 +1,160 @@
+{
+ "anime": {
+  "anilistId": 21234,
+  "slug": "erased",
+  "titleEnglish": "ERASED",
+  "titleRomaji": "Boku dake ga Inai Machi",
+  "trailerYoutubeId": null,
+  "description": "Satory Fujinuma es un autor de manga sin mucho éxito que sufre de un peculiar fenómeno conocido como Resucitación en el cual se transporta a la fuerza atrás en el tiempo hasta el momento anterior de que ocurra algo que supone un peligro para una vida. Satoru no tarda en descubrir que el fenómeno persiste hasta que la causa de la amenaza desaparece.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 81,
+  "popularity": 584108,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21234-XmqW39aQ9o7O.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21234-7lfSSPoMmwr2.jpg",
+  "startYear": 2016,
+  "startMonth": 1,
+  "startDay": 8,
+  "endYear": 2016,
+  "endMonth": 3,
+  "endDay": 25,
+  "genres": [
+   "Thriller",
+   "Drama",
+   "Psychological",
+   "Mystery",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex-of-america",
+    "name": "Aniplex of America",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "fuji-tv",
+    "name": "Fuji TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-shoten",
+    "name": "Kadokawa Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "kansai-tv",
+    "name": "Kansai TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "lawson",
+    "name": "Lawson",
+    "animationStudio": false
+   },
+   {
+    "slug": "madman-entertainment",
+    "name": "Madman Entertainment",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2016,
+  "characters": [
+   {
+    "anilistId": 89276,
+    "name": "Kayo Hinazuki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/89276-LjlYvXfOnjHB.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89275,
+    "name": "Satoru Fujinuma",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89275-xCGzh6jAGe2v.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

@@ -1,11 +1,14 @@
 package com.dondeanime.backend.api;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.Base64;
+import java.util.HexFormat;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,19 +50,21 @@ public class ApiKeyService {
     @Transactional
     public ApiKeyDto create(ApiKeyCreateRequest request) {
         String tier = normalizeTier(request.tier());
+        String rawKey = generateUniqueKey(tier);
         ApiKey apiKey = new ApiKey();
-        apiKey.setKey(generateUniqueKey(tier));
+        apiKey.setKeyHash(hashKey(rawKey));
+        apiKey.setKeyPreview(previewOf(rawKey));
         apiKey.setOwnerEmail(normalizeEmail(request.ownerEmail()));
         apiKey.setTier(tier);
         apiKey.setCreatedAt(Instant.now(clock));
         apiKey.setMonthlyQuota(quotaForTier(tier));
         apiKey.setMonthlyUsage(0);
-        return ApiKeyDto.from(repository.save(apiKey));
+        return ApiKeyDto.from(repository.save(apiKey), rawKey);
     }
 
     @Transactional(readOnly = true)
     public ApiKeyUsage findUsage(String rawKey) {
-        ApiKey apiKey = repository.findByKey(normalizeKey(rawKey))
+        ApiKey apiKey = repository.findByKeyHash(hashKey(normalizeKey(rawKey)))
                 .orElseThrow(ApiKeyNotFoundException::new);
         long remaining = Math.max(0, apiKey.getMonthlyQuota() - apiKey.getMonthlyUsage());
         return new ApiKeyUsage(apiKey.getTier(), apiKey.getMonthlyQuota(), apiKey.getMonthlyUsage(), remaining);
@@ -72,7 +77,7 @@ public class ApiKeyService {
 
     @Transactional
     public ApiKeyUsage recordUsage(String rawKey, String endpoint) {
-        ApiKey apiKey = repository.findByKeyForUpdate(normalizeKey(rawKey))
+        ApiKey apiKey = repository.findByKeyHashForUpdate(hashKey(normalizeKey(rawKey)))
                 .orElseThrow(ApiKeyNotFoundException::new);
         Instant now = Instant.now(clock);
         boolean reset = resetMonthlyUsageIfNeeded(apiKey, now);
@@ -117,6 +122,22 @@ public class ApiKeyService {
         return rawKey == null ? "" : rawKey.trim();
     }
 
+    static String hashKey(String rawKey) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(rawKey.getBytes(StandardCharsets.UTF_8)));
+        } catch (Exception e) {
+            throw new IllegalStateException("No se pudo calcular hash de API key", e);
+        }
+    }
+
+    static String previewOf(String rawKey) {
+        if (rawKey == null || rawKey.length() <= 16) {
+            return rawKey;
+        }
+        return rawKey.substring(0, 12) + "..." + rawKey.substring(rawKey.length() - 4);
+    }
+
     private String generateUniqueKey(String tier) {
         String prefix = "da_" + tier.toLowerCase(Locale.ROOT) + "_";
         String key;
@@ -124,7 +145,7 @@ public class ApiKeyService {
             byte[] bytes = new byte[24];
             RANDOM.nextBytes(bytes);
             key = prefix + Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        } while (repository.existsByKey(key));
+        } while (repository.existsByKeyHash(hashKey(key)));
         return key;
     }
 

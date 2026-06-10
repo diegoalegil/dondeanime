@@ -1,0 +1,107 @@
+{
+ "anime": {
+  "anilistId": 4224,
+  "slug": "toradora",
+  "titleEnglish": "Toradora!",
+  "titleRomaji": "Toradora!",
+  "trailerYoutubeId": null,
+  "description": "Ryuuji Takasu, un estudiante amable con rostro intimidante, y Taiga Aisaka, una pequeña pero feroz chica conocida como el \"Tigre de bolsillo\", terminan cruzando caminos por un error. Descubren que ambos tienen amores no correspondidos y forman una alianza para ayudarse mutuamente, desencadenando una divertida y emotiva comedia romántica.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "averageScore": 78,
+  "popularity": 522386,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx4224-PXVMBLNwy2aF.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/4224-iPUOHdMde27j.jpg",
+  "startYear": 2008,
+  "startMonth": 10,
+  "startDay": 2,
+  "endYear": 2009,
+  "endMonth": 3,
+  "endDay": 26,
+  "genres": [
+   "Comedy",
+   "Slice of Life",
+   "Romance",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "genco",
+    "name": "Genco",
+    "animationStudio": false
+   },
+   {
+    "slug": "hanabee-entertainment",
+    "name": "Hanabee Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "jcstaff",
+    "name": "J.C.STAFF",
+    "animationStudio": true
+   },
+   {
+    "slug": "magic-capsule",
+    "name": "Magic Capsule",
+    "animationStudio": false
+   },
+   {
+    "slug": "nis-america-inc",
+    "name": "NIS America Inc.",
+    "animationStudio": false
+   },
+   {
+    "slug": "starchild-records",
+    "name": "Starchild Records",
+    "animationStudio": false
+   },
+   {
+    "slug": "tv-tokyo-music",
+    "name": "TV Tokyo Music",
+    "animationStudio": false
+   },
+   {
+    "slug": "yomiuri-advertising",
+    "name": "Yomiuri Advertising",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2008,
+  "characters": [
+   {
+    "anilistId": 13725,
+    "name": "Ami Kawashima",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b13725-Vk30kjvVT82z.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 12305,
+    "name": "Minori Kushieda",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b12305-AdKOcp0az9mq.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 12295,
+    "name": "Ryuuji Takasu",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b12295-d45uTNeJHuus.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 12064,
+    "name": "Taiga Aisaka",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b12064-7PDN3ylIeAZn.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 12306,
+    "name": "Yuusaku Kitamura",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b12306-Nb1orOh4UkpT.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

@@ -1,0 +1,149 @@
+{
+ "anime": {
+  "anilistId": 6702,
+  "slug": "fairy-tail",
+  "titleEnglish": "Fairy Tail",
+  "titleRomaji": "FAIRY TAIL",
+  "trailerYoutubeId": null,
+  "description": "Fairy Tail cuenta la historia de un joven mago llamado Natsu en la búsqueda de su maestro y padre adoptivo Igneel que resulta ser un dragón. Por ello se unió a Fairy Tail, un gremio de magos que es famoso por los destrozos y daños que provocan en diversas ciudades (lo cual no debería ser así). El mundo de Fairy Tail gira alrededor de los magos (los cuales poco tienen que ver con la idea general del mago común) que realizan encargos a cambio de dinero, similar a un cazarecompensas. Natsu conoce a Lucy, una guapa muchacha cuyo sueño era ingresar a un gremio de magos, específicamente, a Fairy Tail, lo cual consigue gracias a la ayuda de Natsu. De ahí en adelante, la historia sigue los movimientos de esta pareja de magos los cuales se ven envueltos en un sin número de aventuras antes de conseguir la meta final de encontrar a Igneel.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 175,
+  "averageScore": 72,
+  "popularity": 365976,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b6702-KI4qgSMyI8Pm.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6702-VSHyctSAeUBS.jpg",
+  "startYear": 2009,
+  "startMonth": 10,
+  "startDay": 12,
+  "endYear": 2013,
+  "endMonth": 3,
+  "endDay": 30,
+  "genres": [
+   "Comedy",
+   "Action",
+   "Adventure",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "dax-production",
+    "name": "DAX Production",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "sakura-create",
+    "name": "Sakura Create",
+    "animationStudio": true
+   },
+   {
+    "slug": "satelight",
+    "name": "Satelight",
+    "animationStudio": true
+   },
+   {
+    "slug": "tv-tokyo",
+    "name": "TV Tokyo",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2009,
+  "characters": [
+   {
+    "anilistId": 22723,
+    "name": "Charlés",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b22723-tAU59GCaf2H4.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 5189,
+    "name": "Erza Scarlet",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b5189-GR1xdok9SFsN.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 4839,
+    "name": "Gray Fullbuster",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b4839-p2SBgjdTxHxk.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 5188,
+    "name": "Happy",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b5188-1jTaic3aJ7Ds.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 5186,
+    "name": "Lucy Heartfilia",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b5186-izgXf2S86K9u.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 5187,
+    "name": "Natsu Dragneel",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b5187-y1OEdRu9sPN2.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

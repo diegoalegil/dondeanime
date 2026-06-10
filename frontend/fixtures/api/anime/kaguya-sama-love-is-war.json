@@ -1,0 +1,177 @@
+{
+ "anime": {
+  "anilistId": 101921,
+  "slug": "kaguya-sama-love-is-war",
+  "titleEnglish": "Kaguya-sama: Love is War",
+  "titleRomaji": "Kaguya-sama wa Kokurasetai: Tensaitachi no Renai Zunousen",
+  "trailerYoutubeId": null,
+  "description": "Kaguya es hija de una familia muy importante y millonaria. Shirogane es también hijo de buena familia y presidente del consejo. Ambos son admirados por todos en la Academia Shuchiin, y ambos están enamorados el uno del otro, pero no se rebajarán a admitirlo y ambos intentan que sea el otro el que declare primero su amor.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 83,
+  "popularity": 536259,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101921-ufrjLzhSz7L1.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101921-GgvvFhlNhzlF.jpg",
+  "startYear": 2019,
+  "startMonth": 1,
+  "startDay": 12,
+  "endYear": 2019,
+  "endMonth": 3,
+  "endDay": 30,
+  "genres": [
+   "Slice of Life",
+   "Comedy",
+   "Romance",
+   "Psychological"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "jr-higashi-nihon-kikaku",
+    "name": "JR Higashi Nihon Kikaku",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "shueisha",
+    "name": "Shueisha",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 121103,
+    "name": "Chika Fujiwara",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121103-UGLxT8utLPnq.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 120649,
+    "name": "Kaguya Shinomiya",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b120649-NPaWaIpWy60E.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121101,
+    "name": "Miyuki Shirogane",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121101-Q8HzKP15At2d.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121102,
+    "name": "Yuu Ishigami",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121102-tiQFxnSEIAwm.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

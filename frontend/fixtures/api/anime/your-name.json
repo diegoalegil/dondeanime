@@ -1,0 +1,83 @@
+{
+ "anime": {
+  "anilistId": 21519,
+  "slug": "your-name",
+  "titleEnglish": "Your Name.",
+  "titleRomaji": "Kimi no Na wa.",
+  "trailerYoutubeId": null,
+  "description": "Mitsuha Miyamizu, a high school girl, yearns to live the life of a boy in the bustling city of Tokyo—a dream that stands in stark contrast to her present life in the countryside. Meanwhile in the city, Taki Tachibana lives a busy life as a high school student while juggling his part-time job and hopes for a future in architecture.<br>\n<br>\nOne day, Mitsuha awakens in a room that is not her own and suddenly finds herself living the dream life in Tokyo—but in Taki's body! Elsewhere, Taki finds himself living Mitsuha's life in the humble countryside. In pursuit of an answer to this strange phenomenon, they begin to search for one another.<br>\n<br>\n<i>Kimi no Na wa.</i> revolves around Mitsuha and Taki's actions, which begin to have a dramatic impact on each other's lives, weaving them into a fabric held together by fate and circumstance.<br>\n<br>\n(Source: MAL Rewrite)",
+  "descriptionTranslationPending": true,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "averageScore": 86,
+  "popularity": 684804,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-SUo3ZQuCbYhJ.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21519-1ayMXgNlmByb.jpg",
+  "startYear": 2016,
+  "startMonth": 8,
+  "startDay": 26,
+  "endYear": 2016,
+  "endMonth": 8,
+  "endDay": 26,
+  "genres": [
+   "Romance",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "comix-wave",
+    "name": "CoMix Wave",
+    "animationStudio": true
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-pictures-japan",
+    "name": "Kadokawa Pictures Japan",
+    "animationStudio": false
+   },
+   {
+    "slug": "madman-entertainment",
+    "name": "Madman Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "nyav-post",
+    "name": "NYAV Post",
+    "animationStudio": false
+   },
+   {
+    "slug": "selecta-vision",
+    "name": "Selecta Visión",
+    "animationStudio": false
+   },
+   {
+    "slug": "toho",
+    "name": "Toho",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016,
+  "characters": [
+   {
+    "anilistId": 121514,
+    "name": "Mitsuha Miyamizu",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121514-MGI7JRluscpz.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121516,
+    "name": "Taki Tachibana",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121516-kuPVJLNsH5uE.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

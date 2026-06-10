@@ -1,0 +1,139 @@
+{
+ "anime": {
+  "anilistId": 21827,
+  "slug": "violet-evergarden",
+  "titleEnglish": "Violet Evergarden",
+  "titleRomaji": "Violet Evergarden",
+  "trailerYoutubeId": null,
+  "description": "La guerra ha terminado y Violet Evergarden necesita trabajo. Incapaz de sentir emociones, acepta un empleo como escritora de cartas para entender el pasado.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 85,
+  "popularity": 526942,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-ubzq619ZA2E9.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21827-ROucgYiiiSpR.jpg",
+  "startYear": 2018,
+  "startMonth": 1,
+  "startDay": 11,
+  "endYear": 2018,
+  "endMonth": 4,
+  "endDay": 5,
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "abc-animation",
+    "name": "ABC Animation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kyoto-animation",
+    "name": "Kyoto Animation",
+    "animationStudio": true
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "madman-entertainment",
+    "name": "Madman Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "rakuonsha",
+    "name": "Rakuonsha",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 90169,
+    "name": "Violet Evergarden",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b90169-4wr1Zehnsac8.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

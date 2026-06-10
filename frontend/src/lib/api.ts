@@ -148,7 +148,37 @@ export interface CuratedListDetail extends CuratedListSummary {
   schema: unknown;
 }
 
+const FIXTURE_DIR = import.meta.env.PUBLIC_FIXTURE_DIR;
+
+/**
+ * Modo fixture (CI): con PUBLIC_FIXTURE_DIR definido, cada GET del build se
+ * resuelve contra un JSON en disco en vez de la API real. El mapeo ruta ->
+ * fichero replica el de scripts/generate-fixtures.mjs ([?&=] -> '_').
+ * Fichero ausente = 404, así aplican los mismos fallbacks que con la API.
+ */
+async function fixtureResponse(path: string): Promise<Response> {
+  const [{ readFile }, { resolve }] = await Promise.all([
+    import('node:fs/promises'),
+    import('node:path'),
+  ]);
+  const fileRelative = `${path.replace(/[?&=]/g, '_')}.json`;
+  const filePath = resolve(FIXTURE_DIR, `.${fileRelative}`);
+  try {
+    const body = await readFile(filePath, 'utf-8');
+    return new Response(body, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch {
+    return new Response('null', { status: 404 });
+  }
+}
+
 async function fetchWithRetry(path: string): Promise<Response> {
+  if (FIXTURE_DIR) {
+    return fixtureResponse(path);
+  }
+
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
@@ -484,6 +514,17 @@ export interface NewsDetail {
 // reinicia— pueda tumbar el build estático de 13k páginas.
 export const getNews = (limit = 30) =>
   fetchJsonSafe<NewsSummary[]>(`/api/news?limit=${limit}`, []);
+
+// TODOS los slugs publicados, para getStaticPaths: /api/news capa a 100 y
+// dejaría artículos antiguos indexados en 404 cuando el catálogo crezca.
+// Fallback a getNews(100) mientras la API desplegada no exponga /slugs.
+export const getNewsSlugs = async (): Promise<string[]> => {
+  const slugs = await fetchJsonSafe<string[] | null>('/api/news/slugs', null);
+  if (Array.isArray(slugs)) {
+    return slugs;
+  }
+  return (await getNews(100)).map((item) => item.slug);
+};
 
 export const getNewsBySlug = (slug: string) =>
   fetchJsonSafe<NewsDetail | null>(`/api/news/${slug}`, null);

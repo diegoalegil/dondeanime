@@ -1,0 +1,118 @@
+{
+ "anime": {
+  "anilistId": 9253,
+  "slug": "steinsgate",
+  "titleEnglish": "Steins;Gate",
+  "titleRomaji": "Steins;Gate",
+  "trailerYoutubeId": null,
+  "description": "Okabe Rintarou, autoproclamado científico loco, descubre accidentalmente cómo viajar en el tiempo. Tras evitar un asesinato, se enfrenta a las consecuencias de cambiar el pasado junto a sus amigos en su laboratorio secreto.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 89,
+  "popularity": 571577,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-tIUXF2gfU8Sg.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/n9253-JIhmKgBKsWUN.jpg",
+  "startYear": 2011,
+  "startMonth": 4,
+  "startDay": 6,
+  "endYear": 2011,
+  "endMonth": 9,
+  "endDay": 14,
+  "genres": [
+   "Psychological",
+   "Sci-Fi",
+   "Thriller",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "at-x",
+    "name": "AT-X",
+    "animationStudio": false
+   },
+   {
+    "slug": "frontier-works",
+    "name": "Frontier Works",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-pictures-japan",
+    "name": "Kadokawa Pictures Japan",
+    "animationStudio": false
+   },
+   {
+    "slug": "media-factory",
+    "name": "Media Factory",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "nitroplus",
+    "name": "Nitroplus",
+    "animationStudio": false
+   },
+   {
+    "slug": "white-fox",
+    "name": "WHITE FOX",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2011,
+  "characters": [
+   {
+    "anilistId": 35258,
+    "name": "Itaru Hashida",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b35258-FeTGR4LEUNvt.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 34470,
+    "name": "Kurisu Makise",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b34470-Jw2LXZBL5R8i.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 35253,
+    "name": "Mayuri Shiina",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b35253-u6QVgLLyHq2W.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 35252,
+    "name": "Rintarou Okabe",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b35252-DY9TW6pusqeh.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 35255,
+    "name": "Suzuha Amane",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b35255-Ra9Aq5Kn9lYq.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

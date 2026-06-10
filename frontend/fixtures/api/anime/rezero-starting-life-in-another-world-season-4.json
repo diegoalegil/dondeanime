@@ -1,0 +1,170 @@
+{
+ "anime": {
+  "anilistId": 189046,
+  "slug": "rezero-starting-life-in-another-world-season-4",
+  "titleEnglish": "Re:ZERO -Starting Life in Another World- Season 4",
+  "titleRomaji": "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season",
+  "trailerYoutubeId": null,
+  "description": "Subaru Natsuki es un estudiante corriente de preparatoria que conoce a una hermosa chica de pelo plateado de otro mundo que lo rescata. Para devolverle el favor decide quedarse con ella, pero el destino con el que carga la muchacha es mucho más pesado de lo que Subaru puede imaginar. Los enemigos atacan sin descanso, uno tras otro, hasta que finalmente mueren tanto él como la chica. Subaru no quiere que la chica resulte herida, con lo que jura acabar con cualquier enemigo, con cualquier destino que le aguarde, siempre por protegerla.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": 19,
+  "averageScore": 88,
+  "popularity": 104935,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx189046-yaHWtS5FII46.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/189046-MDk2CaVuRWpb.jpg",
+  "startYear": 2026,
+  "startMonth": 4,
+  "startDay": 8,
+  "endYear": null,
+  "endMonth": null,
+  "endDay": null,
+  "genres": [
+   "Psychological",
+   "Romance",
+   "Drama",
+   "Fantasy",
+   "Action",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "at-x",
+    "name": "AT-X",
+    "animationStudio": false
+   },
+   {
+    "slug": "daxel",
+    "name": "DAXEL",
+    "animationStudio": false
+   },
+   {
+    "slug": "hakuhodo-dy-music-pictures",
+    "name": "Hakuhodo DY Music & Pictures",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa",
+    "name": "KADOKAWA",
+    "animationStudio": false
+   },
+   {
+    "slug": "memory-tech",
+    "name": "Memory-Tech",
+    "animationStudio": false
+   },
+   {
+    "slug": "white-fox",
+    "name": "WHITE FOX",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2026,
+  "characters": [
+   {
+    "anilistId": 90181,
+    "name": "Beatrice",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b90181-wRPm0OEaucmw.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88572,
+    "name": "Emilia",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88572-IzTwXEHSobRs.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88573,
+    "name": "Subaru Natsuki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88573-F8yMTK9GhnTA.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

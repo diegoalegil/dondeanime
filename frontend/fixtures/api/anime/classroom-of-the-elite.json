@@ -1,0 +1,232 @@
+{
+ "anime": {
+  "anilistId": 98659,
+  "slug": "classroom-of-the-elite",
+  "titleEnglish": "Classroom of the Elite",
+  "titleRomaji": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+  "trailerYoutubeId": null,
+  "description": "Kiyotaka Ayanokouji ingresa a la prestigiosa Academia Tokyo Koudo Ikusei, pero es asignado a la Clase 1-D, donde están los estudiantes con problemas. La escuela otorga puntos mensuales equivalentes a 100,000 yenes y permite una libertad inusual en las clases, ocultando un sistema más complejo.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 76,
+  "popularity": 425801,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98659-WNyPLIZDpGGY.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98659-u46B5RCNl9il.jpg",
+  "startYear": 2017,
+  "startMonth": 7,
+  "startDay": 12,
+  "endYear": 2017,
+  "endMonth": 9,
+  "endDay": 27,
+  "genres": [
+   "Drama",
+   "Psychological"
+  ],
+  "studios": [
+   {
+    "slug": "akabeisoft2",
+    "name": "AKABEiSOFT2",
+    "animationStudio": false
+   },
+   {
+    "slug": "at-x",
+    "name": "AT-X",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-music-live",
+    "name": "Bandai Namco Music Live",
+    "animationStudio": false
+   },
+   {
+    "slug": "crunchyroll",
+    "name": "Crunchyroll",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa",
+    "name": "KADOKAWA",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-media-house",
+    "name": "Kadokawa Media House",
+    "animationStudio": false
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "lerche",
+    "name": "Lerche",
+    "animationStudio": true
+   },
+   {
+    "slug": "sony-music-solutions",
+    "name": "Sony Music Solutions",
+    "animationStudio": false
+   },
+   {
+    "slug": "toranoana",
+    "name": "Toranoana",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017,
+  "characters": [
+   {
+    "anilistId": 123215,
+    "name": "Airi Sakura",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b123215-sMQJk35TqQv4.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 123214,
+    "name": "Kikyou Kushida",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b123214-Ym9cldopi3yR.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 123212,
+    "name": "Kiyotaka Ayanokouji",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b123212-ewZgUQr9vvEM.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 123213,
+    "name": "Suzune Horikita",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b123213-jUfrGBXfW7BL.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "claro-video",
+    "providerName": "Claro video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "claro-video",
+    "providerName": "Claro video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "claro-video",
+    "providerName": "Claro video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "claro-video",
+    "providerName": "Claro video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

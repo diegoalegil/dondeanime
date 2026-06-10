@@ -1,0 +1,73 @@
+[
+ {
+  "anilistId": 5114,
+  "slug": "fullmetal-alchemist-brotherhood",
+  "titleEnglish": "Fullmetal Alchemist: Brotherhood",
+  "titleRomaji": "Hagane no Renkinjutsushi: FULLMETAL ALCHEMIST",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 64,
+  "episodeDuration": 25,
+  "studio": "bones",
+  "year": 2009,
+  "averageScore": 90,
+  "popularity": 698994,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5114-nSWCgQlmOMtj.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Fantasy"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2009
+ },
+ {
+  "anilistId": 104578,
+  "slug": "attack-on-titan-season-3-part-2",
+  "titleEnglish": "Attack on Titan Season 3 Part 2",
+  "titleRomaji": "Shingeki no Kyojin Season 3 Part 2",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2019,
+  "averageScore": 90,
+  "popularity": 587538,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx104578-k61nx3LPjvgd.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 189046,
+  "slug": "rezero-starting-life-in-another-world-season-4",
+  "titleEnglish": "Re:ZERO -Starting Life in Another World- Season 4",
+  "titleRomaji": "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season",
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": 19,
+  "episodeDuration": 24,
+  "studio": "KADOKAWA",
+  "year": 2026,
+  "averageScore": 88,
+  "popularity": 104507,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx189046-yaHWtS5FII46.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Adventure",
+   "Drama",
+   "Fantasy",
+   "Romance"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2026
+ }
+]

@@ -19,6 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 class ApiKeyServiceTest {
 
     private static final Instant NOW = Instant.parse("2026-05-25T12:00:00Z");
+    private static final String RAW_KEY = "da_free_test";
+    private static final String RAW_KEY_HASH = ApiKeyService.hashKey(RAW_KEY);
 
     private final ApiKeyRepository repository = org.mockito.Mockito.mock(ApiKeyRepository.class);
     private final ApiKeyEndpointUsageRepository endpointUsageRepository =
@@ -43,9 +45,34 @@ class ApiKeyServiceTest {
     }
 
     @Test
+    void createPersistsOnlyHashAndPreviewNeverRawKey() {
+        when(repository.save(any(ApiKey.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ApiKeyDto dto = service.create(new ApiKeyCreateRequest("diego@example.com", "free"));
+
+        ArgumentCaptor<ApiKey> captor = ArgumentCaptor.forClass(ApiKey.class);
+        verify(repository).save(captor.capture());
+        ApiKey saved = captor.getValue();
+        assertThat(saved.getKeyHash()).isEqualTo(ApiKeyService.hashKey(dto.key()));
+        assertThat(saved.getKeyHash()).hasSize(64).isNotEqualTo(dto.key());
+        assertThat(saved.getKeyPreview()).isEqualTo(ApiKeyService.previewOf(dto.key()));
+        assertThat(saved.getKeyPreview()).doesNotContain(dto.key());
+    }
+
+    @Test
+    void findUsageLooksUpByHashOfRawKey() {
+        ApiKey apiKey = apiKey(25, 1_000, NOW);
+        when(repository.findByKeyHash(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
+
+        ApiKeyUsage usage = service.findUsage(" " + RAW_KEY + " ");
+
+        assertThat(usage.remaining()).isEqualTo(975);
+    }
+
+    @Test
     void recordUsageIncrementsUsageAndUpdatesLastUsedAt() {
         ApiKey apiKey = apiKey(999, 1_000, Instant.parse("2026-05-01T00:00:00Z"));
-        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyHashForUpdate(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
 
         ApiKeyUsage usage = service.recordUsage(" da_free_test ");
 
@@ -57,7 +84,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageStoresEndpointUsage() {
         ApiKey apiKey = apiKey(1, 1_000, Instant.parse("2026-05-01T00:00:00Z"));
-        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyHashForUpdate(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
         when(endpointUsageRepository.findByApiKey_IdAndEndpoint(null, "/api/v1/anime"))
                 .thenReturn(Optional.empty());
 
@@ -76,7 +103,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageResetsCounterWhenMonthChanges() {
         ApiKey apiKey = apiKey(900, 1_000, Instant.parse("2026-04-30T23:59:00Z"));
-        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyHashForUpdate(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
 
         ApiKeyUsage usage = service.recordUsage("da_free_test");
 
@@ -88,7 +115,7 @@ class ApiKeyServiceTest {
     void recordUsageResetsEndpointUsageWhenMonthChanges() {
         ApiKey apiKey = apiKey(900, 1_000, Instant.parse("2026-04-30T23:59:00Z"));
         ReflectionTestUtils.setField(apiKey, "id", 42L);
-        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyHashForUpdate(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
         when(endpointUsageRepository.findByApiKey_IdAndEndpoint(42L, "/api/v1/anime"))
                 .thenReturn(Optional.empty());
 
@@ -100,7 +127,7 @@ class ApiKeyServiceTest {
     @Test
     void recordUsageRejectsExhaustedQuota() {
         ApiKey apiKey = apiKey(1_000, 1_000, NOW);
-        when(repository.findByKeyForUpdate("da_free_test")).thenReturn(Optional.of(apiKey));
+        when(repository.findByKeyHashForUpdate(RAW_KEY_HASH)).thenReturn(Optional.of(apiKey));
 
         assertThatThrownBy(() -> service.recordUsage("da_free_test"))
                 .isInstanceOf(ApiQuotaExceededException.class);
@@ -109,7 +136,7 @@ class ApiKeyServiceTest {
     @Test
     void statsReturnsKeysAndTopEndpoints() {
         ApiKey apiKey = apiKey(25, 1_000, NOW);
-        apiKey.setKey("da_free_abcdefghijklmnopqrstuvwxyz");
+        apiKey.setKeyPreview(ApiKeyService.previewOf("da_free_abcdefghijklmnopqrstuvwxyz"));
         when(repository.findAll(any(org.springframework.data.domain.Sort.class)))
                 .thenReturn(List.of(apiKey));
         when(endpointUsageRepository.findTopEndpoints(any()))
@@ -125,7 +152,8 @@ class ApiKeyServiceTest {
 
     private static ApiKey apiKey(long monthlyUsage, long monthlyQuota, Instant lastUsedAt) {
         ApiKey apiKey = new ApiKey();
-        apiKey.setKey("da_free_test");
+        apiKey.setKeyHash(RAW_KEY_HASH);
+        apiKey.setKeyPreview(ApiKeyService.previewOf(RAW_KEY));
         apiKey.setOwnerEmail("diego@example.com");
         apiKey.setTier("FREE");
         apiKey.setCreatedAt(Instant.parse("2026-01-01T00:00:00Z"));
