@@ -11,11 +11,11 @@ import jakarta.persistence.LockModeType;
 
 public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
 
-    Optional<ApiKey> findByKey(String key);
+    Optional<ApiKey> findByKeyHash(String keyHash);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select a from ApiKey a where a.key = :key")
-    Optional<ApiKey> findByKeyForUpdate(@Param("key") String key);
+    @Query("select a from ApiKey a where a.keyHash = :keyHash")
+    Optional<ApiKey> findByKeyHashForUpdate(@Param("keyHash") String keyHash);
 
-    boolean existsByKey(String key);
+    boolean existsByKeyHash(String keyHash);
 }

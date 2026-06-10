@@ -17,8 +17,11 @@ public class ApiKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "api_key", nullable = false, unique = true, length = 96)
-    private String key;
+    @Column(name = "key_hash", nullable = false, unique = true, length = 64)
+    private String keyHash;
+
+    @Column(name = "key_preview", nullable = false, length = 20)
+    private String keyPreview;
 
     @Column(name = "owner_email", nullable = false, length = 255)
     private String ownerEmail;
@@ -42,12 +45,20 @@ public class ApiKey {
         return id;
     }
 
-    public String getKey() {
-        return key;
+    public String getKeyHash() {
+        return keyHash;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeyHash(String keyHash) {
+        this.keyHash = keyHash;
+    }
+
+    public String getKeyPreview() {
+        return keyPreview;
+    }
+
+    public void setKeyPreview(String keyPreview) {
+        this.keyPreview = keyPreview;
     }
 
     public String getOwnerEmail() {
