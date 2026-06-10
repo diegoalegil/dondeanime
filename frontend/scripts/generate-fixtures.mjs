@@ -118,7 +118,9 @@ const main = async () => {
     [...subset.values()].some((a) => a.seasonYear === s.year && a.season === s.season));
   await write('/api/seasons', subsetSeasons);
   for (const s of subsetSeasons) {
-    await mirror(`/api/seasons/${s.year}/${s.season}`, inSubset);
+    // En minúsculas: es como lo pide el build (getAnimeBySeason) y el CI
+    // corre en un filesystem case-sensitive.
+    await mirror(`/api/seasons/${s.year}/${s.season.toLowerCase()}`, inSubset);
   }
 
   const subsetStudios = new Set(
