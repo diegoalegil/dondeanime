@@ -97,6 +97,18 @@ gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```
 
+Si el backup está cifrado (`.sql.gz.age`), hace falta UNA de las dos claves
+privadas (la offline del password manager, o `/opt/dondeanime/.age/vps-verify.key`
+si sobrevivió; en un VPS nuevo usa la offline):
+
+```bash
+age -d -i /ruta/a/la/clave/privada \
+    dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz.age \
+  | gunzip -c \
+  | docker exec -i dondeanime_postgres_prod \
+      psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
+```
+
 5. Verificar conteos:
 
 ```bash

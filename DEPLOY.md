@@ -293,10 +293,28 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ssh deploy@IP_VPS
 cd /opt/dondeanime
 git pull
+# Etiqueta la imagen actual para poder volver en segundos si algo sale mal.
+docker tag dondeanime-backend:latest dondeanime-backend:prev 2>/dev/null || true
 docker compose -f docker-compose.prod.yml --env-file .env.prod build backend
 docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
 # Postgres y Caddy no se recrean si no cambiaron.
 ```
+
+Rollback rápido a la imagen anterior:
+
+```bash
+docker tag dondeanime-backend:prev dondeanime-backend:latest
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d backend
+```
+
+> **Nota (junio 2026):** el compose pasó de una red única a redes `web`/`db`
+> separadas, el actuator se movió al puerto de management 8081 y Caddy ahora
+> espera al healthcheck del backend. El primer deploy con estos cambios
+> recrea los TRES contenedores (el volumen de Postgres persiste): usa
+> `up -d` a secas y espera ~1 min a que el backend esté healthy antes de que
+> Caddy levante. Verifica después:
+> `curl -s -o /dev/null -w '%{http_code}' https://api.dondeanime.com/actuator/health` → 200
+> y `/actuator/prometheus` → 404.
 
 ### Primer deploy con Flyway
 
@@ -356,6 +374,43 @@ R2_ACCOUNT_ID=TU_ACCOUNT_ID
 R2_ACCESS_KEY_ID=TU_ACCESS_KEY
 R2_SECRET_ACCESS_KEY=TU_SECRET_KEY
 R2_PREFIX=postgres
+# Opcional pero recomendado: cifra el dump (contiene PII) antes de subirlo.
+# Dos claves públicas age separadas por espacio: la offline (password manager)
+# y la de verificación del VPS. Ver "Cifrado de backups con age" más abajo.
+BACKUP_AGE_RECIPIENTS=
+```
+
+#### Cifrado de backups con age
+
+El dump lleva emails de alertas y datos premium/Stripe; sin cifrar, una fuga
+del bucket R2 expone esa PII. Con `BACKUP_AGE_RECIPIENTS` definido el script
+sube `*.sql.gz.age` cifrado para DOS destinatarios:
+
+1. **Clave offline de Diego**: se genera fuera del VPS y la privada vive solo
+   en el password manager. Es la de recuperación de desastres.
+2. **Clave vps-verify**: su privada queda en el VPS para que
+   `verify-backup.sh` pueda restaurar el último backup cada semana. No
+   debilita el modelo de amenaza: quien controle el VPS ya tiene el Postgres
+   entero; lo que protege el cifrado es el bucket R2.
+
+Setup (una sola vez):
+
+```bash
+# En el VPS
+sudo apt-get install -y age
+mkdir -p /opt/dondeanime/.age && chmod 700 /opt/dondeanime/.age
+age-keygen -o /opt/dondeanime/.age/vps-verify.key
+chmod 600 /opt/dondeanime/.age/vps-verify.key
+# Anota el "public key: age1..." que imprime.
+
+# En tu máquina (clave offline; guarda la privada en el password manager)
+age-keygen
+```
+
+En `.env.prod`:
+
+```env
+BACKUP_AGE_RECIPIENTS=age1CLAVE_OFFLINE age1CLAVE_VPS_VERIFY
 ```
 
 Para automatizar cada 6 horas:
@@ -378,6 +433,13 @@ Restore manual desde un backup local:
 ```bash
 # CUIDADO: el dump lleva --clean --if-exists y puede sobrescribir datos.
 gunzip -c /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz \
+  | docker exec -i dondeanime_postgres_prod \
+      psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
+
+# Si el backup está cifrado (.sql.gz.age), descifra primero:
+age -d -i /opt/dondeanime/.age/vps-verify.key \
+    /opt/dondeanime/backups/dondeanime-postgres-YYYYMMDDTHHMMSSZ.sql.gz.age \
+  | gunzip -c \
   | docker exec -i dondeanime_postgres_prod \
       psql -v ON_ERROR_STOP=1 -U dondeanime_user -d dondeanime
 ```

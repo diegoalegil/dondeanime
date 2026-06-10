@@ -70,6 +70,17 @@ BACKUP_RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 AWS_CLI_IMAGE="${AWS_CLI_IMAGE:-amazon/aws-cli:2}"
 R2_PREFIX="${R2_PREFIX:-postgres}"
 
+# Cifrado opcional del dump (contiene PII) antes de subirlo a R2.
+# BACKUP_AGE_RECIPIENTS: claves públicas age separadas por espacios. Lo normal
+# son DOS: la clave offline de Diego (gestor de contraseñas) y la clave
+# vps-verify cuya parte privada vive en el VPS para que verify-backup.sh
+# pueda restaurar. El modelo de amenaza es una fuga del bucket R2, no el
+# compromiso del VPS (quien controle el VPS ya tiene el Postgres entero).
+AGE_RECIPIENTS=()
+if [[ -n "${BACKUP_AGE_RECIPIENTS:-}" ]]; then
+    read -ra AGE_RECIPIENTS <<< "$BACKUP_AGE_RECIPIENTS"
+fi
+
 r2_config_present() {
     [[ -n "${R2_BUCKET:-}" || -n "${R2_ACCOUNT_ID:-}" || -n "${R2_ACCESS_KEY_ID:-}" || -n "${R2_SECRET_ACCESS_KEY:-}" ]]
 }
@@ -78,6 +89,12 @@ validate_config() {
     [[ -n "${POSTGRES_USER:-}" ]] || fail "POSTGRES_USER no esta definido"
     [[ -n "${POSTGRES_DB:-}" ]] || fail "POSTGRES_DB no esta definido"
     [[ "$BACKUP_RETENTION_DAYS" =~ ^[0-9]+$ ]] || fail "BACKUP_RETENTION_DAYS debe ser numerico"
+
+    if [[ ${#AGE_RECIPIENTS[@]} -gt 0 ]]; then
+        for recipient in "${AGE_RECIPIENTS[@]}"; do
+            [[ "$recipient" == age1* ]] || fail "Recipient age invalido en BACKUP_AGE_RECIPIENTS: $recipient"
+        done
+    fi
 
     if r2_config_present; then
         [[ -n "${R2_BUCKET:-}" ]] || fail "R2_BUCKET no esta definido"
@@ -97,6 +114,9 @@ fi
 require_cmd docker
 require_cmd gzip
 require_cmd find
+if [[ ${#AGE_RECIPIENTS[@]} -gt 0 ]]; then
+    require_cmd age
+fi
 
 container_running="$(docker inspect -f '{{.State.Running}}' "$POSTGRES_CONTAINER" 2>/dev/null || true)"
 [[ "$container_running" == "true" ]] || fail "El contenedor $POSTGRES_CONTAINER no está corriendo"
@@ -106,6 +126,9 @@ chmod 700 "$BACKUP_DIR"
 
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 backup_name="dondeanime-postgres-$timestamp.sql.gz"
+if [[ ${#AGE_RECIPIENTS[@]} -gt 0 ]]; then
+    backup_name="$backup_name.age"
+fi
 backup_path="$BACKUP_DIR/$backup_name"
 tmp_path="$BACKUP_DIR/.$backup_name.tmp"
 
@@ -114,16 +137,28 @@ cleanup() {
 }
 trap cleanup EXIT
 
+dump_compressed() {
+    docker exec "$POSTGRES_CONTAINER" \
+        pg_dump \
+        -U "$POSTGRES_USER" \
+        -d "$POSTGRES_DB" \
+        --clean \
+        --if-exists \
+        --no-owner \
+        --no-privileges \
+        | gzip -9
+}
+
 log "Creando backup local: $backup_path"
-docker exec "$POSTGRES_CONTAINER" \
-    pg_dump \
-    -U "$POSTGRES_USER" \
-    -d "$POSTGRES_DB" \
-    --clean \
-    --if-exists \
-    --no-owner \
-    --no-privileges \
-    | gzip -9 > "$tmp_path"
+if [[ ${#AGE_RECIPIENTS[@]} -gt 0 ]]; then
+    age_args=()
+    for recipient in "${AGE_RECIPIENTS[@]}"; do
+        age_args+=(-r "$recipient")
+    done
+    dump_compressed | age "${age_args[@]}" > "$tmp_path"
+else
+    dump_compressed > "$tmp_path"
+fi
 
 mv "$tmp_path" "$backup_path"
 
@@ -178,7 +213,10 @@ fi
 if [[ "$BACKUP_RETENTION_DAYS" =~ ^[0-9]+$ && "$BACKUP_RETENTION_DAYS" -gt 0 ]]; then
     log "Aplicando retención local: $BACKUP_RETENTION_DAYS días"
     find "$BACKUP_DIR" -type f \
-        \( -name 'dondeanime-postgres-*.sql.gz' -o -name 'dondeanime-postgres-*.sql.gz.sha256' \) \
+        \( -name 'dondeanime-postgres-*.sql.gz' \
+        -o -name 'dondeanime-postgres-*.sql.gz.sha256' \
+        -o -name 'dondeanime-postgres-*.sql.gz.age' \
+        -o -name 'dondeanime-postgres-*.sql.gz.age.sha256' \) \
         -mtime +"$BACKUP_RETENTION_DAYS" \
         -delete
 fi
