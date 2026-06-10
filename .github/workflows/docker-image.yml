@@ -40,3 +40,8 @@ jobs:
 
       - name: Build backend image
         run: docker build -t dondeanime-backend:ci backend
+
+      # El compose de prod arranca Caddy solo cuando el backend está healthy;
+      # si la herramienta del HEALTHCHECK faltara, el deploy se quedaría colgado.
+      - name: Verify healthcheck tooling in runtime image
+        run: docker run --rm --entrypoint sh dondeanime-backend:ci -c 'command -v wget'

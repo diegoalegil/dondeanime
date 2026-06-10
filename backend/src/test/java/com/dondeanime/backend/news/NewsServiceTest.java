@@ -41,6 +41,14 @@ class NewsServiceTest {
     }
 
     @Test
+    void publishedSlugsReturnsAllWithoutLimit() {
+        when(itemRepository.findSlugsByStatus(NewsStatus.PUBLISHED))
+                .thenReturn(List.of("noticia-nueva", "noticia-vieja"));
+
+        assertThat(service.publishedSlugs()).containsExactly("noticia-nueva", "noticia-vieja");
+    }
+
+    @Test
     void publishedForAnimeSlugResolvesSlugToInternalId() {
         Anime anime = mock(Anime.class);
         when(anime.getId()).thenReturn(42L);

@@ -15,6 +15,9 @@ test('conecta una cuenta fake de Trakt, oculta vistos y limpia el filtro', async
   const watchedCard = page.locator('[data-anime-filter-item][data-anime-slug="attack-on-titan"]').first();
   await expect(watchedCard).toBeVisible();
 
+  // La isla Svelte pierde el valor si el fill llega antes de hidratar
+  // (Astro quita el atributo ssr al completar la hidratación).
+  await page.waitForSelector('astro-island[component-url*="WatchedFilter"]:not([ssr])');
   await page.getByLabel('Token de Trakt').fill('fake-signed-token');
   await page.getByRole('button', { name: 'Conectar' }).click();
   await expect(page.locator('[data-trakt-filter-status]')).toContainText('1 vistos');

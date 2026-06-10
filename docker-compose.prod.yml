@@ -22,7 +22,8 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
+    # Pineado a digest: un tag mutable podría traer otra imagen en un rebuild.
+    image: postgres:16-alpine@sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229
     container_name: dondeanime_postgres_prod
     restart: unless-stopped
     # Límite de memoria: evita que un proceso desbocado tumbe el VPS
@@ -48,8 +49,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # Solo en la red db: Caddy no necesita ver Postgres.
     networks:
-      - internal
+      - db
 
   backend:
     build:
@@ -68,6 +70,10 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      # Actuator en puerto de management separado: el puerto público (8080)
+      # no sirve /actuator aunque Caddy se desconfigurara. Caddy proxea SOLO
+      # /actuator/health a este puerto (ver Caddyfile).
+      MANAGEMENT_SERVER_PORT: "8081"
       # Permite que el cliente HTTP de Java (java.net.http) mande el header
       # User-Agent custom. Sin esto, el JDK trata User-Agent como header
       # restringido y lo ignora, y AniList (tras Cloudflare) bloquea la
@@ -147,10 +153,12 @@ services:
       STRIPE_PORTAL_RETURN_URL: ${STRIPE_PORTAL_RETURN_URL:-https://dondeanime.com/premium}
     # NO mapeamos puerto al host. Caddy lo proxea desde fuera.
     networks:
-      - internal
+      - web
+      - db
 
   caddy:
-    image: caddy:2-alpine
+    # Pineado a digest (ver nota en postgres).
+    image: caddy:2-alpine@sha256:77c07d5ebfa5be9fd6c820d2094ae662c9e7eeb9bf98346b7f639900263ee2a2
     container_name: dondeanime_caddy
     restart: unless-stopped
     mem_limit: 256m
@@ -168,9 +176,12 @@ services:
       - caddy_data:/data        # persistencia de certificados Let's Encrypt
       - caddy_config:/config
     depends_on:
-      - backend
+      backend:
+        # El healthcheck del Dockerfile valida que la API responde: Caddy no
+        # arranca proxeando a un backend muerto tras un deploy.
+        condition: service_healthy
     networks:
-      - internal
+      - web
 
 volumes:
   postgres_data:
@@ -180,7 +191,12 @@ volumes:
   caddy_config:
     name: dondeanime_caddy_config
 
+# Redes separadas: web (caddy ↔ backend) y db (backend ↔ postgres).
+# Un Caddy comprometido no puede hablar con Postgres directamente.
 networks:
-  internal:
-    name: dondeanime_internal
+  web:
+    name: dondeanime_web
+    driver: bridge
+  db:
+    name: dondeanime_db
     driver: bridge

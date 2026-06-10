@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getNews } from '@/lib/api';
+import { getNews, getNewsSlugs } from '@/lib/api';
 import { sitemapResponse } from '@/lib/sitemaps';
 
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
@@ -16,17 +16,22 @@ const xmlEscape = (value: string): string =>
     .replace(/'/g, '&apos;');
 
 export const GET: APIRoute = async () => {
-  const news = await getNews(100);
+  // Las frescas (48h) necesitan título y fecha → getNews(100) llega de sobra.
+  // El resto solo necesita <loc>, y /slugs no está capado a 100 artículos.
+  const [news, allSlugs] = await Promise.all([getNews(100), getNewsSlugs()]);
   const now = Date.now();
+  const summaryBySlug = new Map(news.map((item) => [item.slug, item]));
 
-  const urls = news
-    .map((item) => {
-      const loc = xmlEscape(`${SITE_URL}/noticias/${item.slug}`);
-      const publishedAt = new Date(item.publishedAt);
-      const isFresh = Number.isFinite(publishedAt.getTime())
+  const urls = allSlugs
+    .map((slug) => {
+      const loc = xmlEscape(`${SITE_URL}/noticias/${slug}`);
+      const item = summaryBySlug.get(slug);
+      const publishedAt = item ? new Date(item.publishedAt) : null;
+      const isFresh = publishedAt !== null
+        && Number.isFinite(publishedAt.getTime())
         && now - publishedAt.getTime() <= NEWS_FRESHNESS_MS;
 
-      if (!isFresh) {
+      if (!item || !isFresh) {
         return `  <url><loc>${loc}</loc></url>`;
       }
 

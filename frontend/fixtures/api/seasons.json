@@ -1,6 +1,11 @@
 [
  {
   "year": 2026,
+  "season": "SPRING",
+  "animeCount": 6
+ },
+ {
+  "year": 2026,
   "season": "SUMMER",
   "animeCount": 1
  },
@@ -255,11 +260,6 @@
   "animeCount": 6
  },
  {
-  "year": 2009,
-  "season": "SUMMER",
-  "animeCount": 5
- },
- {
   "year": 2008,
   "season": "FALL",
   "animeCount": 4
@@ -290,11 +290,6 @@
   "animeCount": 3
  },
  {
-  "year": 2004,
-  "season": "SPRING",
-  "animeCount": 2
- },
- {
   "year": 2002,
   "season": "FALL",
   "animeCount": 3
@@ -313,6 +308,11 @@
   "year": 1998,
   "season": "SPRING",
   "animeCount": 4
+ },
+ {
+  "year": 1996,
+  "season": "WINTER",
+  "animeCount": 3
  },
  {
   "year": 1995,

@@ -16,13 +16,17 @@
 # ============================================================
 
 api.dondeanime.com {
-	# Actuator queda disponible solo dentro de la red Docker llamando
-	# directamente al backend. Desde internet no se proxea, con UNA
-	# excepción: /actuator/health, que necesitan UptimeRobot y los
-	# runbooks para monitorizar el servicio desde fuera.
+	# El actuator vive en un puerto de management separado (8081, ver
+	# MANAGEMENT_SERVER_PORT en docker-compose.prod.yml) que NO se proxea:
+	# aunque esta config se rompiera, /actuator/prometheus no es alcanzable
+	# por el puerto público. La única excepción es /actuator/health, que
+	# necesitan UptimeRobot y los runbooks para monitorizar desde fuera.
+	handle /actuator/health {
+		reverse_proxy backend:8081
+	}
+
 	@actuator {
 		path /actuator /actuator/*
-		not path /actuator/health
 	}
 	handle @actuator {
 		respond 404
@@ -54,7 +58,8 @@ api.dondeanime.com {
 		Referrer-Policy "no-referrer"
 		# HSTS: fuerza HTTPS (2 años). La API solo debe hablar por TLS.
 		Strict-Transport-Security "max-age=63072000; includeSubDomains"
-		# Quita la cabecera Server por defecto que delata Caddy.
+		# Quita las cabeceras que delatan el proxy.
 		-Server
+		-Via
 	}
 }

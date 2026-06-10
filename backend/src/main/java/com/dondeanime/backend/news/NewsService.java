@@ -35,6 +35,16 @@ public class NewsService {
         return toSummaries(items);
     }
 
+    /**
+     * Todos los slugs publicados, sin límite: el frontend los necesita en
+     * getStaticPaths para construir CADA artículo (latestPublished capa a
+     * {@value MAX_LIMIT} y dejaría artículos antiguos en 404 al superarlo).
+     */
+    @Transactional(readOnly = true)
+    public List<String> publishedSlugs() {
+        return newsItemRepository.findSlugsByStatus(NewsStatus.PUBLISHED);
+    }
+
     @Transactional(readOnly = true)
     public Optional<NewsDetailDto> publishedBySlug(String slug) {
         return newsItemRepository.findBySlugAndStatus(slug, NewsStatus.PUBLISHED).map(NewsDetailDto::from);

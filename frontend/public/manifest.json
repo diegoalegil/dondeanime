@@ -32,9 +32,21 @@
       "purpose": "any"
     },
     {
+      "src": "/pwa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/pwa/icons/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     },
     {
@@ -48,20 +60,26 @@
       "sizes": "1024x1024",
       "type": "image/svg+xml",
       "purpose": "maskable"
+    },
+    {
+      "src": "/pwa/icons/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "/pwa/screenshots/home-wide.svg",
+      "src": "/pwa/screenshots/home-wide.png",
       "sizes": "1280x720",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "form_factor": "wide",
       "label": "Catalogo principal de DondeAnime"
     },
     {
-      "src": "/pwa/screenshots/detail-narrow.svg",
+      "src": "/pwa/screenshots/detail-narrow.png",
       "sizes": "390x844",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Ficha de anime con providers por pais"
     }
@@ -70,23 +88,23 @@
     {
       "name": "Buscar",
       "short_name": "Buscar",
-      "description": "Abrir DondeAnime y buscar anime.",
-      "url": "/",
-      "icons": [{ "src": "/pwa/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+      "description": "Buscar anime en todo el catalogo.",
+      "url": "/buscar",
+      "icons": [{ "src": "/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Mi pais",
-      "short_name": "Mi pais",
-      "description": "Ver anime disponible en Espana.",
-      "url": "/pais/espana",
-      "icons": [{ "src": "/pwa/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+      "name": "Noticias",
+      "short_name": "Noticias",
+      "description": "Ultimas noticias de anime.",
+      "url": "/noticias",
+      "icons": [{ "src": "/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Alertas",
-      "short_name": "Alertas",
-      "description": "Abrir una ficha con alertas de disponibilidad.",
-      "url": "/anime/death-note/espana",
-      "icons": [{ "src": "/pwa/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+      "name": "Listas",
+      "short_name": "Listas",
+      "description": "Listas curadas de anime.",
+      "url": "/listas",
+      "icons": [{ "src": "/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

@@ -20,6 +20,9 @@ AWS_CLI_IMAGE="${AWS_CLI_IMAGE:-amazon/aws-cli:2}"
 POSTGRES_IMAGE="${POSTGRES_IMAGE:-postgres:16-alpine}"
 CRON_FILE="/etc/cron.d/dondeanime-backup-verify"
 ERROR_MESSAGE="Backup verification failed"
+# Clave privada age de verificación (pareja del recipient vps-verify en
+# BACKUP_AGE_RECIPIENTS). Solo hace falta si los backups suben cifrados.
+AGE_IDENTITY_FILE="${BACKUP_AGE_IDENTITY_FILE:-$PROJECT_DIR/.age/vps-verify.key}"
 
 INSTALL_CRON=0
 CHECK_CONFIG=0
@@ -164,7 +167,7 @@ remote_base_uri() {
 find_latest_backup_key() {
     local base_uri="$1"
     aws_cli s3 ls "$base_uri/" --recursive \
-        | awk '$4 ~ /dondeanime-postgres-[0-9]{8}T[0-9]{6}Z\.sql\.gz$/ { print $4 }' \
+        | awk '$4 ~ /dondeanime-postgres-[0-9]{8}T[0-9]{6}Z\.sql\.gz(\.age)?$/ { print $4 }' \
         | sort \
         | tail -n 1
 }
@@ -231,10 +234,20 @@ restore_backup() {
     wait_for_verify_postgres
 
     log "Restoring backup into temporary Postgres"
-    gunzip -c "$backup_path" \
-        | docker exec -i "$VERIFY_CONTAINER" \
-            psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
-            >/dev/null
+    if [[ "$backup_path" == *.age ]]; then
+        command -v age >/dev/null 2>&1 || fail "Backup cifrado pero 'age' no esta instalado"
+        [[ -f "$AGE_IDENTITY_FILE" ]] || fail "Backup cifrado pero falta la clave: $AGE_IDENTITY_FILE"
+        age -d -i "$AGE_IDENTITY_FILE" "$backup_path" \
+            | gunzip -c \
+            | docker exec -i "$VERIFY_CONTAINER" \
+                psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+                >/dev/null
+    else
+        gunzip -c "$backup_path" \
+            | docker exec -i "$VERIFY_CONTAINER" \
+                psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+                >/dev/null
+    fi
 }
 
 table_count() {
@@ -250,7 +263,10 @@ cleanup_old_verification_dumps() {
     # Borra los de más de 14 días para no llenar el disco del VPS.
     [[ -d "$VERIFY_DIR" ]] || return 0
     find "$VERIFY_DIR" -maxdepth 1 -type f \
-        \( -name 'dondeanime-postgres-*.sql.gz' -o -name 'dondeanime-postgres-*.sql.gz.sha256' \) \
+        \( -name 'dondeanime-postgres-*.sql.gz' \
+        -o -name 'dondeanime-postgres-*.sql.gz.sha256' \
+        -o -name 'dondeanime-postgres-*.sql.gz.age' \
+        -o -name 'dondeanime-postgres-*.sql.gz.age.sha256' \) \
         -mtime +14 -delete || true
 }
 
