@@ -31,7 +31,7 @@ public class AdminJwtService {
     private final Clock clock;
 
     @Autowired
-    public AdminJwtService(@Value("${alerts.jwt-secret}") String secret) {
+    public AdminJwtService(@Value("${admin.jwt-secret:${alerts.jwt-secret}}") String secret) {
         this(secret, Clock.systemUTC());
     }
 

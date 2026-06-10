@@ -86,6 +86,9 @@ services:
       TRAKT_CLIENT_SECRET: ${TRAKT_CLIENT_SECRET:-}
       TRAKT_REDIRECT_URI: ${TRAKT_REDIRECT_URI:-https://api.dondeanime.com/api/trakt/oauth/callback}
       TRAKT_TOKEN_ENCRYPTION_SECRET: ${TRAKT_TOKEN_ENCRYPTION_SECRET:-}
+      # Firma los tokens de /api/trakt/watched y /api/trakt/sync. Fallback a
+      # JWT_SECRET aquí: una env var vacía anularía el fallback de Spring.
+      TRAKT_ACCESS_TOKEN_SECRET: ${TRAKT_ACCESS_TOKEN_SECRET:-${JWT_SECRET}}
       # Vacío si no usamos webhook. Se rellena cuando configuremos
       # el Deploy Hook de Vercel.
       VERCEL_DEPLOY_HOOK: ${VERCEL_DEPLOY_HOOK:-}
@@ -103,14 +106,18 @@ services:
       # Usuario único del panel admin. La contraseña vive en .env.prod.
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      # Secreto propio para las sesiones JWT del admin; separado del que
+      # firma los tokens de email. Fallback a JWT_SECRET (ver nota premium).
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-${JWT_SECRET}}
       ADMIN_CORS_ALLOWED_ORIGINS: ${ADMIN_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
       # --- Alertas email (Sprint 2) ---
       PUBLIC_API_URL: ${PUBLIC_API_URL:-https://api.dondeanime.com}
       PUBLIC_CORS_ALLOWED_ORIGINS: ${PUBLIC_CORS_ALLOWED_ORIGINS:-https://dondeanime.com,https://www.dondeanime.com}
       JWT_SECRET: ${JWT_SECRET}
-      # Secreto propio para los access tokens premium. Si queda vacío,
-      # el backend usa JWT_SECRET como fallback (application.properties).
-      PREMIUM_ACCESS_TOKEN_SECRET: ${PREMIUM_ACCESS_TOKEN_SECRET:-}
+      # Secreto propio para los access tokens premium. El fallback a
+      # JWT_SECRET se aplica aquí: pasar la env var vacía anularía el
+      # fallback de application.properties y firmaría con clave vacía.
+      PREMIUM_ACCESS_TOKEN_SECRET: ${PREMIUM_ACCESS_TOKEN_SECRET:-${JWT_SECRET}}
       RESEND_ENABLED: ${RESEND_ENABLED:-true}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-alertas@dondeanime.com}
