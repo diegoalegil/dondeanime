@@ -125,6 +125,40 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
         window.addEventListener('pageshow', hideSkeleton);
       })();
     </script>
+    <script is:inline>
+      // Las portadas se sirven directas del CDN de AniList. Cuando una página
+      // pide muchas a la vez (home, listados), su CDN estrangula la ráfaga y
+      // varias fallan (ERR_FAILED, sin status HTTP). Reintentamos escalonado
+      // con jitter para difuminar la ráfaga en el tiempo; si aun así no carga,
+      // la ocultamos (queda el fondo del contenedor) en vez del icono roto.
+      (() => {
+        if (window.__dondeanimeCoverRetryBound) return;
+        window.__dondeanimeCoverRetryBound = true;
+        var MAX = 2;
+        var isCover = function (img) {
+          return img && img.tagName === 'IMG' && /\/\/s4\.anilist\.co\//.test(img.currentSrc || img.src || '');
+        };
+        document.addEventListener('error', function (e) {
+          var img = e.target;
+          if (!isCover(img) || img.__broken) return;
+          var n = img.__coverRetry || 0;
+          if (n >= MAX) {
+            img.__broken = true;
+            img.removeAttribute('srcset');
+            img.style.opacity = '0';
+            return;
+          }
+          img.__coverRetry = n + 1;
+          if (!img.__coverSrc) img.__coverSrc = (img.currentSrc || img.src).split('?')[0];
+          var delay = 600 * (n + 1) + Math.random() * 1200;
+          window.setTimeout(function () {
+            if (img.__broken || !img.isConnected) return;
+            img.removeAttribute('srcset');
+            img.src = img.__coverSrc + '?retry=' + (n + 1);
+          }, delay);
+        }, true);
+      })();
+    </script>
     <SEOHead {...props} />
     {plausibleEnabled && (
       <>
