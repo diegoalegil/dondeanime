@@ -177,7 +177,25 @@ curl https://api.dondeanime.com/api/anime | jq 'length'   # ~929
   - `ADSENSE_ENABLED` = `false`
   - `PUBLIC_ADSENSE_ENABLED` = `false`
   - `PUBLIC_ADSENSE_CLIENT_ID` vacío hasta aprobación
+  - `PUBLIC_IMAGE_PROXY` vacío (opcional, ver más abajo)
 - Click Deploy. Primer build tarda ~2 min.
+
+#### Proxy de portadas (PUBLIC_IMAGE_PROXY) — opcional pero recomendado
+
+Las portadas se sirven directas de `s4.anilist.co`. Su CDN estrangula cuando una
+página pide muchas a la vez (la home pide ~90) y la mitad fallan. Para que carguen
+TODAS, defínela apuntando a un proxy que cachee las imágenes:
+
+- **Rápido (1 paso, proxy gratuito de terceros):** `PUBLIC_IMAGE_PROXY=wsrv`
+  → usa wsrv.nl (images.weserv.nl). Cero infraestructura. Mete una dependencia
+  externa: si wsrv.nl cae, las portadas caen.
+- **Recomendado (proxy propio, coste 0, sin dependencia nueva):** despliega el
+  Cloudflare Worker de `infra/cloudflare-image-worker.js` (instrucciones dentro
+  del archivo) y pon `PUBLIC_IMAGE_PROXY=https://<tu-worker>.workers.dev/`.
+
+Tras cambiar la var, **Redeploy sin build cache**. Vacía = portadas directas
+(comportamiento actual; un script de reintento mitiga los fallos pero no carga
+todas). Verifica después que las `<img>` de portada apuntan al proxy.
 - Cuando termine, abrir la URL `dondeanime-xxx.vercel.app` y verificar que carga con datos reales.
 
 ### 7. Apuntar dondeanime.com a Vercel

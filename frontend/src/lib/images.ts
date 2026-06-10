@@ -21,6 +21,37 @@ const ANILIST_COVER_VARIANTS = [
 
 const ANILIST_COVER_SEGMENT = /\/cover\/(medium|large|extraLarge)\//;
 
+/**
+ * Proxy opcional para las portadas. Vacío (por defecto) = se sirven directas
+ * de AniList. Su CDN estrangula cuando se piden muchas a la vez (la home pide
+ * ~90), así que para que carguen TODAS conviene proxearlas/cachearlas. Valores:
+ *   - 'wsrv'        → proxy gratuito wsrv.nl (images.weserv.nl).
+ *   - 'https://...' → un proxy propio (p.ej. un Cloudflare Worker) que acepte
+ *                     ?url=<url> y devuelva la imagen cacheada.
+ * Ver infra/cloudflare-image-worker.js y DEPLOY.md ("Proxy de portadas").
+ */
+const IMAGE_PROXY = (import.meta.env.PUBLIC_IMAGE_PROXY ?? '').trim();
+
+function proxiedUrl(anilistUrl: string, width: number): string {
+  if (!IMAGE_PROXY) {
+    return anilistUrl;
+  }
+  const base = IMAGE_PROXY === 'wsrv' ? 'https://wsrv.nl/' : IMAGE_PROXY;
+  let url: URL;
+  try {
+    url = new URL(base);
+  } catch {
+    return anilistUrl;
+  }
+  url.searchParams.set('url', anilistUrl);
+  if (IMAGE_PROXY === 'wsrv') {
+    url.searchParams.set('w', String(width));
+    url.searchParams.set('output', 'webp');
+    url.searchParams.set('q', String(DEFAULT_ANIME_IMAGE_QUALITY));
+  }
+  return url.toString();
+}
+
 export function canOptimizeAnimeImage(src: string) {
   return isAniListCover(src);
 }
@@ -38,7 +69,7 @@ export function buildAnimeImageUrl(src: string, width: number, _quality = DEFAUL
   const variant =
     ANILIST_COVER_VARIANTS.find((candidate) => candidate.width >= width) ??
     ANILIST_COVER_VARIANTS[ANILIST_COVER_VARIANTS.length - 1];
-  return withCoverVariant(src, variant.segment);
+  return withCoverVariant(src, variant.segment, variant.width);
 }
 
 export function buildAnimeImageSrcset(
@@ -51,12 +82,13 @@ export function buildAnimeImageSrcset(
   }
 
   return ANILIST_COVER_VARIANTS.map(
-    (variant) => `${withCoverVariant(src, variant.segment)} ${variant.width}w`,
+    (variant) => `${withCoverVariant(src, variant.segment, variant.width)} ${variant.width}w`,
   ).join(', ');
 }
 
-function withCoverVariant(src: string, segment: string) {
-  return src.replace(ANILIST_COVER_SEGMENT, `/cover/${segment}/`);
+function withCoverVariant(src: string, segment: string, width: number) {
+  const anilist = src.replace(ANILIST_COVER_SEGMENT, `/cover/${segment}/`);
+  return proxiedUrl(anilist, width);
 }
 
 function isAniListCover(src: string) {

@@ -60,5 +60,6 @@ const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
     decoding={decoding}
     fetchpriority={fetchpriority}
     class={imgClass}
+    data-cover={canUseSrcset ? '' : undefined}
   />
 </picture>
