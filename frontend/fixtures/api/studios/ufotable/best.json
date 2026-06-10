@@ -119,28 +119,5 @@
   ],
   "season": "FALL",
   "seasonYear": 2021
- },
- {
-  "anilistId": 10087,
-  "slug": "fatezero",
-  "titleEnglish": "Fate/Zero",
-  "titleRomaji": "Fate/Zero",
-  "format": "TV",
-  "status": "FINISHED",
-  "episodes": 13,
-  "episodeDuration": 24,
-  "studio": "Aniplex",
-  "year": 2011,
-  "averageScore": 81,
-  "popularity": 338078,
-  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx10087-M4Hd9qrHGrXk.png",
-  "genres": [
-   "Action",
-   "Drama",
-   "Fantasy",
-   "Supernatural"
-  ],
-  "season": "FALL",
-  "seasonYear": 2011
  }
 ]

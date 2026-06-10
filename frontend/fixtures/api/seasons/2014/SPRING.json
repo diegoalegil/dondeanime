@@ -43,27 +43,5 @@
   ],
   "season": "SPRING",
   "seasonYear": 2014
- },
- {
-  "anilistId": 20474,
-  "slug": "jojos-bizarre-adventure-stardust-crusaders",
-  "titleEnglish": "JoJo's Bizarre Adventure: Stardust Crusaders",
-  "titleRomaji": "JoJo no Kimyou na Bouken: Stardust Crusaders",
-  "format": "TV",
-  "status": "FINISHED",
-  "episodes": 24,
-  "episodeDuration": 24,
-  "studio": "david production",
-  "year": 2014,
-  "averageScore": 79,
-  "popularity": 331674,
-  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20474-xuqem5GBlBtb.jpg",
-  "genres": [
-   "Action",
-   "Adventure",
-   "Supernatural"
-  ],
-  "season": "SPRING",
-  "seasonYear": 2014
  }
 ]

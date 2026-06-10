@@ -1,74 +1,75 @@
 {
  "anime": {
-  "anilistId": 115230,
-  "slug": "tower-of-god",
-  "titleEnglish": "Tower of God",
-  "titleRomaji": "Kami no Tou: Tower of God",
-  "trailerYoutubeId": "ECgUZI2Q3Rs",
-  "description": "En Tower of God conoceremos el viaje de un joven que se abre paso a través de multitud de combates en una misteriosa torre, forjando vínculos, descubriendo las normas que gobieran el lugar y enfrentando terrores inimaginables mientras lucha por recuperar a la única amistad que jamás conoció.",
+  "anilistId": 182300,
+  "slug": "wistoria-wand-and-sword-season-2",
+  "titleEnglish": "Wistoria: Wand and Sword Season 2",
+  "titleRomaji": "Tsue to Tsurugi no Wistoria Season 2",
+  "trailerYoutubeId": null,
+  "description": "En un mundo donde reina la magia, Will Serfort no puede lanzar un hechizo. Aunque es muy trabajador, sus compañeros de clase piensan menos de él por ello. Sin embargo, tiene una fuerza secreta: su espada. ¿Podrá Will desafiar las expectativas con fuerza sobre magia y espada sobre varita? ¡Descúbrelo en esta épica aventura de espada y brujería!",
   "descriptionTranslationPending": false,
   "format": "TV",
-  "status": "FINISHED",
-  "episodes": 13,
-  "averageScore": 74,
-  "popularity": 324674,
-  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx115230-QHOdSN7yt8ab.jpg",
-  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/115230-wjDIxW77TLv3.jpg",
-  "startYear": 2020,
+  "status": "RELEASING",
+  "episodes": 12,
+  "averageScore": 82,
+  "popularity": 89215,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx182300-IYkq5KrkQq1V.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/182300-d1znfWKzn1bT.jpg",
+  "startYear": 2026,
   "startMonth": 4,
-  "startDay": 2,
-  "endYear": 2020,
+  "startDay": 12,
+  "endYear": 2026,
   "endMonth": 6,
-  "endDay": 25,
+  "endDay": 28,
   "genres": [
-   "Drama",
-   "Fantasy",
    "Action",
-   "Mystery",
-   "Adventure"
+   "Adventure",
+   "Drama",
+   "Fantasy"
   ],
   "studios": [
+   {
+    "slug": "actas",
+    "name": "Actas",
+    "animationStudio": true
+   },
+   {
+    "slug": "bandai-namco-filmworks",
+    "name": "Bandai Namco Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-music-live",
+    "name": "Bandai Namco Music Live",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-pictures",
+    "name": "Bandai Namco Pictures",
+    "animationStudio": true
+   },
    {
     "slug": "crunchyroll",
     "name": "Crunchyroll",
     "animationStudio": false
    },
    {
-    "slug": "line-webtoon",
-    "name": "Line Webtoon",
+    "slug": "kodansha",
+    "name": "Kodansha",
     "animationStudio": false
    },
    {
-    "slug": "telecom-animation-film",
-    "name": "Telecom Animation Film",
-    "animationStudio": true
+    "slug": "tbs",
+    "name": "TBS",
+    "animationStudio": false
    }
   ],
   "season": "SPRING",
-  "seasonYear": 2020,
+  "seasonYear": 2026,
   "characters": [
    {
-    "anilistId": 84781,
-    "name": "Aguero Agnis Khun",
-    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84781-sNnhOZ1SZ66f.png",
-    "role": "MAIN"
-   },
-   {
-    "anilistId": 135466,
-    "name": "Rachel",
-    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b135466-vgW4DewsSkER.jpg",
-    "role": "MAIN"
-   },
-   {
-    "anilistId": 84783,
-    "name": "Rak Wraithraiser",
-    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84783-m1qgQvKVAoNn.jpg",
-    "role": "MAIN"
-   },
-   {
-    "anilistId": 84769,
-    "name": "Twenty-Fifth Baam",
-    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b84769-NaLHptr4KXKd.png",
+    "anilistId": 212394,
+    "name": "Will Serfort",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b212394-LBHoN071nIuu.png",
     "role": "MAIN"
    }
   ]

@@ -174,9 +174,21 @@
   "animeCount": 5
  },
  {
-  "slug": "telecom-animation-film",
-  "name": "Telecom Animation Film",
+  "slug": "actas",
+  "name": "Actas",
   "animationStudio": true,
-  "animeCount": 4
+  "animeCount": 3
+ },
+ {
+  "slug": "bones-film",
+  "name": "bones film",
+  "animationStudio": true,
+  "animeCount": 3
+ },
+ {
+  "slug": "bug-films",
+  "name": "BUG FILMS",
+  "animationStudio": true,
+  "animeCount": 2
  }
 ]

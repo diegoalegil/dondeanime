@@ -27,6 +27,9 @@ const EPISODE_LIMITS = [12, 24, 50, 100, 200];
 const NEWS_LIMITS = [6, 50, 100];
 const UPCOMING_DAYS = [7, 30];
 const MAX_UPCOMING = 10;
+// La home destaca la temporada ACTUAL; sin títulos en emisión el e2e no
+// encuentra la sección de estrenos (el top por popularidad son clásicos).
+const MAX_RELEASING = 12;
 
 let written = 0;
 let missing = 0;
@@ -68,6 +71,7 @@ const main = async () => {
 
   const byPopularity = [...allAnime].sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0));
   const upcoming = allAnime.filter((a) => a.status === 'NOT_YET_RELEASED').slice(0, MAX_UPCOMING);
+  const releasing = byPopularity.filter((a) => a.status === 'RELEASING').slice(0, MAX_RELEASING);
   const subset = new Map();
   for (const slug of REQUIRED_SLUGS) {
     const entry = allAnime.find((a) => a.slug === slug);
@@ -75,6 +79,7 @@ const main = async () => {
     subset.set(slug, entry);
   }
   for (const entry of upcoming) subset.set(entry.slug, entry);
+  for (const entry of releasing) subset.set(entry.slug, entry);
   for (const entry of byPopularity) {
     if (subset.size >= SUBSET_SIZE) break;
     subset.set(entry.slug, entry);
@@ -142,6 +147,7 @@ const main = async () => {
   }
 
   let newsItems = [];
+  await mirror('/api/news/slugs');
   for (const limit of NEWS_LIMITS) {
     const news = await mirror(`/api/news?limit=${limit}`);
     if (Array.isArray(news) && news.length > newsItems.length) newsItems = news;
