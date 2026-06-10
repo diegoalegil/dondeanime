@@ -442,15 +442,22 @@ test('PWA manifest links icons, screenshots and shortcuts', async ({ page, reque
   expect(manifest.screenshots).toHaveLength(2);
   expect(manifest.shortcuts.map((shortcut: { name: string }) => shortcut.name)).toEqual([
     'Buscar',
-    'Mi pais',
-    'Alertas',
+    'Noticias',
+    'Listas',
+  ]);
+  expect(manifest.shortcuts.map((shortcut: { url: string }) => shortcut.url)).toEqual([
+    '/buscar',
+    '/noticias',
+    '/listas',
   ]);
 
+  // Iconos en SVG y PNG: iOS/instaladores PWA no aceptan SVG en todos sitios.
   for (const asset of [...manifest.icons, ...manifest.screenshots]) {
     const assetResponse = await request.get(asset.src);
     expect(assetResponse.ok()).toBe(true);
-    expect(assetResponse.headers()['content-type']).toContain('image/svg+xml');
+    expect(assetResponse.headers()['content-type']).toMatch(/image\/(svg\+xml|png)/);
   }
+  expect(manifest.icons.some((icon: { type: string }) => icon.type === 'image/png')).toBe(true);
 });
 
 test('offline page and service worker are generated', async ({ request }) => {
