@@ -28,6 +28,9 @@ jobs:
     env:
       PUBLIC_API_URL: https://api.dondeanime.com
       PUBLIC_SITE_URL: https://www.dondeanime.com
+      # Build contra fixtures committeados: el CI no toca producción.
+      # Regenerar con: node scripts/generate-fixtures.mjs (ver full-build.yml).
+      PUBLIC_FIXTURE_DIR: fixtures
     steps:
       - name: Checkout
         uses: actions/checkout@v6

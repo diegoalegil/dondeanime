@@ -1,0 +1,48 @@
+[
+ {
+  "anilistId": 105333,
+  "slug": "dr-stone",
+  "titleEnglish": "Dr. STONE",
+  "titleRomaji": "Dr. STONE",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 24,
+  "studio": "TMS Entertainment",
+  "year": 2019,
+  "averageScore": 81,
+  "popularity": 532365,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105333-GybuoSoOZfpH.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Adventure",
+   "Comedy"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 113936,
+  "slug": "dr-stone-stone-wars",
+  "titleEnglish": "Dr. STONE: STONE WARS",
+  "titleRomaji": "Dr. STONE: STONE WARS",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "episodeDuration": 24,
+  "studio": "TMS Entertainment",
+  "year": 2021,
+  "averageScore": 81,
+  "popularity": 322605,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113936-D4eYd4XwslVI.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Adventure",
+   "Comedy"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2021
+ }
+]

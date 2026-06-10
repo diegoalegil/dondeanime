@@ -1,0 +1,52 @@
+[
+ {
+  "anilistId": 30,
+  "slug": "neon-genesis-evangelion",
+  "titleEnglish": "Neon Genesis Evangelion",
+  "titleRomaji": "Shin Seiki Evangelion",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "episodeDuration": 24,
+  "studio": "Gainax",
+  "year": 1995,
+  "averageScore": 83,
+  "popularity": 472607,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx30-AI1zr74Dh4ye.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Mecha",
+   "Mystery"
+  ],
+  "season": "FALL",
+  "seasonYear": 1995
+ },
+ {
+  "anilistId": 2001,
+  "slug": "gurren-lagann",
+  "titleEnglish": "Gurren Lagann",
+  "titleRomaji": "Tengen Toppa Gurren Lagann",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 27,
+  "episodeDuration": 24,
+  "studio": "Gainax",
+  "year": 2007,
+  "averageScore": 85,
+  "popularity": 363159,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx2001-XwRnjzGeFWRQ.png",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Mecha",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2007
+ }
+]

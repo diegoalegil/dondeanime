@@ -1,0 +1,108 @@
+{
+ "anime": {
+  "anilistId": 99147,
+  "slug": "attack-on-titan-season-3",
+  "titleEnglish": "Attack on Titan Season 3",
+  "titleRomaji": "Shingeki no Kyojin Season 3",
+  "trailerYoutubeId": null,
+  "description": "Eren and his companions in the 104th are assigned to the newly-formed Levi Squad, whose assignment is to keep Eren and Historia safe given Eren's newly-discovered power and Historia's knowledge and pedigree. Levi and Erwin have good reason to be concerned, because the priest of the Church that Hanji had hidden away was found tortured to death, making it clear that the Military Police are involved with the cover-up. Things get more harrowing when the MPs make a move on Erwin and the Levi Squad narrowly avoids capture. Eren is also having problems with his Titan transformation, and a deadly killer has been hired to secure Eren and Historia, one Levi knows all too well from his youth.<br>\n<br>\n(Source: Anime News Network)",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 86,
+  "popularity": 660222,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99147-AiPDD8cwlCfi.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99147-HACsFVrynFf5.jpg",
+  "startYear": 2018,
+  "startMonth": 7,
+  "startDay": 23,
+  "endYear": 2018,
+  "endMonth": 10,
+  "endDay": 15,
+  "genres": [
+   "Mystery",
+   "Drama",
+   "Fantasy",
+   "Action"
+  ],
+  "studios": [
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon-enterprise",
+    "name": "Pony Canyon Enterprise",
+    "animationStudio": false
+   },
+   {
+    "slug": "production-ig",
+    "name": "Production I.G",
+    "animationStudio": true
+   },
+   {
+    "slug": "wit-studio",
+    "name": "WIT STUDIO",
+    "animationStudio": true
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 46494,
+    "name": "Armin Arlert",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b46494-g7xYYuBtYPnO.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40882,
+    "name": "Eren Yeager",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 46496,
+    "name": "Erwin Smith",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b46496-Mu86MENd5wNB.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 62481,
+    "name": "Krista Lenz",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b62481-ZZDa7vn17lMU.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 45627,
+    "name": "Levi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40881,
+    "name": "Mikasa Ackerman",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40881-F3gr1PkreDvj.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

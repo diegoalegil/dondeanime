@@ -1,0 +1,163 @@
+{
+ "anime": {
+  "anilistId": 11111,
+  "slug": "another",
+  "titleEnglish": "Another",
+  "titleRomaji": "Another",
+  "trailerYoutubeId": null,
+  "description": "La historia sigue a Koichi Sakakibara, quien se transfiere a una clase maldita donde todos actúan como si una alumna fallecida, Misaki, aún estuviera viva. Al investigar, descubre oscuros secretos sobre la clase y su trágico destino.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 71,
+  "popularity": 372458,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11111-gvvE5bBYsyFo.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/11111.jpg",
+  "startYear": 2012,
+  "startMonth": 1,
+  "startDay": 10,
+  "endYear": 2012,
+  "endMonth": 3,
+  "endDay": 27,
+  "genres": [
+   "Thriller",
+   "Psychological",
+   "Mystery",
+   "Horror",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "bandai-namco-live-creative",
+    "name": "Bandai Namco Live Creative",
+    "animationStudio": false
+   },
+   {
+    "slug": "klockworx",
+    "name": "KLOCKWORX",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-shoten",
+    "name": "Kadokawa Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "ntt-docomo",
+    "name": "NTT Docomo",
+    "animationStudio": false
+   },
+   {
+    "slug": "paworks",
+    "name": "P.A.WORKS",
+    "animationStudio": true
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "toho",
+    "name": "Toho",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2012,
+  "characters": [
+   {
+    "anilistId": 41400,
+    "name": "Kouichi Sakakibara",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b41400-R2RzXzBtXOfJ.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 41402,
+    "name": "Mei Misaki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b41402-uMQLbpd8uwKH.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

@@ -1,0 +1,125 @@
+{
+ "anime": {
+  "anilistId": 20605,
+  "slug": "tokyo-ghoul",
+  "titleEnglish": "Tokyo Ghoul",
+  "titleRomaji": "Tokyo Ghoul",
+  "trailerYoutubeId": null,
+  "description": "En Tokyo ocurren asesinatos misteriosos cometidos por Ghouls, seres desconocidos que comen carne humana, un día Kaneki Ken un joven de 18 años que cursa la Universidad conoce a una chica en un restaurante y la invita a salir, pero luego se da cuenta que ella es un Ghoul y sufre un ataque de parte de ella, pero afortunadamente sobrevive y la muchacha muere; debido a sus heridas los médicos le hacen un transplante de riñon sin saber que la muchacha era una Ghoul y Kaneki termina convirtiéndose en un ser híbrido humano-ghoul y de ahora en adelante deberá vivir escondiéndose de los humanos.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 76,
+  "popularity": 711506,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20605-RCJ7M71zLmrh.jpg",
+  "startYear": 2014,
+  "startMonth": 7,
+  "startDay": 4,
+  "endYear": 2014,
+  "endMonth": 9,
+  "endDay": 19,
+  "genres": [
+   "Psychological",
+   "Action",
+   "Mystery",
+   "Horror",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "marvelous",
+    "name": "Marvelous",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-pierrot",
+    "name": "Studio Pierrot",
+    "animationStudio": true
+   },
+   {
+    "slug": "tc-entertainment",
+    "name": "TC Entertainment",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 87275,
+    "name": "Ken Kaneki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b87275-mb13EWZBdbh3.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 87277,
+    "name": "Touka Kirishima",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b87277-oUaqrI1iBzu6.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

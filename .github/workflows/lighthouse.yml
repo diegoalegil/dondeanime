@@ -29,6 +29,8 @@ jobs:
     env:
       PUBLIC_API_URL: https://api.dondeanime.com
       PUBLIC_SITE_URL: https://www.dondeanime.com
+      # Build contra fixtures committeados: el CI no toca producción.
+      PUBLIC_FIXTURE_DIR: fixtures
       LIGHTHOUSE_MIN_PERFORMANCE_SCORE: 80
       LIGHTHOUSE_MIN_ACCESSIBILITY_SCORE: 90
       LIGHTHOUSE_MIN_BEST_PRACTICES_SCORE: 80

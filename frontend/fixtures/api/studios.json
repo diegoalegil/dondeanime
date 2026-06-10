@@ -1,0 +1,182 @@
+[
+ {
+  "slug": "a-1-pictures",
+  "name": "A-1 Pictures",
+  "animationStudio": true,
+  "animeCount": 63
+ },
+ {
+  "slug": "jcstaff",
+  "name": "J.C.STAFF",
+  "animationStudio": true,
+  "animeCount": 55
+ },
+ {
+  "slug": "madhouse",
+  "name": "MADHOUSE",
+  "animationStudio": true,
+  "animeCount": 49
+ },
+ {
+  "slug": "production-ig",
+  "name": "Production I.G",
+  "animationStudio": true,
+  "animeCount": 49
+ },
+ {
+  "slug": "bones",
+  "name": "bones",
+  "animationStudio": true,
+  "animeCount": 47
+ },
+ {
+  "slug": "kyoto-animation",
+  "name": "Kyoto Animation",
+  "animationStudio": true,
+  "animeCount": 33
+ },
+ {
+  "slug": "tms-entertainment",
+  "name": "TMS Entertainment",
+  "animationStudio": true,
+  "animeCount": 30
+ },
+ {
+  "slug": "cloverworks",
+  "name": "CloverWorks",
+  "animationStudio": true,
+  "animeCount": 28
+ },
+ {
+  "slug": "mappa",
+  "name": "MAPPA",
+  "animationStudio": true,
+  "animeCount": 28
+ },
+ {
+  "slug": "studio-pierrot",
+  "name": "Studio Pierrot",
+  "animationStudio": true,
+  "animeCount": 24
+ },
+ {
+  "slug": "wit-studio",
+  "name": "WIT STUDIO",
+  "animationStudio": true,
+  "animeCount": 23
+ },
+ {
+  "slug": "studio-deen",
+  "name": "Studio DEEN",
+  "animationStudio": true,
+  "animeCount": 20
+ },
+ {
+  "slug": "white-fox",
+  "name": "WHITE FOX",
+  "animationStudio": true,
+  "animeCount": 20
+ },
+ {
+  "slug": "8-bit",
+  "name": "8-bit",
+  "animationStudio": true,
+  "animeCount": 18
+ },
+ {
+  "slug": "lerche",
+  "name": "Lerche",
+  "animationStudio": true,
+  "animeCount": 18
+ },
+ {
+  "slug": "brains-base",
+  "name": "Brain's Base",
+  "animationStudio": true,
+  "animeCount": 17
+ },
+ {
+  "slug": "ufotable",
+  "name": "ufotable",
+  "animationStudio": true,
+  "animeCount": 16
+ },
+ {
+  "slug": "lidenfilms",
+  "name": "LIDENFILMS",
+  "animationStudio": true,
+  "animeCount": 15
+ },
+ {
+  "slug": "toei-animation",
+  "name": "Toei Animation",
+  "animationStudio": true,
+  "animeCount": 15
+ },
+ {
+  "slug": "david-production",
+  "name": "david production",
+  "animationStudio": true,
+  "animeCount": 15
+ },
+ {
+  "slug": "studio-ghibli",
+  "name": "Studio Ghibli",
+  "animationStudio": true,
+  "animeCount": 14
+ },
+ {
+  "slug": "paworks",
+  "name": "P.A.WORKS",
+  "animationStudio": true,
+  "animeCount": 13
+ },
+ {
+  "slug": "sunrise",
+  "name": "Sunrise",
+  "animationStudio": true,
+  "animeCount": 13
+ },
+ {
+  "slug": "trigger",
+  "name": "TRIGGER",
+  "animationStudio": true,
+  "animeCount": 11
+ },
+ {
+  "slug": "kinema-citrus",
+  "name": "Kinema Citrus",
+  "animationStudio": true,
+  "animeCount": 9
+ },
+ {
+  "slug": "gainax",
+  "name": "Gainax",
+  "animationStudio": true,
+  "animeCount": 7
+ },
+ {
+  "slug": "studio-bind",
+  "name": "Studio Bind",
+  "animationStudio": true,
+  "animeCount": 6
+ },
+ {
+  "slug": "comix-wave",
+  "name": "CoMix Wave",
+  "animationStudio": true,
+  "animeCount": 5
+ },
+ {
+  "slug": "science-saru",
+  "name": "Science SARU",
+  "animationStudio": true,
+  "animeCount": 5
+ },
+ {
+  "slug": "telecom-animation-film",
+  "name": "Telecom Animation Film",
+  "animationStudio": true,
+  "animeCount": 4
+ }
+]

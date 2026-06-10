@@ -41,7 +41,8 @@ jobs:
     env:
       TMDB_API_KEY: ci_dummy_token
       PUBLIC_API_URL: http://127.0.0.1:8080
-      PUBLIC_DATA_API_URL: https://api.dondeanime.com
+      # Build y seed contra fixtures committeados: el CI no toca producción.
+      PUBLIC_FIXTURE_DIR: fixtures
       PUBLIC_SITE_URL: https://www.dondeanime.com
       RESEND_ENABLED: 'false'
       SPRING_FLYWAY_ENABLED: 'true'
@@ -85,9 +86,9 @@ jobs:
           cat ../backend-e2e.log
           exit 1
 
-      - name: Seed backend anime from public API
+      - name: Seed backend anime from committed fixture
         run: |
-          curl -fsSL --retry 3 --retry-delay 5 --retry-all-errors https://api.dondeanime.com/api/anime -o /tmp/anime.json
+          cp frontend/fixtures/api/anime.json /tmp/anime.json
           node <<'NODE' > /tmp/seed-anime.sql
           const fs = require('node:fs');
           const anime = JSON.parse(fs.readFileSync('/tmp/anime.json', 'utf8'));

@@ -1,0 +1,47 @@
+[
+ {
+  "anilistId": 99147,
+  "slug": "attack-on-titan-season-3",
+  "titleEnglish": "Attack on Titan Season 3",
+  "titleRomaji": "Shingeki no Kyojin Season 3",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "WIT STUDIO",
+  "year": 2018,
+  "averageScore": 86,
+  "popularity": 660222,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99147-AiPDD8cwlCfi.jpg",
+  "genres": [
+   "Action",
+   "Drama",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2018
+ },
+ {
+  "anilistId": 99750,
+  "slug": "i-want-to-eat-your-pancreas",
+  "titleEnglish": "I Want to Eat Your Pancreas",
+  "titleRomaji": "Kimi no Suizou wo Tabetai",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 108,
+  "studio": "Studio VOLN",
+  "year": 2018,
+  "averageScore": 84,
+  "popularity": 356223,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2018
+ }
+]

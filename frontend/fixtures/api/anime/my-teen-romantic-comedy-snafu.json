@@ -1,0 +1,101 @@
+{
+ "anime": {
+  "anilistId": 14813,
+  "slug": "my-teen-romantic-comedy-snafu",
+  "titleEnglish": "My Teen Romantic Comedy SNAFU",
+  "titleRomaji": "Yahari Ore no Seishun Love Come wa Machigatteiru.",
+  "trailerYoutubeId": null,
+  "description": "La comedia romántica gira en torno a un estudiante de instituto bastante antisocial llamado Hachiman Hikigaya y que tiene una distorsionada visión de la vida, aparte de no tener amigos ni mucho menos novia. Cuando ve a sus compañeros de clase hablando alegremente de sus vidas adolescentes, él murmura que son todos una panda de mentirosos. Cuando le preguntan por sus sueños para el futuro, su respuesta es: “no trabajar”. Un profesor sin embargo consigue enrrolar a Hachiman en el club de voluntariado, al que resulta que está también apuntada la chica más guapa del instituto, Yukino Yukinoshita.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 78,
+  "popularity": 364863,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14813-3mNvcKNEQcDs.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14813-urImBxyWJUEw.jpg",
+  "startYear": 2013,
+  "startMonth": 4,
+  "startDay": 5,
+  "endYear": 2013,
+  "endMonth": 6,
+  "endDay": 28,
+  "genres": [
+   "Slice of Life",
+   "Comedy",
+   "Romance",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "brains-base",
+    "name": "Brain's Base",
+    "animationStudio": true
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "tbs",
+    "name": "TBS",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2013,
+  "characters": [
+   {
+    "anilistId": 67065,
+    "name": "Hachiman Hikigaya",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b67065-Dhec6tE2yWA9.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 67069,
+    "name": "Yui Yuigahama",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b67069-6B3xnHfJUO0F.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 67067,
+    "name": "Yukino Yukinoshita",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b67067-gqhgjlni0Bcf.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

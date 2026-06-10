@@ -1,0 +1,173 @@
+{
+ "anime": {
+  "anilistId": 9989,
+  "slug": "anohana-the-flower-we-saw-that-day",
+  "titleEnglish": "Anohana: The Flower We Saw That Day",
+  "titleRomaji": "Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
+  "trailerYoutubeId": "n999uguBmzo",
+  "description": "Un adolescente atormentado por el espíritu de una vieja amiga reúne a su grupo de amigos de la infancia para cumplir el último deseo de la chica.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 11,
+  "averageScore": 80,
+  "popularity": 383890,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9989-hImMg6kCMm6I.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/9989-pyr6rXlV1oAm.jpg",
+  "startYear": 2011,
+  "startMonth": 4,
+  "startDay": 15,
+  "endYear": 2011,
+  "endMonth": 6,
+  "endDay": 24,
+  "genres": [
+   "Slice of Life",
+   "Romance",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex-of-america",
+    "name": "Aniplex of America",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "fuji-tv",
+    "name": "Fuji TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "fujipacific-music",
+    "name": "Fujipacific Music",
+    "animationStudio": false
+   },
+   {
+    "slug": "hanabee-entertainment",
+    "name": "Hanabee Entertainment",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2011,
+  "characters": [
+   {
+    "anilistId": 40594,
+    "name": "Atsumu Matsuyuki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40594-ZKnNeogrL2K0.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40595,
+    "name": "Chiriko Tsurumi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40595-WWFvfCf4C8If.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40591,
+    "name": "Jinta Yadomi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40591-PFcHVI98QgnI.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40592,
+    "name": "Meiko Honma",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40592-mAEyaQyJu5oc.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40593,
+    "name": "Naruko Anjou",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40593-3N05kRft0s8d.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40596,
+    "name": "Tetsudo Hisakawa",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40596-hm4I6Cal3EaS.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

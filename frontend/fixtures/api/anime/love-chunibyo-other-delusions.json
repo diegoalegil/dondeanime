@@ -1,0 +1,108 @@
+{
+ "anime": {
+  "anilistId": 14741,
+  "slug": "love-chunibyo-other-delusions",
+  "titleEnglish": "Love, Chunibyo & Other Delusions",
+  "titleRomaji": "Chuunibyou demo Koi ga Shitai!",
+  "trailerYoutubeId": null,
+  "description": "Yuuta Togashi, un chico que solía sufrir de \"chuu-2 byou\" y Rikka Takanashi, que todavía tiene el síndrome, formarán un vínculo verdadero entre ambos, es decir, que comenzarán a salir. Se encuentran disfrutando de la vida, o al menos deberían. Sin embargo, Satone Shichimiya, o \"Sophia Ring SP Saturn VII\" como le gusta que la llamen, una amiga de Togashi y que sufre del \"chuu-2 byou\" como nadie, aparece de repente y pone patas arriba la vida del muchacho. Así comenzará la batalla entre \"Saturn\" y \"Jaou Shingan\".",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 76,
+  "popularity": 339117,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14741-CGXEIeUe2roA.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14741-7RMdUd7tVfSu.jpg",
+  "startYear": 2012,
+  "startMonth": 10,
+  "startDay": 4,
+  "endYear": 2012,
+  "endMonth": 12,
+  "endDay": 20,
+  "genres": [
+   "Comedy",
+   "Slice of Life",
+   "Romance",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "animation-do",
+    "name": "Animation Do",
+    "animationStudio": true
+   },
+   {
+    "slug": "kyoto-animation",
+    "name": "Kyoto Animation",
+    "animationStudio": true
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "rakuonsha",
+    "name": "Rakuonsha",
+    "animationStudio": false
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "tbs",
+    "name": "TBS",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2012,
+  "characters": [
+   {
+    "anilistId": 67213,
+    "name": "Kumin Tsuyuri",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b67213-ullAaqYtUG1N.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65869,
+    "name": "Makoto Isshiki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65869-lwMeglnCIm0F.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65865,
+    "name": "Rikka Takanashi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65865-AC0ru7cDXUgK.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 67215,
+    "name": "Sanae Dekomori",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b67215-J87mEugyhVRO.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65871,
+    "name": "Shinka Nibutani",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65871-yuJ1aq2vynvC.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65863,
+    "name": "Yuuta Togashi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65863-blMgFqD1EnPs.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

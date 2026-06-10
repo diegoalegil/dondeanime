@@ -1,0 +1,88 @@
+{
+ "anime": {
+  "anilistId": 100166,
+  "slug": "my-hero-academia-season-3",
+  "titleEnglish": "My Hero Academia Season 3",
+  "titleRomaji": "Boku no Hero Academia 3",
+  "trailerYoutubeId": null,
+  "description": "Summer is here, and the heroes of Class 1-A and 1-B are in for the toughest training camp of their lives! A group of seasoned pros pushes everyone's Quirks to new heights as the students face one overwhelming challenge after another. Braving the elements in this secret location becomes the least of their worries when routine training turns into a critical struggle for survival.<br><br>(Source: Crunchyroll)",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "averageScore": 79,
+  "popularity": 581552,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx100166-jUCZYbzn2XLw.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100166-k7RXwN5vZg0r.jpg",
+  "startYear": 2018,
+  "startMonth": 4,
+  "startDay": 7,
+  "endYear": 2018,
+  "endMonth": 9,
+  "endDay": 29,
+  "genres": [
+   "Comedy",
+   "Drama",
+   "Action",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "shueisha",
+    "name": "Shueisha",
+    "animationStudio": false
+   },
+   {
+    "slug": "toho",
+    "name": "Toho",
+    "animationStudio": false
+   },
+   {
+    "slug": "bones",
+    "name": "bones",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 89028,
+    "name": "Izuku Midoriya",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89028-8w1I9o1ISHMg.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88892,
+    "name": "Katsuki Bakugou",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88892-bdOha3lNcaN6.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89221,
+    "name": "Ochako Uraraka",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89221-gSF2a4gPbG4m.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89220,
+    "name": "Shouto Todoroki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89220-KNBwaVFAR8FD.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89222,
+    "name": "Tenya Iida",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89222-TL8MQM3wJgEB.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89224,
+    "name": "Toshinori Yagi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89224-K6KEuQAuYKzq.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

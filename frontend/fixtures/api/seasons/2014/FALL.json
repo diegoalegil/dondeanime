@@ -1,0 +1,74 @@
+[
+ {
+  "anilistId": 20665,
+  "slug": "your-lie-in-april",
+  "titleEnglish": "Your lie in April",
+  "titleRomaji": "Shigatsu wa Kimi no Uso",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 22,
+  "episodeDuration": 23,
+  "studio": "A-1 Pictures",
+  "year": 2014,
+  "averageScore": 84,
+  "popularity": 589867,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20665-TLgkL8T8IRFd.png",
+  "genres": [
+   "Drama",
+   "Music",
+   "Slice of Life",
+   "Romance"
+  ],
+  "season": "FALL",
+  "seasonYear": 2014
+ },
+ {
+  "anilistId": 20789,
+  "slug": "the-seven-deadly-sins",
+  "titleEnglish": "The Seven Deadly Sins",
+  "titleRomaji": "Nanatsu no Taizai",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 25,
+  "studio": "A-1 Pictures",
+  "year": 2014,
+  "averageScore": 73,
+  "popularity": 511327,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20789-Ma5ouSYPkru9.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Fantasy",
+   "Comedy",
+   "Ecchi",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2014
+ },
+ {
+  "anilistId": 20623,
+  "slug": "parasyte-the-maxim",
+  "titleEnglish": "Parasyte -the maxim-",
+  "titleRomaji": "Kiseijuu: Sei no Kakuritsu",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 24,
+  "studio": "MADHOUSE",
+  "year": 2014,
+  "averageScore": 81,
+  "popularity": 483713,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20623-dUARfggnNDOe.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Horror"
+  ],
+  "season": "FALL",
+  "seasonYear": 2014
+ }
+]

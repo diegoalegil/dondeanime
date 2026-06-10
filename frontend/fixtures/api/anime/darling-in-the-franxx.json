@@ -1,0 +1,198 @@
+{
+ "anime": {
+  "anilistId": 99423,
+  "slug": "darling-in-the-franxx",
+  "titleEnglish": "DARLING in the FRANXX",
+  "titleRomaji": "Darling in the Franxx",
+  "trailerYoutubeId": null,
+  "description": "En un futuro distópico, Hiro, un piloto en una ciudad-fortaleza, pierde su habilidad para pilotar un robot Franxx. Su vida cambia al encontrarse con Zero Two, una misteriosa chica con cuernos, y juntos enfrentan amenazas gigantes.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 70,
+  "popularity": 480327,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx99423-8MBxtwCeHf8B.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99423-OQfem628gdxD.jpg",
+  "startYear": 2018,
+  "startMonth": 1,
+  "startDay": 13,
+  "endYear": 2018,
+  "endMonth": 7,
+  "endDay": 7,
+  "genres": [
+   "Psychological",
+   "Sci-Fi",
+   "Action",
+   "Mecha",
+   "Romance",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "cloverworks",
+    "name": "CloverWorks",
+    "animationStudio": true
+   },
+   {
+    "slug": "crunchyroll",
+    "name": "Crunchyroll",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "trigger",
+    "name": "TRIGGER",
+    "animationStudio": true
+   },
+   {
+    "slug": "ultra-super-pictures",
+    "name": "Ultra Super Pictures",
+    "animationStudio": false
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 124383,
+    "name": "Goro",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n124383-I6ZsEBQoETj3.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 124380,
+    "name": "Hiro",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b124380-ct1wJHIl9BY1.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 124382,
+    "name": "Ichigo",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b124382-bSBkjtYjJQtr.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 124384,
+    "name": "Miku",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b124384-bsl6vVNhT2DR.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 124381,
+    "name": "Zero Two",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b124381-pkTKi6HHNuVR.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 124385,
+    "name": "Zorome",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b124385-wnvor7z83ZPt.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

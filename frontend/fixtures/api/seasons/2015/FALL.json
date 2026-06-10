@@ -1,0 +1,47 @@
+[
+ {
+  "anilistId": 21087,
+  "slug": "one-punch-man",
+  "titleEnglish": "One-Punch Man",
+  "titleRomaji": "One Punch Man",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "MADHOUSE",
+  "year": 2015,
+  "averageScore": 83,
+  "popularity": 741633,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21087-B5DHjqZ3kW4b.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2015
+ },
+ {
+  "anilistId": 20992,
+  "slug": "haikyu-2nd-season",
+  "titleEnglish": "HAIKYU!! 2nd Season",
+  "titleRomaji": "Haikyuu!! 2nd Season",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "Production I.G",
+  "year": 2015,
+  "averageScore": 86,
+  "popularity": 386682,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20992-aHgNbcalVEqk.png",
+  "genres": [
+   "Drama",
+   "Comedy",
+   "Sports"
+  ],
+  "season": "FALL",
+  "seasonYear": 2015
+ }
+]

@@ -1,0 +1,69 @@
+{
+ "anime": {
+  "anilistId": 199,
+  "slug": "spirited-away",
+  "titleEnglish": "Spirited Away",
+  "titleRomaji": "Sen to Chihiro no Kamikakushi",
+  "trailerYoutubeId": null,
+  "description": "On the way to their new home, 10-year-old Chihiro Ogino's family stumbles upon a deserted theme park. Intrigued, the family investigates the park, though unbeknownst to them, it is secretly inhabited by spirits who sleep by day and appear at night. When Chihiro's mother and father eat food from a restaurant in the street, angry spirits turn them into pigs. Furthermore, a wide sea has appeared between the spirit world and the human one, trapping Chihiro, the sole human, in a land of spirits. Luckily for her though, a mysterious boy named Haku appears, claiming to know her from the past. Under his instructions, Chihiro secures a job in the bathhouse where Haku works. With only her courage and some new found friends to aid her, Chihiro embarks on a journey to turn her parents back to their original forms and return home.\n",
+  "descriptionTranslationPending": true,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "averageScore": 86,
+  "popularity": 463012,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx199-sWefXJvXkDOb.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/199-Sm2RU5PSqw7T.jpg",
+  "startYear": 2001,
+  "startMonth": 7,
+  "startDay": 20,
+  "endYear": 2001,
+  "endMonth": 7,
+  "endDay": 20,
+  "genres": [
+   "Adventure",
+   "Drama",
+   "Fantasy",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "gkids",
+    "name": "GKIDS",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-ghibli",
+    "name": "Studio Ghibli",
+    "animationStudio": true
+   },
+   {
+    "slug": "studio-hibari",
+    "name": "Studio Hibari",
+    "animationStudio": true
+   },
+   {
+    "slug": "walt-disney-studios",
+    "name": "Walt Disney Studios",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2001,
+  "characters": [
+   {
+    "anilistId": 384,
+    "name": "Chihiro Ogino",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b384-AoWCsQyG0WI7.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 385,
+    "name": "Haku",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b385-pKGCy3oYWxRa.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

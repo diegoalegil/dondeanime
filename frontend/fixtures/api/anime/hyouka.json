@@ -1,0 +1,163 @@
+{
+ "anime": {
+  "anilistId": 12189,
+  "slug": "hyouka",
+  "titleEnglish": "Hyouka",
+  "titleRomaji": "Hyouka",
+  "trailerYoutubeId": null,
+  "description": "Historia que sigue a Hotaro, un joven estudiante que entra por orden de su hermana en vez de por propio interés en el Clud de Literatura Clásica de su escuela. Hotaro junto es acompañado junto a sus compañeros de club en la investigación de un misterioso incidente ocurrida hace 33 años en el que está implicado el tío de una de las integrantes del Club de Literatura.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 22,
+  "averageScore": 79,
+  "popularity": 340865,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx12189-zj5AWUYO53Fv.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/12189-TG0peUcKFqur.jpg",
+  "startYear": 2012,
+  "startMonth": 4,
+  "startDay": 23,
+  "endYear": 2012,
+  "endMonth": 9,
+  "endDay": 16,
+  "genres": [
+   "Slice of Life",
+   "Romance",
+   "Mystery"
+  ],
+  "studios": [
+   {
+    "slug": "animation-do",
+    "name": "Animation Do",
+    "animationStudio": true
+   },
+   {
+    "slug": "klockworx",
+    "name": "KLOCKWORX",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa-shoten",
+    "name": "Kadokawa Shoten",
+    "animationStudio": false
+   },
+   {
+    "slug": "kyoto-animation",
+    "name": "Kyoto Animation",
+    "animationStudio": true
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "chara-anicom",
+    "name": "chara-ani.com",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2012,
+  "characters": [
+   {
+    "anilistId": 55133,
+    "name": "Eru Chitanda",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b55133-S7lRrP0gKXpX.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 55131,
+    "name": "Houtarou Oreki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b55131-ypodHQCyHbzD.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 55137,
+    "name": "Mayaka Ibara",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b55137-PO5CLLnbTwyg.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 55135,
+    "name": "Satoshi Fukube",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b55135-rSgLOX86JRSO.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

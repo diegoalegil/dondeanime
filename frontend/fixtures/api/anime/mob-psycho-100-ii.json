@@ -1,0 +1,93 @@
+{
+ "anime": {
+  "anilistId": 101338,
+  "slug": "mob-psycho-100-ii",
+  "titleEnglish": "Mob Psycho 100 II",
+  "titleRomaji": "Mob Psycho 100 II",
+  "trailerYoutubeId": null,
+  "description": "The second season of <i>Mob Psycho 100</i>. <br>\n<br>Kageyama is an ordinary 8th grader who just wants to live a normal life. Although he can disappear in the crowd in a flash, he was actually the most powerful psychic. The lives of those around Mob and his numerous feelings that softly piles up for the eventual explosion. The mysterious group \"Claw\" stands before him once again. In the midst of his youthful days, where will his roaring heart take him!?\n<br>\n<br>\n(Source: Crunchyroll)",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 87,
+  "popularity": 433586,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101338-rokVscjRYzdP.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101338-Rl54Qhx71dUq.jpg",
+  "startYear": 2019,
+  "startMonth": 1,
+  "startDay": 7,
+  "endYear": 2019,
+  "endMonth": 4,
+  "endDay": 1,
+  "genres": [
+   "Comedy",
+   "Psychological",
+   "Slice of Life",
+   "Drama",
+   "Action",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "bs-fuji",
+    "name": "BS Fuji",
+    "animationStudio": false
+   },
+   {
+    "slug": "hakuhodo-dy-music-pictures",
+    "name": "Hakuhodo DY Music & Pictures",
+    "animationStudio": false
+   },
+   {
+    "slug": "klockworx",
+    "name": "KLOCKWORX",
+    "animationStudio": false
+   },
+   {
+    "slug": "shogakukan-shueisha-productions",
+    "name": "Shogakukan-Shueisha Productions",
+    "animationStudio": false
+   },
+   {
+    "slug": "warner-bros-japan",
+    "name": "Warner Bros. Japan",
+    "animationStudio": false
+   },
+   {
+    "slug": "bones",
+    "name": "bones",
+    "animationStudio": true
+   }
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 89334,
+    "name": "Arataka Reigen",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89334-OPj1hCzvrt7X.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89617,
+    "name": "Ekubo",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89617-HHZ1kziYxc0q.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89616,
+    "name": "Shigeo Kageyama",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89616-dXmdOc7L6SDi.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 130683,
+    "name": "Shou Suzuki",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n130683-TxUJVPKmUxrf.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

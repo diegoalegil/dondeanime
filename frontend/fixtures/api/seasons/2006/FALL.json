@@ -1,0 +1,49 @@
+[
+ {
+  "anilistId": 1535,
+  "slug": "death-note",
+  "titleEnglish": "Death Note",
+  "titleRomaji": "DEATH NOTE",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 37,
+  "episodeDuration": 23,
+  "studio": "MADHOUSE",
+  "year": 2006,
+  "averageScore": 84,
+  "popularity": 919246,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1535-kUgkcrfOrkUM.jpg",
+  "genres": [
+   "Psychological",
+   "Thriller",
+   "Mystery",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2006
+ },
+ {
+  "anilistId": 1575,
+  "slug": "code-geass-lelouch-of-the-rebellion",
+  "titleEnglish": "Code Geass: Lelouch of the Rebellion",
+  "titleRomaji": "Code Geass: Hangyaku no Lelouch",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "Sunrise",
+  "year": 2006,
+  "averageScore": 85,
+  "popularity": 477237,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1575-hsmWM2ydNm1m.jpg",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Drama",
+   "Thriller",
+   "Mecha"
+  ],
+  "season": "FALL",
+  "seasonYear": 2006
+ }
+]

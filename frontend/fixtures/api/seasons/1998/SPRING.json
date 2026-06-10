@@ -1,0 +1,25 @@
+[
+ {
+  "anilistId": 1,
+  "slug": "cowboy-bebop",
+  "titleEnglish": "Cowboy Bebop",
+  "titleRomaji": "Cowboy Bebop",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "episodeDuration": 24,
+  "studio": "Sunrise",
+  "year": 1998,
+  "averageScore": 86,
+  "popularity": 450587,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1-GCsPm7waJ4kS.png",
+  "genres": [
+   "Action",
+   "Sci-Fi",
+   "Adventure",
+   "Drama"
+  ],
+  "season": "SPRING",
+  "seasonYear": 1998
+ }
+]

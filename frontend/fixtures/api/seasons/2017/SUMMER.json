@@ -1,0 +1,70 @@
+[
+ {
+  "anilistId": 98314,
+  "slug": "kakegurui",
+  "titleEnglish": "Kakegurui",
+  "titleRomaji": "Kakegurui",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 25,
+  "studio": "MAPPA",
+  "year": 2017,
+  "averageScore": 70,
+  "popularity": 442764,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98314-TSJykxVwCCQN.jpg",
+  "genres": [
+   "Psychological",
+   "Drama",
+   "Mystery"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017
+ },
+ {
+  "anilistId": 98659,
+  "slug": "classroom-of-the-elite",
+  "titleEnglish": "Classroom of the Elite",
+  "titleRomaji": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "Lerche",
+  "year": 2017,
+  "averageScore": 76,
+  "popularity": 425801,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98659-WNyPLIZDpGGY.jpg",
+  "genres": [
+   "Psychological",
+   "Drama"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017
+ },
+ {
+  "anilistId": 97986,
+  "slug": "made-in-abyss",
+  "titleEnglish": "Made in Abyss",
+  "titleRomaji": "Made in Abyss",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "episodeDuration": 25,
+  "studio": "Kinema Citrus",
+  "year": 2017,
+  "averageScore": 85,
+  "popularity": 390861,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97986-TQ7dCgbS3y5s.jpg",
+  "genres": [
+   "Sci-Fi",
+   "Adventure",
+   "Drama",
+   "Horror",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017
+ }
+]

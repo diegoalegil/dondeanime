@@ -1,0 +1,177 @@
+{
+ "anime": {
+  "anilistId": 20789,
+  "slug": "the-seven-deadly-sins",
+  "titleEnglish": "The Seven Deadly Sins",
+  "titleRomaji": "Nanatsu no Taizai",
+  "trailerYoutubeId": null,
+  "description": "Acusados injustamente de traición, los Siete Pecados Capitales fueron exiliados. Ahora, la princesa Elizabeth busca su ayuda para recuperar el reino, usurpado por los Caballeros Sagrados. Su primer aliado es Meliodas, un joven despreocupado con una fuerza que podría superar las leyendas.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 73,
+  "popularity": 511327,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20789-Ma5ouSYPkru9.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20789-qwG9GcxIrmVE.jpg",
+  "startYear": 2014,
+  "startMonth": 10,
+  "startDay": 5,
+  "endYear": 2015,
+  "endMonth": 3,
+  "endDay": 29,
+  "genres": [
+   "Comedy",
+   "Action",
+   "Ecchi",
+   "Adventure",
+   "Fantasy",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "a-1-pictures",
+    "name": "A-1 Pictures",
+    "animationStudio": true
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 77605,
+    "name": "Ban",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b77605-NrjhQwZwgJ3l.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 74653,
+    "name": "Diane",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b74653-XpMcsLVZBnkZ.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 72923,
+    "name": "Elizabeth Liones",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b72923-Hidpb955mwMW.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 86683,
+    "name": "Hawk",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/n86683-ZXPoLZnKqNtx.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 83801,
+    "name": "King",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b83801-52RnDXQDZ1I7.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 72921,
+    "name": "Meliodas",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b72921-XDHNd1wflN6P.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

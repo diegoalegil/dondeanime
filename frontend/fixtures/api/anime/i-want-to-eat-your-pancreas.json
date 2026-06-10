@@ -1,0 +1,88 @@
+{
+ "anime": {
+  "anilistId": 99750,
+  "slug": "i-want-to-eat-your-pancreas",
+  "titleEnglish": "I Want to Eat Your Pancreas",
+  "titleRomaji": "Kimi no Suizou wo Tabetai",
+  "trailerYoutubeId": null,
+  "description": "Spring time in April and the last of the cherry blossoms are still in bloom. The usually aloof bookworm with no interest in others comes across a book in a hospital waiting room. Handwritten on the cover are the words: \"Living with Dying.\" He soon discovers that it is a diary kept by his very popular and genuinely cheerful classmate, Sakura Yamauchi, who reveals to him that she is secretly suffering from a pancreatic illness and only has a limited time left. It is at this moment that she gains just one more person to share her secret.<br>\n<br>\nTrying to maintain a normal life as much as possible, Sakura is determined to live her life to the fullest until the very last day. As her free spirit and unpredictable actions throw him for a loop, his heart begins to gradually change.\n<br><br>\n(Source: Aniplex USA)",
+  "descriptionTranslationPending": true,
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "averageScore": 84,
+  "popularity": 356223,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99750-KPFW2Jv03b2B.jpg",
+  "startYear": 2018,
+  "startMonth": 9,
+  "startDay": 1,
+  "endYear": 2018,
+  "endMonth": 9,
+  "endDay": 1,
+  "genres": [
+   "Slice of Life",
+   "Romance",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "abc-animation",
+    "name": "ABC Animation",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "asahi-shimbun",
+    "name": "Asahi Shimbun",
+    "animationStudio": false
+   },
+   {
+    "slug": "futabasha",
+    "name": "Futabasha",
+    "animationStudio": false
+   },
+   {
+    "slug": "half-hp-studio",
+    "name": "Half H.P Studio",
+    "animationStudio": false
+   },
+   {
+    "slug": "jr-higashi-nihon-kikaku",
+    "name": "JR Higashi Nihon Kikaku",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-voln",
+    "name": "Studio VOLN",
+    "animationStudio": false
+   },
+   {
+    "slug": "tohan",
+    "name": "Tohan",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2018,
+  "characters": [
+   {
+    "anilistId": 127116,
+    "name": "Haruki Shiga",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127116-u2fIKMSYDdVj.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 127118,
+    "name": "Sakura Yamauchi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b127118-XEvgt4yHSkQv.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

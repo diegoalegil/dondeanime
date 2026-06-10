@@ -1,0 +1,27 @@
+[
+ {
+  "anilistId": 20,
+  "slug": "naruto",
+  "titleEnglish": "Naruto",
+  "titleRomaji": "NARUTO",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 220,
+  "episodeDuration": 23,
+  "studio": "Studio Pierrot",
+  "year": 2002,
+  "averageScore": 80,
+  "popularity": 694959,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Fantasy",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2002
+ }
+]

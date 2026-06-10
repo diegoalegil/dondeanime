@@ -1,0 +1,110 @@
+{
+ "anime": {
+  "anilistId": 97668,
+  "slug": "one-punch-man-season-2",
+  "titleEnglish": "One-Punch Man Season 2",
+  "titleRomaji": "One Punch Man 2",
+  "trailerYoutubeId": null,
+  "description": "Saitama is a hero who only became a hero for fun. After three years of “special training,” he’s become so strong that he’s practically invincible. In fact, he’s too strong—even his mightiest opponents are taken out with a single punch. Now, the great seer Madame Shibabawa’s prediction about the Earth being doomed seems to be coming true as the frequency of monster incidents escalates. Alongside Genos, his faithful disciple, Saitama begins his official hero duties as a member of the Hero Association, while Garou, a man utterly fascinated by monsters, makes his appearance.",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 74,
+  "popularity": 452105,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97668-nC8gQrXVxt7k.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/97668-8Yo3iH2fxbKR.jpg",
+  "startYear": 2019,
+  "startMonth": 4,
+  "startDay": 10,
+  "endYear": 2019,
+  "endMonth": 7,
+  "endDay": 3,
+  "genres": [
+   "Comedy",
+   "Sci-Fi",
+   "Action",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "adk-marketing-solutions",
+    "name": "ADK Marketing Solutions",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-spirits",
+    "name": "BANDAI SPIRITS",
+    "animationStudio": false
+   },
+   {
+    "slug": "bandai-namco-arts",
+    "name": "Bandai Namco Arts",
+    "animationStudio": false
+   },
+   {
+    "slug": "good-smile-company",
+    "name": "Good Smile Company",
+    "animationStudio": false
+   },
+   {
+    "slug": "jcstaff",
+    "name": "J.C.STAFF",
+    "animationStudio": true
+   },
+   {
+    "slug": "jr-higashi-nihon-kikaku",
+    "name": "JR Higashi Nihon Kikaku",
+    "animationStudio": false
+   },
+   {
+    "slug": "lantis",
+    "name": "Lantis",
+    "animationStudio": false
+   },
+   {
+    "slug": "magic-capsule",
+    "name": "Magic Capsule",
+    "animationStudio": false
+   },
+   {
+    "slug": "shueisha",
+    "name": "Shueisha",
+    "animationStudio": false
+   },
+   {
+    "slug": "tv-tokyo",
+    "name": "TV Tokyo",
+    "animationStudio": false
+   },
+   {
+    "slug": "viz-media",
+    "name": "Viz Media",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 89277,
+    "name": "Garou",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89277-xBGb4B5YISXg.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 73979,
+    "name": "Genos",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b73979-tVi9maPID881.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 73935,
+    "name": "Saitama",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b73935-ON5d0mAcrItd.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

@@ -1,0 +1,131 @@
+{
+ "anime": {
+  "anilistId": 120377,
+  "slug": "cyberpunk-edgerunners",
+  "titleEnglish": "Cyberpunk: Edgerunners",
+  "titleRomaji": "Cyberpunk: Edgerunners",
+  "trailerYoutubeId": "W6NhKRY_qmE",
+  "description": "En una distopía plagada de corrupción e implantes cibernéticos, un chico prodigioso pero temerario trata de convertirse en un mercenario proscrito: un ‘edgerunner’.",
+  "descriptionTranslationPending": false,
+  "format": "ONA",
+  "status": "FINISHED",
+  "episodes": 10,
+  "averageScore": 85,
+  "popularity": 353289,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120377-ayZPoxiWt4Li.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/120377-c15oLS8CA31s.jpg",
+  "startYear": 2022,
+  "startMonth": 9,
+  "startDay": 13,
+  "endYear": 2022,
+  "endMonth": 9,
+  "endDay": 13,
+  "genres": [
+   "Psychological",
+   "Action",
+   "Sci-Fi",
+   "Drama"
+  ],
+  "studios": [
+   {
+    "slug": "cd-projekt-red",
+    "name": "CD PROJEKT RED",
+    "animationStudio": false
+   },
+   {
+    "slug": "netflix",
+    "name": "Netflix",
+    "animationStudio": false
+   },
+   {
+    "slug": "trigger",
+    "name": "TRIGGER",
+    "animationStudio": true
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2022,
+  "characters": [
+   {
+    "anilistId": 284158,
+    "name": "David Martinez",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b284158-z1uGKC3IYVa1.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 284157,
+    "name": "Lucy",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b284157-cqYawN7XCNJx.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

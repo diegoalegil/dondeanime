@@ -1,0 +1,93 @@
+[
+ {
+  "anilistId": 21519,
+  "slug": "your-name",
+  "titleEnglish": "Your Name.",
+  "titleRomaji": "Kimi no Na wa.",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 107,
+  "studio": "CoMix Wave",
+  "year": 2016,
+  "averageScore": 86,
+  "popularity": 684804,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-SUo3ZQuCbYhJ.png",
+  "genres": [
+   "Drama",
+   "Romance",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 20954,
+  "slug": "a-silent-voice",
+  "titleEnglish": "A Silent Voice",
+  "titleRomaji": "Koe no Katachi",
+  "format": "MOVIE",
+  "status": "FINISHED",
+  "episodes": 1,
+  "episodeDuration": 130,
+  "studio": "Kyoto Animation",
+  "year": 2016,
+  "averageScore": 88,
+  "popularity": 682818,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20954-sYRfE5jQRtSB.jpg",
+  "genres": [
+   "Drama",
+   "Slice of Life",
+   "Romance"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 21507,
+  "slug": "mob-psycho-100",
+  "titleEnglish": "Mob Psycho 100",
+  "titleRomaji": "Mob Psycho 100",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "bones",
+  "year": 2016,
+  "averageScore": 84,
+  "popularity": 600720,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Drama",
+   "Slice of Life",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ },
+ {
+  "anilistId": 21804,
+  "slug": "the-disastrous-life-of-saiki-k",
+  "titleEnglish": "The Disastrous Life of Saiki K.",
+  "titleRomaji": "Saiki Kusuo no Ψ-nan",
+  "format": "TV_SHORT",
+  "status": "FINISHED",
+  "episodes": 120,
+  "episodeDuration": 5,
+  "studio": "J.C.STAFF",
+  "year": 2016,
+  "averageScore": 83,
+  "popularity": 342712,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21804-As6tDLAvEvNY.jpg",
+  "genres": [
+   "Slice of Life",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2016
+ }
+]

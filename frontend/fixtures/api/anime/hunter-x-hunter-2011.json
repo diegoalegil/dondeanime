@@ -1,0 +1,174 @@
+{
+ "anime": {
+  "anilistId": 11061,
+  "slug": "hunter-x-hunter-2011",
+  "titleEnglish": "Hunter x Hunter (2011)",
+  "titleRomaji": "HUNTER×HUNTER (2011)",
+  "trailerYoutubeId": "F_YR1T_MdCI",
+  "description": "Gon Frecks, un niño de 12 años, vive con su tía Mito y su abuela en Isla Ballena, huérfano de madre y según su tía también de padre. Un día Gon es atacado por un oso del bosque, pero es salvado por un cazador quien le explica que está en busca de su maestro para así convertirse en un cazador, él es quien le dice que su padre Gin está vivo. Enterado de esto Gon decide convertirse en cazador para poder encontrar a su padre.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 148,
+  "averageScore": 89,
+  "popularity": 806746,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx11061-y5gsT1hoHuHw.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/11061-8WkkTZ6duKpq.jpg",
+  "startYear": 2011,
+  "startMonth": 10,
+  "startDay": 2,
+  "endYear": 2014,
+  "endMonth": 9,
+  "endDay": 24,
+  "genres": [
+   "Fantasy",
+   "Action",
+   "Adventure"
+  ],
+  "studios": [
+   {
+    "slug": "madhouse",
+    "name": "MADHOUSE",
+    "animationStudio": true
+   },
+   {
+    "slug": "nippon-television-network",
+    "name": "Nippon Television Network",
+    "animationStudio": false
+   },
+   {
+    "slug": "studio-live",
+    "name": "Studio Live",
+    "animationStudio": true
+   },
+   {
+    "slug": "vap",
+    "name": "VAP",
+    "animationStudio": false
+   },
+   {
+    "slug": "viz-media",
+    "name": "Viz Media",
+    "animationStudio": false
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2011,
+  "characters": [
+   {
+    "anilistId": 30,
+    "name": "Gon Freecss",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 31,
+    "name": "Hisoka Morow",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b31-FZckOuu7L1un.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 27,
+    "name": "Killua Zoldyck",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 28,
+    "name": "Kurapika",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b28-ivA7UGnfE40a.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 29,
+    "name": "Leorio Paradinight",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b29-RgzoSeKmDYzl.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video",
+    "providerName": "Amazon Prime Video",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "amazon-prime-video-with-ads",
+    "providerName": "Amazon Prime Video with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

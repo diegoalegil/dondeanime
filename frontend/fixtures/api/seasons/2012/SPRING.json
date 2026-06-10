@@ -1,0 +1,24 @@
+[
+ {
+  "anilistId": 12189,
+  "slug": "hyouka",
+  "titleEnglish": "Hyouka",
+  "titleRomaji": "Hyouka",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 22,
+  "episodeDuration": 26,
+  "studio": "Kyoto Animation",
+  "year": 2012,
+  "averageScore": 79,
+  "popularity": 340865,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx12189-zj5AWUYO53Fv.jpg",
+  "genres": [
+   "Slice of Life",
+   "Romance",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2012
+ }
+]

@@ -1,0 +1,167 @@
+{
+ "anime": {
+  "anilistId": 21311,
+  "slug": "bungo-stray-dogs",
+  "titleEnglish": "Bungo Stray Dogs",
+  "titleRomaji": "Bungou Stray Dogs",
+  "trailerYoutubeId": null,
+  "description": "La historia se centra en Nakajima Atsushi, que fue expulsado del orfanato y no tiene ningún lugar al que ir. Por el camino se encuentra con Dazai Osamu y con su compañero Kunikida, miembros de una agencia de detectives con poderes sobrenaturales que se dedica a resolver peligrosos casos para la policía y el ejército. Los detectives que forman parte de la agencia son escritores famosos de la vida real, como Osamu Dazai y Doppo Kunikida.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 77,
+  "popularity": 406689,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21311-hAXyT8Yoh6G9.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21311-oVJYXoU38Lm5.jpg",
+  "startYear": 2016,
+  "startMonth": 4,
+  "startDay": 7,
+  "endYear": 2016,
+  "endMonth": 6,
+  "endDay": 23,
+  "genres": [
+   "Comedy",
+   "Action",
+   "Mystery",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "funimation",
+    "name": "Funimation",
+    "animationStudio": false
+   },
+   {
+    "slug": "glovision",
+    "name": "Glovision",
+    "animationStudio": false
+   },
+   {
+    "slug": "bones",
+    "name": "bones",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2016,
+  "characters": [
+   {
+    "anilistId": 89197,
+    "name": "Atsushi Nakajima",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89197-vB5kP72ruckV.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89200,
+    "name": "Doppo Kunikida",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89200-mZJo7iEwJGzg.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89198,
+    "name": "Osamu Dazai",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89198-qKmRTw4Y3PRC.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 89199,
+    "name": "Ryuunosuke Akutagawa",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b89199-h8tHKG8vKPNZ.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

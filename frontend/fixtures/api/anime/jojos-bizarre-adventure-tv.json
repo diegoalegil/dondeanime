@@ -1,0 +1,70 @@
+{
+ "anime": {
+  "anilistId": 14719,
+  "slug": "jojos-bizarre-adventure-tv",
+  "titleEnglish": "JoJo's Bizarre Adventure (TV)",
+  "titleRomaji": "JoJo no Kimyou na Bouken (TV)",
+  "trailerYoutubeId": null,
+  "description": "Beginning its tale in 19th century England, young aristocrat Jonathan Joestar finds himself locked in bitter rivalry with Dio Brando, a low-born boy who Jonathan's father took under his wing after the death of Dio's father. Discontent with his station in life, Dio's fathomless lust to reign over all eventually leads him to seek the supernatural powers of an ancient Aztec stone mask in the Joestar's possession—an artifact that will forever change the destiny of Dio and Jonathan for generations to come.<br>\n<br>\nFifty years later, in 1938 New York City, Jonathan's grandson Joseph Joestar must take up his grandfather's mission and master the abilities necessary to destroy the stone mask and its immensely powerful creators who threaten humanity's very existence, the Pillar Men.<br><br>\n(Source: Anime News Network)",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 26,
+  "averageScore": 77,
+  "popularity": 459438,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx14719-VT5dRzTBSZ0w.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/14719-m7Hv2AxcNNjM.jpg",
+  "startYear": 2012,
+  "startMonth": 10,
+  "startDay": 6,
+  "endYear": 2013,
+  "endMonth": 4,
+  "endDay": 6,
+  "genres": [
+   "Action",
+   "Adventure",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "warner-bros-japan",
+    "name": "Warner Bros. Japan",
+    "animationStudio": false
+   },
+   {
+    "slug": "david-production",
+    "name": "david production",
+    "animationStudio": true
+   }
+  ],
+  "season": "FALL",
+  "seasonYear": 2012,
+  "characters": [
+   {
+    "anilistId": 21959,
+    "name": "Caesar Zeppeli",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b21959-Cm9Rlh0EFAQw.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 4004,
+    "name": "Dio Brando",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b4004-w0OtWuvjhftG.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 8087,
+    "name": "Jonathan Joestar",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b8087-GTrObHQvujB5.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 6356,
+    "name": "Joseph Joestar",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b6356-RImEfUfHpC58.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

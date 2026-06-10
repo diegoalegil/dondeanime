@@ -1,0 +1,156 @@
+{
+ "anime": {
+  "anilistId": 98314,
+  "slug": "kakegurui",
+  "titleEnglish": "Kakegurui",
+  "titleRomaji": "Kakegurui",
+  "trailerYoutubeId": null,
+  "description": "En la Academia Privada Hyakkaou, los estudiantes aprenden a manipular y manejar el dinero a través de juegos de apuestas. Yumeko Jabami, una nueva estudiante, se une a este mundo con la intención de disfrutar del riesgo y la emoción, desafiando las reglas y alterando el equilibrio de poder en la escuela.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "averageScore": 70,
+  "popularity": 442764,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98314-TSJykxVwCCQN.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/98314-gwgiHiJOj2ls.jpg",
+  "startYear": 2017,
+  "startMonth": 7,
+  "startDay": 1,
+  "endYear": 2017,
+  "endMonth": 9,
+  "endDay": 23,
+  "genres": [
+   "Drama",
+   "Psychological",
+   "Mystery"
+  ],
+  "studios": [
+   {
+    "slug": "dive-ii-entertainment",
+    "name": "DIVE II Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "mappa",
+    "name": "MAPPA",
+    "animationStudio": true
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "netflix",
+    "name": "Netflix",
+    "animationStudio": false
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "square-enix",
+    "name": "Square Enix",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017,
+  "characters": [
+   {
+    "anilistId": 122687,
+    "name": "Mary Saotome",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b122687-jl1wk9rjO57e.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 122688,
+    "name": "Ryouta Suzui",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b122688-DdMMQtWRdchY.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 121889,
+    "name": "Yumeko Jabami",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b121889-ABsurpy5SjOW.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "ES": [
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "ES",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

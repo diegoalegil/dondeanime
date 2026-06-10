@@ -1,0 +1,231 @@
+{
+ "anime": {
+  "anilistId": 20997,
+  "slug": "charlotte",
+  "titleEnglish": null,
+  "titleRomaji": "Charlotte",
+  "trailerYoutubeId": null,
+  "description": "Muy pocos chicos y chicas adolescentes desarrollan habilidades especiales. Yu Otosaka es un joven que usa su habilidad sin que otros lo sepan con el fin de llevar una vida escolar satisfactoria. Entonces, un día, aparece ante él una chica llamada Nao Tomori. Su encuentro revelará el destino de quienes poseen habilidades especiales.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 75,
+  "popularity": 416520,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20997-axVYrsIfjtYJ.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20997-nE9VyUa08vS0.jpg",
+  "startYear": 2015,
+  "startMonth": 7,
+  "startDay": 5,
+  "endYear": 2015,
+  "endMonth": 9,
+  "endDay": 27,
+  "genres": [
+   "Comedy",
+   "Sci-Fi",
+   "Romance",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "ascii-media-works",
+    "name": "ASCII Media Works",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "bs11",
+    "name": "BS11",
+    "animationStudio": false
+   },
+   {
+    "slug": "kadokawa",
+    "name": "KADOKAWA",
+    "animationStudio": false
+   },
+   {
+    "slug": "key",
+    "name": "Key",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "paworks",
+    "name": "P.A.WORKS",
+    "animationStudio": true
+   },
+   {
+    "slug": "tokyo-mx",
+    "name": "TOKYO MX",
+    "animationStudio": false
+   },
+   {
+    "slug": "visual-arts",
+    "name": "Visual Arts",
+    "animationStudio": false
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2015,
+  "characters": [
+   {
+    "anilistId": 88955,
+    "name": "Ayumi Otosaka",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/88955-iKYbTaBsmIF0.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88952,
+    "name": "Joujirou Takajou",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88952-0wmPqlWytiRx.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88951,
+    "name": "Nao Tomori",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/88951-bRm610RrrXp9.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88953,
+    "name": "Yusa Kurobane",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88953-wAWVk2jOGZqf.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 88950,
+    "name": "Yuu Otosaka",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b88950-0ER2ke5pswxq.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

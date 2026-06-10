@@ -1,0 +1,322 @@
+[
+ {
+  "year": 2026,
+  "season": "SUMMER",
+  "animeCount": 1
+ },
+ {
+  "year": 2024,
+  "season": "FALL",
+  "animeCount": 9
+ },
+ {
+  "year": 2024,
+  "season": "WINTER",
+  "animeCount": 16
+ },
+ {
+  "year": 2023,
+  "season": "FALL",
+  "animeCount": 19
+ },
+ {
+  "year": 2023,
+  "season": "SPRING",
+  "animeCount": 19
+ },
+ {
+  "year": 2023,
+  "season": "SUMMER",
+  "animeCount": 11
+ },
+ {
+  "year": 2022,
+  "season": "FALL",
+  "animeCount": 15
+ },
+ {
+  "year": 2022,
+  "season": "SPRING",
+  "animeCount": 19
+ },
+ {
+  "year": 2022,
+  "season": "SUMMER",
+  "animeCount": 22
+ },
+ {
+  "year": 2022,
+  "season": "WINTER",
+  "animeCount": 12
+ },
+ {
+  "year": 2021,
+  "season": "FALL",
+  "animeCount": 16
+ },
+ {
+  "year": 2021,
+  "season": "SPRING",
+  "animeCount": 24
+ },
+ {
+  "year": 2021,
+  "season": "WINTER",
+  "animeCount": 22
+ },
+ {
+  "year": 2020,
+  "season": "FALL",
+  "animeCount": 20
+ },
+ {
+  "year": 2020,
+  "season": "SPRING",
+  "animeCount": 14
+ },
+ {
+  "year": 2020,
+  "season": "SUMMER",
+  "animeCount": 13
+ },
+ {
+  "year": 2019,
+  "season": "FALL",
+  "animeCount": 16
+ },
+ {
+  "year": 2019,
+  "season": "SPRING",
+  "animeCount": 16
+ },
+ {
+  "year": 2019,
+  "season": "SUMMER",
+  "animeCount": 20
+ },
+ {
+  "year": 2019,
+  "season": "WINTER",
+  "animeCount": 13
+ },
+ {
+  "year": 2018,
+  "season": "FALL",
+  "animeCount": 16
+ },
+ {
+  "year": 2018,
+  "season": "SPRING",
+  "animeCount": 16
+ },
+ {
+  "year": 2018,
+  "season": "SUMMER",
+  "animeCount": 15
+ },
+ {
+  "year": 2018,
+  "season": "WINTER",
+  "animeCount": 19
+ },
+ {
+  "year": 2017,
+  "season": "FALL",
+  "animeCount": 14
+ },
+ {
+  "year": 2017,
+  "season": "SPRING",
+  "animeCount": 13
+ },
+ {
+  "year": 2017,
+  "season": "SUMMER",
+  "animeCount": 17
+ },
+ {
+  "year": 2017,
+  "season": "WINTER",
+  "animeCount": 12
+ },
+ {
+  "year": 2016,
+  "season": "FALL",
+  "animeCount": 9
+ },
+ {
+  "year": 2016,
+  "season": "SPRING",
+  "animeCount": 15
+ },
+ {
+  "year": 2016,
+  "season": "SUMMER",
+  "animeCount": 18
+ },
+ {
+  "year": 2016,
+  "season": "WINTER",
+  "animeCount": 16
+ },
+ {
+  "year": 2015,
+  "season": "FALL",
+  "animeCount": 10
+ },
+ {
+  "year": 2015,
+  "season": "SPRING",
+  "animeCount": 15
+ },
+ {
+  "year": 2015,
+  "season": "SUMMER",
+  "animeCount": 17
+ },
+ {
+  "year": 2015,
+  "season": "WINTER",
+  "animeCount": 11
+ },
+ {
+  "year": 2014,
+  "season": "FALL",
+  "animeCount": 19
+ },
+ {
+  "year": 2014,
+  "season": "SPRING",
+  "animeCount": 14
+ },
+ {
+  "year": 2014,
+  "season": "SUMMER",
+  "animeCount": 13
+ },
+ {
+  "year": 2014,
+  "season": "WINTER",
+  "animeCount": 8
+ },
+ {
+  "year": 2013,
+  "season": "FALL",
+  "animeCount": 18
+ },
+ {
+  "year": 2013,
+  "season": "SPRING",
+  "animeCount": 10
+ },
+ {
+  "year": 2012,
+  "season": "FALL",
+  "animeCount": 17
+ },
+ {
+  "year": 2012,
+  "season": "SPRING",
+  "animeCount": 11
+ },
+ {
+  "year": 2012,
+  "season": "SUMMER",
+  "animeCount": 5
+ },
+ {
+  "year": 2012,
+  "season": "WINTER",
+  "animeCount": 8
+ },
+ {
+  "year": 2011,
+  "season": "FALL",
+  "animeCount": 7
+ },
+ {
+  "year": 2011,
+  "season": "SPRING",
+  "animeCount": 9
+ },
+ {
+  "year": 2010,
+  "season": "SPRING",
+  "animeCount": 9
+ },
+ {
+  "year": 2009,
+  "season": "FALL",
+  "animeCount": 4
+ },
+ {
+  "year": 2009,
+  "season": "SPRING",
+  "animeCount": 6
+ },
+ {
+  "year": 2009,
+  "season": "SUMMER",
+  "animeCount": 5
+ },
+ {
+  "year": 2008,
+  "season": "FALL",
+  "animeCount": 4
+ },
+ {
+  "year": 2008,
+  "season": "SPRING",
+  "animeCount": 4
+ },
+ {
+  "year": 2007,
+  "season": "SPRING",
+  "animeCount": 6
+ },
+ {
+  "year": 2007,
+  "season": "WINTER",
+  "animeCount": 3
+ },
+ {
+  "year": 2006,
+  "season": "FALL",
+  "animeCount": 6
+ },
+ {
+  "year": 2004,
+  "season": "FALL",
+  "animeCount": 3
+ },
+ {
+  "year": 2004,
+  "season": "SPRING",
+  "animeCount": 2
+ },
+ {
+  "year": 2002,
+  "season": "FALL",
+  "animeCount": 3
+ },
+ {
+  "year": 2001,
+  "season": "SUMMER",
+  "animeCount": 3
+ },
+ {
+  "year": 1999,
+  "season": "FALL",
+  "animeCount": 2
+ },
+ {
+  "year": 1998,
+  "season": "SPRING",
+  "animeCount": 4
+ },
+ {
+  "year": 1995,
+  "season": "FALL",
+  "animeCount": 3
+ }
+]

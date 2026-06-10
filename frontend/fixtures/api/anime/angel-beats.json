@@ -1,0 +1,191 @@
+{
+ "anime": {
+  "anilistId": 6547,
+  "slug": "angel-beats",
+  "titleEnglish": "Angel Beats!",
+  "titleRomaji": "Angel Beats!",
+  "trailerYoutubeId": null,
+  "description": "Otonashi despierta tras morir en un colegio desconocido sin recuerdos de su vida. Allí, Yuri le explica que está en el Otro Mundo, un lugar donde los muertos buscan cumplir sus deseos inconclusos. Ella lidera el SSS, un grupo que lucha contra Dios en busca de respuestas.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "averageScore": 77,
+  "popularity": 429696,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx6547-SYexAn5aFyss.png",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/6547-YUUiSjKyxxeQ.jpg",
+  "startYear": 2010,
+  "startMonth": 4,
+  "startDay": 3,
+  "endYear": 2010,
+  "endMonth": 6,
+  "endDay": 26,
+  "genres": [
+   "Comedy",
+   "Action",
+   "Drama",
+   "Supernatural"
+  ],
+  "studios": [
+   {
+    "slug": "ascii-media-works",
+    "name": "ASCII Media Works",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex",
+    "name": "Aniplex",
+    "animationStudio": false
+   },
+   {
+    "slug": "aniplex-of-america",
+    "name": "Aniplex of America",
+    "animationStudio": false
+   },
+   {
+    "slug": "cbc-tv",
+    "name": "CBC TV",
+    "animationStudio": false
+   },
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "movic",
+    "name": "Movic",
+    "animationStudio": false
+   },
+   {
+    "slug": "paworks",
+    "name": "P.A.WORKS",
+    "animationStudio": true
+   },
+   {
+    "slug": "visual-arts",
+    "name": "Visual Arts",
+    "animationStudio": false
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2010,
+  "characters": [
+   {
+    "anilistId": 32458,
+    "name": "Ayato Naoi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b32458-LTnU8CCcCaOu.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 24503,
+    "name": "Hideki Hinata",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b24503-aMw9BnXmEVrP.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 22369,
+    "name": "Kanade Tachibana",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b22369-zC7OgGbfO7b6.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 24515,
+    "name": "Yui Yoshioka",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b24515-4v85Z9CqCe0Y.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 22370,
+    "name": "Yuri Nakamura",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b22370-pNQxFEv1K7lS.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 24502,
+    "name": "Yuzuru Otonashi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b24502-TJE8JeOERvj0.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "AR",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CL",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "CO",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll",
+    "providerName": "Crunchyroll",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "crunchyroll-amazon-channel",
+    "providerName": "Crunchyroll Amazon Channel",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

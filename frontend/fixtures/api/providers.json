@@ -1,0 +1,146 @@
+[
+ {
+  "slug": "crunchyroll-amazon-channel",
+  "providerName": "Crunchyroll Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pgjz7bzfBq4nFDu8JJDLBoUVAX8.jpg",
+  "animeCount": 532
+ },
+ {
+  "slug": "crunchyroll",
+  "providerName": "Crunchyroll",
+  "logoUrl": "https://image.tmdb.org/t/p/original/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+  "animeCount": 515
+ },
+ {
+  "slug": "netflix",
+  "providerName": "Netflix",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+  "animeCount": 181
+ },
+ {
+  "slug": "netflix-standard-with-ads",
+  "providerName": "Netflix Standard with Ads",
+  "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+  "animeCount": 180
+ },
+ {
+  "slug": "amazon-prime-video",
+  "providerName": "Amazon Prime Video",
+  "logoUrl": "https://image.tmdb.org/t/p/original/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+  "animeCount": 57
+ },
+ {
+  "slug": "amazon-prime-video-with-ads",
+  "providerName": "Amazon Prime Video with Ads",
+  "logoUrl": "https://image.tmdb.org/t/p/original/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+  "animeCount": 57
+ },
+ {
+  "slug": "hbo-max-amazon-channel",
+  "providerName": "HBO Max Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/embS4GPK7c8pjbuY2O2irV5rYch.jpg",
+  "animeCount": 29
+ },
+ {
+  "slug": "hbo-max",
+  "providerName": "HBO Max",
+  "logoUrl": "https://image.tmdb.org/t/p/original/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+  "animeCount": 28
+ },
+ {
+  "slug": "movistartv",
+  "providerName": "MovistarTV",
+  "logoUrl": "https://image.tmdb.org/t/p/original/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+  "animeCount": 23
+ },
+ {
+  "slug": "3cat",
+  "providerName": "3Cat",
+  "logoUrl": "https://image.tmdb.org/t/p/original/lDvzuBuNVgpcdzDpPmmufKvrZPb.jpg",
+  "animeCount": 15
+ },
+ {
+  "slug": "disney-plus",
+  "providerName": "Disney Plus",
+  "logoUrl": "https://image.tmdb.org/t/p/original/97yvRBw1GzX7fXprcF80er19ot.jpg",
+  "animeCount": 13
+ },
+ {
+  "slug": "amc-plus-apple-tv-channel-",
+  "providerName": "AMC Plus Apple TV Channel ",
+  "logoUrl": "https://image.tmdb.org/t/p/original/oTQdXIqM9iewlN4MC2nhKB0gHw.jpg",
+  "animeCount": 10
+ },
+ {
+  "slug": "amc+-amazon-channel",
+  "providerName": "AMC+ Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/2ino0WmHA4GROB7NYKzT6PGqLcb.jpg",
+  "animeCount": 10
+ },
+ {
+  "slug": "claro-video",
+  "providerName": "Claro video",
+  "logoUrl": "https://image.tmdb.org/t/p/original/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+  "animeCount": 8
+ },
+ {
+  "slug": "filmin",
+  "providerName": "Filmin",
+  "logoUrl": "https://image.tmdb.org/t/p/original/kO2SWXvDCHAquaUuTJBuZkTBAuU.jpg",
+  "animeCount": 7
+ },
+ {
+  "slug": "movistar-plus+-ficción-total-",
+  "providerName": "Movistar Plus+ Ficción Total ",
+  "logoUrl": "https://image.tmdb.org/t/p/original/f6TRLB3H4jDpFEZ0z2KWSSvu1SB.jpg",
+  "animeCount": 3
+ },
+ {
+  "slug": "plex",
+  "providerName": "Plex",
+  "logoUrl": "https://image.tmdb.org/t/p/original/vLZKlXUNDcZR7ilvfY9Wr9k80FZ.jpg",
+  "animeCount": 3
+ },
+ {
+  "slug": "lionsgate+-amazon-channels",
+  "providerName": "Lionsgate+ Amazon Channels",
+  "logoUrl": "https://image.tmdb.org/t/p/original/o4OqlMLb3ZjhK7OwR4qvxiZKOXf.jpg",
+  "animeCount": 2
+ },
+ {
+  "slug": "hayu",
+  "providerName": "Hayu",
+  "logoUrl": "https://image.tmdb.org/t/p/original/jxIBXlxRbCcy7Y4GvOZKszCd0dv.jpg",
+  "animeCount": 1
+ },
+ {
+  "slug": "movistar-plus+",
+  "providerName": "Movistar Plus+",
+  "logoUrl": "https://image.tmdb.org/t/p/original/jse4MOi92Jgetym7nbXFZZBI6LK.jpg",
+  "animeCount": 1
+ },
+ {
+  "slug": "skyshowtime",
+  "providerName": "SkyShowtime",
+  "logoUrl": "https://image.tmdb.org/t/p/original/h0ZYcYHicKQ4Ixm5nOjqvwni5NG.jpg",
+  "animeCount": 1
+ },
+ {
+  "slug": "tivify",
+  "providerName": "Tivify",
+  "logoUrl": "https://image.tmdb.org/t/p/original/8VhN4PeHU7yfMNoWK0DnwdS1HlS.jpg",
+  "animeCount": 1
+ },
+ {
+  "slug": "universal+-amazon-channel",
+  "providerName": "Universal+ Amazon Channel",
+  "logoUrl": "https://image.tmdb.org/t/p/original/4ABGBjAMtRrYUrr0w3QfanuiaoB.jpg",
+  "animeCount": 1
+ },
+ {
+  "slug": "fubotv",
+  "providerName": "fuboTV",
+  "logoUrl": "https://image.tmdb.org/t/p/original/9BgaNQRMDvVlji1JBZi6tcfxpKx.jpg",
+  "animeCount": 1
+ }
+]

@@ -1,0 +1,149 @@
+{
+ "anime": {
+  "anilistId": 20613,
+  "slug": "akame-ga-kill",
+  "titleEnglish": "Akame ga Kill!",
+  "titleRomaji": "Akame ga Kill!",
+  "trailerYoutubeId": null,
+  "description": "El joven Tatsumi viaja a la capital del Imperio con el propósito de ganar dinero para su pueblo hambriento y se encuentra con un mundo de depravación inimaginable, dominado por el despiadado Primer Ministro que controla al niño Emperador. Tatsumi es reclutado por Night Raid, un grupo de asesinos dedicado a eliminar la corrupción matando sin piedad a funcionarios y nobles privilegiados.",
+  "descriptionTranslationPending": false,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "averageScore": 73,
+  "popularity": 519465,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20613-HXHpec4bemk5.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20613-CoEQF4qKiWDX.jpg",
+  "startYear": 2014,
+  "startMonth": 7,
+  "startDay": 7,
+  "endYear": 2014,
+  "endMonth": 12,
+  "endDay": 15,
+  "genres": [
+   "Psychological",
+   "Action",
+   "Adventure",
+   "Horror",
+   "Thriller",
+   "Drama",
+   "Fantasy"
+  ],
+  "studios": [
+   {
+    "slug": "animatsu-entertainment",
+    "name": "Animatsu Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "hanabee-entertainment",
+    "name": "Hanabee Entertainment",
+    "animationStudio": false
+   },
+   {
+    "slug": "sentai-filmworks",
+    "name": "Sentai Filmworks",
+    "animationStudio": false
+   },
+   {
+    "slug": "square-enix",
+    "name": "Square Enix",
+    "animationStudio": false
+   },
+   {
+    "slug": "toho",
+    "name": "Toho",
+    "animationStudio": false
+   },
+   {
+    "slug": "white-fox",
+    "name": "WHITE FOX",
+    "animationStudio": true
+   }
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2014,
+  "characters": [
+   {
+    "anilistId": 63351,
+    "name": "Akame",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b63351-0WmsDENpiscp.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65227,
+    "name": "Leone",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65227-PWmfiEVJbCwQ.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65231,
+    "name": "Lubbock",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/65231-2QpM2yw2X86k.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 65229,
+    "name": "Mine",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b65229-hYOZtUlIpd5G.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 64749,
+    "name": "Tatsumi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/64749-a2ZdRWW1D5TR.jpg",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {
+  "AR": [
+   {
+    "countryCode": "AR",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CL": [
+   {
+    "countryCode": "CL",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "CO": [
+   {
+    "countryCode": "CO",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   }
+  ],
+  "MX": [
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix",
+    "providerName": "Netflix",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "affiliateUrl": null
+   },
+   {
+    "countryCode": "MX",
+    "providerSlug": "netflix-standard-with-ads",
+    "providerName": "Netflix Standard with Ads",
+    "providerType": "FLATRATE",
+    "logoUrl": "https://image.tmdb.org/t/p/original/dpR8r13zWDeUR0QkzWidrdMxa56.jpg",
+    "affiliateUrl": null
+   }
+  ]
+ }
+}

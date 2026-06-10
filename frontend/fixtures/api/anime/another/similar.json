@@ -1,0 +1,99 @@
+[
+ {
+  "anilistId": 19,
+  "slug": "monster",
+  "titleEnglish": "Monster",
+  "titleRomaji": "MONSTER",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 74,
+  "episodeDuration": 24,
+  "studio": "MADHOUSE",
+  "year": 2004,
+  "averageScore": 88,
+  "popularity": 324303,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx19-gtMC64182sm4.jpg",
+  "genres": [
+   "Psychological",
+   "Drama",
+   "Horror",
+   "Thriller",
+   "Mystery"
+  ],
+  "season": "SPRING",
+  "seasonYear": 2004
+ },
+ {
+  "anilistId": 97986,
+  "slug": "made-in-abyss",
+  "titleEnglish": "Made in Abyss",
+  "titleRomaji": "Made in Abyss",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "episodeDuration": 25,
+  "studio": "Kinema Citrus",
+  "year": 2017,
+  "averageScore": 85,
+  "popularity": 390861,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97986-TQ7dCgbS3y5s.jpg",
+  "genres": [
+   "Sci-Fi",
+   "Adventure",
+   "Drama",
+   "Horror",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "SUMMER",
+  "seasonYear": 2017
+ },
+ {
+  "anilistId": 101759,
+  "slug": "the-promised-neverland",
+  "titleEnglish": "The Promised Neverland",
+  "titleRomaji": "Yakusoku no Neverland",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 23,
+  "studio": "CloverWorks",
+  "year": 2019,
+  "averageScore": 84,
+  "popularity": 613725,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101759-8UR7r9MNVpz2.jpg",
+  "genres": [
+   "Psychological",
+   "Drama",
+   "Horror",
+   "Thriller",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 127230,
+  "slug": "chainsaw-man",
+  "titleEnglish": "Chainsaw Man",
+  "titleRomaji": "Chainsaw Man",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 25,
+  "studio": "MAPPA",
+  "year": 2022,
+  "averageScore": 83,
+  "popularity": 594506,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx127230-DdP4vAdssLoz.png",
+  "genres": [
+   "Action",
+   "Drama",
+   "Horror",
+   "Supernatural"
+  ],
+  "season": "FALL",
+  "seasonYear": 2022
+ }
+]

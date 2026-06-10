@@ -1,0 +1,102 @@
+{
+ "anime": {
+  "anilistId": 104578,
+  "slug": "attack-on-titan-season-3-part-2",
+  "titleEnglish": "Attack on Titan Season 3 Part 2",
+  "titleRomaji": "Shingeki no Kyojin Season 3 Part 2",
+  "trailerYoutubeId": null,
+  "description": "The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the Beast Titan have plans of their own. Could this be humanity’s final battle for survival?<br>\n<br>\n(Source: Funimation)",
+  "descriptionTranslationPending": true,
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 10,
+  "averageScore": 90,
+  "popularity": 587826,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx104578-k61nx3LPjvgd.jpg",
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/104578-z7SadpYEuAsy.jpg",
+  "startYear": 2019,
+  "startMonth": 4,
+  "startDay": 29,
+  "endYear": 2019,
+  "endMonth": 7,
+  "endDay": 1,
+  "genres": [
+   "Mystery",
+   "Drama",
+   "Fantasy",
+   "Action"
+  ],
+  "studios": [
+   {
+    "slug": "dentsu",
+    "name": "Dentsu",
+    "animationStudio": false
+   },
+   {
+    "slug": "kodansha",
+    "name": "Kodansha",
+    "animationStudio": false
+   },
+   {
+    "slug": "mainichi-broadcasting-system",
+    "name": "Mainichi Broadcasting System",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon",
+    "name": "Pony Canyon",
+    "animationStudio": false
+   },
+   {
+    "slug": "pony-canyon-enterprise",
+    "name": "Pony Canyon Enterprise",
+    "animationStudio": false
+   },
+   {
+    "slug": "production-ig",
+    "name": "Production I.G",
+    "animationStudio": true
+   },
+   {
+    "slug": "wit-studio",
+    "name": "WIT STUDIO",
+    "animationStudio": true
+   }
+  ],
+  "season": "SPRING",
+  "seasonYear": 2019,
+  "characters": [
+   {
+    "anilistId": 46494,
+    "name": "Armin Arlert",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b46494-g7xYYuBtYPnO.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40882,
+    "name": "Eren Yeager",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 46496,
+    "name": "Erwin Smith",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b46496-Mu86MENd5wNB.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 45627,
+    "name": "Levi",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png",
+    "role": "MAIN"
+   },
+   {
+    "anilistId": 40881,
+    "name": "Mikasa Ackerman",
+    "image": "https://s4.anilist.co/file/anilistcdn/character/large/b40881-F3gr1PkreDvj.png",
+    "role": "MAIN"
+   }
+  ]
+ },
+ "watchProvidersByCountry": {}
+}

@@ -1,0 +1,266 @@
+[
+ {
+  "anime": {
+   "anilistId": 21459,
+   "slug": "my-hero-academia",
+   "titleEnglish": "My Hero Academia",
+   "titleRomaji": "Boku no Hero Academia",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 13,
+   "episodeDuration": 24,
+   "studio": "bones",
+   "year": 2016,
+   "averageScore": 77,
+   "popularity": 841317,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Comedy"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2016
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21087,
+   "slug": "one-punch-man",
+   "titleEnglish": "One-Punch Man",
+   "titleRomaji": "One Punch Man",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 24,
+   "studio": "MADHOUSE",
+   "year": 2015,
+   "averageScore": 83,
+   "popularity": 741633,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21087-B5DHjqZ3kW4b.jpg",
+   "genres": [
+    "Action",
+    "Sci-Fi",
+    "Comedy",
+    "Supernatural"
+   ],
+   "season": "FALL",
+   "seasonYear": 2015
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21,
+   "slug": "one-piece",
+   "titleEnglish": "ONE PIECE",
+   "titleRomaji": "ONE PIECE",
+   "format": "TV",
+   "status": "RELEASING",
+   "episodes": null,
+   "episodeDuration": 24,
+   "studio": "Toei Animation",
+   "year": 1999,
+   "averageScore": 87,
+   "popularity": 712364,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-ELSYx3yMPcKM.jpg",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Drama",
+    "Fantasy",
+    "Comedy"
+   ],
+   "season": "FALL",
+   "seasonYear": 1999
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 20,
+   "slug": "naruto",
+   "titleEnglish": "Naruto",
+   "titleRomaji": "NARUTO",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 220,
+   "episodeDuration": 23,
+   "studio": "Studio Pierrot",
+   "year": 2002,
+   "averageScore": 80,
+   "popularity": 694959,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Drama",
+    "Fantasy",
+    "Comedy",
+    "Supernatural"
+   ],
+   "season": "FALL",
+   "seasonYear": 2002
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21856,
+   "slug": "my-hero-academia-season-2",
+   "titleEnglish": "My Hero Academia Season 2",
+   "titleRomaji": "Boku no Hero Academia 2",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 25,
+   "episodeDuration": 24,
+   "studio": "bones",
+   "year": 2017,
+   "averageScore": 80,
+   "popularity": 634556,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21856-gutauxhWAwn6.png",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Comedy"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2017
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 20755,
+   "slug": "assassination-classroom",
+   "titleEnglish": "Assassination Classroom",
+   "titleRomaji": "Ansatsu Kyoushitsu",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 22,
+   "episodeDuration": 23,
+   "studio": "Lerche",
+   "year": 2015,
+   "averageScore": 79,
+   "popularity": 605841,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20755-dWrhs569YGUO.jpg",
+   "genres": [
+    "Action",
+    "Drama",
+    "Comedy",
+    "Supernatural"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2015
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 21507,
+   "slug": "mob-psycho-100",
+   "titleEnglish": "Mob Psycho 100",
+   "titleRomaji": "Mob Psycho 100",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 12,
+   "episodeDuration": 24,
+   "studio": "bones",
+   "year": 2016,
+   "averageScore": 84,
+   "popularity": 600720,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg",
+   "genres": [
+    "Psychological",
+    "Action",
+    "Drama",
+    "Slice of Life",
+    "Comedy",
+    "Supernatural"
+   ],
+   "season": "SUMMER",
+   "seasonYear": 2016
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 1735,
+   "slug": "naruto-shippuden",
+   "titleEnglish": "Naruto: Shippuden",
+   "titleRomaji": "NARUTO: Shippuuden",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 500,
+   "episodeDuration": 23,
+   "studio": "Studio Pierrot",
+   "year": 2007,
+   "averageScore": 82,
+   "popularity": 585128,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1735-kGfVm0YqCPcu.png",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Drama",
+    "Fantasy",
+    "Comedy",
+    "Supernatural"
+   ],
+   "season": "WINTER",
+   "seasonYear": 2007
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 100166,
+   "slug": "my-hero-academia-season-3",
+   "titleEnglish": "My Hero Academia Season 3",
+   "titleRomaji": "Boku no Hero Academia 3",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 25,
+   "episodeDuration": 24,
+   "studio": "bones",
+   "year": 2018,
+   "averageScore": 79,
+   "popularity": 581552,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx100166-jUCZYbzn2XLw.jpg",
+   "genres": [
+    "Action",
+    "Adventure",
+    "Drama",
+    "Comedy"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2018
+  },
+  "beginnerRecommendation": null
+ },
+ {
+  "anime": {
+   "anilistId": 20464,
+   "slug": "haikyu",
+   "titleEnglish": "HAIKYU!!",
+   "titleRomaji": "Haikyuu!!",
+   "format": "TV",
+   "status": "FINISHED",
+   "episodes": 25,
+   "episodeDuration": 24,
+   "studio": "Production I.G",
+   "year": 2014,
+   "averageScore": 84,
+   "popularity": 563243,
+   "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png",
+   "genres": [
+    "Drama",
+    "Comedy",
+    "Sports"
+   ],
+   "season": "SPRING",
+   "seasonYear": 2014
+  },
+  "beginnerRecommendation": null
+ }
+]

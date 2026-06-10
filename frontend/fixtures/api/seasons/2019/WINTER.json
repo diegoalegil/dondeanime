@@ -1,0 +1,120 @@
+[
+ {
+  "anilistId": 101759,
+  "slug": "the-promised-neverland",
+  "titleEnglish": "The Promised Neverland",
+  "titleRomaji": "Yakusoku no Neverland",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 23,
+  "studio": "CloverWorks",
+  "year": 2019,
+  "averageScore": 84,
+  "popularity": 613725,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101759-8UR7r9MNVpz2.jpg",
+  "genres": [
+   "Psychological",
+   "Drama",
+   "Horror",
+   "Thriller",
+   "Fantasy",
+   "Mystery"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 101921,
+  "slug": "kaguya-sama-love-is-war",
+  "titleEnglish": "Kaguya-sama: Love is War",
+  "titleRomaji": "Kaguya-sama wa Kokurasetai: Tensaitachi no Renai Zunousen",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 12,
+  "episodeDuration": 24,
+  "studio": "A-1 Pictures",
+  "year": 2019,
+  "averageScore": 83,
+  "popularity": 536259,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101921-ufrjLzhSz7L1.jpg",
+  "genres": [
+   "Psychological",
+   "Slice of Life",
+   "Romance",
+   "Comedy"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 99263,
+  "slug": "the-rising-of-the-shield-hero",
+  "titleEnglish": "The Rising of the Shield Hero",
+  "titleRomaji": "Tate no Yuusha no Nariagari",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 25,
+  "episodeDuration": 24,
+  "studio": "Kinema Citrus",
+  "year": 2019,
+  "averageScore": 77,
+  "popularity": 442677,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99263-LcazQwdlWzMy.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Fantasy"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 101338,
+  "slug": "mob-psycho-100-ii",
+  "titleEnglish": "Mob Psycho 100 II",
+  "titleRomaji": "Mob Psycho 100 II",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 13,
+  "episodeDuration": 24,
+  "studio": "bones",
+  "year": 2019,
+  "averageScore": 87,
+  "popularity": 433586,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101338-rokVscjRYzdP.jpg",
+  "genres": [
+   "Psychological",
+   "Action",
+   "Drama",
+   "Slice of Life",
+   "Comedy",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ },
+ {
+  "anilistId": 101347,
+  "slug": "dororo",
+  "titleEnglish": "Dororo",
+  "titleRomaji": "Dororo",
+  "format": "TV",
+  "status": "FINISHED",
+  "episodes": 24,
+  "episodeDuration": 24,
+  "studio": "MAPPA",
+  "year": 2019,
+  "averageScore": 81,
+  "popularity": 360965,
+  "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101347-TGaDwEYqLfm1.jpg",
+  "genres": [
+   "Action",
+   "Adventure",
+   "Drama",
+   "Supernatural"
+  ],
+  "season": "WINTER",
+  "seasonYear": 2019
+ }
+]
