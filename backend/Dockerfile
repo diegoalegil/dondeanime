@@ -16,6 +16,12 @@
 # --- STAGE 1: BUILDER ---
 FROM eclipse-temurin:21-jdk AS builder
 
+# El wrapper de Maven valida distributionSha256Sum contra el .zip; sin unzip
+# cambia solo al .tar.gz y el checksum (calculado para el .zip) no casa.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /build
 
 # Copiamos primero los archivos de configuración Maven para
