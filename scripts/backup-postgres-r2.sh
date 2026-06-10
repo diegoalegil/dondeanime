@@ -67,7 +67,9 @@ fi
 POSTGRES_CONTAINER="${POSTGRES_CONTAINER:-dondeanime_postgres_prod}"
 BACKUP_DIR="${BACKUP_DIR:-$PROJECT_DIR/backups}"
 BACKUP_RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
-AWS_CLI_IMAGE="${AWS_CLI_IMAGE:-amazon/aws-cli:2}"
+# 'latest', no ':2': Amazon retiró el tag flotante mayor de Docker Hub y la
+# subida a R2 empezó a fallar con "not found". 'latest' no lo quitan.
+AWS_CLI_IMAGE="${AWS_CLI_IMAGE:-amazon/aws-cli:latest}"
 R2_PREFIX="${R2_PREFIX:-postgres}"
 
 # Cifrado opcional del dump (contiene PII) antes de subirlo a R2.
