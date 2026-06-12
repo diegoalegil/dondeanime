@@ -185,8 +185,10 @@ public class CatalogScheduler {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
             NewsProcessingResult result = newsProcessingService.processDrafts();
-            log.info("[scheduler] processNews: completado, {} procesadas, {} publicadas, {} con anime de {} borradores",
-                    result.itemsProcessed(), result.itemsPublished(), result.animeMatched(), result.draftsSeen());
+            log.info("[scheduler] processNews: completado, {} procesadas ({} via LLM, {} fallos LLM), "
+                            + "{} publicadas, {} a revision, {} con anime de {} borradores",
+                    result.itemsProcessed(), result.llmProcessed(), result.llmFailed(),
+                    result.itemsPublished(), result.sentToReview(), result.animeMatched(), result.draftsSeen());
             recordSuccess("news-processing", sample);
         } catch (Exception e) {
             log.error("[scheduler] processNews: ERROR", e);

@@ -24,4 +24,7 @@ public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
     boolean existsBySlug(String slug);
 
     boolean existsByDedupKey(String dedupKey);
+
+    /** Cupo diario del LLM: ítems redactados desde un instante (ver NewsProcessingService). */
+    long countByLlmTokensUsedIsNotNullAndUpdatedAtGreaterThanEqual(java.time.Instant since);
 }

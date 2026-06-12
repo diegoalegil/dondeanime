@@ -2,6 +2,8 @@ package com.dondeanime.backend.news;
 
 import java.text.Normalizer;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,12 +12,23 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
 import com.dondeanime.backend.anime.Anime;
 import com.dondeanime.backend.anime.AnimeRepository;
 
+/**
+ * Procesado editorial de borradores RSS. Dos rutas excluyentes por pasada:
+ * - LLM activo: redacción en español vía {@link LlmNewsProcessor}. Si el LLM
+ *   falla o se agota el cupo diario, el ítem queda DRAFT para la siguiente
+ *   pasada — nunca se publica el inglés a medias con la heurística.
+ * - LLM apagado: la heurística de siempre (rellena solo lo vacío), idéntica
+ *   al comportamiento previo a la integración del LLM.
+ *
+ * Sin transacción de método: con LLM cada ítem implica una llamada HTTP de
+ * segundos y una transacción que abarcase la pasada retendría una conexión
+ * del pool minutos. Mismo patrón save-por-ítem que NewsIngestionService.
+ */
 @Service
 public class NewsProcessingService {
 
@@ -27,67 +40,80 @@ public class NewsProcessingService {
 
     private final NewsItemRepository itemRepository;
     private final AnimeRepository animeRepository;
+    private final LlmNewsProcessor llmNewsProcessor;
     private final boolean enabled;
     private final boolean publish;
     private final int maxItems;
+    private final int llmDailyLimit;
 
     public NewsProcessingService(
             NewsItemRepository itemRepository,
             AnimeRepository animeRepository,
+            LlmNewsProcessor llmNewsProcessor,
             @Value("${news.processing.enabled:false}") boolean enabled,
             @Value("${news.processing.publish:false}") boolean publish,
-            @Value("${news.processing.max-items:20}") int maxItems) {
+            @Value("${news.processing.max-items:20}") int maxItems,
+            @Value("${news.llm.daily-limit:50}") int llmDailyLimit) {
         this.itemRepository = itemRepository;
         this.animeRepository = animeRepository;
+        this.llmNewsProcessor = llmNewsProcessor;
         this.enabled = enabled;
         this.publish = publish;
         this.maxItems = maxItems;
+        this.llmDailyLimit = llmDailyLimit;
     }
 
-    @Transactional
     public NewsProcessingResult processDrafts() {
         if (!enabled) {
-            return new NewsProcessingResult(false, 0, 0, 0, 0, 0);
+            return NewsProcessingResult.empty(false);
         }
 
         List<NewsItem> drafts = itemRepository.findByStatusOrderByFetchedAtAsc(
                 NewsStatus.DRAFT, PageRequest.of(0, effectiveLimit()));
         if (drafts.isEmpty()) {
-            return new NewsProcessingResult(true, 0, 0, 0, 0, 0);
+            return NewsProcessingResult.empty(true);
         }
 
         List<Anime> animeCatalog = animeRepository.findAllWithSynonyms();
+        boolean llmActive = llmNewsProcessor.enabled();
+        int llmBudget = llmActive ? remainingLlmQuota() : 0;
+
         int processed = 0;
         int published = 0;
         int matched = 0;
         int skipped = 0;
+        int llmProcessed = 0;
+        int llmFailed = 0;
+        int sentToReview = 0;
 
         for (NewsItem item : drafts) {
-            boolean changed = false;
-            String baseSummary = firstText(item.getOriginalExcerpt(), item.getSummary(), item.getTitle());
-            if (!hasText(baseSummary)) {
-                skipped++;
-                continue;
-            }
-
-            if (!hasText(item.getSummary())) {
-                item.setSummary(truncate(baseSummary, MAX_SUMMARY));
-                changed = true;
-            }
-
-            if (!hasText(item.getBody())) {
-                item.setBody(toBodyHtml(item.getSummary()));
-                changed = true;
-            }
-
-            if (!hasText(item.getMetaTitle())) {
-                item.setMetaTitle(truncate(item.getTitle(), MAX_META_TITLE));
-                changed = true;
-            }
-
-            if (!hasText(item.getMetaDescription())) {
-                item.setMetaDescription(truncate(item.getSummary(), MAX_META_DESCRIPTION));
-                changed = true;
+            boolean changed;
+            if (llmActive) {
+                if (item.getLlmTokensUsed() == null) {
+                    if (llmBudget <= 0) {
+                        skipped++;
+                        continue;
+                    }
+                    if (!llmNewsProcessor.enrich(item)) {
+                        llmFailed++;
+                        skipped++;
+                        continue;
+                    }
+                    llmBudget--;
+                    llmProcessed++;
+                    changed = true;
+                } else {
+                    // Ya redactada en una pasada anterior (p. ej. con publish=false):
+                    // no se paga el LLM dos veces, solo match/publicación.
+                    changed = false;
+                }
+            } else {
+                String baseSummary = firstText(item.getOriginalExcerpt(), item.getSummary(), item.getTitle());
+                if (!hasText(baseSummary)) {
+                    skipped++;
+                    continue;
+                }
+                changed = enrichHeuristically(item, baseSummary);
             }
 
             if (item.getAnimeId() == null) {
@@ -116,7 +142,42 @@ public class NewsProcessingService {
             }
         }
 
-        return new NewsProcessingResult(true, drafts.size(), processed, published, matched, skipped);
+        return new NewsProcessingResult(
+                true, drafts.size(), processed, published, matched, skipped,
+                llmProcessed, llmFailed, sentToReview);
+    }
+
+    /** Rellena solo lo vacío, exactamente el comportamiento previo al LLM. */
+    private static boolean enrichHeuristically(NewsItem item, String baseSummary) {
+        boolean changed = false;
+        if (!hasText(item.getSummary())) {
+            item.setSummary(truncate(baseSummary, MAX_SUMMARY));
+            changed = true;
+        }
+        if (!hasText(item.getBody())) {
+            item.setBody(toBodyHtml(item.getSummary()));
+            changed = true;
+        }
+        if (!hasText(item.getMetaTitle())) {
+            item.setMetaTitle(truncate(item.getTitle(), MAX_META_TITLE));
+            changed = true;
+        }
+        if (!hasText(item.getMetaDescription())) {
+            item.setMetaDescription(truncate(item.getSummary(), MAX_META_DESCRIPTION));
+            changed = true;
+        }
+        return changed;
+    }
+
+    /**
+     * Tope de coste: cuántos ítems puede redactar el LLM hoy. Cuenta por
+     * llm_tokens_used + updated_at, conservador a propósito (un ítem tocado
+     * después por otra razón también cuenta; mejor gastar de menos que de más).
+     */
+    private int remainingLlmQuota() {
+        Instant startOfToday = LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
+        long usedToday = itemRepository.countByLlmTokensUsedIsNotNullAndUpdatedAtGreaterThanEqual(startOfToday);
+        return (int) Math.max(0, llmDailyLimit - usedToday);
     }
 
     private int effectiveLimit() {

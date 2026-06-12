@@ -22,6 +22,9 @@ class NewsProcessingServiceTest {
 
     private final NewsItemRepository itemRepository = mock(NewsItemRepository.class);
     private final AnimeRepository animeRepository = mock(AnimeRepository.class);
+    // LLM apagado por defecto: la ruta heurística debe comportarse exactamente
+    // igual que antes de integrar el LLM (los tests de abajo son la prueba).
+    private final LlmNewsProcessor llmNewsProcessor = mock(LlmNewsProcessor.class);
 
     @Test
     void disabledProcessingDoesNotTouchRepositories() {
@@ -78,8 +81,96 @@ class NewsProcessingServiceTest {
         verify(itemRepository).save(item);
     }
 
+    @Test
+    void llmActiveWritesSpanishVersionInsteadOfHeuristic() {
+        NewsItem item = draft("Solo Leveling season 2 announced",
+                "The Solo Leveling anime returns in January.");
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(llmNewsProcessor.enrich(item)).thenAnswer(invocation -> {
+            item.setTitle("Solo Leveling anuncia segunda temporada");
+            item.setSummary("El anime de Solo Leveling vuelve en enero.");
+            item.setBody("<p>El anime de Solo Leveling vuelve en enero.</p>");
+            item.setMetaTitle("Solo Leveling anuncia segunda temporada");
+            item.setMetaDescription("El anime de Solo Leveling vuelve en enero.");
+            item.setLlmTokensUsed(920);
+            return true;
+        });
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms())
+                .thenReturn(List.of(anime(7L, "solo-leveling", "Solo Leveling")));
+
+        NewsProcessingResult result = service(true, false).processDrafts();
+
+        assertThat(result.llmProcessed()).isEqualTo(1);
+        assertThat(result.llmFailed()).isZero();
+        assertThat(result.itemsProcessed()).isEqualTo(1);
+        assertThat(item.getTitle()).isEqualTo("Solo Leveling anuncia segunda temporada");
+        assertThat(item.getAnimeId()).isEqualTo(7L);
+        assertThat(item.getStatus()).isEqualTo(NewsStatus.DRAFT);
+        verify(itemRepository).save(item);
+    }
+
+    @Test
+    void llmFailureLeavesDraftUntouchedWithoutHeuristicFallback() {
+        NewsItem item = draft("Frieren movie announced", "Frieren gets a new movie.");
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(llmNewsProcessor.enrich(item)).thenReturn(false);
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms()).thenReturn(List.of());
+
+        NewsProcessingResult result = service(true, true).processDrafts();
+
+        assertThat(result.llmFailed()).isEqualTo(1);
+        assertThat(result.itemsSkipped()).isEqualTo(1);
+        assertThat(result.itemsPublished()).isZero();
+        assertThat(item.getStatus()).isEqualTo(NewsStatus.DRAFT);
+        assertThat(item.getSummary()).isNull();
+        verify(itemRepository, never()).save(any());
+    }
+
+    @Test
+    void llmDailyQuotaExhaustedSkipsWithoutCallingLlm() {
+        NewsItem item = draft("Chainsaw Man part 2", "New arc confirmed.");
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(itemRepository.countByLlmTokensUsedIsNotNullAndUpdatedAtGreaterThanEqual(any(Instant.class)))
+                .thenReturn(50L);
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms()).thenReturn(List.of());
+
+        NewsProcessingResult result = service(true, false).processDrafts();
+
+        assertThat(result.itemsSkipped()).isEqualTo(1);
+        assertThat(result.llmProcessed()).isZero();
+        verify(llmNewsProcessor, never()).enrich(any());
+        verify(itemRepository, never()).save(any());
+    }
+
+    @Test
+    void alreadyEnrichedItemIsNotSentToLlmAgain() {
+        NewsItem item = draft("Frieren movie announced", "Frieren gets a new movie.");
+        item.setSummary("Frieren tendra pelicula.");
+        item.setBody("<p>Frieren tendra pelicula.</p>");
+        item.setLlmTokensUsed(800);
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms()).thenReturn(List.of());
+
+        NewsProcessingResult result = service(true, true).processDrafts();
+
+        verify(llmNewsProcessor, never()).enrich(any());
+        assertThat(result.llmProcessed()).isZero();
+        assertThat(result.itemsPublished()).isEqualTo(1);
+        assertThat(item.getStatus()).isEqualTo(NewsStatus.PUBLISHED);
+        verify(itemRepository).save(item);
+    }
+
     private NewsProcessingService service(boolean enabled, boolean publish) {
-        return new NewsProcessingService(itemRepository, animeRepository, enabled, publish, 20);
+        return new NewsProcessingService(
+                itemRepository, animeRepository, llmNewsProcessor, enabled, publish, 20, 50);
     }
 
     private static NewsItem draft(String title, String excerpt) {

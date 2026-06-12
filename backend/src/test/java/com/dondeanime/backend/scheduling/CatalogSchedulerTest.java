@@ -105,7 +105,7 @@ class CatalogSchedulerTest {
     void processNewsRunsWhenFlagEnabled() {
         NewsProcessingService newsProcessingService = mock(NewsProcessingService.class);
         when(newsProcessingService.processDrafts())
-                .thenReturn(new NewsProcessingResult(true, 3, 3, 1, 2, 0));
+                .thenReturn(new NewsProcessingResult(true, 3, 3, 1, 2, 0, 0, 0, 0));
         CatalogScheduler scheduler = scheduler(newsProcessingService, true);
 
         scheduler.processNews();
