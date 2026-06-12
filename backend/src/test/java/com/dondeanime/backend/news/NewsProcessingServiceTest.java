@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Pageable;
 
 import com.dondeanime.backend.anime.Anime;
@@ -25,6 +27,9 @@ class NewsProcessingServiceTest {
     // LLM apagado por defecto: la ruta heurística debe comportarse exactamente
     // igual que antes de integrar el LLM (los tests de abajo son la prueba).
     private final LlmNewsProcessor llmNewsProcessor = mock(LlmNewsProcessor.class);
+    // Sin bean del bot por defecto (getIfAvailable() = null en el mock).
+    @SuppressWarnings("unchecked")
+    private final ObjectProvider<TelegramNewsBotService> telegramBotProvider = mock(ObjectProvider.class);
 
     @Test
     void disabledProcessingDoesNotTouchRepositories() {
@@ -168,9 +173,85 @@ class NewsProcessingServiceTest {
         verify(itemRepository).save(item);
     }
 
+    @Test
+    void llmWithBotSendsToReviewInsteadOfPublishing() {
+        NewsItem item = draft("Frieren movie announced", "Frieren gets a new movie.");
+        item.setId(42L);
+        TelegramNewsBotService bot = mock(TelegramNewsBotService.class);
+        when(telegramBotProvider.getIfAvailable()).thenReturn(bot);
+        when(bot.sendReviewRequest(item)).thenReturn(111L);
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(llmNewsProcessor.enrich(item)).thenAnswer(invocation -> {
+            item.setSummary("Frieren tendra pelicula.");
+            item.setBody("<p>Frieren tendra pelicula.</p>");
+            item.setLlmTokensUsed(800);
+            return true;
+        });
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms()).thenReturn(List.of());
+
+        NewsProcessingResult result = service(true, true).processDrafts();
+
+        // Con bot activo manda la revisión manual, no el flag publish.
+        assertThat(result.sentToReview()).isEqualTo(1);
+        assertThat(result.itemsPublished()).isZero();
+        assertThat(item.getStatus()).isEqualTo(NewsStatus.PENDING_REVIEW);
+        assertThat(item.getTelegramMessageId()).isEqualTo(111L);
+        verify(itemRepository, Mockito.times(2)).save(item);
+    }
+
+    @Test
+    void failedTelegramSendLeavesMessageIdNullForRetry() {
+        NewsItem item = draft("Frieren movie announced", "Frieren gets a new movie.");
+        item.setId(42L);
+        TelegramNewsBotService bot = mock(TelegramNewsBotService.class);
+        when(telegramBotProvider.getIfAvailable()).thenReturn(bot);
+        when(bot.sendReviewRequest(item)).thenReturn(null);
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(llmNewsProcessor.enrich(item)).thenAnswer(invocation -> {
+            item.setSummary("Frieren tendra pelicula.");
+            item.setBody("<p>Frieren tendra pelicula.</p>");
+            item.setLlmTokensUsed(800);
+            return true;
+        });
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of(item));
+        when(animeRepository.findAllWithSynonyms()).thenReturn(List.of());
+
+        service(true, false).processDrafts();
+
+        assertThat(item.getStatus()).isEqualTo(NewsStatus.PENDING_REVIEW);
+        assertThat(item.getTelegramMessageId()).isNull();
+        verify(itemRepository).save(item);
+    }
+
+    @Test
+    void resendsPendingReviewsWhoseTelegramSendFailed() {
+        NewsItem pending = draft("Chainsaw Man part 2", "New arc confirmed.");
+        pending.setId(7L);
+        pending.setStatus(NewsStatus.PENDING_REVIEW);
+        TelegramNewsBotService bot = mock(TelegramNewsBotService.class);
+        when(telegramBotProvider.getIfAvailable()).thenReturn(bot);
+        when(bot.sendReviewRequest(pending)).thenReturn(222L);
+        when(llmNewsProcessor.enabled()).thenReturn(true);
+        when(itemRepository.findByStatusAndTelegramMessageIdIsNullOrderByFetchedAtAsc(
+                eq(NewsStatus.PENDING_REVIEW), any(Pageable.class)))
+                .thenReturn(List.of(pending));
+        when(itemRepository.findByStatusOrderByFetchedAtAsc(eq(NewsStatus.DRAFT), any(Pageable.class)))
+                .thenReturn(List.of());
+
+        NewsProcessingResult result = service(true, false).processDrafts();
+
+        assertThat(result.sentToReview()).isEqualTo(1);
+        assertThat(pending.getTelegramMessageId()).isEqualTo(222L);
+        verify(itemRepository).save(pending);
+    }
+
     private NewsProcessingService service(boolean enabled, boolean publish) {
         return new NewsProcessingService(
-                itemRepository, animeRepository, llmNewsProcessor, enabled, publish, 20, 50);
+                itemRepository, animeRepository, llmNewsProcessor, telegramBotProvider,
+                enabled, publish, 20, 50);
     }
 
     private static NewsItem draft(String title, String excerpt) {

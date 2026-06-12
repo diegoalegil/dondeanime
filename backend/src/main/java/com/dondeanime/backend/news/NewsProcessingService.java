@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,8 @@ public class NewsProcessingService {
     private final NewsItemRepository itemRepository;
     private final AnimeRepository animeRepository;
     private final LlmNewsProcessor llmNewsProcessor;
+    // ObjectProvider porque el bot es @ConditionalOnProperty: sin flag no hay bean.
+    private final ObjectProvider<TelegramNewsBotService> telegramBotProvider;
     private final boolean enabled;
     private final boolean publish;
     private final int maxItems;
@@ -50,6 +53,7 @@ public class NewsProcessingService {
             NewsItemRepository itemRepository,
             AnimeRepository animeRepository,
             LlmNewsProcessor llmNewsProcessor,
+            ObjectProvider<TelegramNewsBotService> telegramBotProvider,
             @Value("${news.processing.enabled:false}") boolean enabled,
             @Value("${news.processing.publish:false}") boolean publish,
             @Value("${news.processing.max-items:20}") int maxItems,
@@ -57,6 +61,7 @@ public class NewsProcessingService {
         this.itemRepository = itemRepository;
         this.animeRepository = animeRepository;
         this.llmNewsProcessor = llmNewsProcessor;
+        this.telegramBotProvider = telegramBotProvider;
         this.enabled = enabled;
         this.publish = publish;
         this.maxItems = maxItems;
@@ -68,14 +73,25 @@ public class NewsProcessingService {
             return NewsProcessingResult.empty(false);
         }
 
+        boolean llmActive = llmNewsProcessor.enabled();
+        // El flujo de revisión por Telegram solo aplica con LLM activo: sin
+        // redacción en español no hay nada que aprobar.
+        TelegramNewsBotService bot = llmActive ? telegramBotProvider.getIfAvailable() : null;
+
+        int sentToReview = 0;
+        if (bot != null) {
+            sentToReview += resendPendingReviews(bot);
+        }
+
         List<NewsItem> drafts = itemRepository.findByStatusOrderByFetchedAtAsc(
                 NewsStatus.DRAFT, PageRequest.of(0, effectiveLimit()));
         if (drafts.isEmpty()) {
-            return NewsProcessingResult.empty(true);
+            return sentToReview == 0
+                    ? NewsProcessingResult.empty(true)
+                    : new NewsProcessingResult(true, 0, 0, 0, 0, 0, 0, 0, sentToReview);
         }
 
         List<Anime> animeCatalog = animeRepository.findAllWithSynonyms();
-        boolean llmActive = llmNewsProcessor.enabled();
         int llmBudget = llmActive ? remainingLlmQuota() : 0;
 
         int processed = 0;
@@ -84,7 +100,6 @@ public class NewsProcessingService {
         int skipped = 0;
         int llmProcessed = 0;
         int llmFailed = 0;
-        int sentToReview = 0;
 
         for (NewsItem item : drafts) {
             boolean changed;
@@ -123,6 +138,22 @@ public class NewsProcessingService {
                     matched++;
                     changed = true;
                 }
+            }
+
+            if (bot != null && canPublish(item)) {
+                // Revisión manual: a PENDING_REVIEW y commit ANTES de la llamada
+                // HTTP; si el envío falla, telegram_message_id queda NULL y la
+                // siguiente pasada lo reenvía (resendPendingReviews).
+                item.setStatus(NewsStatus.PENDING_REVIEW);
+                itemRepository.save(item);
+                Long messageId = bot.sendReviewRequest(item);
+                if (messageId != null) {
+                    item.setTelegramMessageId(messageId);
+                    itemRepository.save(item);
+                }
+                sentToReview++;
+                processed++;
+                continue;
             }
 
             if (publish && canPublish(item)) {
@@ -167,6 +198,22 @@ public class NewsProcessingService {
             changed = true;
         }
         return changed;
+    }
+
+    /** Reenvía las revisiones cuyo aviso a Telegram falló en pasadas anteriores. */
+    private int resendPendingReviews(TelegramNewsBotService bot) {
+        List<NewsItem> pending = itemRepository.findByStatusAndTelegramMessageIdIsNullOrderByFetchedAtAsc(
+                NewsStatus.PENDING_REVIEW, PageRequest.of(0, effectiveLimit()));
+        int sent = 0;
+        for (NewsItem item : pending) {
+            Long messageId = bot.sendReviewRequest(item);
+            if (messageId != null) {
+                item.setTelegramMessageId(messageId);
+                itemRepository.save(item);
+                sent++;
+            }
+        }
+        return sent;
     }
 
     /**
