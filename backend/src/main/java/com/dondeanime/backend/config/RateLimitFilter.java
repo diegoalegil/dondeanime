@@ -36,6 +36,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new RateLimitRule("/api/subscriptions", false, 5),
             new RateLimitRule("/api/alerts", false, 5),
             new RateLimitRule("/api/push/subscribe", false, 10),
+            // Webhook del bot de noticias: Telegram entrega los callbacks de un
+            // chat de una persona; 30/min sobra y frena el spam al endpoint.
+            new RateLimitRule("/api/news/telegram/webhook", false, 30),
             new RateLimitRule("/api/mobile/push/register", false, 10),
             new RateLimitRule("/api/premium/checkout", false, 5),
             new RateLimitRule("/api/premium/portal", false, 5),
