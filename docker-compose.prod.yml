@@ -136,6 +136,12 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
       EMBEDDING_API_BASE: ${EMBEDDING_API_BASE:-}
       EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+      # --- LLM noticias (News Engine S2, apagado por defecto) ---
+      LLM_ENABLED: ${LLM_ENABLED:-false}
+      LLM_MODEL: ${LLM_MODEL:-claude-haiku-4-5}
+      LLM_API_BASE: ${LLM_API_BASE:-https://api.anthropic.com}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM_MAX_OUTPUT_TOKENS: ${LLM_MAX_OUTPUT_TOKENS:-1500}
       # --- Alertas críticas Telegram (Sprint 6, opcional) ---
       TELEGRAM_ENABLED: ${TELEGRAM_ENABLED:-false}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
