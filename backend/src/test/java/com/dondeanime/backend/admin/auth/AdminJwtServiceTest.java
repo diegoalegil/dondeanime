@@ -38,4 +38,24 @@ class AdminJwtServiceTest {
 
         assertThat(service.isValidAdminToken(tampered)).isFalse();
     }
+
+    @Test
+    void validClaimsExposeJtiAndExpiration() {
+        AdminJwtService service = new AdminJwtService("secret", Clock.fixed(NOW, ZoneOffset.UTC));
+        String token = service.createAdminSession().token();
+
+        AdminTokenClaims claims = service.validClaims(token).orElseThrow();
+
+        assertThat(claims.jti()).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+        assertThat(claims.expiresAt()).isEqualTo(NOW.plusSeconds(8 * 60 * 60));
+    }
+
+    @Test
+    void validClaimsRejectsTamperedToken() {
+        AdminJwtService service = new AdminJwtService("secret", Clock.fixed(NOW, ZoneOffset.UTC));
+        String token = service.createAdminSession().token();
+        String tampered = token.substring(0, token.length() - 2) + "xx";
+
+        assertThat(service.validClaims(tampered)).isEmpty();
+    }
 }

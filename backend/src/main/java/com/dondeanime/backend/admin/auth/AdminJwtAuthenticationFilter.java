@@ -30,9 +30,16 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/anime/sync-trailers");
 
     private final AdminJwtService adminJwtService;
+    // Nullable: en los slices @WebMvcTest no existe el bean (no escanean
+    // @Service) y el filtro funciona como siempre; en la app real llega el
+    // servicio y las sesiones revocadas dejan de valer.
+    private final AdminTokenRevocationService revocationService;
 
-    public AdminJwtAuthenticationFilter(AdminJwtService adminJwtService) {
+    public AdminJwtAuthenticationFilter(
+            AdminJwtService adminJwtService,
+            AdminTokenRevocationService revocationService) {
         this.adminJwtService = adminJwtService;
+        this.revocationService = revocationService;
     }
 
     @Override
@@ -49,13 +56,16 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
             String token = authorization.substring(BEARER_PREFIX.length());
-            if (adminJwtService.isValidAdminToken(token)) {
+            adminJwtService.validClaims(token).ifPresent(claims -> {
+                if (revocationService != null && revocationService.isRevoked(claims.jti())) {
+                    return;
+                }
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         "admin",
                         null,
                         List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            });
         }
 
         filterChain.doFilter(request, response);

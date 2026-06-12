@@ -20,14 +20,20 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.dondeanime.backend.admin.auth.AdminJwtAuthenticationFilter;
 import com.dondeanime.backend.admin.auth.AdminJwtService;
+import com.dondeanime.backend.admin.auth.AdminTokenRevocationService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    AdminJwtAuthenticationFilter adminJwtAuthenticationFilter(AdminJwtService adminJwtService) {
-        return new AdminJwtAuthenticationFilter(adminJwtService);
+    AdminJwtAuthenticationFilter adminJwtAuthenticationFilter(
+            AdminJwtService adminJwtService,
+            // ObjectProvider: en los slices @WebMvcTest el @Service no existe
+            // y el filtro queda sin denylist (comportamiento previo); en la
+            // app completa sí, y las sesiones revocadas dejan de valer.
+            org.springframework.beans.factory.ObjectProvider<AdminTokenRevocationService> revocationProvider) {
+        return new AdminJwtAuthenticationFilter(adminJwtService, revocationProvider.getIfAvailable());
     }
 
     @Bean

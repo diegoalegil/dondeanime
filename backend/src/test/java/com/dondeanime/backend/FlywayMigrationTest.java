@@ -64,6 +64,7 @@ class FlywayMigrationTest {
         assertThat(tables).contains(
                 "affiliate_click_event",
                 "affiliate_link",
+                "admin_revoked_token",
                 "admin_user",
                 "anime",
                 "anime_character",
@@ -145,6 +146,6 @@ class FlywayMigrationTest {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(successfulMigrations).isEqualTo(27);
+        assertThat(successfulMigrations).isEqualTo(28);
     }
 }

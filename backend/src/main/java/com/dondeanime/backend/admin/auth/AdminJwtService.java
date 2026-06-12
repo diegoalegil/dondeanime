@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ public class AdminJwtService {
     private static final Base64.Decoder BASE64_URL_DECODER = Base64.getUrlDecoder();
     private static final Pattern TOKEN_TYPE_PATTERN = Pattern.compile("\"typ\"\\s*:\\s*\"([^\"]+)\"");
     private static final Pattern EXPIRATION_PATTERN = Pattern.compile("\"exp\"\\s*:\\s*(\\d+)");
+    private static final Pattern JTI_PATTERN = Pattern.compile("\"jti\"\\s*:\\s*\"([^\"]+)\"");
 
     private final byte[] secret;
     private final Clock clock;
@@ -47,27 +49,47 @@ public class AdminJwtService {
     }
 
     public boolean isValidAdminToken(String rawToken) {
+        return validClaims(rawToken).isPresent();
+    }
+
+    /**
+     * Verifica firma, tipo y expiración, y devuelve los claims. El jti es
+     * obligatorio (todos los tokens emitidos lo llevan): es lo que permite
+     * revocar sesiones antes de que expiren.
+     */
+    public Optional<AdminTokenClaims> validClaims(String rawToken) {
         if (rawToken == null || rawToken.isBlank()) {
-            return false;
+            return Optional.empty();
         }
 
         String[] parts = rawToken.split("\\.");
         if (parts.length != 3) {
-            return false;
+            return Optional.empty();
         }
 
         String unsigned = parts[0] + "." + parts[1];
         if (!MessageDigest.isEqual(
                 sign(unsigned).getBytes(StandardCharsets.UTF_8),
                 parts[2].getBytes(StandardCharsets.UTF_8))) {
-            return false;
+            return Optional.empty();
         }
 
         try {
             String payload = new String(BASE64_URL_DECODER.decode(parts[1]), StandardCharsets.UTF_8);
-            return hasAdminType(payload) && hasValidExpiration(payload);
+            if (!hasAdminType(payload)) {
+                return Optional.empty();
+            }
+            Instant expiresAt = expiration(payload);
+            if (expiresAt == null || !expiresAt.isAfter(clock.instant())) {
+                return Optional.empty();
+            }
+            Matcher jti = JTI_PATTERN.matcher(payload);
+            if (!jti.find()) {
+                return Optional.empty();
+            }
+            return Optional.of(new AdminTokenClaims(jti.group(1), expiresAt));
         } catch (IllegalArgumentException e) {
-            return false;
+            return Optional.empty();
         }
     }
 
@@ -85,14 +107,12 @@ public class AdminJwtService {
         return matcher.find() && "admin".equals(matcher.group(1));
     }
 
-    private boolean hasValidExpiration(String payload) {
+    private static Instant expiration(String payload) {
         Matcher matcher = EXPIRATION_PATTERN.matcher(payload);
         if (!matcher.find()) {
-            return false;
+            return null;
         }
-
-        Instant expiresAt = Instant.ofEpochSecond(Long.parseLong(matcher.group(1)));
-        return expiresAt.isAfter(clock.instant());
+        return Instant.ofEpochSecond(Long.parseLong(matcher.group(1)));
     }
 
     private String sign(String value) {

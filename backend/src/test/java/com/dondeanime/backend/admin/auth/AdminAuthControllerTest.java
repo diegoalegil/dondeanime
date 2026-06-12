@@ -47,6 +47,9 @@ class AdminAuthControllerTest {
     @MockitoBean
     private AdminTotpService adminTotpService;
 
+    @MockitoBean
+    private AdminTokenRevocationService revocationService;
+
     @Test
     void loginReturnsBearerToken() throws Exception {
         stubAdminUser(null);
@@ -118,6 +121,36 @@ class AdminAuthControllerTest {
                 .andExpect(status().isNotFound());
 
         assertThat(adminJwtService.isValidAdminToken(token)).isTrue();
+    }
+
+    @Test
+    void logoutRevokesCurrentSession() throws Exception {
+        String token = adminJwtService.createAdminSession().token();
+        String jti = adminJwtService.validClaims(token).orElseThrow().jti();
+
+        mvc.perform(post("/api/admin/logout")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        org.mockito.Mockito.verify(revocationService)
+                .revoke(org.mockito.ArgumentMatchers.argThat(claims -> jti.equals(claims.jti())));
+    }
+
+    @Test
+    void logoutWithoutTokenIsRejectedByAuth() throws Exception {
+        mvc.perform(post("/api/admin/logout"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void revokedTokenNoLongerAuthenticates() throws Exception {
+        String token = adminJwtService.createAdminSession().token();
+        String jti = adminJwtService.validClaims(token).orElseThrow().jti();
+        when(revocationService.isRevoked(jti)).thenReturn(true);
+
+        mvc.perform(get("/api/admin/anything")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
     }
 
     private void stubAdminUser(String totpSecret) {
