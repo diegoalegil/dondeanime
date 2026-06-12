@@ -142,6 +142,12 @@ services:
       LLM_API_BASE: ${LLM_API_BASE:-https://api.anthropic.com}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       LLM_MAX_OUTPUT_TOKENS: ${LLM_MAX_OUTPUT_TOKENS:-1500}
+      NEWS_LLM_DAILY_LIMIT: ${NEWS_LLM_DAILY_LIMIT:-50}
+      # --- Bot Telegram de revision de noticias (S2, apagado por defecto) ---
+      NEWS_TELEGRAM_ENABLED: ${NEWS_TELEGRAM_ENABLED:-false}
+      NEWS_TELEGRAM_BOT_TOKEN: ${NEWS_TELEGRAM_BOT_TOKEN:-}
+      NEWS_TELEGRAM_DIEGO_CHAT_ID: ${NEWS_TELEGRAM_DIEGO_CHAT_ID:-}
+      NEWS_TELEGRAM_WEBHOOK_SECRET: ${NEWS_TELEGRAM_WEBHOOK_SECRET:-}
       # --- Alertas críticas Telegram (Sprint 6, opcional) ---
       TELEGRAM_ENABLED: ${TELEGRAM_ENABLED:-false}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
