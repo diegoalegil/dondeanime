@@ -3,16 +3,20 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import NewsList from '@/components/news/NewsList.astro';
+import NewsPager from '@/components/news/NewsPager.astro';
 import { getNews } from '@/lib/api';
+import { NEWS_PAGE_SIZE, newsPageCount } from '@/lib/newsPagination';
 import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
 
 setLocale('es');
 
-const news = await getNews(50);
+const news = await getNews(100);
+const items = news.slice(0, NEWS_PAGE_SIZE);
+const totalPages = newsPageCount(news.length);
 const pageUrl = absoluteUrl('/noticias');
 const itemList = buildItemListSchema(
-  news.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  items.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
   pageUrl,
   t('news.index.heading'),
 );
@@ -26,7 +30,8 @@ const itemList = buildItemListSchema(
     title={t('news.rss.title')}
     href={absoluteUrl('/noticias/rss.xml')}
   />
-  {news.length > 0 && <JsonLd slot="head" data={itemList} />}
+  {totalPages > 1 && <link slot="head" rel="next" href={absoluteUrl('/noticias/pagina/2')} />}
+  {items.length > 0 && <JsonLd slot="head" data={itemList} />}
 
   <Breadcrumbs
     items={[
@@ -40,13 +45,15 @@ const itemList = buildItemListSchema(
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">{t('news.index.description')}</p>
 
     <div class="mt-10">
-      {news.length === 0 ? (
+      {items.length === 0 ? (
         <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
           {t('news.index.empty')}
         </p>
       ) : (
-        <NewsList items={news} />
+        <NewsList items={items} />
       )}
     </div>
+
+    <NewsPager page={1} totalPages={totalPages} indexPath="/noticias" pagePathPrefix="/noticias/pagina" />
   </section>
 </BaseLayout>

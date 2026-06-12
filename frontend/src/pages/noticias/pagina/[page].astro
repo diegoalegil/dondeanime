@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import NewsList from '@/components/news/NewsList.astro';
+import NewsPager from '@/components/news/NewsPager.astro';
+import { getNews } from '@/lib/api';
+import type { NewsSummary } from '@/lib/api';
+import { newsPageCount, newsPageSlice } from '@/lib/newsPagination';
+import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+interface Props {
+  items: NewsSummary[];
+  page: number;
+  totalPages: number;
+}
+
+// Páginas 2+ del índice de noticias; la 1 es /noticias. Con pocas noticias
+// no se genera ninguna (getStaticPaths vacío), así que hoy no cambia nada.
+export async function getStaticPaths() {
+  const news = await getNews(100);
+  const totalPages = newsPageCount(news.length);
+  if (totalPages <= 1) {
+    return [];
+  }
+  return Array.from({ length: totalPages - 1 }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: { items: newsPageSlice(news, page), page, totalPages },
+    };
+  });
+}
+
+const { items, page, totalPages } = Astro.props as Props;
+const pageUrl = absoluteUrl(`/noticias/pagina/${page}`);
+const prevUrl = page === 2 ? absoluteUrl('/noticias') : absoluteUrl(`/noticias/pagina/${page - 1}`);
+const title = t('news.index.pageTitle', { page: String(page) });
+const itemList = buildItemListSchema(
+  items.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  pageUrl,
+  t('news.index.heading'),
+);
+---
+{/* suppressAlternates: mismo criterio que el índice (contenido solo en ES). */}
+<BaseLayout title={title} description={t('news.index.description')} canonical={pageUrl} suppressAlternates>
+  <link slot="head" rel="prev" href={prevUrl} />
+  {page < totalPages && <link slot="head" rel="next" href={absoluteUrl(`/noticias/pagina/${page + 1}`)} />}
+  {items.length > 0 && <JsonLd slot="head" data={itemList} />}
+
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.news'), url: '/noticias' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-20">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{t('news.index.heading')}</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      {t('news.pager.status', { page: String(page), total: String(totalPages) })}
+    </p>
+
+    <div class="mt-10">
+      <NewsList items={items} />
+    </div>
+
+    <NewsPager page={page} totalPages={totalPages} indexPath="/noticias" pagePathPrefix="/noticias/pagina" />
+  </section>
+</BaseLayout>

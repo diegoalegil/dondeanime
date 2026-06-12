@@ -1,0 +1,36 @@
+---
+import { t } from '@/i18n';
+
+interface Props {
+  /** Página actual (1 = índice). */
+  page: number;
+  totalPages: number;
+  /** Ruta del índice, p. ej. /noticias o /en/news. */
+  indexPath: string;
+  /** Prefijo de las páginas 2+, p. ej. /noticias/pagina o /en/news/page. */
+  pagePathPrefix: string;
+}
+
+const { page, totalPages, indexPath, pagePathPrefix } = Astro.props;
+const prevHref = page <= 1 ? null : page === 2 ? indexPath : `${pagePathPrefix}/${page - 1}`;
+const nextHref = page >= totalPages ? null : `${pagePathPrefix}/${page + 1}`;
+---
+{totalPages > 1 && (
+  <nav class="mt-10 flex items-center justify-between gap-4" aria-label={t('news.pager.status', { page: String(page), total: String(totalPages) })}>
+    {prevHref ? (
+      <a href={prevHref} rel="prev" class="rounded-lg border border-surface-2 bg-surface-1 px-4 py-2 text-sm hover:border-surface-3">
+        ← {t('news.pager.previous')}
+      </a>
+    ) : (
+      <span />
+    )}
+    <span class="text-sm text-fg-secondary">{t('news.pager.status', { page: String(page), total: String(totalPages) })}</span>
+    {nextHref ? (
+      <a href={nextHref} rel="next" class="rounded-lg border border-surface-2 bg-surface-1 px-4 py-2 text-sm hover:border-surface-3">
+        {t('news.pager.next')} →
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}

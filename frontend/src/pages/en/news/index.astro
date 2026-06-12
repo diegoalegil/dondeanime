@@ -3,14 +3,18 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import NewsList from '@/components/news/NewsList.astro';
+import NewsPager from '@/components/news/NewsPager.astro';
 import { getNews } from '@/lib/api';
+import { NEWS_PAGE_SIZE, newsPageCount } from '@/lib/newsPagination';
 import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
-const news = await getNews(50);
+const news = await getNews(100);
+const items = news.slice(0, NEWS_PAGE_SIZE);
+const totalPages = newsPageCount(news.length);
 const siteUrl = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
 // Las noticias aún se publican solo en español: este índice sirve el MISMO
 // contenido bajo lang=en, así que canonicaliza a /noticias y no emite
@@ -18,7 +22,7 @@ const siteUrl = import.meta.env.PUBLIC_SITE_URL.replace(/\/$/, '');
 const canonicalUrl = `${siteUrl}/noticias`;
 const rssHref = `${siteUrl}/en/news/rss.xml`;
 const itemList = buildItemListSchema(
-  news.map((n) => ({ name: n.title, url: absoluteUrl(`/en/news/${n.slug}`) })),
+  items.map((n) => ({ name: n.title, url: absoluteUrl(`/en/news/${n.slug}`) })),
   canonicalUrl,
   t('news.index.heading'),
 );
@@ -30,7 +34,8 @@ const itemList = buildItemListSchema(
   suppressAlternates
 >
   <link slot="head" rel="alternate" type="application/rss+xml" title={t('news.rss.title')} href={rssHref} />
-  {news.length > 0 && <JsonLd slot="head" data={itemList} />}
+  {totalPages > 1 && <link slot="head" rel="next" href={absoluteUrl('/en/news/page/2')} />}
+  {items.length > 0 && <JsonLd slot="head" data={itemList} />}
 
   <Breadcrumbs
     items={[
@@ -44,13 +49,15 @@ const itemList = buildItemListSchema(
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">{t('news.index.description')}</p>
 
     <div class="mt-10">
-      {news.length === 0 ? (
+      {items.length === 0 ? (
         <p class="rounded-lg border border-surface-2 bg-surface-1 p-6 text-sm text-fg-secondary">
           {t('news.index.empty')}
         </p>
       ) : (
-        <NewsList items={news} />
+        <NewsList items={items} />
       )}
     </div>
+
+    <NewsPager page={1} totalPages={totalPages} indexPath="/en/news" pagePathPrefix="/en/news/page" />
   </section>
 </BaseLayout>

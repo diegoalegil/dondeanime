@@ -411,6 +411,10 @@
   "news.anime.heading": "Noticias relacionadas",
   "news.anime.empty": "Todavía no hay noticias publicadas para este anime.",
   "news.card.readMore": "Leer más",
+  "news.pager.previous": "Página anterior",
+  "news.pager.next": "Página siguiente",
+  "news.pager.status": "Página {page} de {total}",
+  "news.index.pageTitle": "Noticias de anime — página {page} | DondeAnime",
   "news.rss.title": "DondeAnime — Noticias",
   "news.rss.description": "Últimas noticias de anime en español."
 }

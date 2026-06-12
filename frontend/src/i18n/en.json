@@ -411,6 +411,10 @@
   "news.anime.heading": "Related news",
   "news.anime.empty": "No news published for this anime yet.",
   "news.card.readMore": "Read more",
+  "news.pager.previous": "Previous page",
+  "news.pager.next": "Next page",
+  "news.pager.status": "Page {page} of {total}",
+  "news.index.pageTitle": "Anime news — page {page} | DondeAnime",
   "news.rss.title": "DondeAnime — News",
   "news.rss.description": "Latest anime news."
 }
