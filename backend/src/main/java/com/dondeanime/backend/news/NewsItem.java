@@ -97,6 +97,14 @@ public class NewsItem {
     @Column(name = "llm_tokens_used")
     private Integer llmTokensUsed;
 
+    /**
+     * id del mensaje de revisión enviado al chat de Telegram. NULL en
+     * PENDING_REVIEW significa "envío pendiente" (se reintenta en la
+     * siguiente pasada); con valor permite editar el mensaje al resolver.
+     */
+    @Column(name = "telegram_message_id")
+    private Long telegramMessageId;
+
     @Column(name = "published_at")
     private Instant publishedAt;
 
@@ -304,6 +312,14 @@ public class NewsItem {
 
     public void setLlmTokensUsed(Integer llmTokensUsed) {
         this.llmTokensUsed = llmTokensUsed;
+    }
+
+    public Long getTelegramMessageId() {
+        return telegramMessageId;
+    }
+
+    public void setTelegramMessageId(Long telegramMessageId) {
+        this.telegramMessageId = telegramMessageId;
     }
 
     public Instant getPublishedAt() {

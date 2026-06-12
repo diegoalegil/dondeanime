@@ -27,4 +27,7 @@ public interface NewsItemRepository extends JpaRepository<NewsItem, Long> {
 
     /** Cupo diario del LLM: ítems redactados desde un instante (ver NewsProcessingService). */
     long countByLlmTokensUsedIsNotNullAndUpdatedAtGreaterThanEqual(java.time.Instant since);
+
+    /** Revisiones cuya notificación a Telegram falló y hay que reenviar. */
+    List<NewsItem> findByStatusAndTelegramMessageIdIsNullOrderByFetchedAtAsc(NewsStatus status, Pageable pageable);
 }
