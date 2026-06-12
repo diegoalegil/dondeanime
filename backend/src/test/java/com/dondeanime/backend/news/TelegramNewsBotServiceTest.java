@@ -65,6 +65,35 @@ class TelegramNewsBotServiceTest {
     }
 
     @Test
+    void ioErrorsDoNotLeakBotTokenInLogs() {
+        // Los errores de I/O de RestClient llevan la URL completa en el mensaje,
+        // y la URL de Telegram contiene el token: el log debe censurarlo.
+        ch.qos.logback.classic.Logger logger =
+                (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(TelegramNewsBotService.class);
+        ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent> appender =
+                new ch.qos.logback.core.read.ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            RestClient.Builder builder = RestClient.builder();
+            MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+            TelegramNewsBotService service = serviceFor(builder);
+            server.expect(once(), requestTo("https://api.telegram.test/bot123456:news-token/sendMessage"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators
+                            .withException(new java.io.IOException("connection refused")));
+
+            assertThat(service.sendReviewRequest(item())).isNull();
+
+            String logged = appender.list.stream()
+                    .map(ch.qos.logback.classic.spi.ILoggingEvent::getFormattedMessage)
+                    .reduce("", (a, b) -> a + "\n" + b);
+            assertThat(logged).doesNotContain("123456:news-token");
+        } finally {
+            logger.detachAppender(appender);
+        }
+    }
+
+    @Test
     void markResolvedEditsOriginalMessage() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();

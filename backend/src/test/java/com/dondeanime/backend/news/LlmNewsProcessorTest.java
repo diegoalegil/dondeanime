@@ -91,6 +91,21 @@ class LlmNewsProcessorTest {
     }
 
     @Test
+    void truncationDoesNotSplitSurrogatePairs() {
+        // 199 chars + emoji (2 chars UTF-16) = 201: el corte en 200 partiría el
+        // par y dejaría un String UTF-16 inválido; debe cortar en 199.
+        String titulo = "x".repeat(199) + "👋";
+        when(llmClient.complete(any(LlmRequest.class))).thenReturn(new LlmCompletion("""
+                {"titulo":"%s","resumen":"r","cuerpo":"<p>c</p>","meta_titulo":"mt","meta_descripcion":"md"}
+                """.formatted(titulo), 10, 10));
+        NewsItem item = draft();
+
+        assertThat(processor.enrich(item)).isTrue();
+        assertThat(item.getTitle()).hasSize(199);
+        assertThat(Character.isHighSurrogate(item.getTitle().charAt(item.getTitle().length() - 1))).isFalse();
+    }
+
+    @Test
     void invalidJsonReturnsFalseAndLeavesItemUntouched() {
         when(llmClient.complete(any(LlmRequest.class)))
                 .thenReturn(new LlmCompletion("esto no es json", 10, 10));

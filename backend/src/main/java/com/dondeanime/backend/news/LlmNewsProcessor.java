@@ -139,7 +139,16 @@ public class LlmNewsProcessor {
         return "";
     }
 
+    /** Trunca sin partir surrogate pairs (emoji): un par cortado a la mitad
+     *  produce un String UTF-16 inválido que corrompe el JSON/HTML. */
     private static String truncate(String value, int max) {
-        return value.length() > max ? value.substring(0, max) : value;
+        if (value.length() <= max) {
+            return value;
+        }
+        int cut = max;
+        if (Character.isHighSurrogate(value.charAt(cut - 1))) {
+            cut--;
+        }
+        return value.substring(0, cut);
     }
 }

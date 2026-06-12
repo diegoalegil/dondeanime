@@ -22,6 +22,9 @@ public class TelegramAlertService {
     private final RestClient restClient;
     private final String sendMessagePath;
     private final String chatId;
+    // Solo para censurarlo en logs: las excepciones de RestClient incluyen la
+    // URL completa, y el token de Telegram va en el path.
+    private final String botToken;
 
     public TelegramAlertService(
             RestClient.Builder restClientBuilder,
@@ -35,6 +38,7 @@ public class TelegramAlertService {
         this.restClient = restClientBuilder.baseUrl(apiBase).build();
         this.sendMessagePath = "/bot" + botToken + "/sendMessage";
         this.chatId = chatId;
+        this.botToken = botToken;
     }
 
     @EventListener
@@ -52,8 +56,14 @@ public class TelegramAlertService {
                     .toBodilessEntity();
             log.info("Alerta Telegram enviada para fallo de scheduler '{}'", event.job());
         } catch (RestClientException e) {
-            log.error("No se pudo enviar alerta Telegram para scheduler '{}': {}", event.job(), e.getMessage());
+            log.error("No se pudo enviar alerta Telegram para scheduler '{}': {}", event.job(), redacted(e));
         }
+    }
+
+    /** Mensaje de error sin el token (los errores de I/O incluyen la URL completa). */
+    private String redacted(RestClientException e) {
+        String message = e.getMessage();
+        return message == null ? e.getClass().getSimpleName() : message.replace(botToken, "***");
     }
 
     private static String formatMessage(SchedulerJobFailedEvent event) {

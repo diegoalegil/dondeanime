@@ -32,6 +32,9 @@ public class TelegramNewsBotService {
     private final RestClient restClient;
     private final String botPath;
     private final String chatId;
+    // Solo para censurarlo en logs: las excepciones de RestClient incluyen la
+    // URL completa, y el token de Telegram va en el path.
+    private final String botToken;
 
     public TelegramNewsBotService(
             RestClient.Builder restClientBuilder,
@@ -45,6 +48,7 @@ public class TelegramNewsBotService {
         this.restClient = restClientBuilder.baseUrl(apiBase).build();
         this.botPath = "/bot" + botToken;
         this.chatId = chatId;
+        this.botToken = botToken;
     }
 
     /**
@@ -74,7 +78,7 @@ public class TelegramNewsBotService {
             }
             return messageId;
         } catch (RestClientException e) {
-            log.error("No se pudo enviar la revisión de '{}' a Telegram: {}", item.getSlug(), e.getMessage());
+            log.error("No se pudo enviar la revisión de '{}' a Telegram: {}", item.getSlug(), redacted(e));
             return null;
         }
     }
@@ -93,7 +97,7 @@ public class TelegramNewsBotService {
                     .toBodilessEntity();
         } catch (RestClientException e) {
             // No bloquea la decisión: el estado ya cambió en BD.
-            log.warn("No se pudo editar el mensaje {} de Telegram: {}", messageId, e.getMessage());
+            log.warn("No se pudo editar el mensaje {} de Telegram: {}", messageId, redacted(e));
         }
     }
 
@@ -106,8 +110,14 @@ public class TelegramNewsBotService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (RestClientException e) {
-            log.warn("No se pudo responder el callback {} de Telegram: {}", callbackQueryId, e.getMessage());
+            log.warn("No se pudo responder el callback {} de Telegram: {}", callbackQueryId, redacted(e));
         }
+    }
+
+    /** Mensaje de error sin el token (los errores de I/O incluyen la URL completa). */
+    private String redacted(RestClientException e) {
+        String message = e.getMessage();
+        return message == null ? e.getClass().getSimpleName() : message.replace(botToken, "***");
     }
 
     private static String formatReviewMessage(NewsItem item) {

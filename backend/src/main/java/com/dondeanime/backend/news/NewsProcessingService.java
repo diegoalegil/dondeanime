@@ -319,10 +319,16 @@ public class NewsProcessingService {
         return value != null && !value.isBlank();
     }
 
+    /** Trunca sin partir surrogate pairs (emoji en excerpts RSS): un par
+     *  cortado a la mitad produce un String UTF-16 inválido. */
     private static String truncate(String value, int max) {
-        if (value == null) {
-            return null;
+        if (value == null || value.length() <= max) {
+            return value;
         }
-        return value.length() > max ? value.substring(0, max) : value;
+        int cut = max;
+        if (Character.isHighSurrogate(value.charAt(cut - 1))) {
+            cut--;
+        }
+        return value.substring(0, cut);
     }
 }
