@@ -421,7 +421,7 @@ test('search index, robots and sitemap are generated', async ({ request }) => {
 test('PWA manifest links icons, screenshots and shortcuts', async ({ page, request }) => {
   await page.goto('/');
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.json');
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0A0A0F');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0E1020');
 
   const manifestResponse = await request.get('/manifest.json');
   expect(manifestResponse.ok()).toBe(true);
