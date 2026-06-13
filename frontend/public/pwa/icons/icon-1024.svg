@@ -1,11 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64" role="img" aria-label="DondeAnime">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 256 256" role="img" aria-label="DondeAnime">
   <defs>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FF6B4A"/>
-      <stop offset="100%" stop-color="#36E0E6"/>
+    <radialGradient id="bgDepth" cx="0.5" cy="0.43" r="0.62">
+      <stop offset="0" stop-color="#1B1F3A"></stop>
+      <stop offset="0.62" stop-color="#13162B"></stop>
+      <stop offset="1" stop-color="#0E1020"></stop>
+    </radialGradient>
+    <linearGradient id="pinFill" x1="74" y1="46" x2="186" y2="214" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF7E55"></stop>
+      <stop offset="0.55" stop-color="#FF6B4A"></stop>
+      <stop offset="1" stop-color="#EC5836"></stop>
     </linearGradient>
+    <linearGradient id="warmWash" x1="56" y1="98" x2="124" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB58E" stop-opacity="0.7"></stop>
+      <stop offset="1" stop-color="#FFB58E" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id="coolWash" x1="176" y1="142" x2="206" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#36E0E6" stop-opacity="0"></stop>
+      <stop offset="1" stop-color="#36E0E6" stop-opacity="0.42"></stop>
+    </linearGradient>
+    <radialGradient id="playGrad" cx="0.4" cy="0.38" r="0.85">
+      <stop offset="0" stop-color="#93F4F7"></stop>
+      <stop offset="0.55" stop-color="#36E0E6"></stop>
+      <stop offset="1" stop-color="#23C8CF"></stop>
+    </radialGradient>
+    <radialGradient id="headLight" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#F4F5FB" stop-opacity="0.95"></stop>
+      <stop offset="1" stop-color="#F4F5FB" stop-opacity="0"></stop>
+    </radialGradient>
+    <linearGradient id="rimGrad" x1="14" y1="14" x2="242" y2="242" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B4A" stop-opacity="0.85"></stop>
+      <stop offset="0.5" stop-color="#F4F5FB" stop-opacity="0.12"></stop>
+      <stop offset="1" stop-color="#36E0E6" stop-opacity="0.85"></stop>
+    </linearGradient>
+    <filter id="cyanGlow" x="-90%" y="-90%" width="280%" height="280%">
+      <feGaussianBlur stdDeviation="5.5"></feGaussianBlur>
+    </filter>
+    <filter id="rimBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+    </filter>
+    <clipPath id="pinClip">
+      <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z"></path>
+    </clipPath>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0E1020"/>
-  <path d="M16 18 L32 12 L48 18 L48 42 L32 52 L16 42 Z" fill="none" stroke="url(#brand)" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="32" cy="32" r="6" fill="url(#brand)"/>
+
+  <rect width="256" height="256" fill="#0E1020"></rect>
+  <rect width="256" height="256" fill="url(#bgDepth)"></rect>
+
+  <rect x="9" y="9" width="238" height="238" rx="52" fill="none" stroke="url(#rimGrad)" stroke-width="3" opacity="0.55" filter="url(#rimBlur)"></rect>
+
+  <g transform="translate(128 128) scale(0.9) translate(-128 -128)">
+    <ellipse cx="126" cy="103" rx="48" ry="42" fill="#36E0E6" opacity="0.16" filter="url(#cyanGlow)"></ellipse>
+
+    <g clip-path="url(#pinClip)">
+      <rect x="40" y="30" width="176" height="200" fill="url(#pinFill)"></rect>
+      <rect x="40" y="30" width="176" height="200" fill="url(#warmWash)"></rect>
+      <rect x="40" y="30" width="176" height="200" fill="url(#coolWash)"></rect>
+      <ellipse cx="103" cy="82" rx="26" ry="22" fill="url(#headLight)" opacity="0.32"></ellipse>
+    </g>
+
+    <path d="M112 74l46 30-46 30z" fill="#36E0E6" opacity="0.5" filter="url(#cyanGlow)"></path>
+    <path d="M112 74l46 30-46 30z" fill="url(#playGrad)"></path>
+    <path d="M112 74l46 30-3.2 2.1-42.8-27.9z" fill="#F4F5FB" opacity="0.5"></path>
+  </g>
 </svg>

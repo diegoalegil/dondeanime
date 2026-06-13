@@ -1,11 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 64 64" role="img" aria-label="DondeAnime">
-  <defs>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FF6B4A"/>
-      <stop offset="100%" stop-color="#36E0E6"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="#0E1020"/>
-  <path d="M16 18 L32 12 L48 18 L48 42 L32 52 L16 42 Z" fill="none" stroke="url(#brand)" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="32" cy="32" r="6" fill="url(#brand)"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" role="img" aria-label="DondeAnime">
+  <rect width="256" height="256" rx="56" fill="#0E1020"></rect>
+  <g transform="translate(128 128) scale(0.94) translate(-128 -128)">
+    <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#FF6B4A"></path>
+    <path d="M112 74l46 30-46 30z" fill="#36E0E6"></path>
+  </g>
 </svg>
