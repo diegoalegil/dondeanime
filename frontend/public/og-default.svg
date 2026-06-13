@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+
+  <defs>
+    <linearGradient id="hairline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF6B4A"></stop>
+      <stop offset="0.5" stop-color="#EBC9C7"></stop>
+      <stop offset="1" stop-color="#36E0E6"></stop>
+    </linearGradient>
+    <radialGradient id="coralGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FF6B4A" stop-opacity="0.16"></stop>
+      <stop offset="1" stop-color="#FF6B4A" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="cyanGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#36E0E6" stop-opacity="0.15"></stop>
+      <stop offset="1" stop-color="#36E0E6" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="starGlow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="2.2"></feGaussianBlur>
+    </filter>
+    <filter id="lineGlow" x="-5%" y="-400%" width="110%" height="900%">
+      <feGaussianBlur stdDeviation="5"></feGaussianBlur>
+    </filter>
+    <filter id="markGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3"></feGaussianBlur>
+    </filter>
+  </defs>
+
+  
+  <rect x="0" y="0" width="1200" height="630" fill="#0E1020"></rect>
+  <rect x="0" y="210" width="1200" height="420" fill="#1A1D33"></rect>
+
+  
+  <rect x="-260" y="40" width="900" height="900" fill="url(#coralGlow)"></rect>
+  <rect x="560" y="-180" width="900" height="900" fill="url(#cyanGlow)"></rect>
+
+  
+  <g><path d="M1164.5 126.7 L1170.6 132.8 L1164.5 138.9 L1158.4 132.8 Z" fill="#36E0E6" opacity="0.064"></path><path d="M163.5 578.6 L167.2 582.3 L163.5 586.0 L159.8 582.3 Z" fill="#FF6B4A" opacity="0.067"></path><path d="M84.3 237.0 L87.0 239.7 L84.3 242.4 L81.6 239.7 Z" fill="#FF6B4A" opacity="0.183" filter="url(#starGlow)"></path><path d="M354.6 513.9 L359.4 518.7 L354.6 523.5 L349.8 518.7 Z" fill="#FF6B4A" opacity="0.112"></path><path d="M628.2 427.4 L633.8 433 L628.2 438.6 L622.6 433 Z" fill="#F4F5FB" opacity="0.102"></path><path d="M525.5 480.0 L529.7 484.2 L525.5 488.4 L521.3 484.2 Z" fill="#F4F5FB" opacity="0.079"></path><path d="M1114.7 416.3 L1120.7 422.3 L1114.7 428.3 L1108.7 422.3 Z" fill="#36E0E6" opacity="0.088"></path><path d="M67.4 394.0 L71.3 397.9 L67.4 401.8 L63.5 397.9 Z" fill="#FF6B4A" opacity="0.080"></path><path d="M786.1 451.9 L789.6 455.4 L786.1 458.9 L782.6 455.4 Z" fill="#F4F5FB" opacity="0.168" filter="url(#starGlow)"></path><path d="M458 149.3 L461.6 152.9 L458 156.5 L454.4 152.9 Z" fill="#F4F5FB" opacity="0.103"></path><path d="M311.1 25.9 L313.9 28.7 L311.1 31.5 L308.3 28.7 Z" fill="#FF6B4A" opacity="0.094"></path><path d="M450.4 71.0 L453.5 74.1 L450.4 77.2 L447.3 74.1 Z" fill="#F4F5FB" opacity="0.178" filter="url(#starGlow)"></path><path d="M639.9 171.0 L642.3 173.4 L639.9 175.8 L637.5 173.4 Z" fill="#F4F5FB" opacity="0.109"></path><path d="M1030 486.9 L1035.1 492 L1030 497.1 L1024.9 492 Z" fill="#36E0E6" opacity="0.094"></path><path d="M491.9 603.3 L498.2 609.6 L491.9 615.9 L485.6 609.6 Z" fill="#F4F5FB" opacity="0.080"></path><path d="M469.6 466.4 L475.9 472.7 L469.6 479.0 L463.3 472.7 Z" fill="#F4F5FB" opacity="0.097"></path><path d="M827.3 147.1 L830.6 150.4 L827.3 153.7 L824.0 150.4 Z" fill="#36E0E6" opacity="0.112"></path><path d="M618 584.5 L621.6 588.1 L618 591.7 L614.4 588.1 Z" fill="#F4F5FB" opacity="0.119"></path><path d="M1001.5 205.8 L1004.4 208.7 L1001.5 211.6 L998.6 208.7 Z" fill="#36E0E6" opacity="0.076"></path><path d="M59.2 401.1 L61.6 403.5 L59.2 405.9 L56.8 403.5 Z" fill="#FF6B4A" opacity="0.206" filter="url(#starGlow)"></path><path d="M855.2 227.0 L860.7 232.5 L855.2 238.0 L849.7 232.5 Z" fill="#36E0E6" opacity="0.099"></path><path d="M327.8 563.8 L333.6 569.6 L327.8 575.4 L322.0 569.6 Z" fill="#FF6B4A" opacity="0.110"></path><path d="M699.1 163.4 L702.2 166.5 L699.1 169.6 L696.0 166.5 Z" fill="#F4F5FB" opacity="0.071"></path><path d="M217.2 288.1 L223.1 294 L217.2 299.9 L211.3 294 Z" fill="#FF6B4A" opacity="0.113"></path><path d="M282.9 288.1 L287.0 292.2 L282.9 296.3 L278.8 292.2 Z" fill="#FF6B4A" opacity="0.084"></path><path d="M413 206.1 L419.4 212.5 L413 218.9 L406.6 212.5 Z" fill="#F4F5FB" opacity="0.105"></path><path d="M68.2 386.8 L74.3 392.9 L68.2 399.0 L62.1 392.9 Z" fill="#FF6B4A" opacity="0.112"></path><path d="M1096.3 481.7 L1100.5 485.9 L1096.3 490.1 L1092.1 485.9 Z" fill="#36E0E6" opacity="0.179" filter="url(#starGlow)"></path><path d="M483.9 446.8 L487.4 450.3 L483.9 453.8 L480.4 450.3 Z" fill="#F4F5FB" opacity="0.114"></path><path d="M914.1 110.2 L919.6 115.7 L914.1 121.2 L908.6 115.7 Z" fill="#36E0E6" opacity="0.084"></path><path d="M515.6 15.7 L521.7 21.8 L515.6 27.9 L509.5 21.8 Z" fill="#F4F5FB" opacity="0.114"></path><path d="M978.5 463.3 L981.4 466.2 L978.5 469.1 L975.6 466.2 Z" fill="#36E0E6" opacity="0.078"></path><path d="M694.7 551.9 L699.0 556.2 L694.7 560.5 L690.4 556.2 Z" fill="#F4F5FB" opacity="0.061"></path><path d="M511 45.2 L516.3 50.5 L511 55.8 L505.7 50.5 Z" fill="#F4F5FB" opacity="0.098"></path><path d="M956 126 L956 148 L976 137 Z" fill="#36E0E6" opacity="0.11" filter="url(#starGlow)"></path></g>
+
+  
+  <rect x="0" y="208.5" width="1200" height="3" fill="url(#hairline)" opacity="0.55" filter="url(#lineGlow)"></rect>
+  <rect x="0" y="209" width="1200" height="2" fill="url(#hairline)"></rect>
+
+  
+  
+  <g>
+    <g filter="url(#markGlow)" opacity="0.5">
+      <g transform="translate(47.6,61.4) scale(0.3)">
+        <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#FF6B4A"></path>
+      </g>
+    </g>
+    <g transform="translate(47.6,61.4) scale(0.3)">
+      <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#FF6B4A"></path>
+      <path d="M112 74l46 30-46 30z" fill="#36E0E6"></path>
+    </g>
+  </g>
+  <text x="128" y="98" font-family="Geist, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.6" fill="#F4F5FB" dominant-baseline="middle">DondeAnime</text>
+
+  
+  <path d="M872 571.0 L876.0 575 L872 579.0 L868.0 575 Z" fill="#36E0E6" opacity="0.9"></path>
+  <text x="892" y="575" font-family="&#39;Geist Mono&#39;, monospace" font-size="20" font-weight="500" letter-spacing="0.5" fill="#F4F5FB" fill-opacity="0.66" dominant-baseline="middle">dondeanime.com</text>
+</svg>
