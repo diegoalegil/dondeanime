@@ -40,7 +40,7 @@ const itemListSchema = buildItemListSchema(
   t('genre.schema.name', { genre: genreName }),
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription}>
+<BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-genero.png')}>
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs

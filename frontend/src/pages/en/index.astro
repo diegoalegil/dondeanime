@@ -70,6 +70,7 @@ const itemListSchema = buildItemListSchema(
 <BaseLayout
   title={t('home.title')}
   description={t('home.description')}
+  image={absoluteUrl('/og-home.png')}
 >
   <JsonLd slot="head" data={websiteSchema} />
   <JsonLd slot="head" data={faqSchema} />

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    
+    <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(250 170) rotate(40) scale(620 560)">
+      <stop stop-color="#FF6B4A" stop-opacity="0.085"></stop>
+      <stop offset="0.32" stop-color="#FF6B4A" stop-opacity="0.03"></stop>
+      <stop offset="0.62" stop-color="#FF6B4A" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="coolGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1010 470) rotate(-30) scale(660 600)">
+      <stop stop-color="#36E0E6" stop-opacity="0.08"></stop>
+      <stop offset="0.34" stop-color="#36E0E6" stop-opacity="0.028"></stop>
+      <stop offset="0.64" stop-color="#36E0E6" stop-opacity="0"></stop>
+    </radialGradient>
+    
+    <linearGradient id="frameInner" x1="120" y1="150" x2="344" y2="486" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#15182C"></stop>
+      <stop offset="1" stop-color="#11132440" stop-opacity="1"></stop>
+    </linearGradient>
+
+    <filter id="glowCyan" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"></feGaussianBlur>
+    </filter>
+    <filter id="glowCyanSoft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="14"></feGaussianBlur>
+    </filter>
+    <filter id="glowCoral" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6"></feGaussianBlur>
+    </filter>
+
+    <clipPath id="panelClip">
+      <rect x="26" y="26" width="1148" height="578" rx="28"></rect>
+    </clipPath>
+    <clipPath id="flag1"><circle cx="130" cy="556" r="10"></circle></clipPath>
+    <clipPath id="flag2"><circle cx="166" cy="556" r="10"></circle></clipPath>
+    <clipPath id="flag3"><circle cx="202" cy="556" r="10"></circle></clipPath>
+    <clipPath id="flag4"><circle cx="238" cy="556" r="10"></circle></clipPath>
+  </defs>
+
+  
+  <rect width="1200" height="630" fill="#0E1020"></rect>
+
+  
+  <rect x="26" y="26" width="1148" height="578" rx="28" fill="#1A1D33" stroke="#2A2E48" stroke-width="1"></rect>
+
+  <g clip-path="url(#panelClip)">
+    
+    <rect x="26" y="26" width="1148" height="578" fill="url(#warmGlow)"></rect>
+    <rect x="26" y="26" width="1148" height="578" fill="url(#coolGlow)"></rect>
+
+    
+    <rect x="27" y="27" width="1146" height="2" fill="#F4F5FB" opacity="0.05"></rect>
+
+    
+    <g fill="#36E0E6">
+      <circle cx="560" cy="118" r="2" opacity="0.13"></circle>
+      <circle cx="1058" cy="252" r="2" opacity="0.11"></circle>
+      <circle cx="1112" cy="468" r="1.8" opacity="0.08"></circle>
+      <circle cx="386" cy="196" r="1.8" opacity="0.08"></circle>
+      <circle cx="648" cy="306" r="1.5" opacity="0.07"></circle>
+      <circle cx="92" cy="300" r="1.6" opacity="0.07"></circle>
+    </g>
+    <g fill="#F4F5FB">
+      <circle cx="704" cy="90" r="1.5" opacity="0.10"></circle>
+      <circle cx="982" cy="384" r="1.6" opacity="0.08"></circle>
+      <circle cx="824" cy="520" r="2" opacity="0.06"></circle>
+    </g>
+    <g fill="#FF6B4A">
+      <circle cx="902" cy="150" r="2.4" opacity="0.09"></circle>
+      <circle cx="420" cy="520" r="1.6" opacity="0.08"></circle>
+      <circle cx="150" cy="470" r="2" opacity="0.07"></circle>
+    </g>
+
+    
+    
+    <rect x="120" y="150" width="224" height="336" rx="18" fill="none" stroke="#36E0E6" stroke-width="8" opacity="0.28" filter="url(#glowCyanSoft)"></rect>
+    
+    <rect x="120" y="150" width="224" height="336" rx="18" fill="url(#frameInner)"></rect>
+    
+    <rect x="127" y="157" width="210" height="322" rx="13" fill="none" stroke="#36E0E6" stroke-width="6" opacity="0.12" filter="url(#glowCyan)"></rect>
+    
+    <rect x="120" y="150" width="224" height="336" rx="18" fill="none" stroke="#36E0E6" stroke-width="5" opacity="0.5" filter="url(#glowCyan)"></rect>
+    <rect x="120" y="150" width="224" height="336" rx="18" fill="none" stroke="#36E0E6" stroke-width="2.4"></rect>
+
+    
+    <g stroke="#36E0E6" stroke-width="2.2" stroke-linecap="round" opacity="0.55" fill="none">
+      <path d="M140 168 L140 156 L152 156"></path>
+      <path d="M324 156 L324 156 L324 168 M312 156 L324 156"></path>
+      <path d="M140 468 L140 480 L152 480"></path>
+      <path d="M312 480 L324 480 L324 468"></path>
+    </g>
+
+    
+    <circle cx="232" cy="300" r="44" fill="none" stroke="#FF6B4A" stroke-width="6" opacity="0.35" filter="url(#glowCoral)"></circle>
+    <circle cx="232" cy="300" r="44" fill="none" stroke="#FF6B4A" stroke-width="2.4" opacity="0.9"></circle>
+    <path d="M222 281 L222 319 L256 300 Z" fill="#FF6B4A" stroke="#FF6B4A" stroke-width="3" stroke-linejoin="round"></path>
+
+    
+    <rect x="186" y="374" width="92" height="8" rx="4" fill="#36E0E6" opacity="0.11"></rect>
+    <rect x="186" y="394" width="60" height="8" rx="4" fill="#F4F5FB" opacity="0.06"></rect>
+
+    
+    <g opacity="0.55">
+      
+      <g clip-path="url(#flag1)"><rect x="120" y="546" width="10" height="20" fill="#36E0E6"></rect><rect x="130" y="546" width="10" height="20" fill="#252841"></rect></g>
+      <g clip-path="url(#flag2)"><rect x="156" y="546" width="10" height="20" fill="#FF6B4A"></rect><rect x="166" y="546" width="10" height="20" fill="#F4F5FB" opacity="0.7"></rect></g>
+      <g clip-path="url(#flag3)"><rect x="192" y="546" width="20" height="6.7" fill="#30334F"></rect><rect x="192" y="552.7" width="20" height="6.6" fill="#36E0E6"></rect><rect x="192" y="559.3" width="20" height="6.7" fill="#30334F"></rect></g>
+      <g clip-path="url(#flag4)"><rect x="228" y="546" width="10" height="20" fill="#252841"></rect><rect x="238" y="546" width="10" height="20" fill="#FF6B4A"></rect></g>
+      <circle cx="130" cy="556" r="10" fill="none" stroke="#3A3E5C" stroke-width="1"></circle>
+      <circle cx="166" cy="556" r="10" fill="none" stroke="#3A3E5C" stroke-width="1"></circle>
+      <circle cx="202" cy="556" r="10" fill="none" stroke="#3A3E5C" stroke-width="1"></circle>
+      <circle cx="238" cy="556" r="10" fill="none" stroke="#3A3E5C" stroke-width="1"></circle>
+
+      
+      <g>
+        <rect x="286" y="543" width="78" height="26" rx="13" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="301" cy="556" r="4.5" fill="#36E0E6" opacity="0.85"></circle>
+        <rect x="312" y="552" width="40" height="8" rx="4" fill="#3A3E5C"></rect>
+      </g>
+      <g>
+        <rect x="376" y="543" width="78" height="26" rx="13" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="391" cy="556" r="4.5" fill="#FF6B4A" opacity="0.85"></circle>
+        <rect x="402" y="552" width="40" height="8" rx="4" fill="#3A3E5C"></rect>
+      </g>
+      <g>
+        <rect x="466" y="543" width="78" height="26" rx="13" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="481" cy="556" r="4.5" fill="#F4F5FB" opacity="0.7"></circle>
+        <rect x="492" y="552" width="40" height="8" rx="4" fill="#3A3E5C"></rect>
+      </g>
+      <g>
+        <rect x="556" y="543" width="78" height="26" rx="13" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="571" cy="556" r="4.5" fill="#36E0E6" opacity="0.6"></circle>
+        <rect x="582" y="552" width="40" height="8" rx="4" fill="#3A3E5C"></rect>
+      </g>
+    </g>
+  </g>
+</svg>

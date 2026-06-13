@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getNewsBySlug, getNewsSlugs } from '@/lib/api';
-import { buildNewsArticleSchema } from '@/lib/seo';
+import { buildNewsArticleSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 
@@ -39,7 +39,7 @@ const metaDescription = item.metaDescription ?? item.summary ?? item.title;
   description={metaDescription}
   canonical={canonicalUrl}
   suppressAlternates
-  image={item.imageUrl ?? undefined}
+  image={item.imageUrl ?? absoluteUrl('/og-news.png')}
   type="article"
 >
   <JsonLd slot="head" data={articleSchema} />

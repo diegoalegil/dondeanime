@@ -46,7 +46,7 @@ const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
 <BaseLayout
   title={t('anime.seo.title', { title })}
   description={seoDescription}
-  image={detail.anime.bannerImage ?? detail.anime.coverImage}
+  image={detail.anime.bannerImage ?? detail.anime.coverImage ?? absoluteUrl('/og-anime-fallback.png')}
   type="article"
 >
   <JsonLd slot="head" data={tvSchema} />

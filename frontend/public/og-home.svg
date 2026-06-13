@@ -1,0 +1,174 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="Geist, system-ui, sans-serif">
+  <defs>
+    
+    <radialGradient id="warmLight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(150 150) rotate(35) scale(640 520)">
+      <stop stop-color="#FF6B4A" stop-opacity="0.18"></stop>
+      <stop offset="0.55" stop-color="#FF6B4A" stop-opacity="0.05"></stop>
+      <stop offset="1" stop-color="#FF6B4A" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="coolLight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 470) rotate(-150) scale(620 520)">
+      <stop stop-color="#36E0E6" stop-opacity="0.16"></stop>
+      <stop offset="0.55" stop-color="#36E0E6" stop-opacity="0.045"></stop>
+      <stop offset="1" stop-color="#36E0E6" stop-opacity="0"></stop>
+    </radialGradient>
+    
+    <linearGradient id="duskTop" x1="600" y1="40" x2="600" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2A2140" stop-opacity="0.5"></stop>
+      <stop offset="1" stop-color="#1A1D33" stop-opacity="0"></stop>
+    </linearGradient>
+
+    
+    <linearGradient id="cardA" x1="0" y1="-150" x2="40" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#30334F"></stop>
+      <stop offset="1" stop-color="#1F2238"></stop>
+    </linearGradient>
+    <linearGradient id="cardB" x1="0" y1="-150" x2="40" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#363a5a"></stop>
+      <stop offset="1" stop-color="#24273f"></stop>
+    </linearGradient>
+    <linearGradient id="cardC" x1="-30" y1="-150" x2="60" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3a3e60"></stop>
+      <stop offset="1" stop-color="#272a44"></stop>
+    </linearGradient>
+    <linearGradient id="platePlay" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FF7E5F"></stop>
+      <stop offset="1" stop-color="#FF5A38"></stop>
+    </linearGradient>
+
+    
+    <filter id="gCyan" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="gCoral" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="7" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14"></feGaussianBlur>
+    </filter>
+
+    <clipPath id="panelClip"><rect x="40" y="40" width="1120" height="550" rx="30"></rect></clipPath>
+  </defs>
+
+  
+  <rect width="1200" height="630" fill="#0E1020"></rect>
+
+  
+  <rect x="40" y="40" width="1120" height="550" rx="30" fill="#1A1D33"></rect>
+
+  <g clip-path="url(#panelClip)">
+    <rect x="40" y="40" width="1120" height="550" fill="url(#duskTop)"></rect>
+    <rect x="40" y="40" width="1120" height="550" fill="url(#warmLight)"></rect>
+    <rect x="40" y="40" width="1120" height="550" fill="url(#coolLight)"></rect>
+
+    
+    <g fill="#F4F5FB">
+      <circle cx="120" cy="430" r="2.5" opacity="0.05"></circle>
+      <circle cx="210" cy="520" r="1.8" opacity="0.06"></circle>
+      <circle cx="300" cy="120" r="2" opacity="0.05"></circle>
+      <circle cx="470" cy="500" r="1.6" opacity="0.05"></circle>
+      <circle cx="560" cy="110" r="2.2" opacity="0.05"></circle>
+      <circle cx="980" cy="120" r="2" opacity="0.06"></circle>
+      <circle cx="1090" cy="250" r="2.4" opacity="0.06"></circle>
+      <circle cx="1110" cy="430" r="1.8" opacity="0.05"></circle>
+      <circle cx="640" cy="540" r="1.6" opacity="0.05"></circle>
+      <circle cx="160" cy="250" r="1.6" opacity="0.05"></circle>
+    </g>
+    <g fill="#36E0E6">
+      <circle cx="1040" cy="500" r="2.2" opacity="0.10"></circle>
+      <circle cx="900" cy="500" r="1.6" opacity="0.08"></circle>
+      <circle cx="1120" cy="160" r="2" opacity="0.09"></circle>
+      <circle cx="740" cy="150" r="1.8" opacity="0.07"></circle>
+      <circle cx="430" cy="180" r="1.6" opacity="0.06"></circle>
+    </g>
+    <g fill="#FF6B4A">
+      <circle cx="240" cy="350" r="2" opacity="0.09"></circle>
+      <circle cx="690" cy="470" r="1.8" opacity="0.08"></circle>
+      <circle cx="380" cy="430" r="1.6" opacity="0.07"></circle>
+      <circle cx="1080" cy="350" r="1.6" opacity="0.07"></circle>
+    </g>
+
+    
+    
+    <g opacity="0.9">
+      <ellipse cx="858" cy="486" rx="250" ry="26" fill="#0E1020" opacity="0.55" filter="url(#softShadow)"></ellipse>
+      <g>
+        <path d="M858 432 L1054 478 L858 524 L662 478 Z" fill="#1e213a"></path>
+        <path d="M858 432 L1054 478 L858 524 L662 478 Z" fill="none" stroke="#36E0E6" stroke-opacity="0.20" stroke-width="1.5"></path>
+        <path d="M858 432 L1054 478 L858 478 Z" fill="#252841" opacity="0.55"></path>
+      </g>
+    </g>
+
+    
+    <g>
+      <g transform="translate(700 452)">
+        <rect width="86" height="30" rx="15" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="18" cy="15" r="5" fill="#36E0E6" opacity="0.9"></circle>
+        <rect x="32" y="11.5" width="40" height="7" rx="3.5" fill="#A8A8B5" opacity="0.45"></rect>
+      </g>
+      <g transform="translate(798 470)">
+        <rect width="86" height="30" rx="15" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="18" cy="15" r="5" fill="#FF6B4A" opacity="0.9"></circle>
+        <rect x="32" y="11.5" width="40" height="7" rx="3.5" fill="#A8A8B5" opacity="0.45"></rect>
+      </g>
+      <g transform="translate(896 470)">
+        <rect width="86" height="30" rx="15" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="18" cy="15" r="5" fill="#A8A8B5" opacity="0.7"></circle>
+        <rect x="32" y="11.5" width="40" height="7" rx="3.5" fill="#A8A8B5" opacity="0.45"></rect>
+      </g>
+      <g transform="translate(950 452)">
+        <rect width="64" height="30" rx="15" fill="#252841" stroke="#30334F" stroke-width="1"></rect>
+        <circle cx="18" cy="15" r="5" fill="#36E0E6" opacity="0.7"></circle>
+        <rect x="32" y="11.5" width="22" height="7" rx="3.5" fill="#A8A8B5" opacity="0.45"></rect>
+      </g>
+    </g>
+
+    
+    <g transform="translate(700 392)">
+      <rect width="316" height="56" rx="28" fill="#1f2238" stroke="#30334F" stroke-width="1.5"></rect>
+      <g transform="translate(28 28)" stroke="#36E0E6" stroke-width="3.2" fill="none" stroke-linecap="round" filter="url(#gCyan)">
+        <circle cx="0" cy="-1" r="10"></circle>
+        <line x1="7.5" y1="6.5" x2="15" y2="14"></line>
+      </g>
+      <rect x="58" y="24" width="150" height="9" rx="4.5" fill="#A8A8B5" opacity="0.4"></rect>
+    </g>
+
+    
+    
+    <g transform="translate(766 248) rotate(-15)">
+      <rect x="-86" y="-128" width="172" height="256" rx="16" fill="url(#cardA)"></rect>
+      <rect x="-86" y="-128" width="172" height="256" rx="16" fill="none" stroke="#36E0E6" stroke-width="2" stroke-opacity="0.85" filter="url(#gCyan)"></rect>
+      <rect x="-70" y="-112" width="140" height="150" rx="9" fill="#0E1020" opacity="0.35"></rect>
+      <rect x="-70" y="60" width="92" height="10" rx="5" fill="#36E0E6" opacity="0.5"></rect>
+      <rect x="-70" y="80" width="120" height="8" rx="4" fill="#A8A8B5" opacity="0.3"></rect>
+    </g>
+
+    
+    <g transform="translate(862 238) rotate(-2)">
+      <rect x="-90" y="-134" width="180" height="268" rx="16" fill="url(#cardB)"></rect>
+      <rect x="-90" y="-134" width="180" height="268" rx="16" fill="none" stroke="#FF6B4A" stroke-width="2" stroke-opacity="0.85" filter="url(#gCoral)"></rect>
+      <rect x="-72" y="-116" width="144" height="158" rx="9" fill="#0E1020" opacity="0.32"></rect>
+      <rect x="-72" y="64" width="84" height="10" rx="5" fill="#FF6B4A" opacity="0.55"></rect>
+      <rect x="-72" y="84" width="128" height="8" rx="4" fill="#A8A8B5" opacity="0.3"></rect>
+    </g>
+
+    
+    <g transform="translate(956 256) rotate(11)">
+      <rect x="-90" y="-136" width="180" height="272" rx="17" fill="url(#cardC)"></rect>
+      <rect x="-90" y="-136" width="180" height="272" rx="17" fill="none" stroke="#36E0E6" stroke-width="2.2" stroke-opacity="0.9" filter="url(#gCyan)"></rect>
+      <rect x="-72" y="-118" width="144" height="160" rx="9" fill="#0E1020" opacity="0.3"></rect>
+      <rect x="-72" y="66" width="78" height="10" rx="5" fill="#36E0E6" opacity="0.5"></rect>
+      <rect x="-72" y="86" width="124" height="8" rx="4" fill="#A8A8B5" opacity="0.3"></rect>
+      
+      <g transform="translate(0 -38)" filter="url(#gCoral)">
+        <circle r="36" fill="url(#platePlay)"></circle>
+        <path d="M-11 -17 L20 0 L-11 17 Z" fill="#0E1020" opacity="0.92"></path>
+        <path d="M-11 -17 L20 0 L-11 17 Z" fill="none" stroke="#F4F5FB" stroke-opacity="0.0"></path>
+      </g>
+    </g>
+  </g>
+
+  
+  <rect x="40.75" y="40.75" width="1118.5" height="548.5" rx="29.25" fill="none" stroke="#30334F" stroke-width="1.5" stroke-opacity="0.7"></rect>
+</svg>

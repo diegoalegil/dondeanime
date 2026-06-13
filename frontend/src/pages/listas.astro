@@ -67,7 +67,7 @@ const itemListSchema = buildItemListSchema(
   'Listas curadas de anime',
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription}>
+<BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-listas.png')}>
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs

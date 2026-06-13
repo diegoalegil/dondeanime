@@ -34,7 +34,7 @@ const schema = list.schema ?? buildItemListSchema(
   list.title,
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription}>
+<BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-listas.png')}>
   <JsonLd slot="head" data={schema} />
 
   <Breadcrumbs
