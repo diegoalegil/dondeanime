@@ -23,17 +23,17 @@
 }
 
 @theme {
-  --color-surface-0: #0A0A0F;
-  --color-surface-1: #13131A;
-  --color-surface-2: #1E1E28;
-  --color-surface-3: #2A2A36;
+  --color-surface-0: #0E1020;
+  --color-surface-1: #1A1D33;
+  --color-surface-2: #252841;
+  --color-surface-3: #30334F;
 
-  --color-fg-primary: #F4F4F8;
+  --color-fg-primary: #F4F5FB;
   --color-fg-secondary: #A8A8B5;
   --color-fg-muted: #8A8A99;
 
-  --color-accent-violet: #A78BFA;
-  --color-accent-pink: #FF6B9D;
+  --color-accent-violet: #36E0E6;
+  --color-accent-pink: #FF6B4A;
 
   --color-success: #22C55E;
   --color-warning: #F59E0B;
@@ -53,8 +53,8 @@
   --color-fg-secondary: #4B4354;
   --color-fg-muted: #625B69;
 
-  --color-accent-violet: #6D37D9;
-  --color-accent-pink: #B8205A;
+  --color-accent-violet: #0B6E73;
+  --color-accent-pink: #B83A14;
 
   --color-success: #0B642F;
   --color-warning: #8A5600;
@@ -74,11 +74,11 @@ body {
 }
 
 .brand-gradient {
-  background: linear-gradient(135deg, var(--color-accent-violet) 0%, var(--color-accent-pink) 100%);
+  background: linear-gradient(135deg, var(--color-accent-pink) 0%, var(--color-accent-violet) 100%);
 }
 
 .brand-gradient-text {
-  background: linear-gradient(135deg, var(--color-accent-violet) 0%, var(--color-accent-pink) 100%);
+  background: linear-gradient(135deg, var(--color-accent-pink) 0%, var(--color-accent-violet) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
