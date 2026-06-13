@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="256" viewBox="0 0 1024 256" fill="none" role="img" aria-label="DondeAnime">
+  <defs>
+    <filter id="glowCoral" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#FF6B4A" flood-opacity="0.5"></feDropShadow></filter>
+    <filter id="glowCyan" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#36E0E6" flood-opacity="0.5"></feDropShadow></filter>
+    <filter id="wordGlow" x="-12%" y="-70%" width="124%" height="240%"><feDropShadow dx="-2.5" dy="0" stdDeviation="7" flood-color="#FF6B4A" flood-opacity="0.32"></feDropShadow><feDropShadow dx="2.5" dy="0" stdDeviation="7" flood-color="#36E0E6" flood-opacity="0.32"></feDropShadow></filter>
+  </defs>
+  <g transform="translate(8,4)">
+    <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#FF6B4A" filter="url(#glowCoral)"></path>
+    <path d="M112 74l46 30-46 30z" fill="#36E0E6" filter="url(#glowCyan)"></path>
+  </g>
+  <text x="300" y="156" filter="url(#wordGlow)" style="font-family:&#39;Geist Variable&#39;,&#39;Geist&#39;,system-ui,sans-serif;font-weight:600;font-size:104px;letter-spacing:-1px;fill:#F4F5FB">DondeAnime</text>
+</svg>
