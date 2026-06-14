@@ -85,9 +85,14 @@ ${sitemaps}
 `;
 };
 
+// Fecha del build: una sola marca para todas las URLs. Da a Google una senal de
+// frescura para priorizar el rastreo de las ~13.8k URLs nuevas (no hay updatedAt
+// por anime en la API, asi que la fecha de generacion es lo correcto y honesto).
+const BUILD_LASTMOD = new Date().toISOString().slice(0, 10);
+
 export const renderUrlSet = (paths: string[]): string => {
   const urls = uniqueSorted(paths)
-    .map((path) => `  <url><loc>${xmlEscape(toAbsoluteUrl(path))}</loc></url>`)
+    .map((path) => `  <url><loc>${xmlEscape(toAbsoluteUrl(path))}</loc><lastmod>${BUILD_LASTMOD}</lastmod></url>`)
     .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>

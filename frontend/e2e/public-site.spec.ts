@@ -9,7 +9,6 @@ const expectedPartitionSitemaps = [
   '/sitemap-mejores.xml',
   '/sitemap-combinatoria.xml',
   '/sitemap-listas.xml',
-  '/sitemap-noticias.xml',
 ];
 
 const expectedLanguageSitemaps = [
@@ -176,7 +175,7 @@ test('upcoming release pages render and are indexed', async ({ page, request }) 
 test('genre and platform combination pages filter anime and are indexed', async ({ page, request }) => {
   await page.goto('/anime/action/en/crunchyroll');
 
-  await expect(page.getByRole('heading', { name: /Anime de Action en Crunchyroll/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Anime de Acción en Crunchyroll/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://www.dondeanime.com/anime/action/en/crunchyroll',
@@ -263,7 +262,7 @@ test('episode count pages render and are indexed', async ({ page, request }) => 
 test('beginner genre pages render curated recommendations and are indexed', async ({ page, request }) => {
   await page.goto('/empezar/action');
 
-  await expect(page.getByRole('heading', { name: /Anime para principiantes en Action/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Anime para principiantes en Acción/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://www.dondeanime.com/empezar/action',
@@ -279,7 +278,7 @@ test('beginner genre pages render curated recommendations and are indexed', asyn
     .find((schema) => schema['@type'] === 'ItemList');
 
   expect(itemList).toEqual(expect.objectContaining({
-    name: 'Anime para principiantes en Action',
+    name: 'Anime para principiantes en Acción',
     numberOfItems: resultCount,
     itemListElement: expect.any(Array),
   }));

@@ -38,6 +38,9 @@ const adsenseEnabled =
   import.meta.env.ADSENSE_ENABLED === 'true' ||
   import.meta.env.PUBLIC_ADSENSE_ENABLED === 'true';
 const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
+// Verificacion de Google Search Console por meta-tag: define PUBLIC_GSC_VERIFICATION
+// en Vercel con el codigo que da GSC y la etiqueta aparece (no hace falta DNS).
+const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 ---
 <!doctype html>
 <html lang={activeLocale} data-theme="dark">
@@ -45,6 +48,7 @@ const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    {gscVerification && <meta name="google-site-verification" content={gscVerification} />}
     <!-- Las cover/banner de anime (LCP) salen de s4.anilist.co; los logos de
          provider de image.tmdb.org. Preconnect acelera la primera imagen. -->
     <link rel="preconnect" href="https://s4.anilist.co" crossorigin />
