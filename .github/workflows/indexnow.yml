@@ -1,0 +1,57 @@
+name: IndexNow
+
+# Envia las URLs del sitemap a IndexNow (Bing, Yandex, DuckDuckGo, Ecosia, Seznam)
+# para acelerar el rastreo/indexacion sin depender de Google Search Console.
+# - workflow_dispatch: lanzalo a mano desde la pestana Actions cuando quieras.
+# - schedule: una vez por semana, para mantener a los buscadores al dia.
+# El archivo-clave vive en frontend/public/<KEY>.txt y se sirve en el dominio.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # lunes 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit sitemap URLs to IndexNow
+        env:
+          INDEXNOW_KEY: 02f52c71f8cf1f0d689f175ce595969e
+          HOST: www.dondeanime.com
+        run: |
+          node --input-type=module <<'JS'
+          const host = process.env.HOST;
+          const key = process.env.INDEXNOW_KEY;
+          const keyLocation = `https://${host}/${key}.txt`;
+
+          const text = async (url) => (await fetch(url)).text();
+          const locs = (xml) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+
+          const index = await text(`https://${host}/sitemap-index.xml`);
+          const subSitemaps = locs(index);
+          const urls = new Set();
+          for (const sm of subSitemaps) {
+            try { for (const u of locs(await text(sm))) urls.add(u); }
+            catch (e) { console.log(`skip ${sm}: ${e.message}`); }
+          }
+          const all = [...urls];
+          console.log(`Descubiertas ${all.length} URLs en ${subSitemaps.length} sub-sitemaps`);
+
+          // IndexNow acepta hasta 10.000 URLs por peticion.
+          let submitted = 0;
+          for (let i = 0; i < all.length; i += 10000) {
+            const batch = all.slice(i, i + 10000);
+            const res = await fetch('https://api.indexnow.org/indexnow', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json; charset=utf-8' },
+              body: JSON.stringify({ host, key, keyLocation, urlList: batch }),
+            });
+            console.log(`Lote ${batch.length} URLs -> HTTP ${res.status}`);
+            submitted += batch.length;
+          }
+          console.log(`Enviadas ${submitted} URLs a IndexNow`);
+          JS
