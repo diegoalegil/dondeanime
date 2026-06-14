@@ -55,6 +55,19 @@ const metaDescription = item.metaDescription ?? item.summary ?? item.title;
     <h1 class="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">{item.title}</h1>
     {item.summary && <p class="mt-4 text-lg leading-8 text-fg-secondary">{item.summary}</p>}
 
+    <div class="mt-6 flex items-center gap-3">
+      <img
+        src="/mascota-avatar.webp"
+        alt=""
+        width="40"
+        height="40"
+        loading="lazy"
+        decoding="async"
+        class="h-10 w-10 rounded-full bg-surface-2 ring-1 ring-surface-2"
+      />
+      <span class="text-sm font-medium text-fg-secondary">Redaccion DondeAnime</span>
+    </div>
+
     {item.imageUrl && (
       <img src={item.imageUrl} alt={item.title} loading="eager" class="mt-8 w-full rounded-lg" />
     )}
