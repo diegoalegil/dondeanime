@@ -16,19 +16,22 @@ public class ResendEmailService implements EmailService {
     private final RestClient restClient;
     private final String from;
     private final boolean enabled;
+    private final String siteUrl;
 
     public ResendEmailService(
             RestClient.Builder restClientBuilder,
             @Value("${resend.api-base}") String apiBase,
             @Value("${resend.api-key:}") String apiKey,
             @Value("${resend.from}") String from,
-            @Value("${resend.enabled:false}") boolean enabled) {
+            @Value("${resend.enabled:false}") boolean enabled,
+            @Value("${dondeanime.site-url:https://dondeanime.com}") String siteUrl) {
         this.restClient = restClientBuilder
                 .baseUrl(apiBase)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
                 .build();
         this.from = from;
         this.enabled = enabled;
+        this.siteUrl = siteUrl.endsWith("/") ? siteUrl.substring(0, siteUrl.length() - 1) : siteUrl;
     }
 
     @Override
@@ -228,11 +231,50 @@ public class ResendEmailService implements EmailService {
 
         ResendEmailResponse response = restClient.post()
                 .uri("/emails")
-                .body(new ResendEmailRequest(from, List.of(email), subject, html, text))
+                .body(new ResendEmailRequest(from, List.of(email), subject, wrapHtml(html), text))
                 .retrieve()
                 .body(ResendEmailResponse.class);
 
         log.info("Email enviado via Resend a '{}', id={}", email, response == null ? "unknown" : response.id());
+    }
+
+    /**
+     * Envuelve el cuerpo de cada email en una plantilla de marca: cabecera con la
+     * mascota, tarjeta clara con el contenido y pie con el enlace al sitio. La
+     * maquetacion es a base de tablas e inline styles por compatibilidad con
+     * clientes de correo (Outlook incluido); la cabecera se sirve como imagen
+     * alojada en el sitio.
+     */
+    private String wrapHtml(String bodyHtml) {
+        return """
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                </head>
+                <body style="margin:0;padding:0;background-color:#0E1020;">
+                  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0E1020;">
+                    <tr><td align="center" style="padding:24px 12px;">
+                      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
+                        <tr><td style="padding:0;line-height:0;">
+                          <a href="%1$s" style="text-decoration:none;">
+                            <img src="%1$s/brand/email-masthead.jpg" width="600" alt="DondeAnime" style="display:block;width:100%%;max-width:600px;height:auto;border:0;">
+                          </a>
+                        </td></tr>
+                        <tr><td style="padding:28px 32px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#19151F;">
+                          %2$s
+                        </td></tr>
+                        <tr><td style="padding:18px 32px;border-top:1px solid #ECE7E0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#625B69;">
+                          DondeAnime &middot; Encuentra donde ver cada anime.<br>
+                          <a href="%1$s" style="color:#B83A14;text-decoration:none;">dondeanime.com</a>
+                        </td></tr>
+                      </table>
+                    </td></tr>
+                  </table>
+                </body>
+                </html>
+                """.formatted(siteUrl, bodyHtml);
     }
 
     private static String escapeHtml(String value) {

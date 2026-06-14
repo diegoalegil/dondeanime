@@ -26,7 +26,8 @@ class ResendEmailServiceTest {
                 "https://api.resend.com",
                 "re_test",
                 "alertas@dondeanime.com",
-                true);
+                true,
+                "https://dondeanime.com");
 
         server.expect(once(), requestTo("https://api.resend.com/emails"))
                 .andExpect(method(HttpMethod.POST))
@@ -34,6 +35,8 @@ class ResendEmailServiceTest {
                 .andExpect(jsonPath("$.from").value("alertas@dondeanime.com"))
                 .andExpect(jsonPath("$.to[0]").value("diego@example.com"))
                 .andExpect(jsonPath("$.subject").value("Attack on Titan ya está disponible en España"))
+                .andExpect(jsonPath("$.html").value(org.hamcrest.Matchers.containsString(
+                        "https://dondeanime.com/brand/email-masthead.jpg")))
                 .andRespond(withSuccess("""
                         {"id":"email_123"}
                         """, MediaType.APPLICATION_JSON));
@@ -58,7 +61,8 @@ class ResendEmailServiceTest {
                 "https://api.resend.com",
                 "re_test",
                 "alertas@dondeanime.com",
-                true);
+                true,
+                "https://dondeanime.com");
 
         server.expect(once(), requestTo("https://api.resend.com/emails"))
                 .andExpect(method(HttpMethod.POST))
@@ -87,7 +91,8 @@ class ResendEmailServiceTest {
                 "https://api.resend.com",
                 "re_test",
                 "alertas@dondeanime.com",
-                true);
+                true,
+                "https://dondeanime.com");
 
         server.expect(once(), requestTo("https://api.resend.com/emails"))
                 .andExpect(method(HttpMethod.POST))
