@@ -5,11 +5,16 @@ import AnimeCard from './AnimeCard.astro';
 interface Props {
   anime: AnimeSummary[];
   badge?: 'top' | 'nuevo' | 'estreno' | 'premium';
+  // Cuantas portadas cargan con prioridad (eager + fetchpriority=high). En
+  // paginas donde el grid es el contenido principal arriba del pliegue (genero,
+  // plataforma, temporada, busqueda) las 2 primeras deben priorizarse. En la
+  // home el grid va DEBAJO del hero, asi que se pasa 0 para no robarle prioridad
+  // al LCP (la mascota del hero).
+  priorityCount?: number;
 }
 
-const { anime, badge } = Astro.props;
-const PRIORITY_CARDS = 2;
+const { anime, badge, priorityCount = 2 } = Astro.props;
 ---
 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6">
-  {anime.map((a, index) => <AnimeCard anime={a} priority={index < PRIORITY_CARDS} badge={badge} />)}
+  {anime.map((a, index) => <AnimeCard anime={a} priority={index < priorityCount} badge={badge} />)}
 </div>

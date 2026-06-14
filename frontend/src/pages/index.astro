@@ -15,12 +15,6 @@ import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
 import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
 import { setLocale, t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
-import {
-  DEFAULT_ANIME_IMAGE_SIZES,
-  DEFAULT_ANIME_IMAGE_WIDTHS,
-  buildAnimeImageSrcset,
-  buildAnimeImageUrl,
-} from '@/lib/images';
 
 setLocale('es');
 
@@ -44,10 +38,6 @@ const trending = [...anime]
   .filter((a) => a.popularity !== null)
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
   .slice(0, 12);
-const priorityCoverPreloads = trending.slice(0, 2).map((a) => ({
-  href: buildAnimeImageUrl(a.coverImage, 320),
-  srcset: buildAnimeImageSrcset(a.coverImage, DEFAULT_ANIME_IMAGE_WIDTHS),
-}));
 
 const topGenre = genres[0];
 const topGenreAnime = topGenre ? (await getAnimeByGenre(topGenre.slug)).slice(0, 12) : [];
@@ -89,17 +79,6 @@ const itemListSchema = buildItemListSchema(
   <JsonLd slot="head" data={websiteSchema} />
   <JsonLd slot="head" data={faqSchema} />
   <JsonLd slot="head" data={itemListSchema} />
-  {priorityCoverPreloads.map((preload) => (
-    <link
-      slot="head"
-      rel="preload"
-      as="image"
-      href={preload.href}
-      imagesrcset={preload.srcset}
-      imagesizes={preload.srcset ? DEFAULT_ANIME_IMAGE_SIZES : undefined}
-      fetchpriority="high"
-    />
-  ))}
 
   <section class="mx-auto max-w-6xl px-4 pt-16 pb-12">
     <div class="flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
@@ -119,6 +98,7 @@ const itemListSchema = buildItemListSchema(
         height="760"
         loading="eager"
         decoding="async"
+        fetchpriority="high"
         class="h-44 w-auto shrink-0 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:h-56 md:h-72 lg:h-80"
       />
     </div>
@@ -132,7 +112,7 @@ const itemListSchema = buildItemListSchema(
       <h2 class="text-2xl font-semibold">{t('home.trending')}</h2>
       <span class="text-sm text-fg-muted">{t('home.topCount', { count: trending.length })}</span>
     </div>
-    <AnimeGrid anime={trending} badge="top" />
+    <AnimeGrid anime={trending} badge="top" priorityCount={0} />
   </section>
 
   <NewsLatest items={latestNews} />
@@ -150,7 +130,7 @@ const itemListSchema = buildItemListSchema(
           {t('home.viewSeason')} →
         </a>
       </div>
-      <AnimeGrid anime={homeSeasonAnime} />
+      <AnimeGrid anime={homeSeasonAnime} priorityCount={0} />
     </section>
   )}
 
@@ -167,7 +147,7 @@ const itemListSchema = buildItemListSchema(
           {t('home.viewGenre')} →
         </a>
       </div>
-      <AnimeGrid anime={topGenreAnime} />
+      <AnimeGrid anime={topGenreAnime} priorityCount={0} />
     </section>
   )}
 
@@ -240,7 +220,7 @@ const itemListSchema = buildItemListSchema(
       <h2 class="text-2xl font-semibold">{t('home.fullCatalog')}</h2>
       <span class="text-sm text-fg-muted">{t('home.animeCount', { count: anime.length })}</span>
     </div>
-    <AnimeGrid anime={anime.slice(0, 60)} />
+    <AnimeGrid anime={anime.slice(0, 60)} priorityCount={0} />
     <div class="mt-8 text-center">
       <a
         href={localizedPath('/buscar')}
