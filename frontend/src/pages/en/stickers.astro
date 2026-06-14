@@ -1,0 +1,118 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { setLocale, t } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
+import { absoluteUrl } from '@/lib/seo';
+
+setLocale('en');
+
+const stickers = [
+  { file: '01_a-ver-anime.png', caption: '¡A ver anime!' },
+  { file: '02_donde-lo-veo.png', caption: '¿Dónde lo veo?' },
+  { file: '03_gg.png', caption: 'GG' },
+  { file: '05_feels.png', caption: 'Me dio en el feels' },
+  { file: '06_dale-play.png', caption: '¡Dale play!' },
+  { file: '07_maraton.png', caption: 'Maratón' },
+  { file: '10_episodio-nuevo.png', caption: '¡Episodio nuevo!' },
+  { file: '12_hola-otaku.png', caption: '¡Hola, otaku!' },
+];
+
+const guides = [
+  {
+    title: t('stickers.telegram.title'),
+    steps: [t('stickers.telegram.step1'), t('stickers.telegram.step2'), t('stickers.telegram.step3')],
+  },
+  {
+    title: t('stickers.whatsapp.title'),
+    steps: [t('stickers.whatsapp.step1'), t('stickers.whatsapp.step2'), t('stickers.whatsapp.step3')],
+  },
+];
+---
+<BaseLayout
+  title={t('stickers.title')}
+  description={t('stickers.description')}
+  image={absoluteUrl('/og-stickers.png')}
+>
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: localizedPath('/') },
+      { name: t('stickers.breadcrumb'), url: localizedPath('/stickers') },
+    ]}
+  />
+
+  <section class="mx-auto max-w-5xl px-4 py-10">
+    <div class="grid items-center gap-8 md:grid-cols-[1.3fr_1fr]">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight text-fg-primary md:text-4xl">{t('stickers.heading')}</h1>
+        <p class="mt-4 text-base leading-7 text-fg-secondary">{t('stickers.lead')}</p>
+        <a
+          href="/stickers/dondeanime-stickers.zip"
+          download
+          class="brand-gradient mt-6 inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90"
+        >
+          {t('stickers.downloadAll')}
+        </a>
+      </div>
+      <div class="flex justify-center">
+        <img
+          src="/stickers/00_cover.png"
+          alt={t('stickers.heading')}
+          width="320"
+          height="320"
+          class="h-auto w-64 drop-shadow-[0_12px_30px_rgba(0,0,0,0.45)] md:w-72"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-12">
+    <h2 class="text-xl font-semibold text-fg-primary">{t('stickers.gridHeading')}</h2>
+    <ul class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      {stickers.map((s) => (
+        <li class="group rounded-2xl bg-surface-1 p-3 text-center ring-1 ring-surface-2/60">
+          <a
+            href={`/stickers/${s.file}`}
+            download
+            class="block"
+            aria-label={t('stickers.downloadAria', { name: s.caption })}
+          >
+            <img
+              src={`/stickers/${s.file}`}
+              alt={s.caption}
+              width="220"
+              height="220"
+              loading="lazy"
+              decoding="async"
+              class="mx-auto h-auto w-full max-w-[160px] transition-transform group-hover:scale-105"
+            />
+            <span class="mt-2 inline-block text-xs font-medium text-fg-muted transition-colors group-hover:text-accent-violet">
+              {s.caption} &#8595;
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-20">
+    <h2 class="text-xl font-semibold text-fg-primary">{t('stickers.guideHeading')}</h2>
+    <p class="mt-2 text-sm text-fg-secondary">{t('stickers.guideIntro')}</p>
+    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+      {guides.map((g) => (
+        <div class="rounded-2xl bg-surface-1 p-5 ring-1 ring-surface-2/60">
+          <h3 class="text-base font-semibold text-fg-primary">{g.title}</h3>
+          <ol class="mt-3 space-y-2 text-sm leading-6 text-fg-secondary">
+            {g.steps.map((step, i) => (
+              <li class="flex gap-2">
+                <span class="font-mono text-accent-violet">{i + 1}.</span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </div>
+    <p class="mt-6 text-xs text-fg-muted">{t('stickers.note')}</p>
+  </section>
+</BaseLayout>
