@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { absoluteUrl } from '@/lib/seo';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
@@ -12,6 +13,7 @@ const stripeMode = publishableKey.startsWith('pk_live_')
 <BaseLayout
   title="Premium DondeAnime"
   description="Plan Premium de DondeAnime con experiencia sin anuncios y mejoras para usuarios frecuentes."
+  image={absoluteUrl('/og-premium.png')}
 >
   <section
     class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_24rem]"

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { absoluteUrl } from '@/lib/seo';
 import { setLocale } from '@/i18n';
 
 setLocale('en');
@@ -15,6 +16,7 @@ const stripeMode = publishableKey.startsWith('pk_live_')
 <BaseLayout
   title="DondeAnime Premium"
   description="DondeAnime Premium plan with fewer ads and improvements for frequent users."
+  image={absoluteUrl('/og-premium.png')}
 >
   <section
     class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_24rem]"
