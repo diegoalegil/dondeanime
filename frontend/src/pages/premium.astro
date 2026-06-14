@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { absoluteUrl } from '@/lib/seo';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
@@ -15,6 +16,13 @@ const stripeMode = publishableKey.startsWith('pk_live_')
   description="Plan Premium de DondeAnime con experiencia sin anuncios y mejoras para usuarios frecuentes."
   image={absoluteUrl('/og-premium.png')}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'Inicio', url: '/' },
+      { name: 'Premium', url: '/premium' },
+    ]}
+  />
+
   <section class="mx-auto max-w-6xl px-4 pt-6">
     <img
       src="/heroes/hero-premium-mascota.webp"

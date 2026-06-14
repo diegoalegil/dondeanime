@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { absoluteUrl } from '@/lib/seo';
 import { setLocale } from '@/i18n';
 
@@ -18,6 +19,13 @@ const stripeMode = publishableKey.startsWith('pk_live_')
   description="DondeAnime Premium plan with fewer ads and improvements for frequent users."
   image={absoluteUrl('/og-premium.png')}
 >
+  <Breadcrumbs
+    items={[
+      { name: 'Home', url: '/' },
+      { name: 'Premium', url: '/premium' },
+    ]}
+  />
+
   <section class="mx-auto max-w-6xl px-4 pt-6">
     <img
       src="/heroes/hero-premium-mascota.webp"
