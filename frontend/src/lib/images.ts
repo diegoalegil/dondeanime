@@ -13,10 +13,15 @@ export const DEFAULT_ANIME_IMAGE_QUALITY = 75;
  * lugar de pasar por el optimizador de Vercel: coste 0 y sin tope de cupo,
  * que con 12.853 páginas y tráfico de crawlers se agotaba siempre.
  */
+// AniList NO genera 'extraLarge' (700w) para la mayoría de portadas: ese
+// segmento devuelve 404 SIEMPRE, y en pantallas Retina el navegador elegía ese
+// candidato del srcset → 404 → toda la rejilla caía al placeholder. Servimos
+// solo las variantes que existen de verdad: 'medium' (230w, en el 100% de las
+// portadas — es la que guarda el backend) y 'large' (460w, ~96%; el 4% sin
+// large cae con gracia a medium vía window.__coverError). Nada de extraLarge.
 const ANILIST_COVER_VARIANTS = [
   { segment: 'medium', width: 230 },
   { segment: 'large', width: 460 },
-  { segment: 'extraLarge', width: 700 },
 ] as const;
 
 const ANILIST_COVER_SEGMENT = /\/cover\/(medium|large|extraLarge)\//;

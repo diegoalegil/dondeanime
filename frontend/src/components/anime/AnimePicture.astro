@@ -47,7 +47,10 @@ const canUseSrcset = canOptimizeAnimeImage(src);
 const normalizedWidths = normalizeImageWidths(widths);
 const fallbackWidth = normalizedWidths[Math.min(1, normalizedWidths.length - 1)] ?? width ?? 320;
 const imageAlt = ariaHidden ? '' : alt;
-const optimizedSrc = buildAnimeImageUrl(src, fallbackWidth, quality);
+// Para portadas de AniList el `src` base (y el destino del reintento) es la
+// variante GARANTIZADA: 'medium' (existe en el 100%). El navegador igual sube a
+// 'large' vía srcset donde existe; donde no, el onerror cae a este medium.
+const optimizedSrc = buildAnimeImageUrl(src, canUseSrcset ? 1 : fallbackWidth, quality);
 const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
 // Si la carátula no carga (AniList throttla covers en ráfaga) reintentamos la
 // misma URL con jitter (cache HIT de Cloudflare) y, solo tras 2 intentos, caemos
