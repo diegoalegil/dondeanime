@@ -175,7 +175,7 @@ test('upcoming release pages render and are indexed', async ({ page, request }) 
 test('genre and platform combination pages filter anime and are indexed', async ({ page, request }) => {
   await page.goto('/anime/action/en/crunchyroll');
 
-  await expect(page.getByRole('heading', { name: /Anime de Acción en Crunchyroll/i })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Anime de Acción en Crunchyroll/i })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://www.dondeanime.com/anime/action/en/crunchyroll',
