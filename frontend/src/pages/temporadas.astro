@@ -1,0 +1,51 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { getSeasons } from '@/lib/api';
+import { formatSeason } from '@/lib/format';
+import { absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+const RANK: Record<string, number> = { WINTER: 1, SPRING: 2, SUMMER: 3, FALL: 4 };
+const seasons = (await getSeasons())
+  .slice()
+  .sort((a, b) => b.year - a.year || (RANK[b.season.toUpperCase()] ?? 0) - (RANK[a.season.toUpperCase()] ?? 0));
+---
+<BaseLayout
+  title="Temporadas de anime — todas las temporadas por año | DondeAnime"
+  description="Explora el anime por temporada: invierno, primavera, verano y otoño de cada año, con dónde ver cada serie en streaming."
+  image={absoluteUrl('/heroes/seasonal/hero-winter-og.png')}
+>
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.seasons'), url: '/temporadas' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-4">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Catálogo por temporada</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">Anime por temporada</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      Cada temporada de anime, de la más reciente a la más antigua. Abre una para ver sus estrenos y en qué plataformas verlos.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      {seasons.map((s) => (
+        <li>
+          <a
+            href={`/temporada/${s.year}/${s.season.toLowerCase()}`}
+            class="flex items-center justify-between rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/60"
+          >
+            <span class="font-medium text-fg-primary">{formatSeason(s.season.toUpperCase())} {s.year}</span>
+            <span class="text-xs text-fg-muted">{s.animeCount}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

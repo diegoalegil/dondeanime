@@ -111,6 +111,7 @@ export const staticSitemapPaths = async (): Promise<string[]> => {
     ...posts.map((post) => `/blog/${blogSlug(post)}`),
     '/noticias',
     '/stickers',
+    '/temporadas',
     '/contacto',
     '/legal/privacidad',
     '/legal/cookies',

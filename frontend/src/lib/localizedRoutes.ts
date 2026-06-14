@@ -60,6 +60,7 @@ export const spanishPathFromLocalized = (path: string): string => {
 
   if (section === 'genre' && first) return `/genero/${first}`;
   if (section === 'season' && first && second) return `/temporada/${first}/${second}`;
+  if (section === 'seasons') return '/temporadas';
   if (section === 'best' && first) return `/mejores/${first}`;
 
   if (section === 'upcoming') {
@@ -117,6 +118,7 @@ export const localizedEnPath = (spanishPath: string): string | null => {
 
   if (section === 'genero' && first) return `/en/genre/${first}`;
   if (section === 'temporada' && first && second) return `/en/season/${first}/${second}`;
+  if (section === 'temporadas') return '/en/seasons';
   if (section === 'mejores' && first) return `/en/best/${first}`;
 
   if (section === 'estrenos') {
