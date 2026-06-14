@@ -39,7 +39,6 @@ export const PARTITION_SITEMAP_ENTRIES = [
   { name: t('sitemap.best'), path: '/sitemap-mejores.xml' },
   { name: t('sitemap.combinations'), path: '/sitemap-combinatoria.xml' },
   { name: 'Listas', path: '/sitemap-listas.xml' },
-  { name: 'Noticias', path: '/sitemap-noticias.xml' },
 ] as const;
 
 export const SITEMAP_ENTRIES = [

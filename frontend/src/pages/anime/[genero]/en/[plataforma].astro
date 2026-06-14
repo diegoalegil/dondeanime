@@ -5,6 +5,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import type { AnimeSummary, ProviderSummary } from '@/lib/api';
 import { getAnimeByProvider, getGenres, getProviders } from '@/lib/api';
+import { localizedGenreName } from '@/lib/genres';
 import { AutoTextGenerator } from '@/lib/autoTextGenerator.mjs';
 import { COUNTRIES } from '@/lib/countries';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
@@ -50,6 +51,7 @@ export async function getStaticPaths() {
 const { genero, plataforma } = Astro.params;
 const { genreName, genreSlug, provider } = Astro.props as Props;
 const platformName = getPlatform(provider.slug)?.name ?? provider.providerName;
+const genreLabel = localizedGenreName(genreSlug, genreName, 'es');
 
 const animeByCountry = await Promise.all(
   Object.values(COUNTRIES).map((country) => getAnimeByProvider(plataforma!, country.iso)),
@@ -65,19 +67,19 @@ const anime = providerAnime
 const autoText = new AutoTextGenerator().generateGenrePlatform({
   animeCount: anime.length,
   countries: Object.values(COUNTRIES).map((country) => country.name).join(', '),
-  genreName,
+  genreName: genreLabel,
   platformName,
   topTitles: anime.slice(0, 4).map((item) => item.titleEnglish || item.titleRomaji),
 });
 
-const seoTitle = t('combo.seo.title', { genre: genreName, platform: platformName });
+const seoTitle = t('combo.seo.title', { genre: genreLabel, platform: platformName });
 const seoDescription = anime.length > 0
   ? t('combo.seo.description.populated', {
-      genre: genreName,
+      genre: genreLabel,
       platform: platformName,
       titles: anime.slice(0, 5).map((item) => item.titleEnglish || item.titleRomaji).join(', '),
     })
-  : t('combo.seo.description.empty', { genre: genreName, platform: platformName });
+  : t('combo.seo.description.empty', { genre: genreLabel, platform: platformName });
 
 const pageUrl = absoluteUrl(`/anime/${genero}/en/${plataforma}`);
 const itemListSchema = buildItemListSchema(
@@ -86,7 +88,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${item.slug}`),
   })),
   pageUrl,
-  t('combo.schema.name', { genre: genreName, platform: platformName }),
+  t('combo.schema.name', { genre: genreLabel, platform: platformName }),
 );
 ---
 <BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-disponibilidad.png')}>
@@ -97,14 +99,14 @@ const itemListSchema = buildItemListSchema(
       { name: t('breadcrumbs.home'), url: '/' },
       { name: t('breadcrumbs.genres'), url: `/genero/${genero}` },
       { name: platformName, url: `/plataforma/${plataforma}` },
-      { name: t('combo.schema.name', { genre: genreName, platform: platformName }), url: `/anime/${genero}/en/${plataforma}` },
+      { name: t('combo.schema.name', { genre: genreLabel, platform: platformName }), url: `/anime/${genero}/en/${plataforma}` },
     ]}
   />
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
     <p class="text-xs uppercase tracking-wide text-accent-violet">{t('combo.eyebrow')}</p>
     <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">
-      {t('combo.headingPrefix')} <span class="brand-gradient-text">{genreName}</span> {t('combo.headingMiddle')} {platformName}
+      {t('combo.headingPrefix')} <span class="brand-gradient-text">{genreLabel}</span> {t('combo.headingMiddle')} {platformName}
     </h1>
     <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
       {t('combo.summary', { count: anime.length })}

@@ -6,6 +6,7 @@ import type { AnimeSummary, BeginnerAnime } from '@/lib/api';
 import { getBeginnerAnimeByGenre, getGenres } from '@/lib/api';
 import { beginnerGenrePath } from '@/lib/programmaticSeo';
 import { absoluteUrl, buildItemListSchema } from '@/lib/seo';
+import { localizedGenreName } from '@/lib/genres';
 
 interface Props {
   genreName: string;
@@ -21,20 +22,21 @@ export async function getStaticPaths() {
 
 const { genero } = Astro.params;
 const { genreName } = Astro.props as Props;
+const genreLabel = localizedGenreName(genero!, genreName, 'es');
 const recommendations = await getBeginnerAnimeByGenre(genero!);
 const anime = recommendations.map((item: BeginnerAnime) => item.anime);
 const topTitles = anime.slice(0, 4).map((item: AnimeSummary) => item.titleEnglish || item.titleRomaji);
 const pagePath = beginnerGenrePath(genero!);
 const pageUrl = absoluteUrl(pagePath);
 
-const seoTitle = `Anime para principiantes en ${genreName} | DondeAnime`;
+const seoTitle = `Anime para principiantes en ${genreLabel} | DondeAnime`;
 const seoDescription = topTitles.length > 0
-  ? `Empieza con anime de ${genreName}: ${topTitles.join(', ')} y mas recomendaciones populares.`
-  : `Guia para empezar con anime de ${genreName}.`;
+  ? `Empieza con anime de ${genreLabel}: ${topTitles.join(', ')} y mas recomendaciones populares.`
+  : `Guia para empezar con anime de ${genreLabel}.`;
 
 const intro = topTitles.length > 0
-  ? `Si quieres empezar con anime de ${genreName}, esta seleccion prioriza titulos populares y faciles de ubicar en el catalogo. El objetivo es evitar listas enormes: diez opciones claras para probar el genero sin perderse entre sagas, spin-offs o estrenos demasiado concretos.`
-  : `Todavia no tenemos anime suficientes para preparar una lista de inicio en ${genreName}, pero la pagina queda lista para completarse con el catalogo sincronizado.`;
+  ? `Si quieres empezar con anime de ${genreLabel}, esta seleccion prioriza titulos populares y faciles de ubicar en el catalogo. El objetivo es evitar listas enormes: diez opciones claras para probar el genero sin perderse entre sagas, spin-offs o estrenos demasiado concretos.`
+  : `Todavia no tenemos anime suficientes para preparar una lista de inicio en ${genreLabel}, pero la pagina queda lista para completarse con el catalogo sincronizado.`;
 
 const itemListSchema = buildItemListSchema(
   anime.map((item: AnimeSummary) => ({
@@ -42,7 +44,7 @@ const itemListSchema = buildItemListSchema(
     url: absoluteUrl(`/anime/${item.slug}`),
   })),
   pageUrl,
-  `Anime para principiantes en ${genreName}`,
+  `Anime para principiantes en ${genreLabel}`,
 );
 ---
 <BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
@@ -51,7 +53,7 @@ const itemListSchema = buildItemListSchema(
   <Breadcrumbs
     items={[
       { name: 'Inicio', url: '/' },
-      { name: genreName, url: pagePath },
+      { name: genreLabel, url: pagePath },
     ]}
   />
 
@@ -60,7 +62,7 @@ const itemListSchema = buildItemListSchema(
       <div class="md:max-w-3xl">
         <p class="text-xs uppercase text-accent-violet">Guia de entrada</p>
         <h1 class="mt-2 text-4xl font-semibold md:text-5xl">
-          Anime para principiantes en <span class="brand-gradient-text">{genreName}</span>
+          Anime para principiantes en <span class="brand-gradient-text">{genreLabel}</span>
         </h1>
         <p class="mt-4 text-lg text-fg-secondary">
           {intro}
@@ -100,7 +102,7 @@ const itemListSchema = buildItemListSchema(
                 </a>
               </h2>
               <p class="mt-2 max-w-3xl text-sm leading-relaxed text-fg-secondary">
-                {item.beginnerRecommendation ?? `Buena puerta de entrada al ${genreName}: es uno de los titulos mas populares del genero en el catalogo y permite orientarte rapido antes de pasar a listas mas largas.`}
+                {item.beginnerRecommendation ?? `Buena puerta de entrada al ${genreLabel}: es uno de los titulos mas populares del genero en el catalogo y permite orientarte rapido antes de pasar a listas mas largas.`}
               </p>
             </div>
           </div>
