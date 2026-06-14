@@ -37,7 +37,7 @@ const metaDescription = item.metaDescription ?? item.summary ?? item.title;
   description={metaDescription}
   canonical={pageUrl}
   suppressAlternates
-  image={item.imageUrl ?? absoluteUrl('/og-news.png')}
+  image={item.imageUrl ?? absoluteUrl('/og-news.jpg')}
   type="article"
 >
   <JsonLd slot="head" data={articleSchema} />
