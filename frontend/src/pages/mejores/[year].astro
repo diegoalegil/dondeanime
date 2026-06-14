@@ -102,7 +102,7 @@ const itemListSchema = buildItemListSchema(
   t('bestYear.schema.name', { year: yearNum }),
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription}>
+<BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/heroes/seasonal/hero-ranking-og.png')}>
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs
@@ -112,6 +112,18 @@ const itemListSchema = buildItemListSchema(
       { name: String(year), url: `/mejores/${year}` },
     ]}
   />
+
+  <section class="mx-auto max-w-6xl px-4 pt-6">
+    <img
+      src="/heroes/seasonal/hero-ranking.webp"
+      alt=""
+      width="1600"
+      height="400"
+      loading="eager"
+      decoding="async"
+      class="w-full rounded-2xl ring-1 ring-surface-2/60"
+    />
+  </section>
 
   <section class="mx-auto max-w-6xl px-4 pt-8 pb-10">
     <p class="text-xs uppercase tracking-wide text-accent-violet">{t('bestYear.eyebrow')}</p>
