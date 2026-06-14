@@ -188,7 +188,10 @@
       role="listbox"
     >
       {#if loading}
-        <p class="px-4 py-3 text-sm text-fg-muted">{loadingLabel}</p>
+        <div class="flex items-center gap-3 px-4 py-3">
+          <img src="/mascota-loading.webp" alt="" width="337" height="420" class="h-9 w-auto shrink-0" />
+          <p class="text-sm text-fg-muted">{loadingLabel}</p>
+        </div>
       {:else if results.length === 0}
         <p class="px-4 py-3 text-sm text-fg-muted">{noResultsLabel}</p>
       {:else}

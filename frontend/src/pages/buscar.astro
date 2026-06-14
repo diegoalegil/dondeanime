@@ -66,6 +66,25 @@ const popular = [...anime]
       class="hidden grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6"
       data-search-results-grid
     ></div>
+
+    <div
+      class="flex-col items-center justify-center gap-4 py-12 text-center"
+      style="display:none"
+      data-search-empty
+    >
+      <img
+        src="/mascota-vacio.webp"
+        alt=""
+        width="458"
+        height="600"
+        loading="lazy"
+        decoding="async"
+        class="h-40 w-auto drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+      />
+      <p class="max-w-sm text-fg-secondary">
+        No encontramos ningun anime con ese nombre. Prueba con otro titulo.
+      </p>
+    </div>
   </section>
 
   <script>
@@ -85,6 +104,7 @@ const popular = [...anime]
     const count = document.querySelector('[data-search-page-count]');
     const popularGrid = document.querySelector('[data-search-popular-grid]') as HTMLElement | null;
     const resultsGrid = document.querySelector('[data-search-results-grid]') as HTMLElement | null;
+    const emptyState = document.querySelector('[data-search-empty]') as HTMLElement | null;
     const defaultCountText = count?.textContent ?? '';
 
     let index: Array<SearchIndexEntry & { haystack: string }> | null = null;
@@ -126,6 +146,9 @@ const popular = [...anime]
       img.loading = 'lazy';
       img.className =
         'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105';
+      img.addEventListener('error', () => {
+        img.src = '/cover-placeholder.webp';
+      }, { once: true });
       figure.appendChild(img);
 
       const meta = document.createElement('div');
@@ -152,6 +175,7 @@ const popular = [...anime]
         popularGrid?.classList.remove('hidden');
         resultsGrid?.classList.add('hidden');
         if (resultsGrid) resultsGrid.replaceChildren();
+        if (emptyState) emptyState.style.display = 'none';
         if (count) count.textContent = defaultCountText;
         return;
       }
@@ -164,6 +188,7 @@ const popular = [...anime]
         resultsGrid.classList.remove('hidden');
         resultsGrid.replaceChildren(...matches.map(renderCard));
       }
+      if (emptyState) emptyState.style.display = matches.length === 0 ? 'flex' : 'none';
       if (count) count.textContent = `${matches.length} resultados`;
     };
 

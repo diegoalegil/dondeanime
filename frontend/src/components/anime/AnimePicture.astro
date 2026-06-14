@@ -23,6 +23,7 @@ interface Props {
   fetchpriority?: 'high' | 'low' | 'auto';
   quality?: number;
   ariaHidden?: boolean;
+  fallbackSrc?: string;
 }
 
 const {
@@ -39,6 +40,7 @@ const {
   fetchpriority,
   quality = DEFAULT_ANIME_IMAGE_QUALITY,
   ariaHidden = false,
+  fallbackSrc,
 } = Astro.props;
 
 const canUseSrcset = canOptimizeAnimeImage(src);
@@ -47,6 +49,10 @@ const fallbackWidth = normalizedWidths[Math.min(1, normalizedWidths.length - 1)]
 const imageAlt = ariaHidden ? '' : alt;
 const optimizedSrc = buildAnimeImageUrl(src, fallbackWidth, quality);
 const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
+// Si la carátula no carga (AniList throttla covers en ráfaga) caemos al placeholder de marca.
+const onCoverError = fallbackSrc
+  ? `this.onerror=null;this.removeAttribute('srcset');this.removeAttribute('sizes');this.src='${fallbackSrc}';`
+  : undefined;
 ---
 <picture class={className} aria-hidden={ariaHidden ? 'true' : undefined}>
   <img
@@ -61,5 +67,6 @@ const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
     fetchpriority={fetchpriority}
     class={imgClass}
     data-cover={canUseSrcset ? '' : undefined}
+    onerror={onCoverError}
   />
 </picture>
