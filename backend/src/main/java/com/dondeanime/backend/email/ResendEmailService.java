@@ -246,20 +246,26 @@ public class ResendEmailService implements EmailService {
      * alojada en el sitio.
      */
     private String wrapHtml(String bodyHtml) {
+        // Los enlaces del cuerpo llevan color de marca inline (no por <style>, que Gmail
+        // elimina) para no salir en azul por defecto ni perder contraste en modo oscuro.
+        String styledBody = bodyHtml.replace(
+                "<a href=", "<a style=\"color:#B83A14;text-decoration:underline;\" href=");
         return """
                 <!DOCTYPE html>
                 <html lang="es">
                 <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="color-scheme" content="light">
+                <meta name="supported-color-schemes" content="light">
                 </head>
-                <body style="margin:0;padding:0;background-color:#0E1020;">
+                <body style="margin:0;padding:0;background-color:#0E1020;color-scheme:light;">
                   <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0E1020;">
                     <tr><td align="center" style="padding:24px 12px;">
                       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
-                        <tr><td style="padding:0;line-height:0;">
+                        <tr><td style="padding:0;background-color:#0E1020;">
                           <a href="%1$s" style="text-decoration:none;">
-                            <img src="%1$s/brand/email-masthead.jpg" width="600" alt="DondeAnime" style="display:block;width:100%%;max-width:600px;height:auto;border:0;">
+                            <img src="%1$s/brand/email-masthead.jpg" width="600" alt="DondeAnime" style="display:block;width:100%%;max-width:600px;height:auto;border:0;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:bold;color:#F4F5FB;">
                           </a>
                         </td></tr>
                         <tr><td style="padding:28px 32px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#19151F;">
@@ -274,7 +280,7 @@ public class ResendEmailService implements EmailService {
                   </table>
                 </body>
                 </html>
-                """.formatted(siteUrl, bodyHtml);
+                """.formatted(siteUrl, styledBody);
     }
 
     private static String escapeHtml(String value) {
