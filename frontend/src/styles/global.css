@@ -61,6 +61,13 @@
   --color-danger: #C42B3A;
 }
 
+/* Los iconos de seccion del footer llevan trazo off-white horneado (van por
+   <img> y no heredan currentColor); en tema claro el footer es casi blanco, asi
+   que se oscurecen para mantener el contraste del glifo y del acento. */
+[data-theme="light"] .footer-section-icon {
+  filter: brightness(0.4) saturate(1.3);
+}
+
 html {
   background-color: var(--color-surface-0);
   color: var(--color-fg-primary);
