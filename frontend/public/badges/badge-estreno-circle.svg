@@ -1,0 +1,30 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="bd-estrenoc" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF6B4A" stop-opacity="0.68"></stop><stop offset="0.5" stop-color="#F4F5FB" stop-opacity="0.18"></stop><stop offset="1" stop-color="#36E0E6" stop-opacity="0.68"></stop></linearGradient>
+ <linearGradient id="hl-estrenoc" x1="32" y1="2" x2="32" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4F5FB" stop-opacity="0.34"></stop><stop offset="1" stop-color="#F4F5FB" stop-opacity="0"></stop></linearGradient>
+ <radialGradient id="warm-estrenoc" cx="0.12" cy="0.16" r="0.92"><stop offset="0" stop-color="#FF6B4A" stop-opacity="0.18"></stop><stop offset="1" stop-color="#FF6B4A" stop-opacity="0"></stop></radialGradient>
+ <radialGradient id="cool-estrenoc" cx="0.88" cy="0.86" r="0.92"><stop offset="0" stop-color="#36E0E6" stop-opacity="0.18"></stop><stop offset="1" stop-color="#36E0E6" stop-opacity="0"></stop></radialGradient>
+ <filter id="gl-estrenoc" x="-95%" y="-95%" width="290%" height="290%" color-interpolation-filters="sRGB">
+   
+   <feGaussianBlur in="SourceAlpha" stdDeviation="5.07" result="wb"></feGaussianBlur>
+   <feFlood flood-color="#FF6B4A" flood-opacity="0.31"></feFlood>
+   <feComposite in2="wb" operator="in" result="halo"></feComposite>
+   <feGaussianBlur in="SourceAlpha" stdDeviation="1.43" result="tb"></feGaussianBlur>
+   <feFlood flood-color="#FFCDBE" flood-opacity="0.62"></feFlood>
+   <feComposite in2="tb" operator="in" result="bloom"></feComposite>
+   <feMerge><feMergeNode in="halo"></feMergeNode><feMergeNode in="bloom"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+  </filter>
+</defs>
+<circle cx="32" cy="32" r="30.5" fill="#1A1D33"></circle>
+<circle cx="32" cy="32" r="30.5" fill="url(#warm-estrenoc)"></circle>
+<circle cx="32" cy="32" r="30.5" fill="url(#cool-estrenoc)"></circle>
+<circle cx="32" cy="32" r="30.5" stroke="url(#bd-estrenoc)" stroke-width="1.5"></circle>
+<circle cx="32" cy="32" r="30.5" stroke="url(#hl-estrenoc)" stroke-width="1.25"></circle>
+<g filter="url(#gl-estrenoc)" transform="translate(11.84 11.84) scale(0.84)">
+    <rect x="15" y="3.5" width="3.6" height="8.5" rx="1.8" fill="#FF6B4A"></rect>
+    <rect x="29.4" y="3.5" width="3.6" height="8.5" rx="1.8" fill="#FF6B4A"></rect>
+    <rect x="6.5" y="8.5" width="35" height="33.5" rx="6.5" stroke="#FF6B4A" stroke-width="3" fill="none"></rect>
+    <line x1="6.5" y1="19" x2="41.5" y2="19" stroke="#FF6B4A" stroke-width="2.6"></line>
+    <path d="M20 25.5 L31.5 31 L20 36.5 Z" fill="#FF6B4A"></path>
+    <circle cx="22" cy="28.4" r="1.5" fill="#F4F5FB" opacity="0.85"></circle></g>
+</svg>

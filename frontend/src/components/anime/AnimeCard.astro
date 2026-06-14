@@ -8,9 +8,10 @@ interface Props {
   anime: AnimeSummary;
   priority?: boolean;
   recommendationSourceSlug?: string;
+  badge?: 'top' | 'nuevo' | 'estreno' | 'premium';
 }
 
-const { anime, priority = false, recommendationSourceSlug } = Astro.props;
+const { anime, priority = false, recommendationSourceSlug, badge } = Astro.props;
 const title = anime.titleEnglish || anime.titleRomaji;
 const score = anime.averageScore;
 const recommendationAttributes = recommendationSourceSlug
@@ -46,6 +47,17 @@ if (score !== null) {
         <span class={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-semibold backdrop-blur-md ${scoreClass}`}>
           {score}
         </span>
+      )}
+      {badge && (
+        <img
+          src={`/badges/badge-${badge}-circle.svg`}
+          alt=""
+          width="40"
+          height="40"
+          loading="lazy"
+          decoding="async"
+          class="absolute left-2 top-2 h-9 w-9 drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+        />
       )}
     </div>
     <div class="mt-3">

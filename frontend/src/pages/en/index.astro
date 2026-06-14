@@ -104,7 +104,7 @@ const itemListSchema = buildItemListSchema(
       <h2 class="text-2xl font-semibold">{t('home.trending')}</h2>
       <span class="text-sm text-fg-muted">{t('home.topCount', { count: trending.length })}</span>
     </div>
-    <AnimeGrid anime={trending} />
+    <AnimeGrid anime={trending} badge="top" />
   </section>
 
   <NewsLatest items={latestNews} />
