@@ -49,9 +49,11 @@ const fallbackWidth = normalizedWidths[Math.min(1, normalizedWidths.length - 1)]
 const imageAlt = ariaHidden ? '' : alt;
 const optimizedSrc = buildAnimeImageUrl(src, fallbackWidth, quality);
 const optimizedSrcset = buildAnimeImageSrcset(src, normalizedWidths, quality);
-// Si la carátula no carga (AniList throttla covers en ráfaga) caemos al placeholder de marca.
+// Si la carátula no carga (AniList throttla covers en ráfaga) reintentamos la
+// misma URL con jitter (cache HIT de Cloudflare) y, solo tras 2 intentos, caemos
+// al placeholder de marca. La lógica vive en window.__coverError (BaseLayout).
 const onCoverError = fallbackSrc
-  ? `this.onerror=null;this.removeAttribute('srcset');this.removeAttribute('sizes');this.src='${fallbackSrc}';`
+  ? `window.__coverError&&window.__coverError(this)`
   : undefined;
 ---
 <picture class={className} aria-hidden={ariaHidden ? 'true' : undefined}>
@@ -67,6 +69,8 @@ const onCoverError = fallbackSrc
     fetchpriority={fetchpriority}
     class={imgClass}
     data-cover={canUseSrcset ? '' : undefined}
+    data-cover-src={fallbackSrc ? optimizedSrc : undefined}
+    data-cover-fallback={fallbackSrc}
     onerror={onCoverError}
   />
 </picture>

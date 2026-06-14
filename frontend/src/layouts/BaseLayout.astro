@@ -69,6 +69,35 @@ const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
         }
       } catch (e) {}
     </script>
+    <script is:inline>
+      // Reintento escalonado de portadas. El CDN de AniList estrangula cuando un
+      // cliente pide muchas a la vez (una rejilla entera): la primera carga da
+      // error y, hasta ahora, caiamos directos al placeholder de marca, dejando
+      // TODA la rejilla con la mascota. El throttle es por rafaga y transitorio,
+      // y la portada queda cacheada en Cloudflare; reintentar la MISMA URL tras
+      // un retardo con jitter acierta (cache HIT). Definido en <head> para que
+      // exista antes de que cualquier <img> dispare su onerror.
+      window.__coverError = function (img) {
+        try {
+          var n = img.__coverTries || 0;
+          var fb = img.getAttribute('data-cover-fallback');
+          if (n >= 2) {
+            img.onerror = null;
+            img.removeAttribute('srcset');
+            img.removeAttribute('sizes');
+            if (fb) img.src = fb;
+            return;
+          }
+          img.__coverTries = n + 1;
+          var url = (img.getAttribute('data-cover-src') || img.getAttribute('src') || '').split('#')[0];
+          img.removeAttribute('srcset');
+          img.removeAttribute('sizes');
+          // El fragmento #rN fuerza la recarga (src distinto) pero NO viaja al
+          // servidor: misma URL real => cache HIT de Cloudflare, no golpea origen.
+          setTimeout(function () { img.src = url + '#r' + img.__coverTries; }, 300 + Math.random() * 1400 * (n + 1));
+        } catch (e) {}
+      };
+    </script>
     {publicLanguageRoute && (
       <script is:inline define:vars={{ languageRoutes }}>
         // Solo respetamos la preferencia EXPLÍCITA del usuario (cookie del
