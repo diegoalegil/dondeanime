@@ -64,6 +64,7 @@ const itemListSchema = buildItemListSchema(
   title={seoTitle}
   description={seoDescription}
   locale={country.hreflang.replace('-', '_')}
+  image={absoluteUrl('/og-disponibilidad.png')}
 >
   <JsonLd slot="head" data={itemListSchema} />
 

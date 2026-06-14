@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="DondeAnime — country and platform availability share card (base template)">
+  <title>DondeAnime — Disponibilidad país + plataforma — OG base template</title>
+  <desc>Nocturnal-dusk base illustration for availability OG cards. Wordmark zone, eyebrow chip and the right-hand band are intentionally empty: the live site composites the wordmark, platform name, country name and anime count over this base. Region-neutral globe, warm coral + cool cyan location pins, a dotted streaming-signal arc, one anonymous play-tile and an empty circular flag slot.</desc>
+  <defs>
+    <pattern id="da-diamondGrid" width="58" height="58" patternUnits="userSpaceOnUse">
+      <path d="M29 7 L51 29 L29 51 L7 29 Z" fill="none" stroke="#F4F5FB" stroke-width="1"></path>
+    </pattern>
+    <radialGradient id="da-duskWarm" cx="2%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.18"></stop>
+      <stop offset="46%" stop-color="#FF6B4A" stop-opacity="0.05"></stop>
+      <stop offset="100%" stop-color="#FF6B4A" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="da-duskCool" cx="96%" cy="74%" r="82%">
+      <stop offset="0%" stop-color="#36E0E6" stop-opacity="0.17"></stop>
+      <stop offset="46%" stop-color="#36E0E6" stop-opacity="0.05"></stop>
+      <stop offset="100%" stop-color="#36E0E6" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="da-globeHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#36E0E6" stop-opacity="0.16"></stop>
+      <stop offset="44%" stop-color="#36E0E6" stop-opacity="0.06"></stop>
+      <stop offset="100%" stop-color="#36E0E6" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="da-globeBody" cx="38%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#1E2238"></stop>
+      <stop offset="100%" stop-color="#121526" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="da-neon" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="da-softGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="2.4"></feGaussianBlur>
+    </filter>
+    <clipPath id="da-panelClip"><rect x="28" y="28" width="1144" height="574" rx="26"></rect></clipPath>
+    <clipPath id="da-globeClip"><circle cx="372" cy="372" r="170"></circle></clipPath>
+  </defs>
+
+  
+  <rect width="1200" height="630" fill="#0E1020"></rect>
+  <rect x="28" y="28" width="1144" height="574" rx="26" fill="#1A1D33"></rect>
+
+  <g clip-path="url(#da-panelClip)">
+    <rect x="28" y="28" width="1144" height="574" fill="url(#da-diamondGrid)" opacity="0.05"></rect>
+    <rect x="28" y="28" width="1144" height="574" fill="url(#da-duskWarm)"></rect>
+    <rect x="28" y="28" width="1144" height="574" fill="url(#da-duskCool)"></rect>
+
+    
+    <g>
+      <path d="M150 470 l4 4 -4 4 -4 -4 Z" fill="#FF6B4A" opacity="0.16" filter="url(#da-softGlow)"></path>
+      <path d="M96 360 l3 3 -3 3 -3 -3 Z" fill="#FF6B4A" opacity="0.12"></path>
+      <path d="M250 150 l3 3 -3 3 -3 -3 Z" fill="#F4F5FB" opacity="0.10"></path>
+      <path d="M520 120 l4 4 -4 4 -4 -4 Z" fill="#F4F5FB" opacity="0.14" filter="url(#da-softGlow)"></path>
+      <path d="M640 200 l3 3 -3 3 -3 -3 Z" fill="#36E0E6" opacity="0.12"></path>
+      <path d="M840 110 l3 3 -3 3 -3 -3 Z" fill="#36E0E6" opacity="0.10"></path>
+      <path d="M1010 180 l4 4 -4 4 -4 -4 Z" fill="#36E0E6" opacity="0.16" filter="url(#da-softGlow)"></path>
+      <path d="M1120 300 l3 3 -3 3 -3 -3 Z" fill="#F4F5FB" opacity="0.10"></path>
+      <path d="M1086 472 l3 3 -3 3 -3 -3 Z" fill="#36E0E6" opacity="0.13"></path>
+      <path d="M944 520 l4 4 -4 4 -4 -4 Z" fill="#36E0E6" opacity="0.16" filter="url(#da-softGlow)"></path>
+      <path d="M470 540 l3 3 -3 3 -3 -3 Z" fill="#F4F5FB" opacity="0.10"></path>
+      <path d="M300 524 l3 3 -3 3 -3 -3 Z" fill="#FF6B4A" opacity="0.12"></path>
+      <path d="M210 250 l3 3 -3 3 -3 -3 Z" fill="#FF6B4A" opacity="0.10"></path>
+      <path d="M700 540 l3 3 -3 3 -3 -3 Z" fill="#F4F5FB" opacity="0.09"></path>
+    </g>
+
+    
+    <g>
+      <circle cx="372" cy="372" r="232" fill="url(#da-globeHalo)"></circle>
+      <circle cx="372" cy="372" r="170" fill="#141728"></circle>
+      <circle cx="372" cy="372" r="170" fill="url(#da-globeBody)"></circle>
+      <g clip-path="url(#da-globeClip)">
+        <g fill="#252841">
+          <path d="M250 300 q40 -34 92 -20 q40 12 30 48 q-10 34 -58 30 q-44 -4 -70 6 q-26 10 -22 -22 q4 -30 28 -42 Z" opacity="0.9"></path>
+          <path d="M398 256 q44 -10 70 14 q22 22 4 40 q-22 22 -58 12 q-30 -8 -34 -34 q-4 -24 18 -32 Z" opacity="0.8"></path>
+          <path d="M330 412 q50 -14 88 12 q30 20 8 48 q-26 32 -78 22 q-40 -8 -46 -42 q-4 -28 28 -40 Z" opacity="0.85"></path>
+          <path d="M468 388 q28 -6 40 16 q12 22 -10 34 q-24 12 -40 -8 q-12 -18 0 -34 Z" opacity="0.7"></path>
+        </g>
+        <g fill="none" stroke="#36E0E6" stroke-opacity="0.22" stroke-width="1.3">
+          <ellipse cx="372" cy="372" rx="170" ry="58"></ellipse>
+          <ellipse cx="372" cy="372" rx="168" ry="118"></ellipse>
+          <ellipse cx="372" cy="300" rx="153" ry="40"></ellipse>
+          <ellipse cx="372" cy="444" rx="153" ry="40"></ellipse>
+          <line x1="202" y1="372" x2="542" y2="372"></line>
+        </g>
+        <g fill="none" stroke="#36E0E6" stroke-opacity="0.20" stroke-width="1.3">
+          <ellipse cx="372" cy="372" rx="58" ry="170"></ellipse>
+          <ellipse cx="372" cy="372" rx="118" ry="170"></ellipse>
+          <line x1="372" y1="202" x2="372" y2="542"></line>
+        </g>
+      </g>
+      <circle cx="372" cy="372" r="170" fill="none" stroke="#36E0E6" stroke-opacity="0.5" stroke-width="2"></circle>
+      <path d="M372 202 a170 170 0 0 0 0 340" fill="none" stroke="#FF6B4A" stroke-opacity="0.34" stroke-width="2.4"></path>
+    </g>
+
+    
+    <g filter="url(#da-neon)">
+      <path d="M300 352 C 322 256, 452 262, 438 406" fill="none" stroke="#36E0E6" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 14" stroke-opacity="0.95"></path>
+    </g>
+    <g fill="#36E0E6">
+      <path d="M374 250 l5 5 -5 5 -5 -5 Z" filter="url(#da-neon)"></path>
+      <path d="M430 300 l3.6 3.6 -3.6 3.6 -3.6 -3.6 Z" opacity="0.85"></path>
+    </g>
+
+    
+    <ellipse cx="300" cy="356" rx="34" ry="11" fill="#FF6B4A" opacity="0.20" filter="url(#da-softGlow)"></ellipse>
+    <g filter="url(#da-neon)">
+      <g transform="translate(261.6,288) scale(0.3)">
+        <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#FF6B4A"></path>
+        <circle cx="128" cy="100" r="20" fill="#0E1020" fill-opacity="0.92"></circle>
+      </g>
+    </g>
+    <ellipse cx="438" cy="410" rx="32" ry="10" fill="#36E0E6" opacity="0.20" filter="url(#da-softGlow)"></ellipse>
+    <g filter="url(#da-neon)">
+      <g transform="translate(399.6,342) scale(0.3)">
+        <path d="M128 36c-39.8 0-72 30.6-72 68.4 0 46 50.4 96.2 67.1 111.6a7.3 7.3 0 0 0 9.8 0c16.7-15.4 67.1-65.6 67.1-111.6C200 66.6 167.8 36 128 36Z" fill="#36E0E6"></path>
+        <circle cx="128" cy="100" r="20" fill="#0E1020" fill-opacity="0.92"></circle>
+      </g>
+    </g>
+
+    
+    
+    <g>
+      <rect x="556" y="300" width="138" height="138" rx="32" fill="#20253F" stroke="#323754" stroke-width="2"></rect>
+      <rect x="556" y="300" width="138" height="138" rx="32" fill="none" stroke="#FF6B4A" stroke-opacity="0.18" stroke-width="2"></rect>
+      <g filter="url(#da-neon)">
+        <path d="M608 344 L654 369 L608 394 Z" fill="#36E0E6"></path>
+      </g>
+      <g>
+        <circle cx="694" cy="438" r="36" fill="#1A1D33" stroke="#0E1020" stroke-width="4"></circle>
+        <circle cx="694" cy="438" r="32" fill="#161A2C" stroke="#36E0E6" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="3 5"></circle>
+        <circle cx="694" cy="438" r="8" fill="none" stroke="#36E0E6" stroke-opacity="0.35" stroke-width="2"></circle>
+      </g>
+    </g>
+
+    
+    <rect id="slot-eyebrow" x="64" y="120" width="200" height="46" rx="23" fill="none" stroke="#36E0E6" stroke-width="2"></rect>
+
+    
+    <rect id="slot-wordmark" x="64" y="52" width="430" height="56" fill="none" pointer-events="none"></rect>
+    <rect id="slot-title" x="730" y="232" width="406" height="92" fill="none" pointer-events="none"></rect>
+    <rect id="slot-country" x="730" y="336" width="406" height="44" fill="none" pointer-events="none"></rect>
+    <rect id="slot-count" x="730" y="392" width="406" height="56" fill="none" pointer-events="none"></rect>
+  </g>
+</svg>
