@@ -1,0 +1,87 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { getProvidersByCountry } from '@/lib/api';
+import { COUNTRIES, COUNTRY_SLUGS } from '@/lib/countries';
+import { isHiddenVariant, getPlatform } from '@/lib/platforms';
+import { absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+interface PlatformRow {
+  slug: string;
+  name: string;
+  logoUrl?: string;
+  animeCount: number;
+  countryCount: number;
+}
+
+const lists = await Promise.all(
+  COUNTRY_SLUGS.map((s) => getProvidersByCountry(COUNTRIES[s].iso)),
+);
+
+const bySlug = new Map<string, PlatformRow>();
+for (const list of lists) {
+  for (const p of list) {
+    if (isHiddenVariant(p.slug)) continue;
+    const existing = bySlug.get(p.slug);
+    if (existing) {
+      existing.animeCount += p.animeCount;
+      existing.countryCount += 1;
+      existing.logoUrl ??= p.logoUrl;
+    } else {
+      bySlug.set(p.slug, {
+        slug: p.slug,
+        name: getPlatform(p.slug)?.name ?? p.providerName,
+        logoUrl: p.logoUrl,
+        animeCount: p.animeCount,
+        countryCount: 1,
+      });
+    }
+  }
+}
+
+const platforms = Array.from(bySlug.values()).sort((a, b) => b.animeCount - a.animeCount);
+---
+<BaseLayout
+  title="Plataformas de streaming de anime — todas y dónde ver cada serie | DondeAnime"
+  description="Todas las plataformas con anime en Hispanoamérica: Crunchyroll, Netflix, Prime Video, HBO Max, Disney+ y más. Mira en cuáles ver cada serie por país."
+  image={absoluteUrl('/og-disponibilidad.png')}
+>
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.platforms'), url: '/plataformas' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-4">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Catálogo por plataforma</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">Anime por plataforma</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      Cada plataforma de streaming con anime, de mayor a menor catálogo. Abre una para ver su disponibilidad por país.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {platforms.map((p) => (
+        <li>
+          <a
+            href={`/plataforma/${p.slug}`}
+            class="flex items-center gap-3 rounded-xl border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/60"
+          >
+            {p.logoUrl && (
+              <img src={p.logoUrl} alt={p.name} width="40" height="40" loading="lazy" class="h-10 w-10 rounded-lg object-cover ring-1 ring-surface-2" />
+            )}
+            <div class="min-w-0">
+              <span class="block truncate font-medium text-fg-primary">{p.name}</span>
+              <span class="text-xs text-fg-muted">{t('platform.animeCount', { count: p.animeCount })}</span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

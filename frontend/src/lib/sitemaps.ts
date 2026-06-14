@@ -117,6 +117,8 @@ export const staticSitemapPaths = async (): Promise<string[]> => {
     '/noticias',
     '/stickers',
     '/temporadas',
+    '/generos',
+    '/plataformas',
     '/contacto',
     '/legal/privacidad',
     '/legal/cookies',

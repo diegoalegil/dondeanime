@@ -1,0 +1,50 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { getGenres } from '@/lib/api';
+import { localizedGenreName } from '@/lib/genres';
+import { absoluteUrl } from '@/lib/seo';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+const genres = (await getGenres())
+  .slice()
+  .sort((a, b) => b.animeCount - a.animeCount);
+---
+<BaseLayout
+  title="Géneros de anime — todos los géneros y dónde verlos | DondeAnime"
+  description="Explora el anime por género: acción, romance, terror, comedia y más, con en qué plataformas de streaming ver cada serie en Hispanoamérica."
+  image={absoluteUrl('/og-genero.png')}
+>
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.genres'), url: '/generos' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-6xl px-4 pt-8 pb-4">
+    <p class="text-xs uppercase tracking-wide text-accent-violet">Catálogo por género</p>
+    <h1 class="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">Anime por género</h1>
+    <p class="mt-4 max-w-2xl text-lg text-fg-secondary">
+      Cada género de anime, de más a menos catálogo. Abre uno para ver sus series y en qué plataformas verlas.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-20">
+    <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      {genres.map((g) => (
+        <li>
+          <a
+            href={`/genero/${g.slug}`}
+            class="flex items-center justify-between rounded-lg border border-surface-2 bg-surface-1 px-4 py-3 transition-colors hover:border-accent-violet/60"
+          >
+            <span class="font-medium text-fg-primary">{localizedGenreName(g.slug, g.name)}</span>
+            <span class="text-xs text-fg-muted">{g.animeCount}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

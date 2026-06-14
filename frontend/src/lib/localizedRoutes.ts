@@ -59,6 +59,8 @@ export const spanishPathFromLocalized = (path: string): string => {
   }
 
   if (section === 'genre' && first) return `/genero/${first}`;
+  if (section === 'genres') return '/generos';
+  if (section === 'platforms') return '/plataformas';
   if (section === 'season' && first && second) return `/temporada/${first}/${second}`;
   if (section === 'seasons') return '/temporadas';
   if (section === 'best' && first) return `/mejores/${first}`;
@@ -117,6 +119,8 @@ export const localizedEnPath = (spanishPath: string): string | null => {
   }
 
   if (section === 'genero' && first) return `/en/genre/${first}`;
+  if (section === 'generos') return '/en/genres';
+  if (section === 'plataformas') return '/en/platforms';
   if (section === 'temporada' && first && second) return `/en/season/${first}/${second}`;
   if (section === 'temporadas') return '/en/seasons';
   if (section === 'mejores' && first) return `/en/best/${first}`;

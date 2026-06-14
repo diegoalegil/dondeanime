@@ -59,6 +59,8 @@
   "footer.countries": "Countries",
   "footer.platforms": "Platforms",
   "footer.genres": "Genres",
+  "footer.allPlatforms": "All platforms",
+  "footer.allGenres": "All genres",
   "footer.dataAttribution": "Data via AniList and TMDb.",
   "footer.privacy": "Privacy",
   "footer.cookies": "Cookies",
