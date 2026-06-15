@@ -42,6 +42,15 @@ const [anime, genres, seasons] = await Promise.all([
   getSeasons(),
 ]);
 
+// Portadas (del propio catálogo) de los anime que cita el post destacado, para
+// que el banner de portada sea visual. Sin fetches extra: salen de getAllAnime.
+const featuredCovers = (featuredPost?.data.animeSlugs ?? []).flatMap((slug) => {
+  const item = anime.find((a) => a.slug === slug);
+  return item
+    ? [{ slug: item.slug, title: item.titleEnglish || item.titleRomaji, coverImage: item.coverImage }]
+    : [];
+});
+
 const trending = [...anime]
   .filter((a) => a.popularity !== null)
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
@@ -117,7 +126,7 @@ const itemListSchema = buildItemListSchema(
     </div>
   </section>
 
-  {featuredPost && <FeaturedPost post={featuredPost} />}
+  {featuredPost && <FeaturedPost post={featuredPost} covers={featuredCovers} />}
 
   <AnimeChatSearch />
   <WatchedFilter />

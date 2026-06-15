@@ -3,12 +3,20 @@ import type { BlogPost } from '@/lib/blog';
 import { blogSlug, blogLocale } from '@/lib/blog';
 import { localizedPath } from '@/lib/localizedRoutes';
 import { t } from '@/i18n';
+import AnimePicture from '@/components/anime/AnimePicture.astro';
+
+export interface FeaturedCover {
+  slug: string;
+  title: string;
+  coverImage: string;
+}
 
 interface Props {
   post: BlogPost;
+  covers?: FeaturedCover[];
 }
 
-const { post } = Astro.props;
+const { post, covers = [] } = Astro.props;
 const href = localizedPath(`/blog/${blogSlug(post)}`);
 const { title, description, tags, pubDate } = post.data;
 const locale = blogLocale(post);
@@ -17,29 +25,53 @@ const dateLabel = pubDate.toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES'
   month: 'long',
   year: 'numeric',
 });
+const shownCovers = covers.slice(0, 5);
 ---
 <section class="mx-auto max-w-6xl px-4 pt-2 pb-10">
   <a
     href={href}
-    class="group relative isolate block overflow-hidden rounded-2xl border border-surface-2 p-6 transition-colors hover:border-accent-pink/50 md:p-8"
+    class="group relative isolate block overflow-hidden rounded-2xl border border-surface-2 transition-colors hover:border-accent-pink/50"
   >
     <div class="absolute inset-0 -z-10 bg-gradient-to-br from-accent-pink/15 via-surface-1 to-accent-violet/12"></div>
-    <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-accent-pink">
-      <span class="inline-block h-2 w-2 rounded-full bg-accent-pink"></span>
-      {t('featured.eyebrow')}
-    </p>
-    <h2 class="mt-3 max-w-3xl text-2xl font-semibold tracking-tight text-fg-primary transition-colors group-hover:text-accent-violet md:text-3xl">
-      {title}
-    </h2>
-    <p class="mt-3 max-w-2xl text-base text-fg-secondary md:text-lg">{description}</p>
-    <div class="mt-5 flex flex-wrap items-center gap-2">
-      {tags.slice(0, 3).map((tag) => (
-        <span class="rounded-full border border-surface-2 px-3 py-1 text-xs text-fg-muted">#{tag}</span>
-      ))}
-      <span class="text-xs text-fg-muted">{dateLabel}</span>
-      <span class="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-accent-violet">
-        {t('featured.cta')} →
-      </span>
+    <div class="flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
+      <div class="min-w-0">
+        <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-accent-pink">
+          <span class="inline-block h-2 w-2 rounded-full bg-accent-pink"></span>
+          {t('featured.eyebrow')}
+        </p>
+        <h2 class="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-fg-primary transition-colors group-hover:text-accent-violet md:text-3xl">
+          {title}
+        </h2>
+        <p class="mt-3 max-w-2xl text-base text-fg-secondary md:text-lg">{description}</p>
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          {tags.slice(0, 3).map((tag) => (
+            <span class="rounded-full border border-surface-2 px-3 py-1 text-xs text-fg-muted">#{tag}</span>
+          ))}
+          <span class="text-xs text-fg-muted">{dateLabel}</span>
+          <span class="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-accent-violet">
+            {t('featured.cta')} →
+          </span>
+        </div>
+      </div>
+
+      {shownCovers.length > 0 && (
+        <div class="flex shrink-0 -space-x-6 self-center md:-space-x-8">
+          {shownCovers.map((cover) => (
+            <AnimePicture
+              src={cover.coverImage}
+              ariaHidden
+              width={120}
+              height={180}
+              widths={[120, 240]}
+              sizes="6rem"
+              loading="lazy"
+              class="block shrink-0 transition-transform duration-300 group-hover:-translate-y-1"
+              imgClass="h-28 w-[4.7rem] rounded-lg object-cover shadow-xl shadow-black/40 ring-2 ring-surface-1 md:h-40 md:w-[6.7rem]"
+              fallbackSrc="/cover-placeholder.webp"
+            />
+          ))}
+        </div>
+      )}
     </div>
   </a>
 </section>
