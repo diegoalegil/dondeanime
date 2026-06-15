@@ -1,5 +1,7 @@
 <div align="center">
 
+<a href="https://dondeanime.com"><img src="docs/img/banner-dondeanime.webp" alt="DondeAnime — dónde y cuándo ver cualquier anime en streaming en España y Latinoamérica, en menos de 5 segundos" width="100%" /></a>
+
 # DondeAnime
 
 **Dónde y cuándo ver cualquier anime en streaming en España y Latinoamérica — en menos de 5 segundos.**
@@ -42,7 +44,7 @@ La capa de datos de DondeAnime no usa clientes HTTP a medida: corre sobre **[Tsu
 <dependency>
     <groupId>io.github.diegoalegil</groupId>
     <artifactId>tsunagi</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -96,7 +98,7 @@ DondeAnime consume `AniListClient.fetchPopular(...)` para el catálogo y `TmdbCl
 - **[anime-title-matcher](https://github.com/diegoalegil/anime-title-matcher)** (librería propia) para el cruce difuso AniList ↔ TMDb
 - **[anime-feed-parser](https://github.com/diegoalegil/anime-feed-parser)** (librería propia) para la ingesta RSS/Atom de noticias
 - **Jackson 3.x** (paquetes `tools.jackson.*` propios de Spring Boot 4)
-- **Spring Security** (HTTP Basic + 2FA para `/api/admin/**`, JWT para flujos públicos)
+- **Spring Security** (JWT admin + 2FA TOTP en `/api/admin/**`, tokens JWT para flujos públicos)
 - **Resend** para email transaccional
 
 ### Frontend
