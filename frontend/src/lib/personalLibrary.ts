@@ -7,6 +7,7 @@
  * Se importa desde los `<script>` de los componentes (FavoriteButton, la home y la
  * página Mi lista). No importar nada de servidor aquí: este módulo corre en cliente.
  */
+import { scoreBadgeClass } from './animeBadge';
 
 export interface LibraryItem {
   slug: string;
@@ -97,12 +98,6 @@ export function getRecent(): LibraryItem[] {
 export function recordRecent(item: LibraryItem): void {
   const current = getRecent().filter((existing) => existing.slug !== item.slug);
   writeList(RECENT_KEY, [item, ...current].slice(0, MAX_RECENT));
-}
-
-function scoreBadgeClass(score: number): string {
-  if (score >= 80) return 'bg-success/15 text-success';
-  if (score >= 60) return 'bg-warning/15 text-warning';
-  return 'bg-danger/15 text-danger';
 }
 
 /**

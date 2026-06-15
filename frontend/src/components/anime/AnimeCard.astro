@@ -1,6 +1,7 @@
 ---
 import type { AnimeSummary } from '@/lib/api';
 import { formatType } from '@/lib/format';
+import { scoreBadgeClass } from '@/lib/animeBadge';
 import { localizedPath } from '@/lib/localizedRoutes';
 import AnimePicture from './AnimePicture.astro';
 
@@ -22,12 +23,7 @@ const recommendationAttributes = recommendationSourceSlug
     }
   : {};
 
-let scoreClass = '';
-if (score !== null) {
-  if (score >= 80) scoreClass = 'bg-success/15 text-success';
-  else if (score >= 60) scoreClass = 'bg-warning/15 text-warning';
-  else scoreClass = 'bg-danger/15 text-danger';
-}
+const scoreClass = score !== null ? scoreBadgeClass(score) : '';
 ---
 <article class="group" data-anime-filter-item data-anime-slug={anime.slug}>
   <a href={localizedPath(`/anime/${anime.slug}`)} class="block" {...recommendationAttributes}>
