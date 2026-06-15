@@ -7,6 +7,8 @@ import { absoluteUrl } from '@/lib/seo';
 import { setLocale, getLocale, t } from '@/i18n';
 import { blogSlug, isPublishedBlogPost } from '@/lib/blog';
 import { localizedPath } from '@/lib/localizedRoutes';
+import { getAllAnime } from '@/lib/api';
+import AnimeCard from '@/components/anime/AnimeCard.astro';
 
 setLocale('en');
 
@@ -30,6 +32,14 @@ const pageUrl = absoluteUrl(`/en/blog/${slug}`);
 const published = post.data.pubDate.toISOString();
 const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 const activeLocale = getLocale();
+
+// Anime citados por el post (animeSlugs): tarjetas con portada + enlace a ficha.
+const eventSlugs = post.data.animeSlugs ?? [];
+const eventAnime = eventSlugs.length
+  ? (await getAllAnime())
+      .filter((anime) => eventSlugs.includes(anime.slug))
+      .sort((a, b) => eventSlugs.indexOf(a.slug) - eventSlugs.indexOf(b.slug))
+  : [];
 
 const blogPostingSchema = {
   '@context': 'https://schema.org',
@@ -83,6 +93,15 @@ const blogPostingSchema = {
     <p class="mt-4 text-lg leading-8 text-fg-secondary">
       {post.data.description}
     </p>
+
+    {eventAnime.length > 0 && (
+      <section class="mt-8">
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-accent-violet">{t('blog.eventAnime')}</h2>
+        <div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          {eventAnime.map((anime) => <AnimeCard anime={anime} />)}
+        </div>
+      </section>
+    )}
 
     <div class="blog-content mt-10 border-t border-surface-2 pt-8 text-fg-secondary">
       <Content />
