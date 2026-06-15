@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import { buildOrganizationSchema } from '@/lib/seo';
 import { t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import { localizedGenreName } from '@/lib/genres';
 import CountryFlag from '@/components/ui/CountryFlag.astro';
 
 const year = new Date().getFullYear();
@@ -84,7 +85,7 @@ const legalLinks = [
           {featuredGenres.map((g) => (
             <li>
               <a href={localizedPath(`/genero/${g.slug}`)} class="text-fg-muted transition-colors hover:text-fg-primary">
-                {g.name}
+                {localizedGenreName(g.slug, g.name)}
               </a>
             </li>
           ))}

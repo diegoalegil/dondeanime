@@ -2,6 +2,7 @@
 import type { AnimeDetail } from '@/lib/api';
 import { formatType, formatStatus } from '@/lib/format';
 import { genreSlug } from '@/lib/programmaticSeo';
+import { localizedGenreName } from '@/lib/genres';
 import { t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 import AnimePicture from './AnimePicture.astro';
@@ -85,7 +86,7 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
                 href={localizedPath(`/genero/${genreSlug(g)}`)}
                 class="rounded-full border border-surface-2 px-3 py-1 text-xs text-fg-secondary transition-colors hover:border-accent-violet hover:text-fg-primary"
               >
-                {g}
+                {localizedGenreName(genreSlug(g), g)}
               </a>
             ))}
           </div>

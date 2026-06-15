@@ -15,6 +15,7 @@ import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
 import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
 import { setLocale, t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import { localizedGenreName } from '@/lib/genres';
 import { getCollection } from 'astro:content';
 import { isPublishedBlogPost } from '@/lib/blog';
 import FeaturedPost from '@/components/blog/FeaturedPost.astro';
@@ -200,7 +201,7 @@ const itemListSchema = buildItemListSchema(
     <section class="mx-auto max-w-6xl px-4 pb-12">
       <div class="mb-5 flex items-baseline justify-between">
         <h2 class="text-2xl font-semibold">
-          {t('home.bestInGenrePrefix')} <span class="brand-gradient-text">{topGenre.name}</span>
+          {t('home.bestInGenrePrefix')} <span class="brand-gradient-text">{localizedGenreName(topGenre.slug, topGenre.name)}</span>
         </h2>
         <a
           href={localizedPath(`/genero/${topGenre.slug}`)}
