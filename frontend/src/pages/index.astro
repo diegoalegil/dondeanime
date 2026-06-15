@@ -275,11 +275,25 @@ const itemListSchema = buildItemListSchema(
   </section>
 </BaseLayout>
 <script>
-  import { getFavorites, getRecent, renderLibraryCard, LIBRARY_CHANGE_EVENT } from '../lib/personalLibrary';
+  // Carga diferida: solo importamos la biblioteca (y pintamos) si el usuario ya
+  // tiene datos guardados. Asi la home no carga este JS para visitantes nuevos
+  // (ni en Lighthouse), preservando el rendimiento de la pagina mas importante.
+  const hasLibraryData = () => {
+    try {
+      return !!(localStorage.getItem('dondeanime-favorites') || localStorage.getItem('dondeanime-recent'));
+    } catch {
+      return false;
+    }
+  };
 
-  const render = () => {
+  const render = async () => {
     const root = document.querySelector<HTMLElement>('[data-home-library]');
     if (!root) return;
+    if (!hasLibraryData()) {
+      root.setAttribute('hidden', '');
+      return;
+    }
+    const { getFavorites, getRecent, renderLibraryCard } = await import('../lib/personalLibrary');
     const prefix = root.dataset.animePrefix || '/anime';
     const favorites = getFavorites();
     const recent = getRecent();
@@ -293,5 +307,4 @@ const itemListSchema = buildItemListSchema(
   };
 
   document.addEventListener('astro:page-load', render);
-  window.addEventListener(LIBRARY_CHANGE_EVENT, render);
 </script>

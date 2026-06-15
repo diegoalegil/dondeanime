@@ -265,11 +265,24 @@ const itemListSchema = buildItemListSchema(
   </section>
 </BaseLayout>
 <script>
-  import { getFavorites, getRecent, renderLibraryCard, LIBRARY_CHANGE_EVENT } from '../../lib/personalLibrary';
+  // Carga diferida (ver index.astro): la home solo importa la biblioteca si el
+  // usuario ya tiene datos, para no penalizar el rendimiento de visitantes nuevos.
+  const hasLibraryData = () => {
+    try {
+      return !!(localStorage.getItem('dondeanime-favorites') || localStorage.getItem('dondeanime-recent'));
+    } catch {
+      return false;
+    }
+  };
 
-  const render = () => {
+  const render = async () => {
     const root = document.querySelector<HTMLElement>('[data-home-library]');
     if (!root) return;
+    if (!hasLibraryData()) {
+      root.setAttribute('hidden', '');
+      return;
+    }
+    const { getFavorites, getRecent, renderLibraryCard } = await import('../../lib/personalLibrary');
     const prefix = root.dataset.animePrefix || '/en/anime';
     const favorites = getFavorites();
     const recent = getRecent();
@@ -283,5 +296,4 @@ const itemListSchema = buildItemListSchema(
   };
 
   document.addEventListener('astro:page-load', render);
-  window.addEventListener(LIBRARY_CHANGE_EVENT, render);
 </script>
