@@ -35,6 +35,11 @@ const trending = [...anime]
   .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
   .slice(0, 12);
 
+const airing = [...anime]
+  .filter((a) => a.status === 'RELEASING')
+  .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+  .slice(0, 12);
+
 const topGenre = genres[0];
 const topGenreAnime = topGenre ? (await getAnimeByGenre(topGenre.slug)).slice(0, 12) : [];
 
@@ -106,6 +111,21 @@ const itemListSchema = buildItemListSchema(
     </div>
     <AnimeGrid anime={trending} badge="top" />
   </section>
+
+  {airing.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 pb-12">
+      <div class="mb-5 flex items-baseline justify-between">
+        <h2 class="text-2xl font-semibold">{t('airing.home.title')}</h2>
+        <a
+          href={localizedPath('/en-emision')}
+          class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
+        >
+          {t('airing.home.viewAll')} →
+        </a>
+      </div>
+      <AnimeGrid anime={airing} />
+    </section>
+  )}
 
   <NewsLatest items={latestNews} />
 

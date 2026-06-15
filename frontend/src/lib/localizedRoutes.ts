@@ -63,6 +63,7 @@ export const spanishPathFromLocalized = (path: string): string => {
   if (section === 'platforms') return '/plataformas';
   if (section === 'season' && first && second) return `/temporada/${first}/${second}`;
   if (section === 'seasons') return '/temporadas';
+  if (section === 'airing') return '/en-emision';
   if (section === 'best' && first) return `/mejores/${first}`;
 
   if (section === 'upcoming') {
@@ -125,6 +126,7 @@ export const localizedEnPath = (spanishPath: string): string | null => {
   if (section === 'plataformas') return '/en/platforms';
   if (section === 'temporada' && first && second) return `/en/season/${first}/${second}`;
   if (section === 'temporadas') return '/en/seasons';
+  if (section === 'en-emision') return '/en/airing';
   if (section === 'mejores' && first) return `/en/best/${first}`;
 
   if (section === 'estrenos') {
