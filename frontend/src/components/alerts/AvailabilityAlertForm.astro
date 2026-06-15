@@ -130,7 +130,9 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
       scheduleAlertSync().catch(() => {});
     });
 
-    document.querySelectorAll('[data-alert-form]').forEach((root) => {
+    // ClientRouter (View Transitions) reemplaza el form en cada navegacion
+    // soft; re-enlazamos en cada astro:page-load (dispara en la carga inicial).
+    const init = () => document.querySelectorAll('[data-alert-form]').forEach((root) => {
       const alertApiUrl = root.getAttribute('data-alert-api-url') ?? '';
       const animeSlug = root.getAttribute('data-anime-slug') ?? '';
       const country = root.getAttribute('data-country') ?? '';
@@ -205,5 +207,7 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
         }
       });
     });
+
+    document.addEventListener('astro:page-load', init);
   </script>
 </section>

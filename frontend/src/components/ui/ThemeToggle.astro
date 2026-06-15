@@ -46,16 +46,23 @@ import { t } from '@/i18n';
 <script>
   const STORAGE_KEY = 'dondeanime-theme';
   const html = document.documentElement;
-  const btn = document.getElementById('theme-toggle');
 
-  btn?.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme') ?? 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch (e) {
-      // localStorage bloqueado (modo privado, cookies off, etc.)
-    }
-  });
+  // Con ClientRouter (View Transitions) el Header se re-renderiza en cada
+  // navegacion soft y el boton es un nodo nuevo sin handler. Re-enlazamos en
+  // cada astro:page-load, que dispara tambien en la carga inicial.
+  const init = () => {
+    const btn = document.getElementById('theme-toggle');
+    btn?.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme') ?? 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem(STORAGE_KEY, next);
+      } catch (e) {
+        // localStorage bloqueado (modo privado, cookies off, etc.)
+      }
+    });
+  };
+
+  document.addEventListener('astro:page-load', init);
 </script>

@@ -50,7 +50,9 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
   </div>
 
   <script>
-    document.querySelectorAll('[data-newsletter-form]').forEach((root) => {
+    // ClientRouter (View Transitions) reemplaza el form en cada navegacion
+    // soft; re-enlazamos en cada astro:page-load (dispara en la carga inicial).
+    const init = () => document.querySelectorAll('[data-newsletter-form]').forEach((root) => {
       const apiUrl = root.getAttribute('data-api-url') ?? '';
       const form = root.querySelector('[data-newsletter-panel]');
       const status = root.querySelector('[data-newsletter-status]');
@@ -95,5 +97,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
         }
       });
     });
+
+    document.addEventListener('astro:page-load', init);
   </script>
 </section>

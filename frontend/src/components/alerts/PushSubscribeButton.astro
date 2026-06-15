@@ -52,7 +52,9 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
     return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
   };
 
-  document.querySelectorAll('[data-push-subscribe]').forEach((root) => {
+  // ClientRouter (View Transitions) reemplaza el nodo en cada navegacion soft;
+  // re-enlazamos en cada astro:page-load (dispara en la carga inicial).
+  const init = () => document.querySelectorAll('[data-push-subscribe]').forEach((root) => {
     const apiUrl = root.getAttribute('data-api-url') ?? '';
     const countryIso = root.getAttribute('data-country') ?? '';
     const vapidKey = root.getAttribute('data-vapid-key') ?? '';
@@ -134,4 +136,6 @@ const vapidPublicKey = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY ?? '';
       }
     });
   });
+
+  document.addEventListener('astro:page-load', init);
 </script>

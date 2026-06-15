@@ -16,10 +16,12 @@ const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 </span>
 
 <script>
-  const badge = document.querySelector('[data-premium-badge]');
-  const label = document.querySelector('[data-premium-badge-label]');
-
-  (async () => {
+  // ClientRouter (View Transitions) re-renderiza el badge en cada navegacion
+  // soft; re-evaluamos el estado premium en cada astro:page-load (dispara
+  // tambien en la carga inicial).
+  const init = async () => {
+    const badge = document.querySelector('[data-premium-badge]');
+    const label = document.querySelector('[data-premium-badge-label]');
     if (!(badge instanceof HTMLElement)) return;
 
     try {
@@ -49,5 +51,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
     } catch (error) {
       // LocalStorage o red pueden estar bloqueados; el badge se queda oculto.
     }
-  })();
+  };
+
+  document.addEventListener('astro:page-load', init);
 </script>

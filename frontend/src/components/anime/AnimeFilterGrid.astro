@@ -174,18 +174,25 @@ const years = [...new Set(
     window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
   };
 
-  for (const root of document.querySelectorAll('[data-filter-root]') as NodeListOf<HTMLElement>) {
-    const params = new URLSearchParams(window.location.search);
+  // ClientRouter (View Transitions) re-renderiza el grid en cada navegacion
+  // soft; los selects son nodos nuevos sin listener. Re-enlazamos en cada
+  // astro:page-load, que dispara tambien en la carga inicial.
+  const init = () => {
+    for (const root of document.querySelectorAll('[data-filter-root]') as NodeListOf<HTMLElement>) {
+      const params = new URLSearchParams(window.location.search);
 
-    for (const key of FILTER_KEYS) {
-      const select = root.querySelector(`[name="${key}"]`) as HTMLSelectElement | null;
-      if (select) select.value = params.get(key) ?? '';
-      select?.addEventListener('change', () => {
-        updateUrl(root);
-        applyFilters(root);
-      });
+      for (const key of FILTER_KEYS) {
+        const select = root.querySelector(`[name="${key}"]`) as HTMLSelectElement | null;
+        if (select) select.value = params.get(key) ?? '';
+        select?.addEventListener('change', () => {
+          updateUrl(root);
+          applyFilters(root);
+        });
+      }
+
+      applyFilters(root);
     }
+  };
 
-    applyFilters(root);
-  }
+  document.addEventListener('astro:page-load', init);
 </script>

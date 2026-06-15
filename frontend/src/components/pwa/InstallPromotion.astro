@@ -67,12 +67,10 @@ import { t } from '@/i18n';
     return next;
   };
 
-  const promotion = document.querySelector('[data-install-promotion]');
-  const installButton = document.querySelector('[data-install-action]');
-  const dismissButton = document.querySelector('[data-install-dismiss]');
   let deferredInstallPrompt = null;
 
   const showPromotion = () => {
+    const promotion = document.querySelector('[data-install-promotion]');
     if (!promotion || !deferredInstallPrompt) return;
     if (isStandalone() || readCookie(DISMISSED_COOKIE) === 'true' || visits() < 3) return;
 
@@ -83,19 +81,31 @@ import { t } from '@/i18n';
     }
   };
 
-  dismissButton?.addEventListener('click', () => {
-    writeCookie(DISMISSED_COOKIE, 'true', 30);
-    promotion?.classList.add('hidden');
-  });
+  // El banner se re-renderiza en cada navegacion soft (ClientRouter); re-atamos
+  // los botones en cada astro:page-load (dispara tambien en la carga inicial).
+  // Los listeners de window van a nivel de modulo para no apilarse.
+  const init = () => {
+    const promotion = document.querySelector('[data-install-promotion]');
+    const installButton = document.querySelector('[data-install-action]');
+    const dismissButton = document.querySelector('[data-install-dismiss]');
 
-  installButton?.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
+    dismissButton?.addEventListener('click', () => {
+      writeCookie(DISMISSED_COOKIE, 'true', 30);
+      promotion?.classList.add('hidden');
+    });
 
-    promotion?.classList.add('hidden');
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice.catch(() => undefined);
-    deferredInstallPrompt = null;
-  });
+    installButton?.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+
+      promotion?.classList.add('hidden');
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice.catch(() => undefined);
+      deferredInstallPrompt = null;
+    });
+
+    // Si el prompt llego antes de esta navegacion, reevalua si mostrar el banner.
+    showPromotion();
+  };
 
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -106,6 +116,8 @@ import { t } from '@/i18n';
   window.addEventListener('appinstalled', () => {
     writeCookie(DISMISSED_COOKIE, 'true', 365);
     trackInstallEvent('install_completed');
-    promotion?.classList.add('hidden');
+    document.querySelector('[data-install-promotion]')?.classList.add('hidden');
   });
+
+  document.addEventListener('astro:page-load', init);
 </script>
