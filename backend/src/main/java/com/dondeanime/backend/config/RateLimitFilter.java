@@ -26,6 +26,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new RateLimitRule("/api/chat/search", false, 20),
             new RateLimitRule("/api/track/affiliate", false, 60),
             new RateLimitRule("/api/track/recommendation", false, 60),
+            // Tracking público de listas: mismo límite por IP que los hermanos de
+            // /api/track/* para que un anónimo no pueda inundar curated_list_metric_event
+            // ni envenenar los conteos del dashboard de afiliados.
+            new RateLimitRule("/api/track/lists/", true, 60),
             new RateLimitRule("/api/trakt/sync", false, 10),
             new RateLimitRule("/api/trakt/watched", false, 60),
             new RateLimitRule("/api/trakt/oauth/", true, 20),
