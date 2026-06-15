@@ -33,15 +33,19 @@ const { slug } = Astro.params;
 const { detail } = Astro.props as Props;
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
 const news = await getAnimeNews(slug!);
+// Las noticias aún se publican solo en español: esta página EN sirve el MISMO
+// contenido bajo lang=en, así que canonicaliza a /anime/{slug}/noticias y no
+// emite hreflang propio (mismo patrón que en/news/index). El JSON-LD enlaza a
+// los artículos por su ruta EN para no sacar al usuario del idioma.
 const pageUrl = absoluteUrl(`/anime/${slug}/noticias`);
 const description = t('news.anime.description', { title });
 const itemList = buildItemListSchema(
-  news.map((n) => ({ name: n.title, url: absoluteUrl(`/noticias/${n.slug}`) })),
+  news.map((n) => ({ name: n.title, url: absoluteUrl(`/en/news/${n.slug}`) })),
   pageUrl,
   t('news.anime.title', { title }),
 );
 ---
-<BaseLayout title={t('news.anime.title', { title })} description={description} canonical={pageUrl}>
+<BaseLayout title={t('news.anime.title', { title })} description={description} canonical={pageUrl} suppressAlternates>
   {news.length > 0 && <JsonLd slot="head" data={itemList} />}
 
   <Breadcrumbs
