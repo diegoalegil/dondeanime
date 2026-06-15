@@ -527,12 +527,17 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   );
 
   const articleLinks = page.locator('article h2 a[href^="/blog/"]');
-  await expect(articleLinks).toHaveCount(2);
+  await expect(articleLinks.first()).toBeVisible();
+  // No fijamos el conteo exacto: publicar nuevos posts no debe romper el test
+  // por dato (ver auditoria L44). Basta con que esten los posts base.
+  expect(await articleLinks.count()).toBeGreaterThanOrEqual(2);
 
-  const firstHref = await articleLinks.first().getAttribute('href');
-  expect(firstHref).toBe('/blog/guia-estrenos-anime-streaming');
+  // La guia sigue listada, sin depender del orden por fecha de publicacion.
+  await expect(
+    page.locator('article h2 a[href="/blog/guia-estrenos-anime-streaming"]'),
+  ).toHaveCount(1);
 
-  await articleLinks.first().click();
+  await page.goto('/blog/guia-estrenos-anime-streaming');
   await expect(page.getByRole('heading', { name: 'Guía para seguir estrenos de anime en streaming' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
@@ -566,10 +571,15 @@ test('blog index, article schema and RSS are generated', async ({ page, request 
   await expect(page.getByRole('heading', { name: /Blog DondeAnime/i })).toBeVisible();
 
   const englishArticleLinks = page.locator('article h2 a[href^="/en/blog/"]');
-  await expect(englishArticleLinks).toHaveCount(2);
-  expect(await englishArticleLinks.first().getAttribute('href')).toBe('/en/blog/guia-estrenos-anime-streaming');
+  await expect(englishArticleLinks.first()).toBeVisible();
+  // Conteo no fijo: publicar nuevos posts no debe romper el test (ver L44).
+  expect(await englishArticleLinks.count()).toBeGreaterThanOrEqual(2);
 
-  await englishArticleLinks.first().click();
+  await expect(
+    page.locator('article h2 a[href="/en/blog/guia-estrenos-anime-streaming"]'),
+  ).toHaveCount(1);
+
+  await page.goto('/en/blog/guia-estrenos-anime-streaming');
   await expect(page.getByRole('heading', { name: 'How to track new anime premieres on streaming' })).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
