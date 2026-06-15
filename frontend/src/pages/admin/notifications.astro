@@ -44,6 +44,10 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
           <span class="mb-1 block text-xs font-medium text-fg-secondary">Password</span>
           <input name="password" type="password" autocomplete="current-password" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
         </label>
+        <label class="hidden" data-totp-field>
+          <span class="mb-1 block text-xs font-medium text-fg-secondary">Codigo 2FA</span>
+          <input name="totpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="w-full rounded-md border border-surface-2 bg-surface-0 px-3 py-2 text-sm text-fg-primary outline-none focus:border-accent-violet" />
+        </label>
         <button type="submit" class="self-end rounded-md bg-accent-violet px-4 py-2 text-sm font-semibold text-surface-0 transition-opacity hover:opacity-90">
           Entrar
         </button>
@@ -90,6 +94,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     const tokenKey = 'dondeanime-admin-token';
     const form = document.querySelector('[data-login-form]');
     const status = document.querySelector('[data-status]');
+    const totpField = document.querySelector('[data-totp-field]');
     const list = document.querySelector('[data-subscriptions]');
     const refresh = document.querySelector('[data-refresh]');
 
@@ -102,8 +107,8 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     };
 
     const authHeaders = () => {
-      const token = sessionStorage.getItem(tokenKey);
-      return token ? { Authorization: `Basic ${token}` } : {};
+      const token = localStorage.getItem(tokenKey);
+      return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     const escapeHtml = (value) => String(value ?? '')
@@ -180,13 +185,34 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       setStatus('Datos cargados.', 'success');
     }
 
-    form?.addEventListener('submit', (event) => {
+    form?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(form);
-      sessionStorage.setItem(tokenKey, btoa(`${data.get('username') ?? ''}:${data.get('password') ?? ''}`));
-      loadStats().catch(() => {
-        sessionStorage.removeItem(tokenKey);
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: String(data.get('username') ?? ''),
+          password: String(data.get('password') ?? ''),
+          totpCode: String(data.get('totpCode') ?? ''),
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        localStorage.removeItem(tokenKey);
+        if (payload?.error === 'totp_required') {
+          totpField?.classList.remove('hidden');
+          form.querySelector('[name="totpCode"]')?.focus();
+          setStatus('Introduce el codigo de Google Authenticator.', 'danger');
+          return;
+        }
         setStatus('Credenciales incorrectas.', 'danger');
+        return;
+      }
+      localStorage.setItem(tokenKey, payload.token);
+      loadStats().catch(() => {
+        localStorage.removeItem(tokenKey);
+        setStatus('No se pudo cargar notificaciones.', 'danger');
       });
     });
 
@@ -220,7 +246,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
       }
     });
 
-    if (sessionStorage.getItem(tokenKey)) {
+    if (localStorage.getItem(tokenKey)) {
       loadStats().catch(() => setStatus('No se pudo cargar notificaciones.', 'danger'));
     } else {
       setStatus('Inicia sesion para ver notificaciones.');
