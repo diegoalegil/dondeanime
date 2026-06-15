@@ -138,6 +138,38 @@ class TraktSyncServiceTest {
     }
 
     @Test
+    void reloadsAccountBeforeSavingToAvoidClobberingRefreshedTokens() {
+        // Token caducado: fuerza el refresh, que persiste los tokens nuevos vía
+        // upsert (su propia transacción). El objeto cargado al inicio queda
+        // stale; si el save final lo usara, pisaría el token recién refrescado.
+        ExternalAccount stale = account("user-123", "old-access-token", "refresh-token");
+        stale.setTokenExpiresAt(Instant.parse("2026-05-27T11:59:30Z"));
+        ExternalAccount fresh = account("user-123", "new-access-token", "new-refresh-token");
+
+        when(accountRepository.findByProviderAndExternalUserId("trakt", "user-123"))
+                .thenReturn(Optional.of(stale))
+                .thenReturn(Optional.of(fresh));
+        when(traktClient.refreshAccessToken("refresh-token"))
+                .thenReturn(new TraktOAuthTokenResponse(
+                        "new-access-token",
+                        "new-refresh-token",
+                        "bearer",
+                        7200L,
+                        "public watched",
+                        1780000000L));
+        when(animeRepository.findAll()).thenReturn(List.of());
+        when(traktHistoryClient.fetchWatchedShows("new-access-token")).thenReturn(List.of());
+        when(traktHistoryClient.fetchRatedShows("new-access-token")).thenReturn(List.of());
+
+        service.sync("user-123");
+
+        // El save final usa la cuenta RECARGADA; la stale queda intacta.
+        verify(accountRepository).save(fresh);
+        assertThat(fresh.getLastSyncedAt()).isEqualTo("2026-05-27T12:00:00Z");
+        assertThat(stale.getLastSyncedAt()).isNull();
+    }
+
+    @Test
     void deduplicatesRepeatedShowsFromTrakt() {
         ExternalAccount account = account("user-123", "access-token", "refresh-token");
         Anime attackOnTitan = anime("Attack on Titan", "Shingeki no Kyojin", 2013, "attack-on-titan");

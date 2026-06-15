@@ -114,8 +114,17 @@ public class TraktSyncService {
             }
         }
 
-        account.setLastSyncedAt(Instant.now(clock));
-        accountRepository.save(account);
+        // Si accessTokenFor() refrescó el token, lo persistió en su propia
+        // transacción vía upsert; el objeto 'account' cargado al principio quedó
+        // con los ciphertext viejos (open-in-view=false, sync() sin transacción).
+        // Un save() de ese objeto stale pisaría el token recién refrescado, y como
+        // Trakt rota el refresh_token (single-use) la cuenta quedaría rota. Por eso
+        // releemos antes de marcar lastSyncedAt y guardar.
+        ExternalAccount accountToStamp = accountRepository
+                .findByProviderAndExternalUserId(PROVIDER, externalUserId)
+                .orElse(account);
+        accountToStamp.setLastSyncedAt(Instant.now(clock));
+        accountRepository.save(accountToStamp);
         saveSyncEvent(watchedImported, ratingsImported, unmatched.size());
 
         return new TraktSyncResponse(
