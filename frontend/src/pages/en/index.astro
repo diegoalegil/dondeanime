@@ -11,8 +11,16 @@ import { PLATFORMS, PLATFORM_SLUGS, type PlatformSlug } from '@/lib/platforms';
 import { BEST_ANIME_YEARS_DESC } from '@/lib/bestYears';
 import { setLocale, t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
+import { getCollection } from 'astro:content';
+import { isPublishedBlogPost } from '@/lib/blog';
+import FeaturedPost from '@/components/blog/FeaturedPost.astro';
 
 setLocale('en');
+
+const blogPosts = (await getCollection('blog')).filter((post) => isPublishedBlogPost(post, 'en'));
+const featuredPost =
+  blogPosts.find((post) => post.data.featured) ??
+  [...blogPosts].sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())[0];
 
 const latestNews = await getNews(6);
 
@@ -103,6 +111,8 @@ const itemListSchema = buildItemListSchema(
       />
     </div>
   </section>
+
+  {featuredPost && <FeaturedPost post={featuredPost} />}
 
   <section
     class="mx-auto max-w-6xl px-4 pb-12"
