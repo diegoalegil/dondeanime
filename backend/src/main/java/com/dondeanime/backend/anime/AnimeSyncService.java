@@ -51,7 +51,10 @@ import com.dondeanime.backend.studio.StudioRepository;
 @Service
 public class AnimeSyncService {
 
-    public static final int MAX_POPULAR_SYNC_COUNT = 1000;
+    // Tope de anime a sincronizar desde AniList (top por popularidad). Subir este
+    // numero agranda el catalogo; surte efecto al redeplegar el backend y correr
+    // un sync. Mas alto = catalogo mayor pero build/sync mas largos.
+    public static final int MAX_POPULAR_SYNC_COUNT = 3000;
 
     private static final Logger log = LoggerFactory.getLogger(AnimeSyncService.class);
 
