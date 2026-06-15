@@ -37,7 +37,7 @@ const rows: Array<{ label: string; value: string; mono?: boolean }> = [
 </section>
 {studios.length > 0 && (
   <section class="mx-auto max-w-6xl px-4 pb-8">
-    <h2 class="mb-4 text-lg font-semibold text-fg-primary">Estudios</h2>
+    <h2 class="mb-4 text-lg font-semibold text-fg-primary">{t('anime.meta.studios')}</h2>
     <div class="flex flex-wrap gap-2">
       {studios.map((studio) => (
         <a

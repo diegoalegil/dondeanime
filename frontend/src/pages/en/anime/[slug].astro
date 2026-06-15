@@ -67,5 +67,5 @@ const tvSchema = buildTVSeriesSchema(detail.anime, uniqueProviders, pageUrl);
   />
   <MetaList anime={detail.anime} />
 
-  <NewsLatest items={animeNews} heading={t('news.anime.heading')} viewAllHref={`/anime/${slug}/noticias`} />
+  <NewsLatest items={animeNews} heading={t('news.anime.heading')} viewAllHref={localizedPath(`/anime/${slug}/noticias`)} />
 </BaseLayout>
