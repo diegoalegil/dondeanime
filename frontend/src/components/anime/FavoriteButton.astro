@@ -1,0 +1,88 @@
+---
+import { t } from '@/i18n';
+import { formatType } from '@/lib/format';
+
+interface Props {
+  slug: string;
+  title: string;
+  image: string;
+  score: number | null;
+  format: string | null;
+  year: number | null;
+  /** En la ficha = true: además de favorito, registra "visto recientemente". */
+  track?: boolean;
+}
+
+const { slug, title, image, score, format, year, track = false } = Astro.props;
+const meta = `${year ?? '---'} · ${formatType(format)}`;
+const payload = JSON.stringify({ slug, title, image, score, meta });
+const addLabel = t('library.favorite.add');
+const addedLabel = t('library.favorite.added');
+---
+<button
+  type="button"
+  data-fav-toggle
+  data-fav-payload={payload}
+  data-fav-track={track ? 'true' : undefined}
+  data-label-add={addLabel}
+  data-label-added={addedLabel}
+  aria-pressed="false"
+  class="inline-flex items-center gap-2 rounded-md border border-surface-2 bg-surface-1 px-4 py-2.5 text-sm font-semibold text-fg-secondary transition-colors hover:border-accent-pink/50 hover:text-fg-primary aria-pressed:border-accent-pink/60 aria-pressed:text-accent-pink"
+>
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="h-4 w-4">
+    <path d="M12 21s-7.4-4.6-10-9.3C.6 8.9 1.7 5.6 4.6 4.7 6.6 4.1 8.7 4.8 12 8c3.3-3.2 5.4-3.9 7.4-3.3 2.9.9 4 4.2 2.6 7C19.4 16.4 12 21 12 21z" />
+  </svg>
+  <span data-fav-label>{addLabel}</span>
+</button>
+<script>
+  import {
+    isFavorite,
+    toggleFavorite,
+    recordRecent,
+    LIBRARY_CHANGE_EVENT,
+  } from '../../lib/personalLibrary';
+
+  const parsePayload = (btn: HTMLElement) => {
+    try {
+      return JSON.parse(btn.dataset.favPayload || 'null');
+    } catch {
+      return null;
+    }
+  };
+
+  const paint = (btn: HTMLElement) => {
+    const item = parsePayload(btn);
+    if (!item) return;
+    const on = isFavorite(item.slug);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const label = btn.querySelector('[data-fav-label]');
+    if (label) {
+      label.textContent = on ? btn.dataset.labelAdded ?? '' : btn.dataset.labelAdd ?? '';
+    }
+  };
+
+  const init = () => {
+    document.querySelectorAll<HTMLElement>('[data-fav-toggle]').forEach((btn) => {
+      const item = parsePayload(btn);
+      if (!item) return;
+      if (btn.dataset.favTrack === 'true') recordRecent(item);
+      paint(btn);
+      if (btn.dataset.favBound === 'true') return;
+      btn.dataset.favBound = 'true';
+      btn.addEventListener('click', () => {
+        toggleFavorite(item);
+        document.querySelectorAll<HTMLElement>('[data-fav-toggle]').forEach((other) => {
+          const otherItem = parsePayload(other);
+          if (otherItem && otherItem.slug === item.slug) paint(other);
+        });
+      });
+    });
+  };
+
+  // La biblioteca puede cambiar desde otra pestaña/sección: re-pintamos al vuelo.
+  window.addEventListener(LIBRARY_CHANGE_EVENT, () => {
+    document.querySelectorAll<HTMLElement>('[data-fav-toggle]').forEach(paint);
+  });
+
+  document.addEventListener('astro:page-load', init);
+</script>

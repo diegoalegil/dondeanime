@@ -23,6 +23,16 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
     </nav>
     <div class="flex items-center gap-3">
       <SearchBox />
+      <a
+        href={localizedPath('/mi-lista')}
+        aria-label={t('library.nav')}
+        title={t('library.nav')}
+        class="inline-flex h-9 w-9 items-center justify-center rounded-md text-fg-secondary transition-colors hover:text-accent-pink"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="h-5 w-5">
+          <path d="M12 21s-7.4-4.6-10-9.3C.6 8.9 1.7 5.6 4.6 4.7 6.6 4.1 8.7 4.8 12 8c3.3-3.2 5.4-3.9 7.4-3.3 2.9.9 4 4.2 2.6 7C19.4 16.4 12 21 12 21z" />
+        </svg>
+      </a>
       {showLanguageSwitcher && <LanguageSwitcher />}
       <ThemeToggle />
     </div>
