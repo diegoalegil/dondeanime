@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { absoluteUrl } from '@/lib/seo';
 import { setLocale } from '@/i18n';
+import { localizedPath } from '@/lib/localizedRoutes';
 
 setLocale('en');
 
@@ -21,8 +22,8 @@ const stripeMode = publishableKey.startsWith('pk_live_')
 >
   <Breadcrumbs
     items={[
-      { name: 'Home', url: '/' },
-      { name: 'Premium', url: '/premium' },
+      { name: 'Home', url: localizedPath('/') },
+      { name: 'Premium', url: localizedPath('/premium') },
     ]}
   />
 
