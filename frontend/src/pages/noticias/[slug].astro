@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getNewsBySlug, getNewsSlugs } from '@/lib/api';
 import { absoluteUrl, buildNewsArticleSchema } from '@/lib/seo';
+import { sanitizeHtml } from '@/lib/sanitizeHtml';
 import { setLocale, getLocale, t } from '@/i18n';
 
 setLocale('es');
@@ -73,7 +74,7 @@ const metaDescription = item.metaDescription ?? item.summary ?? item.title;
     )}
 
     {item.body && (
-      <div class="news-content mt-8 border-t border-surface-2 pt-8 text-fg-secondary" set:html={item.body} />
+      <div class="news-content mt-8 border-t border-surface-2 pt-8 text-fg-secondary" set:html={sanitizeHtml(item.body)} />
     )}
 
     <p class="mt-10 border-t border-surface-2 pt-6 text-sm">

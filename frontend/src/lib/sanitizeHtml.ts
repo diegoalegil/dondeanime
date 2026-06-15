@@ -4,7 +4,10 @@
 // almacenado: descarta <script>, atributos (onerror, href=javascript:) y
 // cualquier etiqueta fuera de la lista de formato básico.
 
-const ALLOWED_TAGS = new Set(['b', 'i', 'em', 'strong', 'br', 'p', 'ul', 'ol', 'li', 'span']);
+// h2/h3 entran porque los bodies editoriales de noticias los usan (el CSS de
+// .news-content ya estiliza h2); son etiquetas sin atributos, así que el modelo
+// "sin atributos" sigue cerrando el XSS.
+const ALLOWED_TAGS = new Set(['b', 'i', 'em', 'strong', 'br', 'p', 'ul', 'ol', 'li', 'span', 'h2', 'h3']);
 
 export function sanitizeHtml(input: string | null | undefined): string {
   if (!input) return '';
