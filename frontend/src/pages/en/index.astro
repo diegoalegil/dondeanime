@@ -104,6 +104,29 @@ const itemListSchema = buildItemListSchema(
     </div>
   </section>
 
+  <section
+    class="mx-auto max-w-6xl px-4 pb-12"
+    data-home-library
+    hidden
+    data-anime-prefix={localizedPath('/anime')}
+    data-title-favorites={t('library.home.favorites')}
+    data-title-recent={t('library.recent.title')}
+  >
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="text-2xl font-semibold" data-home-library-title>{t('library.home.favorites')}</h2>
+      <a
+        href={localizedPath('/mi-lista')}
+        class="text-sm text-accent-violet transition-colors hover:text-fg-primary"
+      >
+        {t('library.home.viewAll')} →
+      </a>
+    </div>
+    <div
+      class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6"
+      data-home-library-grid
+    ></div>
+  </section>
+
   <section class="mx-auto max-w-6xl px-4 pb-12">
     <div class="mb-5 flex items-baseline justify-between">
       <h2 class="text-2xl font-semibold">{t('home.trending')}</h2>
@@ -241,3 +264,24 @@ const itemListSchema = buildItemListSchema(
     </div>
   </section>
 </BaseLayout>
+<script>
+  import { getFavorites, getRecent, renderLibraryCard, LIBRARY_CHANGE_EVENT } from '../../lib/personalLibrary';
+
+  const render = () => {
+    const root = document.querySelector<HTMLElement>('[data-home-library]');
+    if (!root) return;
+    const prefix = root.dataset.animePrefix || '/en/anime';
+    const favorites = getFavorites();
+    const recent = getRecent();
+    const items = favorites.length ? favorites.slice(0, 12) : recent.slice(0, 12);
+    const title = favorites.length ? root.dataset.titleFavorites : root.dataset.titleRecent;
+    const grid = root.querySelector('[data-home-library-grid]');
+    const heading = root.querySelector('[data-home-library-title]');
+    if (heading) heading.textContent = title ?? '';
+    if (grid) grid.replaceChildren(...items.map((item) => renderLibraryCard(item, prefix)));
+    root.toggleAttribute('hidden', items.length === 0);
+  };
+
+  document.addEventListener('astro:page-load', render);
+  window.addEventListener(LIBRARY_CHANGE_EVENT, render);
+</script>

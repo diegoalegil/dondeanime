@@ -151,6 +151,8 @@
   "library.recent.title": "Recently viewed",
   "library.favorite.add": "Add to my list",
   "library.favorite.added": "In your list",
+  "library.home.favorites": "Your list",
+  "library.home.viewAll": "View all",
   "airing.eyebrow": "Airing now",
   "airing.heading.prefix": "Anime",
   "airing.heading.highlight": "airing right now",
