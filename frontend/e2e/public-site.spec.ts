@@ -475,11 +475,14 @@ test('offline page and service worker are generated', async ({ request }) => {
   expect(serviceWorkerText).toContain("const OFFLINE_URL = '/offline'");
   expect(serviceWorkerText).toContain('const MAX_CACHED_ANIME_PAGES = 12');
   expect(serviceWorkerText).toContain("const ASSET_CACHE = 'dondeanime-assets-v2'");
-  expect(serviceWorkerText).toContain("const IMAGE_CACHE = 'dondeanime-images-v2'");
+  expect(serviceWorkerText).toContain("const IMAGE_CACHE = 'dondeanime-images-v3'");
   expect(serviceWorkerText).toContain('const MAX_CACHED_IMAGES = 120');
   expect(serviceWorkerText).toContain('const ANIME_PAGE_PATTERN');
   expect(serviceWorkerText).toContain("request.destination === 'image'");
-  expect(serviceWorkerText).toContain('allowOpaque: true');
+  // Las portadas cross-origin (AniList/TMDb) NO se cachean en el SW: guardar su
+  // respuesta opaca envenenaba la cache (un 429/bloqueo se servia roto en bucle).
+  expect(serviceWorkerText).toContain('cacheFirst(IMAGE_CACHE, request, MAX_CACHED_IMAGES)');
+  expect(serviceWorkerText).not.toContain('allowOpaque: true');
   expect(serviceWorkerText).toContain("request.mode === 'navigate'");
   // HTML en navegación suave (ClientRouter) = network-first, no cache-first.
   expect(serviceWorkerText).toContain("accept.includes('text/html')");

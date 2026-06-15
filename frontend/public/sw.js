@@ -3,7 +3,7 @@
 const PAGE_CACHE = 'dondeanime-pages-v2';
 const STATIC_CACHE = 'dondeanime-static-v2';
 const ASSET_CACHE = 'dondeanime-assets-v2';
-const IMAGE_CACHE = 'dondeanime-images-v2';
+const IMAGE_CACHE = 'dondeanime-images-v3';
 const OFFLINE_URL = '/offline';
 const MAX_CACHED_ANIME_PAGES = 12;
 const MAX_CACHED_ASSETS = 80;
@@ -192,7 +192,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (request.destination === 'image') {
-    event.respondWith(cacheFirst(IMAGE_CACHE, request, MAX_CACHED_IMAGES, { allowOpaque: true }));
+    // Solo cacheamos imágenes propias (mismo origen: mascota, badges, OG...).
+    // Las portadas de AniList/TMDb son cross-origin y vuelven como respuestas
+    // OPACAS (status 0 oculto): un fallo transitorio (429 de throttle de AniList,
+    // un bloqueador del cliente) se guardaría indistinguible de un 200 y
+    // cacheFirst lo serviría roto en bucle hasta subir la versión de la cache.
+    // Las dejamos al navegador (su cache HTTP + el onerror/placeholder del <img>).
+    if (url.origin === self.location.origin) {
+      event.respondWith(cacheFirst(IMAGE_CACHE, request, MAX_CACHED_IMAGES));
+    }
     return;
   }
 
