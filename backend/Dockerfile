@@ -14,7 +14,7 @@
 # ============================================================
 
 # --- STAGE 1: BUILDER ---
-FROM eclipse-temurin:21-jdk AS builder
+FROM eclipse-temurin:25-jdk AS builder
 
 # El wrapper de Maven valida distributionSha256Sum contra el .zip; sin unzip
 # cambia solo al .tar.gz y el checksum (calculado para el .zip) no casa.
@@ -40,7 +40,7 @@ COPY src/ src/
 RUN ./mvnw clean package -DskipTests -B
 
 # --- STAGE 2: RUNTIME ---
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
