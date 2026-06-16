@@ -15,6 +15,7 @@ import type { AnimeDetail } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
 import { filterVisibleProviders } from '@/lib/platforms';
 import { buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
+import { buildAnimeImageUrl, buildAnimeImageSrcset, canOptimizeAnimeImage, HERO_COVER_SIZES } from '@/lib/images';
 import { setLocale, t } from '@/i18n';
 import { canonicalCountrySlug, localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
 
@@ -72,6 +73,13 @@ const canonicalOverride = hasProviders ? undefined : absoluteUrl(localizedPath(`
 // señales contradictorias (schema en una URL, canonical en otra).
 const pageUrl = canonicalOverride ?? absoluteUrl(`/anime/${slug}/${countrySlug}`);
 const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
+
+// Preload de la portada del hero (LCP): mismos src/srcset/sizes que AnimeHero,
+// igual que en la ficha base, para que la variante por país no pierda LCP.
+const heroCover = detail.anime.coverImage;
+const canPreloadHero = !!heroCover && canOptimizeAnimeImage(heroCover);
+const heroPreloadSrc = heroCover ? buildAnimeImageUrl(heroCover, 1) : undefined;
+const heroPreloadSrcset = heroCover ? buildAnimeImageSrcset(heroCover) : undefined;
 ---
 <BaseLayout
   title={seoTitle}
@@ -83,6 +91,17 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
   locale={country.hreflang.replace('-', '_')}
 >
   <JsonLd slot="head" data={tvSchema} />
+  {canPreloadHero && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      href={heroPreloadSrc}
+      imagesrcset={heroPreloadSrcset}
+      imagesizes={HERO_COVER_SIZES}
+      fetchpriority="high"
+    />
+  )}
 
   <Breadcrumbs
     items={[
