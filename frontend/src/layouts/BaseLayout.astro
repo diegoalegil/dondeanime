@@ -8,7 +8,7 @@ import AffiliateTrackingScript from '@/components/analytics/AffiliateTrackingScr
 import SkeletonRow from '@/components/ui/SkeletonRow.astro';
 import InstallPromotion from '@/components/pwa/InstallPromotion.astro';
 import { localeFromPath, setLocale, t } from '@/i18n';
-import { localizedPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
+import { localizedEnPath, spanishPathFromLocalized } from '@/lib/localizedRoutes';
 import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 
 interface Props {
@@ -27,9 +27,14 @@ const activeLocale = localeFromPath(Astro.url.pathname);
 setLocale(activeLocale);
 const publicLanguageRoute = !Astro.url.pathname.startsWith('/admin') && !Astro.url.pathname.startsWith('/api');
 const spanishPath = spanishPathFromLocalized(Astro.url.pathname);
+// Para el redirect por preferencia de idioma usamos localizedEnPath (devuelve
+// null si la pagina inglesa NO existe), NO localizedPath (que inventa un
+// /en/... de respaldo). Asi un usuario con cookie EN en una pagina solo-ES
+// (p.ej. /buscar) se queda donde esta en vez de ser rebotado a /en/buscar -> 404.
+const englishPath = localizedEnPath(spanishPath);
 const languageRoutes = {
   es: spanishPath,
-  en: localizedPath(spanishPath, 'en'),
+  en: englishPath ?? spanishPath,
 };
 const plausibleEnabled = import.meta.env.PUBLIC_PLAUSIBLE_ENABLED === 'true';
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? 'dondeanime.com';
