@@ -116,4 +116,17 @@ public class AnimeAdminController {
     public ResponseEntity<RematchMoviesResponse> rematchMovies() {
         return ResponseEntity.ok(new RematchMoviesResponse(matchingService.rematchMovies()));
     }
+
+    /**
+     * Re-match de todo el catálogo aplicando solo los cambios en los que el
+     * matcher está seguro (deja intactos los matches que solo cambiarían por el
+     * respaldo por popularidad). Por seguridad NO guarda nada por defecto:
+     * {@code ?apply=true} es obligatorio para persistir. Operación larga (una
+     * búsqueda TMDb por anime); el resumen queda en logs.
+     */
+    @PostMapping("/matching/rematch-confident")
+    public ResponseEntity<AnimeMatchingService.RematchConfidentReport> rematchConfident(
+            @RequestParam(defaultValue = "false") boolean apply) {
+        return ResponseEntity.ok(matchingService.rematchConfident(apply));
+    }
 }

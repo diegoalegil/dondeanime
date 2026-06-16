@@ -376,6 +376,79 @@ class AnimeMatchingServiceTest {
         verify(repo, never()).save(any());
     }
 
+    // --- rematch confiado (solo cambios del matcher, nunca del fallback) ---
+
+    @Test
+    void rematchConfidentAppliesMatcherConfidentChange() {
+        Anime anime = anime(1L, "Steins;Gate", 2011);
+        anime.setTmdbId(111L); // id heredado equivocado
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(tvResult(222L, "Steins;Gate", "JP", "2011-04-06", 5.0)), 1, 1));
+
+        AnimeMatchingService.RematchConfidentReport report =
+                service(client, repo).rematchConfident(true);
+
+        assertThat(report.changed()).isEqualTo(1);
+        assertThat(report.changes()).singleElement().satisfies(c -> {
+            assertThat(c.slug()).isEqualTo("steinsgate");
+            assertThat(c.currentTmdbId()).isEqualTo(111L);
+            assertThat(c.proposedTmdbId()).isEqualTo(222L);
+        });
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture());
+        assertThat(captor.getValue().getTmdbId()).isEqualTo(222L);
+    }
+
+    @Test
+    void rematchConfidentNeverLetsFallbackOverwriteExistingId() {
+        // Títulos de relleno => el matcher NO confía => entra el respaldo por
+        // popularidad. Ese es justo el caso 'erased': preservamos el id actual.
+        Anime anime = anime(1L, "Some Anime", 2010);
+        anime.setTmdbId(999L); // id correcto que NO se debe pisar
+
+        TmdbSearchResult fillerA = result(1L, "JP", "2020-01-01", 10.0);
+        TmdbSearchResult fillerB = result(2L, "JP", "2022-01-01", 50.0);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(
+                new TmdbSearchResponse(1, List.of(fillerA, fillerB), 2, 1));
+
+        AnimeMatchingService.RematchConfidentReport report =
+                service(client, repo).rematchConfident(true);
+
+        assertThat(report.changed()).isZero();
+        assertThat(report.skipped()).isEqualTo(1);
+        verify(repo, never()).save(any());
+        assertThat(anime.getTmdbId()).isEqualTo(999L);
+    }
+
+    @Test
+    void rematchConfidentPreviewDoesNotSave() {
+        Anime anime = anime(1L, "Steins;Gate", 2011);
+        anime.setTmdbId(111L);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(anime));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(tvResult(222L, "Steins;Gate", "JP", "2011-04-06", 5.0)), 1, 1));
+
+        AnimeMatchingService.RematchConfidentReport report =
+                service(client, repo).rematchConfident(false);
+
+        assertThat(report.applied()).isFalse();
+        assertThat(report.changed()).isEqualTo(1);
+        assertThat(report.changes()).hasSize(1);
+        verify(repo, never()).save(any());
+        assertThat(anime.getTmdbId()).isEqualTo(111L); // sin tocar
+    }
+
     // --- helpers ---
 
     private static Anime anime(long id, String titleEnglish, int startYear) {

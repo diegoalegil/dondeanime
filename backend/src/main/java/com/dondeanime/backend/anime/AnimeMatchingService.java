@@ -154,6 +154,63 @@ public class AnimeMatchingService {
     }
 
     /**
+     * Re-matchea todo el catálogo pero SOLO aplica el cambio cuando el matcher
+     * está seguro ({@code source == MATCHER}, es decir EXACT_MATCH o
+     * HIGH_CONFIDENCE). Corrige matches heredados de la heurística vieja (p.ej.
+     * varias temporadas de un anime compartiendo el id equivocado) sin el
+     * peligro de un re-match general: el respaldo por popularidad (baja
+     * confianza) NUNCA pisa un id existente, así que matches correctos cuyo
+     * único candidato nuevo es un fallback dudoso (caso real: {@code erased})
+     * se quedan como están.
+     *
+     * <p>Por defecto NO guarda: {@code apply=false} devuelve la lista de cambios
+     * que haría para revisarlos antes. Con {@code apply=true} los persiste.
+     * Igual de costoso que el dry-run (una búsqueda TMDb por anime).
+     */
+    public RematchConfidentReport rematchConfident(boolean apply) {
+        List<Anime> animes = repository.findAllWithSynonyms();
+        log.info("Re-match confiado iniciado (apply={}): {} anime", apply, animes.size());
+
+        int changed = 0;
+        int unchanged = 0;
+        int skipped = 0;
+        List<RematchConfidentChange> changes = new ArrayList<>();
+
+        for (Anime a : animes) {
+            Long current = a.getTmdbId();
+            Resolution resolution;
+            try {
+                resolution = resolve(a);
+            } catch (Exception e) {
+                log.error("Re-match confiado error slug={}: {}", a.getSlug(), e.getMessage());
+                continue;
+            }
+
+            boolean confident = resolution.source() == MatchSource.MATCHER && resolution.tmdbId() != null;
+            if (!confident) {
+                // Respaldo por popularidad o sin match: preservamos el id actual.
+                skipped++;
+            } else if (Objects.equals(current, resolution.tmdbId())) {
+                unchanged++;
+            } else {
+                changes.add(new RematchConfidentChange(a.getSlug(), current, resolution.tmdbId(),
+                        resolution.decision(), resolution.score()));
+                if (apply) {
+                    a.setTmdbId(resolution.tmdbId());
+                    repository.save(a);
+                }
+                changed++;
+            }
+            sleep(RATE_LIMIT_SLEEP_MS);
+        }
+
+        log.info("Re-match confiado completado (apply={}): {} {}, {} sin cambio, "
+                        + "{} respaldo/sin match (id conservado)",
+                apply, changed, apply ? "aplicados" : "propuestos", unchanged, skipped);
+        return new RematchConfidentReport(animes.size(), apply, changed, unchanged, skipped, changes);
+    }
+
+    /**
      * Recorre todos los anime y calcula qué tmdbId propondría el matcher SIN
      * guardar nada. Sirve para validar el cambio comparando contra los tmdbId
      * actuales antes de activarlo. Igual de costoso que matchAll (una búsqueda
@@ -383,4 +440,15 @@ public class AnimeMatchingService {
     }
 
     public record RematchResult(String slug, boolean matched) {}
+
+    /** Un cambio que el re-match confiado aplicaría (o aplicó). */
+    public record RematchConfidentChange(String slug, Long currentTmdbId, Long proposedTmdbId,
+                                         MatchDecision decision, double score) {}
+
+    /**
+     * Informe del re-match confiado. {@code applied=false} = solo preview.
+     * {@code changes} lista cada cambio (actual → propuesto) para revisarlo.
+     */
+    public record RematchConfidentReport(int total, boolean applied, int changed, int unchanged,
+                                         int skipped, List<RematchConfidentChange> changes) {}
 }
