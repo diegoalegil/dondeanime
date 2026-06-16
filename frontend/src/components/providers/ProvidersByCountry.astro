@@ -40,12 +40,14 @@ const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
             <CountryFlag country={country} />
             <h3 class="text-base font-semibold text-fg-primary">{localizedCountryName(slug)}</h3>
           </div>
-          <a
-            href={localizedPath(`/anime/${animeSlug}/${slug}`)}
-            class="text-xs text-fg-muted transition-colors hover:text-accent-violet"
-          >
-            {t('anime.providers.viewMore')}
-          </a>
+          {providers.length > 0 && (
+            <a
+              href={localizedPath(`/anime/${animeSlug}/${slug}`)}
+              class="text-xs text-fg-muted transition-colors hover:text-accent-violet"
+            >
+              {t('anime.providers.viewMore')}
+            </a>
+          )}
         </header>
         {providers.length === 0 ? (
           <p class="text-sm text-fg-muted">{t('anime.providers.notAvailable')}</p>

@@ -92,7 +92,7 @@ const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
     ]}
   />
   <AnimeHero anime={detail.anime} />
-  <CountrySwitcher animeSlug={slug!} activeCountry={countrySlug} />
+  <CountrySwitcher animeSlug={slug!} activeCountry={countrySlug} availableCountries={availableInCountries} />
 
   {hasProviders ? (
     <section class="mx-auto max-w-6xl px-4 py-8">

@@ -7,9 +7,10 @@ import CountryFlag from '@/components/ui/CountryFlag.astro';
 interface Props {
   animeSlug: string;
   activeCountry: CountrySlug;
+  availableCountries?: CountrySlug[];
 }
 
-const { animeSlug, activeCountry } = Astro.props;
+const { animeSlug, activeCountry, availableCountries = [] } = Astro.props;
 ---
 <nav class="mx-auto max-w-6xl px-4 pt-2 pb-6">
   <div class="flex items-center gap-2 overflow-x-auto">
@@ -18,22 +19,27 @@ const { animeSlug, activeCountry } = Astro.props;
       {COUNTRY_SLUGS.map((slug) => {
         const country = COUNTRIES[slug];
         const isActive = slug === activeCountry;
+        // Solo enlazamos países con providers: enlazar páginas país sin streaming
+        // (thin, canonicalizan a la ficha base) gasta crawl budget en balde.
+        const isLinkable = !isActive && availableCountries.includes(slug);
         const baseClass = "flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors";
         const stateClass = isActive
           ? "bg-accent-violet/15 text-accent-violet"
-          : "border border-surface-2 text-fg-secondary hover:border-accent-violet/40 hover:text-fg-primary";
+          : isLinkable
+            ? "border border-surface-2 text-fg-secondary hover:border-accent-violet/40 hover:text-fg-primary"
+            : "border border-surface-2/50 text-fg-muted";
         return (
           <Fragment>
-            {isActive ? (
-              <span class={`${baseClass} ${stateClass}`} aria-current="page">
-                <CountryFlag country={country} />
-                {localizedCountryName(slug)}
-              </span>
-            ) : (
+            {isLinkable ? (
               <a href={localizedPath(`/anime/${animeSlug}/${slug}`)} class={`${baseClass} ${stateClass}`}>
                 <CountryFlag country={country} />
                 {localizedCountryName(slug)}
               </a>
+            ) : (
+              <span class={`${baseClass} ${stateClass}`} aria-current={isActive ? "page" : undefined}>
+                <CountryFlag country={country} />
+                {localizedCountryName(slug)}
+              </span>
             )}
           </Fragment>
         );
