@@ -82,7 +82,12 @@ const itemListSchema = buildItemListSchema(
   t('combo.schema.name', { genre: genreName, platform: platformName }),
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-disponibilidad.png')}>
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  image={absoluteUrl('/og-disponibilidad.png')}
+  noindex={anime.length === 0}
+>
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs
