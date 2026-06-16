@@ -103,6 +103,57 @@ public class AnimeMatchingService {
     }
 
     /**
+     * Re-matchea SOLO los anime de formato MOVIE. Corrige un problema de datos
+     * heredado: las películas matcheadas con la lógica antigua (que solo miraba
+     * series) guardaron un tmdbId del espacio TV, y por eso
+     * {@code /movie/{idTV}/watch/providers} devuelve 404. Al re-resolver,
+     * {@link #resolve} prioriza películas para formato MOVIE, así que obtienen
+     * un id del espacio película. No toca series.
+     *
+     * <p>Seguro frente a fallos puntuales de TMDb: si una película no resuelve a
+     * nada, conserva su id actual en vez de borrarlo (a diferencia de
+     * {@link #rematch}, pensado para un único slug bajo supervisión). Igual de
+     * costoso que matchAll por película (una búsqueda + rate limit cada una),
+     * pero solo recorre las películas.
+     *
+     * @return número de películas cuyo tmdbId cambió
+     */
+    public int rematchMovies() {
+        List<Anime> movies = repository.findAllWithSynonyms().stream()
+                .filter(AnimeMatchingService::isMovieFormat)
+                .toList();
+        log.info("Re-match películas iniciado: {} anime de formato MOVIE", movies.size());
+
+        int updated = 0;
+        int unchanged = 0;
+        int kept = 0;
+        for (Anime a : movies) {
+            Long current = a.getTmdbId();
+            Long proposed;
+            try {
+                proposed = findTmdbId(a);
+            } catch (Exception e) {
+                log.error("Re-match película error slug={}: {}", a.getSlug(), e.getMessage());
+                continue;
+            }
+            if (proposed == null) {
+                kept++;
+            } else if (Objects.equals(current, proposed)) {
+                unchanged++;
+            } else {
+                a.setTmdbId(proposed);
+                repository.save(a);
+                updated++;
+            }
+            sleep(RATE_LIMIT_SLEEP_MS);
+        }
+
+        log.info("Re-match películas completado: {} actualizadas, {} sin cambio, {} sin match (id conservado)",
+                updated, unchanged, kept);
+        return updated;
+    }
+
+    /**
      * Recorre todos los anime y calcula qué tmdbId propondría el matcher SIN
      * guardar nada. Sirve para validar el cambio comparando contra los tmdbId
      * actuales antes de activarlo. Igual de costoso que matchAll (una búsqueda

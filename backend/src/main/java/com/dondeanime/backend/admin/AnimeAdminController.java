@@ -105,4 +105,15 @@ public class AnimeAdminController {
     public ResponseEntity<AnimeMatchingService.DryRunReport> dryRunMatching() {
         return ResponseEntity.ok(matchingService.dryRunMatchAll());
     }
+
+    /**
+     * Re-matchea solo las películas para corregir tmdbId heredados del espacio
+     * TV (causaban 404 en {@code /movie/{id}/watch/providers}). No toca series.
+     * Operación larga (una búsqueda TMDb por película) pero mucho más corta que
+     * el dry-run completo; el resumen queda en logs.
+     */
+    @PostMapping("/matching/rematch-movies")
+    public ResponseEntity<RematchMoviesResponse> rematchMovies() {
+        return ResponseEntity.ok(new RematchMoviesResponse(matchingService.rematchMovies()));
+    }
 }

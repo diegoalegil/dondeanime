@@ -315,6 +315,67 @@ class AnimeMatchingServiceTest {
         verify(repo, never()).save(any());
     }
 
+    // --- rematch solo películas (arreglo de tmdbId TV heredados) ---
+
+    @Test
+    void rematchMoviesReplacesStaleTvIdWithMovieIdAndLeavesSeriesUntouched() {
+        Anime series = anime(1L, "Some Series", 2020); // formato null => no es película
+        series.setTmdbId(111L);
+        Anime movie = anime(2L, "A Silent Voice", 2016);
+        movie.setFormat("MOVIE");
+        movie.setTmdbId(999L); // id del espacio TV heredado (404 en /movie)
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(series, movie));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(movieResult(42L, "A Silent Voice", "2016-09-17", 5.0)), 1, 1));
+
+        int updated = service(client, repo).rematchMovies();
+
+        assertThat(updated).isEqualTo(1);
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture()); // solo la película, nunca la serie
+        assertThat(captor.getValue().getSlug()).isEqualTo("a-silent-voice");
+        assertThat(captor.getValue().getTmdbId()).isEqualTo(42L);
+    }
+
+    @Test
+    void rematchMoviesKeepsCurrentIdWhenNoMovieResolves() {
+        Anime movie = anime(1L, "Unknown Film", 2020);
+        movie.setFormat("MOVIE");
+        movie.setTmdbId(999L);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(movie));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(1, List.of(), 0, 0));
+
+        int updated = service(client, repo).rematchMovies();
+
+        assertThat(updated).isZero();
+        verify(repo, never()).save(any()); // no nullificamos un id que podría servir
+        assertThat(movie.getTmdbId()).isEqualTo(999L);
+    }
+
+    @Test
+    void rematchMoviesDoesNotSaveWhenProposedIdEqualsCurrent() {
+        Anime movie = anime(1L, "A Silent Voice", 2016);
+        movie.setFormat("MOVIE");
+        movie.setTmdbId(42L); // ya correcto
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(movie));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(movieResult(42L, "A Silent Voice", "2016-09-17", 5.0)), 1, 1));
+
+        int updated = service(client, repo).rematchMovies();
+
+        assertThat(updated).isZero();
+        verify(repo, never()).save(any());
+    }
+
     // --- helpers ---
 
     private static Anime anime(long id, String titleEnglish, int startYear) {
