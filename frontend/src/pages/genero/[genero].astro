@@ -3,9 +3,11 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnimeGrid from '@/components/anime/AnimeGrid.astro';
 import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { getGenres, getAnimeByGenre, requireNonEmpty } from '@/lib/api';
+import { getGenres, getAnimeByGenre, getProviders, requireNonEmpty } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { localizedGenreName } from '@/lib/genres';
+import { getPlatform, isHiddenVariant } from '@/lib/platforms';
+import { localizedPath } from '@/lib/localizedRoutes';
 import { setLocale, t } from '@/i18n';
 
 setLocale('es');
@@ -41,6 +43,15 @@ const itemListSchema = buildItemListSchema(
   pageUrl,
   t('genre.schema.name', { genre: genreLabel }),
 );
+
+// Combos género×plataforma: enlazamos SOLO los que existen. El combo se genera
+// para top-7 géneros × top-5 providers (ver anime/[genero]/en/[plataforma]);
+// replicamos esa MISMA lógica (mismas llamadas, mismo build) para no crear
+// enlaces a páginas inexistentes (404).
+const isComboGenre = (await getGenres()).slice(0, 7).some((g) => g.slug === genero);
+const comboProviders = isComboGenre
+  ? (await getProviders()).filter((p) => !isHiddenVariant(p.slug)).slice(0, 5)
+  : [];
 ---
 <BaseLayout title={seoTitle} description={seoDescription} image={absoluteUrl('/og-genero.png')}>
   <JsonLd slot="head" data={itemListSchema} />
@@ -72,4 +83,22 @@ const itemListSchema = buildItemListSchema(
       <AnimeGrid anime={anime} />
     )}
   </section>
+
+  {comboProviders.length > 0 && (
+    <section class="mx-auto max-w-6xl border-t border-surface-2 px-4 pt-10 pb-20">
+      <h2 class="text-2xl font-semibold tracking-tight">{t('genre.byPlatform.heading', { genre: genreLabel })}</h2>
+      <ul class="mt-5 flex flex-wrap gap-2">
+        {comboProviders.map((p) => (
+          <li>
+            <a
+              href={localizedPath(`/anime/${genero}/en/${p.slug}`)}
+              class="inline-flex rounded-full border border-surface-2 bg-surface-1 px-3 py-1.5 text-sm text-fg-secondary transition-colors hover:border-accent-violet/60 hover:text-fg-primary"
+            >
+              {t('genre.byPlatform.cta', { genre: genreLabel, platform: getPlatform(p.slug)?.name ?? p.providerName })}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 </BaseLayout>
