@@ -2,6 +2,10 @@ import { formatStudioName, studioSlug } from './programmaticSeo';
 
 const API_URL = import.meta.env.PUBLIC_DATA_API_URL ?? import.meta.env.PUBLIC_API_URL;
 const JSON_CACHE = new Map<string, Promise<unknown>>();
+// Centinela para cachear respuestas 404 en fetchJsonAllowing404 sin confundirlas
+// con un valor real. Sus entradas van bajo clave namespaced (allow404:) para no
+// colisionar con fetchJson/fetchJsonSafe, que leen por path crudo.
+const ALLOW_404_NOT_FOUND = Symbol('allow404-not-found');
 const FETCH_ATTEMPTS = 3;
 const FETCH_TIMEOUT_MS = 15_000;
 const DETAIL_BUILD_CONCURRENCY = 12;
@@ -230,16 +234,39 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 async function fetchJsonAllowing404<T>(path: string, fallback: () => Promise<T> | T): Promise<T> {
-  try {
+  // Memoizado por path (clave namespaced) igual que fetchJsonSafe: en el build
+  // getSimilarAnime/getAnimeNews se piden varias veces por anime (ES/EN/variantes
+  // país); sin cache eran ~1900 requests duplicadas al VPS. El 404 se cachea como
+  // centinela para no re-pedirlo.
+  const cacheKey = `allow404:${path}`;
+  const cached = JSON_CACHE.get(cacheKey);
+  if (cached) {
+    try {
+      const value = await cached;
+      return value === ALLOW_404_NOT_FOUND ? fallback() : (value as T);
+    } catch {
+      return fallback();
+    }
+  }
+
+  const request = (async () => {
     const res = await fetchWithRetry(path);
     if (res.status === 404) {
-      return fallback();
+      return ALLOW_404_NOT_FOUND;
     }
     if (!res.ok) {
       throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`);
     }
-    return res.json() as Promise<T>;
+    return res.json();
+  })();
+
+  JSON_CACHE.set(cacheKey, request);
+
+  try {
+    const value = await request;
+    return value === ALLOW_404_NOT_FOUND ? fallback() : (value as T);
   } catch {
+    JSON_CACHE.delete(cacheKey);
     return fallback();
   }
 }
