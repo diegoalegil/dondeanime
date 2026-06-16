@@ -36,8 +36,14 @@ import com.dondeanime.backend.subscription.AlertService;
  * con lo que la anotación se ignora silenciosamente. TransactionTemplate
  * funciona siempre porque es una API programática.
  *
- * Solo guardamos FLATRATE (incluido en suscripción) y FREE. RENT y BUY
- * los ignoramos: el objetivo es "dónde puedo VER el anime", no comprarlo.
+ * Guardamos las cuatro ofertas de TMDb (FLATRATE incluido en suscripción,
+ * FREE, RENT y BUY). Antes solo FLATRATE/FREE, pero eso dejaba muchas fichas
+ * en "no disponible" (un montón de títulos solo están para alquiler) y tiraba
+ * el provider de Amazon, que es donde vive el enlace de afiliado. Si un mismo
+ * provider aparece en varias ofertas nos quedamos con la mejor por este orden:
+ * FLATRATE > FREE > RENT > BUY. La unique constraint de watch_provider es
+ * (anime, country, provider_name) SIN el tipo, así que insertar el mismo
+ * provider dos veces (p. ej. Apple TV en alquiler y compra) reventaría.
  */
 @Service
 public class ProviderSyncService {
@@ -157,14 +163,20 @@ public class ProviderSyncService {
         for (String country : TARGET_COUNTRIES) {
             TmdbCountryProviders cp = response.results().get(country);
             if (cp == null) continue;
-            addProviders(providers, animeId, country, cp.flatrate(), "FLATRATE", now);
-            addProviders(providers, animeId, country, cp.free(), "FREE", now);
+            // Dedup por nombre de provider quedándonos con la mejor oferta
+            // (orden FLATRATE > FREE > RENT > BUY). Ver javadoc de la clase.
+            Set<String> seen = new HashSet<>();
+            addProviders(providers, seen, animeId, country, cp.flatrate(), "FLATRATE", now);
+            addProviders(providers, seen, animeId, country, cp.free(), "FREE", now);
+            addProviders(providers, seen, animeId, country, cp.rent(), "RENT", now);
+            addProviders(providers, seen, animeId, country, cp.buy(), "BUY", now);
         }
         return providers;
     }
 
     private void addProviders(
             List<WatchProvider> providers,
+            Set<String> seen,
             Long animeId,
             String country,
             List<TmdbProvider> list,
@@ -174,6 +186,9 @@ public class ProviderSyncService {
             return;
         }
         for (TmdbProvider p : list) {
+            if (!seen.add(p.providerName())) {
+                continue; // ya añadido con una oferta de mayor prioridad
+            }
             WatchProvider wp = new WatchProvider();
             wp.setAnimeId(animeId);
             wp.setCountryCode(country);
