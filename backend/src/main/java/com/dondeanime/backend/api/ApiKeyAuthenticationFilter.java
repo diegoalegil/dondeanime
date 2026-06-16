@@ -2,9 +2,9 @@ package com.dondeanime.backend.api;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,13 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private static final Duration MONTHLY_REFILL = Duration.ofDays(31);
 
     private final ApiKeyService apiKeyService;
-    private final ConcurrentMap<String, BucketState> buckets = new ConcurrentHashMap<>();
+    // Caffeine con tope de tamaño y TTL largo (el bucket es MENSUAL: el TTL debe
+    // superar el ciclo de refill). Acota la memoria sin reiniciar el límite
+    // mensual de las claves activas; una clave inactiva 35 días se evicciona.
+    private final Cache<String, BucketState> buckets = Caffeine.newBuilder()
+            .expireAfterAccess(Duration.ofDays(35))
+            .maximumSize(10_000)
+            .build();
 
     public ApiKeyAuthenticationFilter(ApiKeyService apiKeyService) {
         this.apiKeyService = apiKeyService;
@@ -90,7 +96,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Bucket bucketFor(String key, long monthlyQuota) {
-        BucketState state = buckets.compute(key, (ignored, existing) -> {
+        BucketState state = buckets.asMap().compute(key, (ignored, existing) -> {
             if (existing != null && existing.monthlyQuota() == monthlyQuota) {
                 return existing;
             }

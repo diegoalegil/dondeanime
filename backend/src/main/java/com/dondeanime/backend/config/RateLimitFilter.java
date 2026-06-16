@@ -3,9 +3,9 @@ package com.dondeanime.backend.config;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -49,7 +49,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new RateLimitRule("/api/users/", true, 5),
             new RateLimitRule("/api/admin/", true, 10));
 
-    private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
+    // Caffeine con TTL: las claves son por IP (ilimitadas) y un ConcurrentHashMap
+    // crecía sin tope (fuga de memoria en un VPS de larga vida). Una IP inactiva
+    // 15 min se evicciona; su bucket por-minuto se recrea limpio al volver.
+    private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
+            .expireAfterAccess(Duration.ofMinutes(15))
+            .maximumSize(50_000)
+            .build();
 
     @Override
     protected void doFilterInternal(
@@ -67,7 +73,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        Bucket bucket = buckets.computeIfAbsent(bucketKey(rule, request), ignored -> createBucket(rule.requestsPerMinute()));
+        Bucket bucket = buckets.get(bucketKey(rule, request), ignored -> createBucket(rule.requestsPerMinute()));
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
         if (probe.isConsumed()) {
             filterChain.doFilter(request, response);
