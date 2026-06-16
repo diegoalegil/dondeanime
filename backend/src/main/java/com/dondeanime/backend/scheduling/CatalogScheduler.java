@@ -1,5 +1,9 @@
 package com.dondeanime.backend.scheduling;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +37,7 @@ import io.micrometer.core.instrument.Timer;
 public class CatalogScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(CatalogScheduler.class);
+    private static final Duration FRESHNESS_STALE_THRESHOLD = Duration.ofHours(36);
 
     private final AnimeSyncService syncService;
     private final AnimeMatchingService matchingService;
@@ -133,6 +138,35 @@ public class CatalogScheduler {
         }
         if (ok) {
             triggerVercelRebuild();
+        }
+    }
+
+    /**
+     * Watchdog de frescura: el sync de datos hace delete+insert, así que si el
+     * scheduler se cae los datos quedan VIEJOS sin error visible (la web vende
+     * "dónde verlo" fresco; un dato obsoleto quema al usuario). Una vez al día
+     * miramos cuándo fue el último sync; si supera el umbral, avisamos por el
+     * mismo canal que los fallos de job (Telegram).
+     */
+    @Scheduled(cron = "${dondeanime.cron.freshness-watchdog:0 15 6 * * *}")
+    public void freshnessWatchdog() {
+        Optional<Instant> lastSync = syncService.findLastSyncedAt();
+        if (lastSync.isEmpty()) {
+            log.error("[scheduler] freshnessWatchdog: el catalogo esta VACIO (sin syncedAt)");
+            publishJobFailure("freshness-watchdog",
+                    new IllegalStateException("El catalogo no tiene ningun anime sincronizado"));
+            return;
+        }
+        Duration age = Duration.between(lastSync.get(), Instant.now());
+        if (age.compareTo(FRESHNESS_STALE_THRESHOLD) > 0) {
+            log.error("[scheduler] freshnessWatchdog: datos OBSOLETOS, ultimo sync hace {}h (umbral {}h)",
+                    age.toHours(), FRESHNESS_STALE_THRESHOLD.toHours());
+            publishJobFailure("freshness-watchdog",
+                    new IllegalStateException("El catalogo lleva " + age.toHours()
+                            + "h sin sincronizar (umbral " + FRESHNESS_STALE_THRESHOLD.toHours()
+                            + "h): el scheduler de datos puede estar caido"));
+        } else {
+            log.debug("[scheduler] freshnessWatchdog: ok, ultimo sync hace {}h", age.toHours());
         }
     }
 

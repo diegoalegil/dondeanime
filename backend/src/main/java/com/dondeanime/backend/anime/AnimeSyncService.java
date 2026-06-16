@@ -77,6 +77,15 @@ public class AnimeSyncService {
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * Instante del sync mas reciente del catalogo. Lo usa el watchdog de frescura
+     * para detectar si el scheduler de datos lleva demasiado sin correr (el
+     * delete+insert deja datos viejos en silencio, sin error visible).
+     */
+    public Optional<Instant> findLastSyncedAt() {
+        return repository.findMaxSyncedAt();
+    }
+
     public int syncPopular(int count) {
         if (count < 1 || count > MAX_POPULAR_SYNC_COUNT) {
             throw new IllegalArgumentException("count debe estar entre 1 y " + MAX_POPULAR_SYNC_COUNT);

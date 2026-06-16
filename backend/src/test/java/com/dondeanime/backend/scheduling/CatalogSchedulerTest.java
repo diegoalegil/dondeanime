@@ -1,5 +1,6 @@
 package com.dondeanime.backend.scheduling;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -7,6 +8,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -111,6 +116,59 @@ class CatalogSchedulerTest {
         scheduler.processNews();
 
         verify(newsProcessingService).processDrafts();
+    }
+
+    @Test
+    void freshnessWatchdogAlertsWhenCatalogIsStale() {
+        AnimeSyncService syncService = mock(AnimeSyncService.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        when(syncService.findLastSyncedAt())
+                .thenReturn(Optional.of(Instant.now().minus(Duration.ofHours(40))));
+
+        schedulerWith(syncService, eventPublisher).freshnessWatchdog();
+
+        verify(eventPublisher).publishEvent(any(SchedulerJobFailedEvent.class));
+    }
+
+    @Test
+    void freshnessWatchdogDoesNotAlertWhenCatalogIsFresh() {
+        AnimeSyncService syncService = mock(AnimeSyncService.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        when(syncService.findLastSyncedAt())
+                .thenReturn(Optional.of(Instant.now().minus(Duration.ofHours(2))));
+
+        schedulerWith(syncService, eventPublisher).freshnessWatchdog();
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void freshnessWatchdogAlertsWhenCatalogIsEmpty() {
+        AnimeSyncService syncService = mock(AnimeSyncService.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        when(syncService.findLastSyncedAt()).thenReturn(Optional.empty());
+
+        schedulerWith(syncService, eventPublisher).freshnessWatchdog();
+
+        verify(eventPublisher).publishEvent(any(SchedulerJobFailedEvent.class));
+    }
+
+    private static CatalogScheduler schedulerWith(
+            AnimeSyncService syncService, ApplicationEventPublisher eventPublisher) {
+        return new CatalogScheduler(
+                syncService,
+                mock(AnimeMatchingService.class),
+                mock(AnimeDescriptionEnricher.class),
+                mock(ProviderSyncService.class),
+                mock(TrailerSyncService.class),
+                RestClient.builder(),
+                new SimpleMeterRegistry(),
+                eventPublisher,
+                mock(NewsIngestionService.class),
+                mock(NewsProcessingService.class),
+                "",
+                false,
+                false);
     }
 
     private static CatalogScheduler scheduler(

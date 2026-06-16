@@ -1,5 +1,6 @@
 package com.dondeanime.backend.anime;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,6 +14,10 @@ import org.springframework.data.repository.query.Param;
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
 
     Optional<Anime> findByAnilistId(Long anilistId);
+
+    /** Instante del sync mas reciente del catalogo (watchdog de frescura de datos). */
+    @Query("SELECT MAX(a.syncedAt) FROM Anime a")
+    Optional<Instant> findMaxSyncedAt();
 
     @EntityGraph(attributePaths = "genres")
     Optional<Anime> findBySlug(String slug);
