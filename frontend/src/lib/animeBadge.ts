@@ -5,7 +5,10 @@
  * módulos de servidor (p. ej. el de i18n con AsyncLocalStorage).
  */
 export function scoreBadgeClass(score: number): string {
-  if (score >= 80) return 'bg-success/15 text-success';
-  if (score >= 60) return 'bg-warning/15 text-warning';
-  return 'bg-danger/15 text-danger';
+  // Fondo oscuro opaco (no un tinte translucido del color): sobre portadas
+  // claras un bg-success/15 daba contraste ~1.2:1 y la nota no se leia. Con
+  // bg-surface-0/90 el numero queda legible (>=4.5:1) sobre cualquier portada.
+  if (score >= 80) return 'bg-surface-0/90 text-success';
+  if (score >= 60) return 'bg-surface-0/90 text-warning';
+  return 'bg-surface-0/90 text-danger';
 }
