@@ -57,4 +57,8 @@ const hasAnyProvider = blocks.some((b) => b.providers.length > 0);
       </div>
     ))}
   </div>
+
+  {hasAnyProvider && (
+    <p class="mt-6 text-xs text-fg-muted">{t('anime.providers.disclaimer')}</p>
+  )}
 </section>
