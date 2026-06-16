@@ -9,6 +9,7 @@ import { localizedGenreName } from '@/lib/genres';
 import { AutoTextGenerator } from '@/lib/autoTextGenerator.mjs';
 import { COUNTRIES } from '@/lib/countries';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
+import { sanitizeHtml } from '@/lib/sanitizeHtml';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
 
@@ -117,7 +118,7 @@ const itemListSchema = buildItemListSchema(
     <div
       class="grid gap-4 rounded-lg border border-surface-2 bg-surface-1 p-5"
       data-auto-text
-      set:html={autoText.html}
+      set:html={sanitizeHtml(autoText.html)}
     />
   </section>
 
