@@ -289,7 +289,8 @@ public class AnimeMatchingService {
                 .toList();
 
         MatchResult match = matcher.findBestMatch(toAniListAnime(anime), candidates);
-        if (isConfident(match.decision()) && match.bestCandidate() != null) {
+        if (isConfident(match.decision()) && match.bestCandidate() != null
+                && mediaTypeMatchesFormat(match.bestCandidate().tmdbTitle(), isMovieFormat(anime))) {
             return new Resolution(match.bestCandidate().tmdbTitle().id(),
                     MatchSource.MATCHER, match.decision(), match.score());
         }
@@ -302,6 +303,20 @@ public class AnimeMatchingService {
     /** Solo aceptamos automáticamente las decisiones fuertes del matcher. */
     private static boolean isConfident(MatchDecision decision) {
         return decision == MatchDecision.EXACT_MATCH || decision == MatchDecision.HIGH_CONFIDENCE;
+    }
+
+    /**
+     * El media-type del candidato debe concordar con el formato del anime:
+     * formato MOVIE -> película, cualquier otro (TV/OVA/ONA/SPECIAL...) -> serie.
+     * Sin esto, el matcher podía dar HIGH_CONFIDENCE a una película para un OVA y,
+     * como {@code ProviderSyncService} enruta por {@code format=="MOVIE"}, ese OVA
+     * acababa pegando a {@code /tv/{idPelícula}} -> 404 -> sin "dónde verlo". El
+     * respaldo ya filtra por tipo (ver {@link #fallbackTmdbId}); aquí replicamos
+     * esa garantía en la rama confiada. Si no concuerda, caemos al respaldo.
+     */
+    private static boolean mediaTypeMatchesFormat(TmdbTitle candidate, boolean movieFormat) {
+        TmdbMediaType type = candidate.mediaType();
+        return movieFormat ? type == TmdbMediaType.MOVIE : type == TmdbMediaType.TV;
     }
 
     private static String primaryQuery(Anime anime) {

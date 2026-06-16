@@ -15,6 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.dondeanime.animetitlematcher.api.AnimeTitleMatcher;
+import com.dondeanime.animetitlematcher.api.MatchCandidate;
+import com.dondeanime.animetitlematcher.api.MatchDecision;
+import com.dondeanime.animetitlematcher.api.MatchResult;
+import com.dondeanime.animetitlematcher.domain.TmdbMediaType;
+import com.dondeanime.animetitlematcher.domain.TmdbTitle;
 import io.github.diegoalegil.tsunagi.tmdb.TmdbClient;
 import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResponse;
 import io.github.diegoalegil.tsunagi.tmdb.TmdbSearchResult;
@@ -447,6 +452,67 @@ class AnimeMatchingServiceTest {
         assertThat(report.changes()).hasSize(1);
         verify(repo, never()).save(any());
         assertThat(anime.getTmdbId()).isEqualTo(111L); // sin tocar
+    }
+
+    // --- guard de media-type (F10): no asignar id de pelicula a OVA/ONA/SPECIAL ---
+
+    @Test
+    void doesNotAssignMovieIdToNonMovieFormatEvenIfMatcherIsConfident() {
+        // El matcher puede dar HIGH_CONFIDENCE a una PELICULA para un OVA (no marca
+        // hard-conflict OVA<->MOVIE). Sin guard, ese id de pelicula se le pega al OVA
+        // y ProviderSyncService lo enruta a /tv/{movieId} -> 404 -> sin "donde verlo".
+        Anime ova = anime(1L, "Some Ova", 2015);
+        ova.setFormat("OVA");
+
+        TmdbTitle movieCandidate = TmdbTitle.builder().id(500L).mediaType(TmdbMediaType.MOVIE).build();
+        MatchCandidate best = mock(MatchCandidate.class);
+        when(best.tmdbTitle()).thenReturn(movieCandidate);
+        MatchResult confidentMovie = mock(MatchResult.class);
+        when(confidentMovie.decision()).thenReturn(MatchDecision.HIGH_CONFIDENCE);
+        when(confidentMovie.bestCandidate()).thenReturn(best);
+        when(confidentMovie.score()).thenReturn(0.9175);
+        AnimeTitleMatcher stubbedMatcher = mock(AnimeTitleMatcher.class);
+        when(stubbedMatcher.findBestMatch(any(), any())).thenReturn(confidentMovie);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(ova));
+        TmdbClient client = mock(TmdbClient.class);
+        // unico resultado = pelicula; sin candidato TV el respaldo (espacio TV) no encuentra nada
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(movieResult(500L, "Some Ova", "2015-01-01", 80.0)), 1, 1));
+
+        int matched = new AnimeMatchingService(client, repo, stubbedMatcher).matchAll();
+
+        assertThat(matched).isZero();
+        verify(repo, never()).save(any()); // el OVA NO se queda con el id de pelicula
+    }
+
+    @Test
+    void keepsAcceptingMatcherWhenMediaTypeAgreesWithFormat() {
+        // Control: serie (formato TV/null) con candidato confiado de TV -> se acepta.
+        Anime tv = anime(1L, "Some Series", 2015);
+
+        TmdbTitle tvCandidate = TmdbTitle.builder().id(700L).mediaType(TmdbMediaType.TV).build();
+        MatchCandidate best = mock(MatchCandidate.class);
+        when(best.tmdbTitle()).thenReturn(tvCandidate);
+        MatchResult confidentTv = mock(MatchResult.class);
+        when(confidentTv.decision()).thenReturn(MatchDecision.EXACT_MATCH);
+        when(confidentTv.bestCandidate()).thenReturn(best);
+        when(confidentTv.score()).thenReturn(1.0);
+        AnimeTitleMatcher stubbedMatcher = mock(AnimeTitleMatcher.class);
+        when(stubbedMatcher.findBestMatch(any(), any())).thenReturn(confidentTv);
+
+        AnimeRepository repo = mock(AnimeRepository.class);
+        when(repo.findAllWithSynonyms()).thenReturn(List.of(tv));
+        TmdbClient client = mock(TmdbClient.class);
+        when(client.searchMulti(any(), any())).thenReturn(new TmdbSearchResponse(
+                1, List.of(tvResult(700L, "Some Series", "JP", "2015-01-01", 50.0)), 1, 1));
+
+        new AnimeMatchingService(client, repo, stubbedMatcher).matchAll();
+
+        ArgumentCaptor<Anime> captor = ArgumentCaptor.forClass(Anime.class);
+        verify(repo).save(captor.capture());
+        assertThat(captor.getValue().getTmdbId()).isEqualTo(700L);
     }
 
     // --- helpers ---
