@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import { getGenres } from '@/lib/api';
 import { localizedGenreName } from '@/lib/genres';
 import { absoluteUrl } from '@/lib/seo';
+import { DURATION_MINUTES, EPISODE_LIMITS, durationPath, episodeLimitPath } from '@/lib/programmaticSeo';
 import { setLocale, t } from '@/i18n';
 
 setLocale('es');
@@ -46,5 +47,41 @@ const genres = (await getGenres())
         </li>
       ))}
     </ul>
+  </section>
+
+  <section class="mx-auto max-w-6xl border-t border-surface-2 px-4 pt-10 pb-20">
+    <h2 class="text-2xl font-semibold tracking-tight">Explora también por</h2>
+    <div class="mt-6 grid gap-8 sm:grid-cols-2">
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-fg-secondary">Duración por episodio</h3>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {DURATION_MINUTES.map((m) => (
+            <li>
+              <a
+                href={durationPath(m)}
+                class="inline-flex rounded-full border border-surface-2 bg-surface-1 px-3 py-1.5 text-sm text-fg-secondary transition-colors hover:border-accent-violet/60 hover:text-fg-primary"
+              >
+                Hasta {m} min
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-fg-secondary">Número de episodios</h3>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {EPISODE_LIMITS.map((n) => (
+            <li>
+              <a
+                href={episodeLimitPath(n)}
+                class="inline-flex rounded-full border border-surface-2 bg-surface-1 px-3 py-1.5 text-sm text-fg-secondary transition-colors hover:border-accent-violet/60 hover:text-fg-primary"
+              >
+                {n} episodios o menos
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   </section>
 </BaseLayout>
