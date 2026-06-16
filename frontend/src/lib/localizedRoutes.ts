@@ -77,6 +77,8 @@ export const spanishPathFromLocalized = (path: string): string => {
 
   if (section === 'contact') return '/contacto';
 
+  if (section === 'about') return '/sobre';
+
   if (section === 'stickers') return '/stickers';
 
   if (section === 'my-list') return '/mi-lista';
@@ -140,6 +142,8 @@ export const localizedEnPath = (spanishPath: string): string | null => {
   if (section === 'noticias') return first ? `/en/news/${first}` : '/en/news';
 
   if (section === 'contacto') return '/en/contact';
+
+  if (section === 'sobre') return '/en/about';
 
   if (section === 'stickers') return '/en/stickers';
 

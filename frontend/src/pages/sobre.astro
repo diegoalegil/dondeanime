@@ -1,0 +1,49 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import { localizedPath } from '@/lib/localizedRoutes';
+import { setLocale, t } from '@/i18n';
+
+setLocale('es');
+
+const sections = [
+  { heading: t('about.what.heading'), body: t('about.what.body') },
+  { heading: t('about.data.heading'), body: t('about.data.body') },
+];
+---
+<BaseLayout
+  title={t('about.title')}
+  description={t('about.description')}
+>
+  <Breadcrumbs
+    items={[
+      { name: t('breadcrumbs.home'), url: '/' },
+      { name: t('breadcrumbs.about'), url: '/sobre' },
+    ]}
+  />
+
+  <section class="mx-auto max-w-3xl px-4 py-10">
+    <h1 class="text-3xl font-semibold text-fg-primary">{t('about.heading')}</h1>
+    <p class="mt-5 text-base leading-7 text-fg-secondary">{t('about.lead')}</p>
+
+    <div class="mt-10 space-y-8">
+      {sections.map((section) => (
+        <section>
+          <h2 class="text-xl font-semibold text-fg-primary">{section.heading}</h2>
+          <p class="mt-3 text-sm leading-7 text-fg-secondary">{section.body}</p>
+        </section>
+      ))}
+
+      <section>
+        <h2 class="text-xl font-semibold text-fg-primary">{t('about.errors.heading')}</h2>
+        <p class="mt-3 text-sm leading-7 text-fg-secondary">{t('about.errors.body')}</p>
+        <a
+          href={localizedPath('/contacto')}
+          class="mt-4 inline-flex rounded-md border border-accent-violet/50 px-4 py-2 text-sm font-medium text-accent-violet transition-colors hover:border-accent-pink hover:text-accent-pink"
+        >
+          {t('about.errors.cta')}
+        </a>
+      </section>
+    </div>
+  </section>
+</BaseLayout>

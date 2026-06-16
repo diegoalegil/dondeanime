@@ -120,6 +120,7 @@ export const staticSitemapPaths = async (): Promise<string[]> => {
     '/temporadas',
     '/generos',
     '/plataformas',
+    '/sobre',
     '/contacto',
     '/legal/privacidad',
     '/legal/cookies',
