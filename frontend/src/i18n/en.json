@@ -212,7 +212,7 @@
   "genre.headingPrefix": "Anime in",
   "genre.count": "{count} title{plural} in this genre.",
   "genre.empty": "We do not have anime cataloged in this genre right now.",
-  "genre.byPlatform.heading": "Watch {genre} anime by platform",
+  "genre.byPlatform.heading": "{genre} by platform",
   "genre.byPlatform.cta": "{genre} on {platform}",
   "platform.seo.title": "Anime on {platform} - Availability by country | DondeAnime",
   "platform.seo.description": "{platform} offers anime in {countryCount}. Choose your country to view the full catalog.",
