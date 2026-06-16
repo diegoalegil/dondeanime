@@ -60,6 +60,7 @@ public class ProviderSyncService {
     private static final long RATE_LIMIT_SLEEP_MS = 300;
 
     private final TmdbClient client;
+    private final MovieWatchProviderClient movieClient;
     private final AnimeRepository animeRepository;
     private final WatchProviderRepository providerRepository;
     private final AlertService alertService;
@@ -69,6 +70,7 @@ public class ProviderSyncService {
 
     public ProviderSyncService(
             TmdbClient client,
+            MovieWatchProviderClient movieClient,
             AnimeRepository animeRepository,
             WatchProviderRepository providerRepository,
             AlertService alertService,
@@ -76,6 +78,7 @@ public class ProviderSyncService {
             AvailabilityChangeService availabilityChangeService,
             PlatformTransactionManager transactionManager) {
         this.client = client;
+        this.movieClient = movieClient;
         this.animeRepository = animeRepository;
         this.providerRepository = providerRepository;
         this.alertService = alertService;
@@ -94,14 +97,6 @@ public class ProviderSyncService {
 
         for (Anime a : animes) {
             if (a.getTmdbId() == null) {
-                skipped++;
-                continue;
-            }
-            // El matcher puede asignar ids de PELÍCULA de TMDb, pero este cliente
-            // solo consulta endpoints /tv/{id}/...: para una película ese id
-            // apuntaría a una serie sin relación. Las saltamos.
-            if ("MOVIE".equalsIgnoreCase(a.getFormat())) {
-                log.debug("Sync providers: skip slug={} (formato MOVIE, cliente TMDb solo TV)", a.getSlug());
                 skipped++;
                 continue;
             }
@@ -136,7 +131,11 @@ public class ProviderSyncService {
     }
 
     private Map<String, List<WatchProvider>> syncOne(Anime anime) {
-        TmdbProvidersResponse resp = client.getWatchProviders(anime.getTmdbId());
+        // Las películas se consultan en /movie/{id}/... (MovieWatchProviderClient);
+        // las series y demás formatos en /tv/{id}/... (TmdbClient de Tsunagi).
+        TmdbProvidersResponse resp = isMovie(anime)
+                ? movieClient.getMovieWatchProviders(anime.getTmdbId())
+                : client.getWatchProviders(anime.getTmdbId());
         if (resp == null || resp.results() == null) {
             return Map.of();
         }
@@ -208,6 +207,10 @@ public class ProviderSyncService {
             wp.setUpdatedAt(now);
             providers.add(wp);
         }
+    }
+
+    private static boolean isMovie(Anime anime) {
+        return "MOVIE".equalsIgnoreCase(anime.getFormat());
     }
 
     private static void sleep(long ms) {

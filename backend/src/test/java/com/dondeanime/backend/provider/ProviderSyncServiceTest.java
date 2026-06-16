@@ -37,6 +37,7 @@ class ProviderSyncServiceTest {
     void publishesProviderAddedEventWhenNewProviderHasPendingAlerts() {
         Anime anime = anime();
         TmdbClient client = mock(TmdbClient.class);
+        MovieWatchProviderClient movieClient = mock(MovieWatchProviderClient.class);
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         AlertService alertService = mock(AlertService.class);
@@ -44,6 +45,7 @@ class ProviderSyncServiceTest {
         AvailabilityChangeService availabilityChangeService = mock(AvailabilityChangeService.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
+                movieClient,
                 animeRepository,
                 providerRepository,
                 alertService,
@@ -72,6 +74,7 @@ class ProviderSyncServiceTest {
     void skipsProviderAddedEventWhenThereAreNoPendingAlerts() {
         Anime anime = anime();
         TmdbClient client = mock(TmdbClient.class);
+        MovieWatchProviderClient movieClient = mock(MovieWatchProviderClient.class);
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         AlertService alertService = mock(AlertService.class);
@@ -79,6 +82,7 @@ class ProviderSyncServiceTest {
         AvailabilityChangeService availabilityChangeService = mock(AvailabilityChangeService.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
+                movieClient,
                 animeRepository,
                 providerRepository,
                 alertService,
@@ -98,16 +102,18 @@ class ProviderSyncServiceTest {
     }
 
     @Test
-    void skipsMovieFormatAnime() {
-        // getWatchProviders pega a /tv/{id}/watch/providers: con un tmdbId de
-        // película traería las plataformas de una serie sin relación.
+    void processesMovieFormatViaMovieClient() {
+        // El matcher asigna a las películas un id de TMDb de PELÍCULA; se
+        // consultan en /movie/... (movieClient), no en /tv/... (TmdbClient de Tsunagi).
         Anime anime = anime();
         anime.setFormat("MOVIE");
         TmdbClient client = mock(TmdbClient.class);
+        MovieWatchProviderClient movieClient = mock(MovieWatchProviderClient.class);
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
+                movieClient,
                 animeRepository,
                 providerRepository,
                 mock(AlertService.class),
@@ -116,22 +122,27 @@ class ProviderSyncServiceTest {
                 transactionManager());
 
         when(animeRepository.findAll()).thenReturn(List.of(anime));
+        when(providerRepository.findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(1L))
+                .thenReturn(List.of());
+        when(movieClient.getMovieWatchProviders(10L)).thenReturn(providerResponse());
 
         int processed = service.syncAll();
 
-        assertThat(processed).isZero();
-        verify(client, never()).getWatchProviders(any());
-        verify(providerRepository, never()).save(any());
+        assertThat(processed).isEqualTo(1);
+        verify(client, never()).getWatchProviders(any());       // película -> no usa el cliente de TV
+        verify(providerRepository, atLeastOnce()).save(any());  // guarda los providers de la película
     }
 
     @Test
     void persistsRentAndBuyDedupedByBestOffer() {
         Anime anime = anime();
         TmdbClient client = mock(TmdbClient.class);
+        MovieWatchProviderClient movieClient = mock(MovieWatchProviderClient.class);
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
+                movieClient,
                 animeRepository,
                 providerRepository,
                 mock(AlertService.class),
@@ -162,12 +173,14 @@ class ProviderSyncServiceTest {
     void doesNotPublishAlertForRentOnlyProvider() {
         Anime anime = anime();
         TmdbClient client = mock(TmdbClient.class);
+        MovieWatchProviderClient movieClient = mock(MovieWatchProviderClient.class);
         AnimeRepository animeRepository = mock(AnimeRepository.class);
         WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
         AlertService alertService = mock(AlertService.class);
         ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
         ProviderSyncService service = new ProviderSyncService(
                 client,
+                movieClient,
                 animeRepository,
                 providerRepository,
                 alertService,
