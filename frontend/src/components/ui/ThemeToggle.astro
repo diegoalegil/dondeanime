@@ -5,6 +5,7 @@ import { t } from '@/i18n';
   id="theme-toggle"
   type="button"
   aria-label={t('header.theme.toggle')}
+  aria-pressed="false"
   class="flex h-9 w-9 items-center justify-center rounded-md border border-surface-2 bg-surface-1 text-fg-secondary transition-colors hover:border-accent-violet/40 hover:text-fg-primary"
 >
   <svg
@@ -52,10 +53,16 @@ import { t } from '@/i18n';
   // cada astro:page-load, que dispara tambien en la carga inicial.
   const init = () => {
     const btn = document.getElementById('theme-toggle');
-    btn?.addEventListener('click', () => {
+    if (!btn) return;
+    // aria-pressed = true cuando el tema activo es el claro (toggle "encendido").
+    const syncPressed = () =>
+      btn.setAttribute('aria-pressed', String((html.getAttribute('data-theme') ?? 'dark') === 'light'));
+    syncPressed();
+    btn.addEventListener('click', () => {
       const current = html.getAttribute('data-theme') ?? 'dark';
       const next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
+      syncPressed();
       try {
         localStorage.setItem(STORAGE_KEY, next);
       } catch (e) {
