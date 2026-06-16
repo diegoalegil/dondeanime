@@ -61,14 +61,17 @@ const seoDescription = hasProviders
   ? t('anime.country.seo.availableDescription', { title, country: countryName, platforms: platformNames })
   : t('anime.country.seo.unavailableDescription', { title, country: countryName });
 
-const pageUrl = absoluteUrl(localizedPath(`/anime/${slug}/${countrySlug}`));
-const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
-
 // Canonical: las páginas país SIN providers son thin content (todas dicen "no
 // disponible"), así que canonicalizan a la ficha base para no diluir SEO ni gastar
 // crawl budget. Las que tienen streaming real en ese país aportan info diferencial
 // (providers distintos por país) y mantienen self-canonical.
 const canonicalOverride = hasProviders ? undefined : absoluteUrl(localizedPath(`/anime/${slug}`));
+
+// El @id/url del schema TVSeries debe coincidir con el canonical: si la página
+// canonicaliza a la ficha base, el structured data apunta ahí también para no dar
+// señales contradictorias (schema en una URL, canonical en otra).
+const pageUrl = canonicalOverride ?? absoluteUrl(localizedPath(`/anime/${slug}/${countrySlug}`));
+const tvSchema = buildTVSeriesSchema(detail.anime, providers, pageUrl);
 ---
 <BaseLayout
   title={seoTitle}
