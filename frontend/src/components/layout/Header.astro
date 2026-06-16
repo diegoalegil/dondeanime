@@ -2,10 +2,13 @@
 import ThemeToggle from '@/components/ui/ThemeToggle.astro';
 import SearchBox from '@/components/ui/SearchBox.astro';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.astro';
-import { t } from '@/i18n';
+import { t, getLocale } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 
 const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
+// /listas (marketplace de listas curadas) es solo-ES: no existe /en/listas, así
+// que enlazarlo en EN daba 404. Se oculta hasta que haya versión inglesa.
+const isSpanish = getLocale() === 'es';
 ---
 <header class="sticky top-0 z-50 border-b border-surface-2 bg-surface-1/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
@@ -15,7 +18,7 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
     </a>
     <nav aria-label={t('nav.primary')} class="hidden items-center gap-5 text-sm text-fg-secondary md:flex">
       <a href={localizedPath('/')} class="transition-colors hover:text-fg-primary">{t('nav.catalog')}</a>
-      <a href="/listas" class="transition-colors hover:text-fg-primary">{t('nav.lists')}</a>
+      {isSpanish && <a href="/listas" class="transition-colors hover:text-fg-primary">{t('nav.lists')}</a>}
       <a href={localizedPath('/pais/espana')} class="transition-colors hover:text-fg-primary">{t('nav.countries')}</a>
       <a href={localizedPath('/plataforma/crunchyroll')} class="transition-colors hover:text-fg-primary">{t('nav.platforms')}</a>
       <a href={localizedPath('/premium')} class="transition-colors hover:text-fg-primary">{t('nav.premium')}</a>
@@ -45,7 +48,7 @@ const showLanguageSwitcher = !Astro.url.pathname.startsWith('/admin');
         </summary>
         <div class="absolute right-0 top-full z-50 mt-2 flex w-52 flex-col gap-1 rounded-md border border-surface-2 bg-surface-1 p-2 text-sm text-fg-secondary shadow-lg">
           <a href={localizedPath('/')} class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.catalog')}</a>
-          <a href="/listas" class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.lists')}</a>
+          {isSpanish && <a href="/listas" class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.lists')}</a>}
           <a href={localizedPath('/pais/espana')} class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.countries')}</a>
           <a href={localizedPath('/plataforma/crunchyroll')} class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.platforms')}</a>
           <a href={localizedPath('/premium')} class="rounded px-3 py-2 transition-colors hover:bg-surface-2 hover:text-fg-primary">{t('nav.premium')}</a>
