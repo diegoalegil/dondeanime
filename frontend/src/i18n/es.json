@@ -214,6 +214,7 @@
   "genre.empty": "No tenemos anime catalogados con este género ahora mismo.",
   "genre.byPlatform.heading": "{genre} por plataforma",
   "genre.byPlatform.cta": "{genre} en {platform}",
+  "genre.beginnerLink": "¿Empiezas con {genre}? Guía para principiantes",
   "platform.seo.title": "Anime en {platform} - Disponibilidad por país | DondeAnime",
   "platform.seo.description": "{platform} ofrece anime en {countryCount}. Elige tu país para ver el catálogo completo.",
   "platform.schema.name": "{platform} por país",
