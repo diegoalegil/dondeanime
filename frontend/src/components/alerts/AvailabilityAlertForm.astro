@@ -66,7 +66,7 @@ const alertApiUrl = `${apiUrl}/api/alerts`;
           {t('alert.privacyPrefix')} <a href={localizedPath('/legal/privacidad')} class="text-accent-violet hover:underline">{t('alert.privacyLink')}</a>.
         </span>
       </label>
-      <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status></p>
+      <p class="min-h-5 text-sm text-fg-muted md:col-span-2" data-alert-status role="status" aria-live="polite"></p>
     </form>
 
     <PushSubscribeButton countryIso={countryIso} />
