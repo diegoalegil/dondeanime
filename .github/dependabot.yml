@@ -42,3 +42,24 @@ updates:
         update-types:
           - minor
           - patch
+
+  # Imagenes Docker: docker-compose en la raiz y el Dockerfile del backend.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      docker-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+    groups:
+      docker-minor-patch:
+        update-types:
+          - minor
+          - patch
