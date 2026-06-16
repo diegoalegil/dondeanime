@@ -7,6 +7,7 @@ import { t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
 import AnimePicture from './AnimePicture.astro';
 import FavoriteButton from './FavoriteButton.astro';
+import { HERO_COVER_SIZES } from '@/lib/images';
 
 interface Props {
   anime: AnimeDetail['anime'];
@@ -39,7 +40,7 @@ const backdropImage = anime.bannerImage ?? anime.coverImage;
           width={448}
           height={672}
           widths={[224, 320, 448, 640]}
-          sizes="(min-width: 768px) 14rem, 10rem"
+          sizes={HERO_COVER_SIZES}
           loading="eager"
           fetchpriority="high"
           class="block"

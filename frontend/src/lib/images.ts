@@ -3,6 +3,12 @@ export const DEFAULT_ANIME_IMAGE_SIZES =
   '(min-width: 1280px) 16vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw';
 export const DEFAULT_ANIME_IMAGE_QUALITY = 75;
 
+// `sizes` de la portada del hero de la ficha. Constante compartida por
+// AnimeHero (el <img>) y el preload del <head> de la ficha (PERF-3): si el
+// preload no usa EXACTAMENTE el mismo sizes/srcset que el <img>, el navegador
+// descarga dos candidatos distintos (doble descarga). Aquí está el único sitio.
+export const HERO_COVER_SIZES = '(min-width: 768px) 14rem, 10rem';
+
 /**
  * Variantes nativas que el CDN de AniList ya sirve para una misma portada,
  * cambiando solo el segmento /cover/<size>/ de la ruta. Sus anchos son

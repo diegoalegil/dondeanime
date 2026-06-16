@@ -15,6 +15,7 @@ import { getBuildableAnimeDetails, getSimilarAnime, getAnimeNews } from '@/lib/a
 import type { AnimeDetail } from '@/lib/api';
 import { buildRelatedAnimeSchema, buildTVSeriesSchema, absoluteUrl } from '@/lib/seo';
 import { filterVisibleProviders } from '@/lib/platforms';
+import { buildAnimeImageUrl, buildAnimeImageSrcset, canOptimizeAnimeImage, HERO_COVER_SIZES } from '@/lib/images';
 import { setLocale, t } from '@/i18n';
 
 setLocale('es');
@@ -33,6 +34,14 @@ const { detail } = Astro.props as Props;
 const similarAnime = await getSimilarAnime(slug!);
 const animeNews = await getAnimeNews(slug!);
 const title = detail.anime.titleEnglish || detail.anime.titleRomaji;
+
+// Preload de la portada del hero (LCP de la ficha): mismos src/srcset/sizes que
+// pinta AnimeHero, así el navegador la descubre y descarga antes sin doble
+// descarga (HERO_COVER_SIZES es la constante compartida con AnimeHero).
+const heroCover = detail.anime.coverImage;
+const canPreloadHero = !!heroCover && canOptimizeAnimeImage(heroCover);
+const heroPreloadSrc = heroCover ? buildAnimeImageUrl(heroCover, 1) : undefined;
+const heroPreloadSrcset = heroCover ? buildAnimeImageSrcset(heroCover) : undefined;
 
 const allProviders = Object.values(detail.watchProvidersByCountry).flat();
 const uniqueProviders = filterVisibleProviders(
@@ -55,6 +64,17 @@ const relatedSchema = buildRelatedAnimeSchema(detail.anime, similarAnime, pageUr
 >
   <JsonLd slot="head" data={tvSchema} />
   {relatedSchema && <JsonLd slot="head" data={relatedSchema} />}
+  {canPreloadHero && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      href={heroPreloadSrc}
+      imagesrcset={heroPreloadSrcset}
+      imagesizes={HERO_COVER_SIZES}
+      fetchpriority="high"
+    />
+  )}
 
   <Breadcrumbs
     items={[
