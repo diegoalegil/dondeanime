@@ -147,26 +147,44 @@ public class CatalogScheduler {
      * "dónde verlo" fresco; un dato obsoleto quema al usuario). Una vez al día
      * miramos cuándo fue el último sync; si supera el umbral, avisamos por el
      * mismo canal que los fallos de job (Telegram).
+     *
+     * <p>Vigilamos DOS frescuras independientes: el catálogo (AniList, escribe
+     * {@code Anime.syncedAt}) y los providers ("dónde verlo", escriben
+     * {@code WatchProvider.updatedAt}). Tienen crons distintos, así que el de
+     * providers puede caerse mientras el de AniList sigue vivo: sin mirar ambos,
+     * {@code syncedAt} se renovaría y las plataformas envejecerían en silencio.
      */
     @Scheduled(cron = "${dondeanime.cron.freshness-watchdog:0 15 6 * * *}")
     public void freshnessWatchdog() {
+        Instant now = Instant.now();
+
         Optional<Instant> lastSync = syncService.findLastSyncedAt();
         if (lastSync.isEmpty()) {
             log.error("[scheduler] freshnessWatchdog: el catalogo esta VACIO (sin syncedAt)");
             publishJobFailure("freshness-watchdog",
                     new IllegalStateException("El catalogo no tiene ningun anime sincronizado"));
-            return;
+        } else {
+            checkFreshness("catalogo (AniList)", lastSync.get(), now);
         }
-        Duration age = Duration.between(lastSync.get(), Instant.now());
+
+        // Providers: solo alertamos si EXISTEN y están obsoletos. Si la tabla está
+        // vacía (despliegue nuevo, sync de providers aún sin correr) no es señal de
+        // job caído, así que no falseamos la alerta.
+        providerSyncService.findLastProviderSyncAt()
+                .ifPresent(last -> checkFreshness("providers (donde verlo)", last, now));
+    }
+
+    private void checkFreshness(String what, Instant last, Instant now) {
+        Duration age = Duration.between(last, now);
         if (age.compareTo(FRESHNESS_STALE_THRESHOLD) > 0) {
-            log.error("[scheduler] freshnessWatchdog: datos OBSOLETOS, ultimo sync hace {}h (umbral {}h)",
-                    age.toHours(), FRESHNESS_STALE_THRESHOLD.toHours());
+            log.error("[scheduler] freshnessWatchdog: {} OBSOLETO, ultima actualizacion hace {}h (umbral {}h)",
+                    what, age.toHours(), FRESHNESS_STALE_THRESHOLD.toHours());
             publishJobFailure("freshness-watchdog",
-                    new IllegalStateException("El catalogo lleva " + age.toHours()
-                            + "h sin sincronizar (umbral " + FRESHNESS_STALE_THRESHOLD.toHours()
+                    new IllegalStateException(what + " lleva " + age.toHours()
+                            + "h sin actualizarse (umbral " + FRESHNESS_STALE_THRESHOLD.toHours()
                             + "h): el scheduler de datos puede estar caido"));
         } else {
-            log.debug("[scheduler] freshnessWatchdog: ok, ultimo sync hace {}h", age.toHours());
+            log.debug("[scheduler] freshnessWatchdog: {} ok, ultima actualizacion hace {}h", what, age.toHours());
         }
     }
 

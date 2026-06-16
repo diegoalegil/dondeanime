@@ -1,6 +1,8 @@
 package com.dondeanime.backend.provider;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +15,15 @@ public interface WatchProviderRepository extends JpaRepository<WatchProvider, Lo
 
     /** Todos los providers de un anime, ordenados de forma estable para la UI. */
     List<WatchProvider> findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(Long animeId);
+
+    /**
+     * Instante de la última escritura de providers (watchdog de frescura del
+     * "dónde verlo"). El sync de providers tiene su propio cron, distinto del de
+     * AniList; sin este dato el watchdog solo vigilaba {@code Anime.syncedAt} y no
+     * detectaba un job de providers caído. Vacío si aún no hay providers.
+     */
+    @Query("SELECT MAX(wp.updatedAt) FROM WatchProvider wp")
+    Optional<Instant> findMaxUpdatedAt();
 
     @Query("""
             SELECT wp FROM WatchProvider wp

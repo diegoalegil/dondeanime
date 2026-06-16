@@ -153,13 +153,36 @@ class CatalogSchedulerTest {
         verify(eventPublisher).publishEvent(any(SchedulerJobFailedEvent.class));
     }
 
+    @Test
+    void freshnessWatchdogAlertsWhenProvidersAreStaleEvenIfCatalogFresh() {
+        // El sync de providers tiene su propio cron: puede caerse mientras el de
+        // AniList (syncedAt) sigue fresco. El watchdog debe alertar igualmente.
+        AnimeSyncService syncService = mock(AnimeSyncService.class);
+        ProviderSyncService providerSyncService = mock(ProviderSyncService.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        when(syncService.findLastSyncedAt())
+                .thenReturn(Optional.of(Instant.now().minus(Duration.ofHours(2))));
+        when(providerSyncService.findLastProviderSyncAt())
+                .thenReturn(Optional.of(Instant.now().minus(Duration.ofHours(40))));
+
+        schedulerWith(syncService, providerSyncService, eventPublisher).freshnessWatchdog();
+
+        verify(eventPublisher).publishEvent(any(SchedulerJobFailedEvent.class));
+    }
+
     private static CatalogScheduler schedulerWith(
             AnimeSyncService syncService, ApplicationEventPublisher eventPublisher) {
+        return schedulerWith(syncService, mock(ProviderSyncService.class), eventPublisher);
+    }
+
+    private static CatalogScheduler schedulerWith(
+            AnimeSyncService syncService, ProviderSyncService providerSyncService,
+            ApplicationEventPublisher eventPublisher) {
         return new CatalogScheduler(
                 syncService,
                 mock(AnimeMatchingService.class),
                 mock(AnimeDescriptionEnricher.class),
-                mock(ProviderSyncService.class),
+                providerSyncService,
                 mock(TrailerSyncService.class),
                 RestClient.builder(),
                 new SimpleMeterRegistry(),

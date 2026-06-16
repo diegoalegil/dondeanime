@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,6 +86,15 @@ public class ProviderSyncService {
         this.eventPublisher = eventPublisher;
         this.availabilityChangeService = availabilityChangeService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
+    }
+
+    /**
+     * Instante de la última actualización de providers ("dónde verlo"). Lo usa el
+     * watchdog de frescura: el sync de providers tiene su propio cron, así que
+     * puede caerse mientras el de AniList sigue vivo. Vacío si aún no hay providers.
+     */
+    public Optional<Instant> findLastProviderSyncAt() {
+        return providerRepository.findMaxUpdatedAt();
     }
 
     public int syncAll() {
