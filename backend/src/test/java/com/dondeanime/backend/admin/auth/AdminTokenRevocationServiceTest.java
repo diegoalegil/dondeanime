@@ -1,9 +1,7 @@
 package com.dondeanime.backend.admin.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +10,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class AdminTokenRevocationServiceTest {
 
@@ -29,20 +26,17 @@ class AdminTokenRevocationServiceTest {
         service.revoke(claims);
 
         verify(repository).deleteByExpiresAtBefore(NOW);
-        ArgumentCaptor<AdminRevokedToken> captor = ArgumentCaptor.forClass(AdminRevokedToken.class);
-        verify(repository).save(captor.capture());
-        assertThat(captor.getValue().getJti()).isEqualTo("jti-1");
-        assertThat(captor.getValue().getExpiresAt()).isEqualTo(NOW.plusSeconds(3600));
-        assertThat(captor.getValue().getRevokedAt()).isEqualTo(NOW);
+        verify(repository).insertIfAbsent("jti-1", NOW.plusSeconds(3600), NOW);
     }
 
     @Test
-    void revokeIsIdempotent() {
-        when(repository.existsById("jti-1")).thenReturn(true);
-
+    void revokeUsesIdempotentUpsert() {
+        // La idempotencia la garantiza ahora el INSERT ... ON CONFLICT DO NOTHING
+        // a nivel de BD (sin la carrera existsById->save): revoke solo emite el
+        // upsert, así que un doble logout concurrente no revienta la PK.
         service.revoke(new AdminTokenClaims("jti-1", NOW.plusSeconds(3600)));
 
-        verify(repository, never()).save(any());
+        verify(repository).insertIfAbsent("jti-1", NOW.plusSeconds(3600), NOW);
     }
 
     @Test

@@ -34,9 +34,9 @@ public class AdminTokenRevocationService {
     public void revoke(AdminTokenClaims claims) {
         Instant now = clock.instant();
         repository.deleteByExpiresAtBefore(now);
-        if (!repository.existsById(claims.jti())) {
-            repository.save(new AdminRevokedToken(claims.jti(), claims.expiresAt(), now));
-        }
+        // Upsert atómico: idempotente y sin la carrera existsById->save (que en
+        // un doble logout concurrente reventaba la PK con un 500).
+        repository.insertIfAbsent(claims.jti(), claims.expiresAt(), now);
     }
 
     @Transactional(readOnly = true)
