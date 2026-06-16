@@ -158,40 +158,6 @@ const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
         window.addEventListener('pageshow', hideSkeleton);
       })();
     </script>
-    <script is:inline>
-      // Las portadas (img[data-cover]) pueden fallar cuando una página pide
-      // muchas a la vez: el CDN de AniList estrangula la ráfaga y varias caen
-      // (ERR_FAILED, sin status HTTP). Reintentamos escalonado con jitter para
-      // difuminar la ráfaga; si aun así no carga, la ocultamos (queda el fondo
-      // del contenedor) en vez del icono roto. Funciona igual con AniList
-      // directo o con un proxy (ver PUBLIC_IMAGE_PROXY).
-      (() => {
-        if (window.__dondeanimeCoverRetryBound) return;
-        window.__dondeanimeCoverRetryBound = true;
-        var MAX = 2;
-        document.addEventListener('error', function (e) {
-          var img = e.target;
-          if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-cover') || img.__broken) return;
-          var n = img.__coverRetry || 0;
-          if (n >= MAX) {
-            img.__broken = true;
-            img.removeAttribute('srcset');
-            img.style.opacity = '0';
-            return;
-          }
-          img.__coverRetry = n + 1;
-          if (!img.__coverSrc) img.__coverSrc = img.currentSrc || img.src;
-          var base = img.__coverSrc;
-          var bust = base + (base.indexOf('?') >= 0 ? '&' : '?') + '__r=' + (n + 1);
-          var delay = 600 * (n + 1) + Math.random() * 1200;
-          window.setTimeout(function () {
-            if (img.__broken || !img.isConnected) return;
-            img.removeAttribute('srcset');
-            img.src = bust;
-          }, delay);
-        }, true);
-      })();
-    </script>
     <SEOHead {...props} />
     {plausibleEnabled && (
       <>
