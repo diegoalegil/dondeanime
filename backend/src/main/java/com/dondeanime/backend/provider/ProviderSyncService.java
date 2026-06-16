@@ -51,6 +51,12 @@ public class ProviderSyncService {
     private static final Logger log = LoggerFactory.getLogger(ProviderSyncService.class);
 
     private static final List<String> TARGET_COUNTRIES = List.of("ES", "MX", "AR", "CO", "CL");
+    // Solo las ofertas "incluidas" disparan la alerta "ya está disponible". Que un
+    // anime pase a estar en alquiler/compra NO es lo que pidió el usuario al
+    // suscribirse (querían poder VERLO incluido), y el email tiene asunto fijo
+    // "ya está disponible": avisar por un RENT/BUY sería engañoso. Se guardan
+    // igual para mostrarlos, pero no notifican.
+    private static final Set<String> ALERT_OFFER_TYPES = Set.of("FLATRATE", "FREE");
     private static final long RATE_LIMIT_SLEEP_MS = 300;
 
     private final TmdbClient client;
@@ -144,6 +150,9 @@ public class ProviderSyncService {
         List<WatchProvider> current = buildProviders(anime.getId(), resp, now);
         Map<String, List<WatchProvider>> newProvidersByCountry = current.stream()
                 .filter(provider -> !existingKeys.contains(ProviderKey.from(provider)))
+                // Solo FLATRATE/FREE disparan alertas: un alta de RENT/BUY no es
+                // "ya está disponible" para quien se suscribió a la disponibilidad.
+                .filter(provider -> ALERT_OFFER_TYPES.contains(provider.getProviderType()))
                 .collect(Collectors.groupingBy(
                         WatchProvider::getCountryCode,
                         LinkedHashMap::new,

@@ -3,6 +3,7 @@ package com.dondeanime.backend.provider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -157,6 +158,37 @@ class ProviderSyncServiceTest {
                         tuple("Apple TV", "RENT"));
     }
 
+    @Test
+    void doesNotPublishAlertForRentOnlyProvider() {
+        Anime anime = anime();
+        TmdbClient client = mock(TmdbClient.class);
+        AnimeRepository animeRepository = mock(AnimeRepository.class);
+        WatchProviderRepository providerRepository = mock(WatchProviderRepository.class);
+        AlertService alertService = mock(AlertService.class);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        ProviderSyncService service = new ProviderSyncService(
+                client,
+                animeRepository,
+                providerRepository,
+                alertService,
+                eventPublisher,
+                mock(AvailabilityChangeService.class),
+                transactionManager());
+
+        when(animeRepository.findAll()).thenReturn(List.of(anime));
+        when(providerRepository.findByAnimeIdOrderByCountryCodeAscProviderTypeAscProviderNameAsc(1L))
+                .thenReturn(List.of());
+        when(client.getWatchProviders(10L)).thenReturn(rentOnlyResponse());
+        when(alertService.hasPendingAlerts(1L, "ES")).thenReturn(true);
+
+        service.syncAll();
+
+        // El provider de alquiler se guarda (se muestra en la ficha) pero NO
+        // dispara la alerta "ya está disponible": no es lo que pidió el suscriptor.
+        verify(providerRepository, atLeastOnce()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
     private static Anime anime() {
         Anime anime = new Anime();
         anime.setId(1L);
@@ -186,6 +218,17 @@ class ProviderSyncServiceTest {
                 null,                   // free
                 List.of(apple, prime),  // rent: prime ya está en flatrate -> se ignora
                 List.of(apple));        // buy: apple ya está en rent -> se ignora
+        return new TmdbProvidersResponse(10L, Map.of("ES", spain));
+    }
+
+    private static TmdbProvidersResponse rentOnlyResponse() {
+        TmdbProvider apple = new TmdbProvider(2, "Apple TV", "/apple.png", 1);
+        TmdbCountryProviders spain = new TmdbCountryProviders(
+                "https://example.com",
+                null,            // flatrate
+                null,            // free
+                List.of(apple),  // rent
+                null);           // buy
         return new TmdbProvidersResponse(10L, Map.of("ES", spain));
     }
 
