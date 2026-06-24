@@ -8,6 +8,7 @@ import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
 import { setLocale, t } from '@/i18n';
 import { localizedPath } from '@/lib/localizedRoutes';
+import { genreDescription } from '@/lib/genres';
 
 setLocale('en');
 
@@ -68,6 +69,11 @@ const comboProviders = isComboGenre
     <p class="mt-4 text-lg text-fg-secondary">
       {t('genre.count', { count: anime.length, plural: anime.length === 1 ? '' : 's' })}
     </p>
+    {genreDescription(genero!) && (
+      <p class="mt-4 max-w-3xl text-base leading-relaxed text-fg-secondary">
+        {genreDescription(genero!)}
+      </p>
+    )}
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">

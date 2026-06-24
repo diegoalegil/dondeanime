@@ -5,7 +5,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getGenres, getAnimeByGenre, getProviders, requireNonEmpty } from '@/lib/api';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
-import { localizedGenreName } from '@/lib/genres';
+import { localizedGenreName, genreDescription } from '@/lib/genres';
 import { getPlatform, isHiddenVariant } from '@/lib/platforms';
 import { beginnerGenrePath } from '@/lib/programmaticSeo';
 import { localizedPath } from '@/lib/localizedRoutes';
@@ -73,6 +73,11 @@ const comboProviders = isComboGenre
     <p class="mt-4 text-lg text-fg-secondary">
       {t('genre.count', { count: anime.length, plural: anime.length === 1 ? '' : 's' })}
     </p>
+    {genreDescription(genero!) && (
+      <p class="mt-4 max-w-3xl text-base leading-relaxed text-fg-secondary">
+        {genreDescription(genero!)}
+      </p>
+    )}
     <p class="mt-3 text-sm">
       <a href={beginnerGenrePath(genero)} class="text-accent-violet transition-colors hover:text-accent-pink hover:underline">
         {t('genre.beginnerLink', { genre: genreLabel })}
