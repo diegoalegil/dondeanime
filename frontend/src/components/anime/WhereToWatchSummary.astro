@@ -1,0 +1,37 @@
+---
+import type { WatchProvider } from '@/lib/api';
+import { getLocale, t } from '@/i18n';
+
+interface Props {
+  // Plataformas visibles ya deduplicadas (uniqueProviders de la ficha).
+  providers: WatchProvider[];
+  title: string;
+}
+
+const { providers, title } = Astro.props;
+
+// Resumen en lenguaje natural que responde la query exacta "dónde ver X": es la
+// única prosa única por anime (sale de datos reales), frente a la sinopsis que es
+// contenido común a todas las webs de anime. Va como texto líder, sobre la lista.
+const names = Array.from(new Set(providers.map((p) => p.providerName)));
+const hasAny = names.length > 0;
+
+// Lista legible "A, B y C" / "A, B and C" (la ficha es ES, pero el componente
+// respeta el locale por si se reutiliza en /en).
+const conjunction = getLocale() === 'en' ? 'and' : 'y';
+const MAX_NAMES = 6;
+const shown = names.slice(0, MAX_NAMES);
+const joined = shown.length <= 1
+  ? shown[0] ?? ''
+  : `${shown.slice(0, -1).join(', ')} ${conjunction} ${shown[shown.length - 1]}`;
+const providerList = names.length > MAX_NAMES
+  ? `${shown.join(', ')} ${t('anime.whereToWatch.andOthers')}`
+  : joined;
+---
+<section class="mx-auto max-w-6xl px-4 pt-4">
+  <p class="max-w-3xl text-base leading-relaxed text-fg-secondary">
+    {hasAny
+      ? t('anime.whereToWatch.available', { title, providers: providerList })
+      : t('anime.whereToWatch.unavailable', { title })}
+  </p>
+</section>
