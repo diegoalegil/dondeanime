@@ -4,7 +4,7 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { getProvidersByCountry, requireNonEmpty, type ProviderSummary } from '@/lib/api';
 import { COUNTRIES, COUNTRY_SLUGS, type CountrySlug } from '@/lib/countries';
-import { isHiddenVariant, getPlatform } from '@/lib/platforms';
+import { isHiddenVariant, getPlatform, platformDescription } from '@/lib/platforms';
 import { buildItemListSchema, absoluteUrl } from '@/lib/seo';
 import { setLocale, t } from '@/i18n';
 import { localizedCountryName, localizedPath } from '@/lib/localizedRoutes';
@@ -93,6 +93,11 @@ const itemListSchema = buildItemListSchema(
         </p>
       </div>
     </div>
+    {platformDescription(plataforma!) && (
+      <p class="mt-5 max-w-3xl text-base leading-relaxed text-fg-secondary">
+        {platformDescription(plataforma!)}
+      </p>
+    )}
   </section>
 
   <section class="mx-auto max-w-6xl px-4 pb-20">
