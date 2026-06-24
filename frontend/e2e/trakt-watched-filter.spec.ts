@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
 
+// El filtro "ya visto" está detrás de PUBLIC_TRAKT_ENABLED (apagado por defecto
+// porque /api/trakt está deshabilitado en prod). Sin el flag la isla no se
+// renderiza, así que el test solo aplica con el flag activo (mismo patrón que
+// chat-search.spec.ts).
+test.skip(
+  process.env.PUBLIC_TRAKT_ENABLED !== 'true',
+  'PUBLIC_TRAKT_ENABLED no está activo: el filtro de Trakt no se renderiza.',
+);
+
 test('conecta una cuenta fake de Trakt, oculta vistos y limpia el filtro', async ({ page }) => {
   await page.route('**/api/trakt/watched', async (route) => {
     expect(route.request().headers()['authorization']).toBe('Bearer fake-signed-token');

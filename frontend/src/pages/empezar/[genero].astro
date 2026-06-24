@@ -47,7 +47,7 @@ const itemListSchema = buildItemListSchema(
   `Anime para principiantes en ${genreLabel}`,
 );
 ---
-<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl}>
+<BaseLayout title={seoTitle} description={seoDescription} canonical={pageUrl} noindex={recommendations.length === 0}>
   <JsonLd slot="head" data={itemListSchema} />
 
   <Breadcrumbs

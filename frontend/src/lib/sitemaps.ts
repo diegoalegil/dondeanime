@@ -3,6 +3,7 @@ import {
   getBuildableAnimeDetails,
   getCuratedLists,
   getGenres,
+  getNews,
   getProviders,
   getProvidersByCountry,
   getSeasons,
@@ -85,10 +86,12 @@ ${sitemaps}
 `;
 };
 
-// Fecha del build: una sola marca para todas las URLs. Da a Google una senal de
-// frescura para priorizar el rastreo de las ~13.8k URLs nuevas (no hay updatedAt
-// por anime en la API, asi que la fecha de generacion es lo correcto y honesto).
-const BUILD_LASTMOD = new Date().toISOString().slice(0, 10);
+// lastmod ESTABLE (no la fecha de build). Estampar new Date() en las ~13.8k URLs
+// en cada deploy ensena a Google a desconfiar del lastmod: dice "cambio hoy" y al
+// recrastrear no hay cambio, asi que acaba ignorandolo. Sin updatedAt por anime en
+// la API, una fecha fija es lo honesto; subela cuando haya un refresco real de
+// contenido (re-sync del catalogo, rediseno de plantillas...).
+const BUILD_LASTMOD = '2026-06-24';
 
 export const renderUrlSet = (paths: string[]): string => {
   const urls = uniqueSorted(paths)
@@ -109,12 +112,15 @@ export const animeSitemapPaths = async (): Promise<string[]> => {
 
 export const staticSitemapPaths = async (): Promise<string[]> => {
   const posts = await getCollection('blog', (post) => isPublishedBlogPost(post, 'es'));
+  // /noticias solo entra en el sitemap si hay noticias publicadas: enviar una
+  // pagina vacia (News Engine OFF) es contenido fino que ensucia la cobertura.
+  const hasNews = (await getNews(1)).length > 0;
 
   return [
     '/',
     '/blog',
     ...posts.map((post) => `/blog/${blogSlug(post)}`),
-    '/noticias',
+    ...(hasNews ? ['/noticias'] : []),
     '/stickers',
     '/en-emision',
     '/temporadas',

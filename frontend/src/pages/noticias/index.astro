@@ -22,7 +22,7 @@ const itemList = buildItemListSchema(
 );
 ---
 {/* suppressAlternates: /en/news canonicaliza aquí (contenido sin traducir). */}
-<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl} image={absoluteUrl('/og-news.jpg')} suppressAlternates>
+<BaseLayout title={t('news.index.title')} description={t('news.index.description')} canonical={pageUrl} image={absoluteUrl('/og-news.jpg')} noindex={news.length === 0} suppressAlternates>
   <link
     slot="head"
     rel="alternate"
