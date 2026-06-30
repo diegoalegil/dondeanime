@@ -22,16 +22,16 @@
     "@astrojs/svelte": "^8.1.2",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.2",
     "astro": "^6.4.5",
     "chart.js": "^4.5.1",
     "flag-icons": "^7.5.0",
-    "svelte": "^5.56.3",
+    "svelte": "^5.56.4",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
-    "@playwright/test": "^1.60.0",
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "lighthouse": "^13.4.0"
   }
 }
